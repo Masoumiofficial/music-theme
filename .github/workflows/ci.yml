@@ -112,8 +112,12 @@ jobs:
       database:
         image: mariadb:10.11
         env:
+          # Only the credentials are seeded on purpose: install-wp-tests.sh drops
+          # and creates the test database itself, and prompts interactively when
+          # the database already exists (fatal in CI, no TTY). Verified by run
+          # 37300269096: `MARIADB_DATABASE: wordpress_test` made the installer
+          # stop at 'Are you sure you want to proceed? [y/N]'.
           MARIADB_ROOT_PASSWORD: root
-          MARIADB_DATABASE: wordpress_test
         ports:
           - 3306:3306
         options: >-
@@ -150,22 +154,33 @@ jobs:
       - name: Install database and subversion clients
         run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client rsync
 
-      - name: Check database connectivity (annotated)
+      - name: Prepare database (annotated)
         run: |
           set -o pipefail
+          MYSQL="mysql -h 127.0.0.1 -uroot -proot"
           {
             echo "mysql client: $(mysql --version 2>&1)"
-            echo "ping: $(mysqladmin ping -h 127.0.0.1 -proot 2>&1)"
-            mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wordpress_probe;" 2>&1 || true
-            echo "create database exit: $?"
-            mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;" 2>&1 || true
+            echo "ping: $(mysqladmin ping -h 127.0.0.1 -uroot -proot 2>&1)"
+            $MYSQL -e "CREATE DATABASE IF NOT EXISTS wavira_probe; DROP DATABASE wavira_probe;" 2>&1
+            echo "create/drop probe database ok"
+            # install-wp-tests.sh must create the test database itself; a service
+            # image that seeds it would trigger its interactive prompt.
+            $MYSQL -e "DROP DATABASE IF EXISTS wordpress_test;" 2>&1
+            echo "test database dropped if it existed"
+            $MYSQL -e "SHOW DATABASES;" 2>&1
           } 2>&1 | tee /tmp/dbcheck.log
           node tools/annotate-log.mjs /tmp/dbcheck.log dbcheck 12 warning
 
       - name: Install the WordPress test library
         run: |
-          set -o pipefail
-          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest 2>&1 | tee /tmp/install.log
+          set -euo pipefail
+          if mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;" 2>/dev/null | grep -qx wordpress_test; then
+            echo "::error::wordpress_test existed before install — refusing to let the installer prompt interactively."
+            exit 1
+          fi
+          # stdin from /dev/null: if a prompt is ever reached the script fails fast
+          # instead of hanging on a missing TTY.
+          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest < /dev/null 2>&1 | tee /tmp/install.log
 
       - name: Run the integration suite
         env:
@@ -179,7 +194,12 @@ jobs:
 
       - name: Report PHPUnit log
         if: always()
-        run: node tools/annotate-log.mjs /tmp/phpunit.log phpunit 40
+        run: |
+          if [ -f /tmp/phpunit.log ]; then
+            node tools/annotate-log.mjs /tmp/phpunit.log phpunit 40
+          else
+            echo "::notice::No PHPUnit log — the suite did not run because an earlier step failed."
+          fi
 
       - name: Annotate failures (readable without job logs)
         if: always()
