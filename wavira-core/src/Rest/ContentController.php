@@ -10,8 +10,11 @@ namespace Wavira\Core\Rest;
 use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
+use Wavira\Core\Content\QueryFilters;
 use Wavira\Core\Content\Taxonomies;
 use Wavira\Core\Downloads\Access;
+use Wavira\Core\Downloads\Counter;
+use Wavira\Core\Related\RelatedService;
 use WP_Post;
 use WP_Query;
 use WP_REST_Request;
@@ -69,6 +72,35 @@ final class ContentController extends AbstractController {
 				),
 			)
 		);
+
+		if ( RelatedService::supports( $this->post_type ) ) {
+			register_rest_route(
+				self::API_NAMESPACE,
+				'/' . $this->rest_base . '/(?P<id>[\d]+)/related',
+				array(
+					array(
+						'methods'             => 'GET',
+						'callback'            => array( $this, 'get_related' ),
+						'permission_callback' => array( $this, 'read_permission' ),
+						'args'                => array(
+							'id'    => array(
+								'description'       => __( 'Unique identifier for the object.', 'wavira-core' ),
+								'type'              => 'integer',
+								'required'          => true,
+								'sanitize_callback' => 'absint',
+							),
+							'limit' => array(
+								'description' => __( 'Maximum number of related items.', 'wavira-core' ),
+								'type'        => 'integer',
+								'default'     => 0,
+								'minimum'     => 0,
+								'maximum'     => RelatedService::MAX_ITEMS,
+							),
+						),
+					),
+				)
+			);
+		}
 
 		register_rest_route(
 			self::API_NAMESPACE,
@@ -144,52 +176,47 @@ final class ContentController extends AbstractController {
 	}
 
 	/**
+	 * Related-items endpoint.
+	 *
+	 * @param WP_REST_Request $request Current request.
+	 * @return \WP_REST_Response
+	 */
+	public function get_related( $request ) {
+		$post_id = (int) $request['id'];
+		$post    = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post || $this->post_type !== $post->post_type || 'publish' !== $post->post_status ) {
+			return $this->not_found( $this->post_type );
+		}
+
+		$limit = (int) $request['limit'];
+		$items = array();
+
+		foreach ( RelatedService::posts( $post_id, $limit ) as $related ) {
+			if ( $related instanceof WP_Post ) {
+				$items[] = $this->prepare_item( $related );
+			}
+		}
+
+		return $this->paginated_response( $items, count( $items ), 1 );
+	}
+
+	/**
 	 * Translate request filters into query arguments.
 	 *
 	 * @param WP_REST_Request $request Current request.
 	 * @return array<string, mixed>
 	 */
 	private function relation_args( $request ): array {
-		$args = array();
-
-		if ( '' !== (string) $request['genre'] && taxonomy_exists( Taxonomies::GENRE ) ) {
-			$args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- bounded, indexed taxonomy filter.
-				array(
-					'taxonomy' => Taxonomies::GENRE,
-					'field'    => 'slug',
-					'terms'    => (string) $request['genre'],
-				),
-			);
-		}
-
-		$meta_query = array();
-
-		if ( (int) $request['artist'] > 0 ) {
-			$meta_query[] = array(
-				'key'   => MetaSchema::ARTIST,
-				'value' => (int) $request['artist'],
-			);
-		}
-
-		if ( (int) $request['album'] > 0 && in_array( $this->post_type, array( PostTypes::TRACK, PostTypes::VIDEO ), true ) ) {
-			$meta_query[] = array(
-				'key'   => MetaSchema::ALBUM,
-				'value' => (int) $request['album'],
-			);
-		}
-
-		if ( $request['featured'] ) {
-			$meta_query[] = array(
-				'key'   => MetaSchema::FEATURED,
-				'value' => '1',
-			);
-		}
-
-		if ( ! empty( $meta_query ) ) {
-			$args['meta_query'] = $meta_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- bounded, indexed relation filters.
-		}
-
-		return $args;
+		return QueryFilters::args(
+			array(
+				'genre'    => (string) $request['genre'],
+				'artist'   => (int) $request['artist'],
+				'album'    => (int) $request['album'],
+				'featured' => (bool) $request['featured'],
+			),
+			$this->post_type
+		);
 	}
 
 	/**
@@ -219,6 +246,10 @@ final class ContentController extends AbstractController {
 		if ( PostTypes::TRACK === $post->post_type ) {
 			$payload['player']    = $this->player_payload( $post_id );
 			$payload['downloads'] = Access::matrix( $post_id );
+
+			if ( Access::can_download( $post_id ) ) {
+				$payload['download_stats'] = Counter::summary( $post_id );
+			}
 		}
 
 		if ( PostTypes::ALBUM === $post->post_type ) {
@@ -258,9 +289,39 @@ final class ContentController extends AbstractController {
 
 		return array(
 			'id'  => $attachment_id,
-			'url' => (string) wp_get_attachment_image_url( $attachment_id, 'wavira-cover' ),
+			'url' => $this->cover_url( $attachment_id ),
 			'alt' => (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
 		);
+	}
+
+	/**
+	 * Cover URL with a size fallback chain.
+	 *
+	 * `wavira-cover` is registered by the theme. Under any other theme the plugin
+	 * must still return a usable image, so the chain ends at the full size and
+	 * never returns an empty string for an existing attachment.
+	 *
+	 * @param int $attachment_id Attachment ID.
+	 * @return string
+	 */
+	private function cover_url( int $attachment_id ): string {
+		$candidates = array(
+			'wavira-cover',
+			'large',
+			'medium',
+			'thumbnail',
+			'full',
+		);
+
+		foreach ( $candidates as $size ) {
+			$url = wp_get_attachment_image_url( $attachment_id, $size );
+
+			if ( is_string( $url ) && '' !== $url ) {
+				return $url;
+			}
+		}
+
+		return '';
 	}
 
 	/**

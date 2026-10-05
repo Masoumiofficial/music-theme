@@ -37,5 +37,7 @@ final class ContentRoutes implements Registrable {
 		}
 
 		( new GenresController() )->register_routes();
+		( new SearchController() )->register_routes();
+		( new DownloadController() )->register_routes();
 	}
 }

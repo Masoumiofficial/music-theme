@@ -39,6 +39,11 @@ final class MetaSchema {
 	public const EXPLICIT         = 'wavira_explicit';
 	public const VERSION_NOTE     = 'wavira_version_note';
 
+	/* Download metrics (written by the plugin only) ------------------------------- */
+	public const DOWNLOAD_COUNT     = 'wavira_download_count';
+	public const DOWNLOAD_COUNT_128 = 'wavira_download_count_128';
+	public const DOWNLOAD_COUNT_320 = 'wavira_download_count_320';
+
 	/* Editorial / listing -------------------------------------------------------- */
 	public const RELEASE_DATE    = 'wavira_release_date';
 	public const FEATURED        = 'wavira_featured';
@@ -86,217 +91,237 @@ final class MetaSchema {
 
 		return array(
 			/* Relations --------------------------------------------------------- */
-			self::ARTIST           => array(
+			self::ARTIST             => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => array_merge( $track, $album, $video ),
 			),
-			self::FEATURED_ARTISTS => array(
+			self::FEATURED_ARTISTS   => array(
 				'type'       => 'array',
 				'rest_items' => 'integer',
 				'sanitize'   => 'ids',
 				'entities'   => array_merge( $track, $album ),
 			),
-			self::ALBUM            => array(
+			self::ALBUM              => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => array_merge( $track, $video ),
 			),
-			self::TRACKLIST        => array(
+			self::TRACKLIST          => array(
 				'type'       => 'array',
 				'rest_items' => 'integer',
 				'sanitize'   => 'ids',
 				'entities'   => $album,
 			),
-			self::RELATED_ARTISTS  => array(
+			self::RELATED_ARTISTS    => array(
 				'type'       => 'array',
 				'rest_items' => 'integer',
 				'sanitize'   => 'ids',
 				'entities'   => $artist,
 			),
-			self::CREDIT_LABEL     => array(
+			self::CREDIT_LABEL       => array(
 				'type'     => 'string',
 				'sanitize' => 'text',
 				'entities' => array_merge( $track, $album, $video ),
 			),
 
 			/* Track audio ------------------------------------------------------- */
-			self::AUDIO_128        => array(
+			self::AUDIO_128          => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $track,
 			),
-			self::AUDIO_320        => array(
+			self::AUDIO_320          => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $track,
 			),
-			self::AUDIO_EXTERNAL   => array(
+			self::AUDIO_EXTERNAL     => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $track,
 			),
-			self::DOWNLOAD_ENABLED => array(
+			self::DOWNLOAD_ENABLED   => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
 				'entities' => $track,
 			),
-			self::FILE_SIZE_128    => array(
+			self::FILE_SIZE_128      => array(
 				'type'     => 'integer',
 				'sanitize' => 'int',
 				'entities' => $track,
 			),
-			self::FILE_SIZE_320    => array(
+			self::FILE_SIZE_320      => array(
 				'type'     => 'integer',
 				'sanitize' => 'int',
 				'entities' => $track,
 			),
-			self::DURATION         => array(
+			self::DURATION           => array(
 				'type'     => 'integer',
 				'sanitize' => 'int',
 				'entities' => array_merge( $track, $video ),
 			),
-			self::LYRICS           => array(
+			self::LYRICS             => array(
 				'type'     => 'string',
 				'sanitize' => 'html',
 				'entities' => $track,
 			),
-			self::ISRC             => array(
+			self::ISRC               => array(
 				'type'     => 'string',
 				'sanitize' => 'text',
 				'entities' => $track,
 			),
-			self::EXPLICIT         => array(
+			self::EXPLICIT           => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
 				'entities' => $track,
 			),
-			self::VERSION_NOTE     => array(
+			self::VERSION_NOTE       => array(
 				'type'     => 'string',
 				'sanitize' => 'text',
 				'entities' => $track,
 			),
 
+			/* Download metrics (plugin-written; not writable through the API) --- */
+			self::DOWNLOAD_COUNT     => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => $track,
+				'rest'     => false,
+			),
+			self::DOWNLOAD_COUNT_128 => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => $track,
+				'rest'     => false,
+			),
+			self::DOWNLOAD_COUNT_320 => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => $track,
+				'rest'     => false,
+			),
+
 			/* Editorial / listing ----------------------------------------------- */
-			self::RELEASE_DATE     => array(
+			self::RELEASE_DATE       => array(
 				'type'     => 'string',
 				'sanitize' => 'date',
 				'entities' => array_merge( $track, $album, $video ),
 			),
-			self::FEATURED         => array(
+			self::FEATURED           => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
 				'entities' => array_merge( $track, $album, $video ),
 			),
-			self::IN_INDEX_PLAYER  => array(
+			self::IN_INDEX_PLAYER    => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
 				'entities' => $track,
 			),
-			self::COVER            => array(
+			self::COVER              => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => array_merge( $track, $album, $video, $artist ),
 			),
 
 			/* Album ------------------------------------------------------------- */
-			self::ALBUM_TYPE       => array(
+			self::ALBUM_TYPE         => array(
 				'type'     => 'string',
 				'sanitize' => 'enum',
 				'enum'     => array( 'album', 'single', 'ep', 'compilation' ),
 				'entities' => $album,
 			),
-			self::CATALOG_NUMBER   => array(
+			self::CATALOG_NUMBER     => array(
 				'type'     => 'string',
 				'sanitize' => 'text',
 				'entities' => $album,
 			),
 
 			/* Video ------------------------------------------------------------- */
-			self::VIDEO_SOURCE     => array(
+			self::VIDEO_SOURCE       => array(
 				'type'     => 'string',
 				'sanitize' => 'enum',
 				'enum'     => array( 'self', 'youtube', 'vimeo', 'aparat', 'other' ),
 				'entities' => $video,
 			),
-			self::VIDEO_URL        => array(
+			self::VIDEO_URL          => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $video,
 			),
-			self::VIDEO_480        => array(
+			self::VIDEO_480          => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $video,
 			),
-			self::VIDEO_720        => array(
+			self::VIDEO_720          => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $video,
 			),
-			self::VIDEO_1080       => array(
+			self::VIDEO_1080         => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $video,
 			),
-			self::VIDEO_POSTER     => array(
+			self::VIDEO_POSTER       => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => $video,
 			),
 
 			/* Artist ------------------------------------------------------------ */
-			self::ARTIST_IMAGE     => array(
+			self::ARTIST_IMAGE       => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => $artist,
 			),
-			self::ARTIST_COVER     => array(
+			self::ARTIST_COVER       => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => $artist,
 			),
-			self::VERIFIED         => array(
+			self::VERIFIED           => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
 				'entities' => $artist,
 			),
-			self::COUNTRY          => array(
+			self::COUNTRY            => array(
 				'type'     => 'string',
 				'sanitize' => 'text',
 				'entities' => $artist,
 			),
-			self::WEBSITE          => array(
+			self::WEBSITE            => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_FACEBOOK  => array(
+			self::SOCIAL_FACEBOOK    => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_INSTAGRAM => array(
+			self::SOCIAL_INSTAGRAM   => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_TELEGRAM  => array(
+			self::SOCIAL_TELEGRAM    => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_X         => array(
+			self::SOCIAL_X           => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_YOUTUBE   => array(
+			self::SOCIAL_YOUTUBE     => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,
 			),
-			self::SOCIAL_APARAT    => array(
+			self::SOCIAL_APARAT      => array(
 				'type'     => 'string',
 				'sanitize' => 'url',
 				'entities' => $artist,

@@ -63,3 +63,21 @@ function wavira_icon( $name ) {
 
 	return (string) $svg;
 }
+
+/**
+ * Related items for a music post, or an empty array when the core plugin is off.
+ *
+ * Presentation never stores music data (ARCHITECTURE §1): with the plugin
+ * inactive the theme renders nothing instead of guessing.
+ *
+ * @param int $post_id Source post ID.
+ * @param int $limit   Maximum number of items (0 = site setting).
+ * @return WP_Post[]
+ */
+function wavira_related_posts( int $post_id, int $limit = 0 ): array {
+	if ( ! wavira_has_core() || ! class_exists( '\\Wavira\\Core\\Related\\RelatedService' ) ) {
+		return array();
+	}
+
+	return \Wavira\Core\Related\RelatedService::posts( $post_id, $limit );
+}

@@ -94,6 +94,69 @@ jobs:
           '
 
   # ---------------------------------------------------------------------------
+  # Runtime: the integration suite on a real WordPress install with a real
+  # database. Static analysis cannot prove that the data model registers, that
+  # the REST routes answer, or that counters and caches behave (docs/VERIFICATION.md).
+  # ---------------------------------------------------------------------------
+  wp-integration:
+    name: "WordPress integration (PHP ${{ matrix.php }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+          extensions: mysqli, mbstring, curl, dom, exif, fileinfo, iconv, openssl, simplexml, tokenizer, xml, xmlwriter, zip
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-integration-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-integration-
+
+      - name: Install dev tooling
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Install the WordPress test library
+        run: bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
+
+      - name: Run the integration suite
+        env:
+          WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        run: vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox || true
+
+      - name: Annotate failures (readable without job logs)
+        if: always()
+        run: node tools/junit-annotate.mjs /tmp/junit.xml
+
+  # ---------------------------------------------------------------------------
   # Assets & gates: JS syntax, JSON validity, legacy-echo gate, build dry-run.
   # ---------------------------------------------------------------------------
   assets-and-gates:

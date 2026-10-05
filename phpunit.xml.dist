@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+	Integration suite: real WordPress, real database, real REST dispatch.
+
+	Provision the test library first (see bin/install-wp-tests.sh) and export
+	WP_TESTS_DIR if it lives somewhere other than /tmp/wordpress-tests-lib.
+-->
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	beStrictAboutOutputDuringTests="true"
+	beStrictAboutTestsThatDoNotTestAnything="false"
+	colors="true"
+	convertDeprecationsToExceptions="false"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	>
+	<testsuites>
+		<testsuite name="integration">
+			<directory prefix="test-" suffix=".php">tests</directory>
+		</testsuite>
+	</testsuites>
+	<coverage>
+		<include>
+			<directory suffix=".php">wavira-core/src</directory>
+		</include>
+	</coverage>
+</phpunit>

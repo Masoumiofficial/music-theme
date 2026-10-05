@@ -15,10 +15,12 @@
 		"php": ">=7.4"
 	},
 	"require-dev": {
-		"wp-coding-standards/wpcs": "^3.1",
-		"phpcompatibility/phpcompatibility-wp": "^2.1",
 		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
-		"php-parallel-lint/php-parallel-lint": "^1.4"
+		"php-parallel-lint/php-parallel-lint": "^1.4",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpunit/phpunit": "^9.6",
+		"wp-coding-standards/wpcs": "^3.1",
+		"yoast/phpunit-polyfills": "^2.0"
 	},
 	"config": {
 		"allow-plugins": {
@@ -30,6 +32,8 @@
 		"lint": "parallel-lint --exclude vendor --exclude node_modules wavira wavira-core",
 		"phpcs": "phpcs",
 		"phpcbf": "phpcbf",
+		"test": "phpunit",
+		"test:install": "bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest",
 		"check": [
 			"@lint",
 			"@phpcs"

@@ -56,7 +56,7 @@ final class Meta implements Registrable {
 			$schema['enum'] = $field['enum'];
 		}
 
-		return array(
+		$args = array(
 			'type'              => $field['type'],
 			'single'            => true,
 			'show_in_rest'      => array( 'schema' => $schema ),
@@ -67,6 +67,15 @@ final class Meta implements Registrable {
 				return current_user_can( 'edit_post', (int) $post_id );
 			},
 		);
+
+		// Plugin-written metrics (download counters) stay out of the REST API:
+		// they are read through the product payloads and can never be edited
+		// by a client (ADR 0013).
+		if ( isset( $field['rest'] ) && false === $field['rest'] ) {
+			$args['show_in_rest'] = false;
+		}
+
+		return $args;
 	}
 
 	/**
