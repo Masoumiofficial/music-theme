@@ -37,7 +37,7 @@ class Test_Blocks extends Wavira_Test_Case {
 		if ( ! defined( 'WAVIRA_THEME_DIR' ) ) {
 			define( 'WAVIRA_THEME_DIR', trailingslashit( dirname( __DIR__ ) . '/wavira' ) );
 			define( 'WAVIRA_THEME_URI', 'https://example.test/wp-content/themes/wavira/' );
-			define( 'WAVIRA_THEME_VERSION', '0.9.0-test' );
+			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
 		}
 
 		foreach ( array( 'helpers', 'markup', 'assets', 'player', 'artists', 'news', 'shortcodes', 'blocks' ) as $file ) {

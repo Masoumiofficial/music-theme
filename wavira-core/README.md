@@ -6,7 +6,7 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 
 | | |
 | --- | --- |
-| Version | 0.9.0 |
+| Version | 0.10.0 |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira-core` |
@@ -15,7 +15,7 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 | REST namespace | `wavira/v1` (registered in 0.3.0) |
 | Licence | GPL-2.0-or-later |
 
-## What exists today (0.9.0)
+## What exists today (0.10.0)
 
 ```
 wavira-core.php               plugin header, constants, requirements gate, activation guard

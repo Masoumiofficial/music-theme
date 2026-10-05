@@ -271,15 +271,19 @@ if ( ! function_exists( 'wavira_get_image' ) ) {
 		$alt   = isset( $image['alt'] ) ? (string) $image['alt'] : '';
 
 		if ( $id > 0 && function_exists( 'wp_get_attachment_image' ) ) {
+			// `loading`, `decoding` and `fetchpriority` are deliberately not set:
+			// core computes them per image position
+			// (`wp_get_loading_optimization_attributes()`), which is what gives the
+			// first, likely-LCP image `fetchpriority="high"` and keeps everything
+			// below the fold lazy. Hard-coding `loading="lazy"` here — as an earlier
+			// version did — silently cancels that (inc/performance.php).
 			return (string) wp_get_attachment_image(
 				$id,
 				$size,
 				false,
 				array(
-					'class'    => $class_name,
-					'loading'  => 'lazy',
-					'decoding' => 'async',
-					'alt'      => $alt,
+					'class' => $class_name,
+					'alt'   => $alt,
 				)
 			);
 		}
@@ -290,6 +294,8 @@ if ( ! function_exists( 'wavira_get_image' ) ) {
 			return '';
 		}
 
+		// A bare URL has no attachment, so core cannot optimise it; this branch is
+		// the documented fallback for data that came from somewhere else.
 		return sprintf(
 			'<img class="%s" src="%s" alt="%s" loading="lazy" decoding="async" />',
 			esc_attr( $class_name ),

@@ -6,7 +6,7 @@ tracks, videos, genres), settings, playback logic and REST endpoints belong to t
 
 | | |
 | --- | --- |
-| Version | 0.9.0 (Persian-first, artist profiles, music news) |
+| Version | 0.10.0 (SEO cooperation, music structured data, performance budgets) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira` |

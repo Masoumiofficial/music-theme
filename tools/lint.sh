@@ -16,6 +16,7 @@
 #   [FA]        Persian catalogues complete and compiled (tools/i18n.mjs check)
 #   [CSS]       CSS rules + size budgets (tools/check-css.mjs)
 #   [CONTRAST]  WCAG 2.2 AA contrast of the documented pairs (tools/check-contrast.mjs)
+#   [PERF]      Performance budgets + query discipline (tools/check-perf.mjs)
 #   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
 #   [BOUNDARIES] Module boundaries (ARCHITECTURE §2, tools/check-boundaries.mjs)
 #   [SIZE]      Asset-size report (informational)
@@ -211,6 +212,21 @@ if command -v node >/dev/null 2>&1; then
     :
   else
     say "      FAIL  a colour pair misses its WCAG threshold (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
+# ------------------------------------------------------------------ PERF
+# The 0.10.0 budget (PERFORMANCE-AUDIT §3, ADR 0009) is machine-checked on the
+# built bundles: gzipped sizes, no third-party URL, bounded queries, intact srcset.
+say "[PERF] Performance budget and query discipline"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-perf.mjs; then
+    :
+  else
+    say "      FAIL  a performance budget is not met (see above)"
     FAIL=1
   fi
 else

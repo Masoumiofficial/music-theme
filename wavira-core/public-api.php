@@ -294,3 +294,110 @@ if ( ! function_exists( 'wavira_core_video_source' ) ) {
 		return $empty;
 	}
 }
+
+if ( ! function_exists( 'wavira_core_cover_image' ) ) {
+	/**
+	 * The cover image of a post: `id`, `url`, `alt`, `width`, `height`.
+	 *
+	 * One function for every visual surface (hero, card, share image), so a theme
+	 * never reads `wavira_cover` or the featured-image meta itself — which is what
+	 * keeps a theme switch safe when the storage changes (ADR 0012).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array<string, mixed> Empty array when the post has no image.
+	 */
+	function wavira_core_cover_image( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Cover' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\Cover::payload( absint( $post_id ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_credit_names' ) ) {
+	/**
+	 * Names of the artists a work is credited to, in credit order.
+	 *
+	 * A theme needs this for a credit line, a document title or a meta
+	 * description; the plugin owns it so a track, an album and a video cannot
+	 * disagree about who made them (Content\\Credit).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string[] Artist display names, empty when the plugin is inactive.
+	 */
+	function wavira_core_credit_names( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Credit' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\Credit::names( absint( $post_id ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_seo_plugin_active' ) ) {
+	/**
+	 * Whether a third-party SEO plugin owns the generic SEO surface.
+	 *
+	 * The theme uses this to decide whether to print its own `meta description`
+	 * and Open Graph fallbacks: two plugins describing one page is worse than
+	 * none. Music structured data is separate — see
+	 * `wavira_core_structured_data()`.
+	 *
+	 * @return bool
+	 */
+	function wavira_core_seo_plugin_active() {
+		if ( ! class_exists( 'Wavira\\Core\\Seo\\SeoSupport' ) ) {
+			return false;
+		}
+
+		return (bool) \Wavira\Core\Seo\SeoSupport::plugin_active();
+	}
+}
+
+if ( ! function_exists( 'wavira_core_structured_data' ) ) {
+	/**
+	 * The schema.org graph of one music post, as plain arrays.
+	 *
+	 * A theme prints it (the product's themes print JSON-LD in `wp_head`); a
+	 * headless consumer or another theme can reuse the same nodes, which is why
+	 * the payload — not the `<script>` tag — is the API (ADR 0016).
+	 *
+	 * @param int $post_id Post ID. Defaults to the queried object.
+	 * @return array<int, array<string, mixed>> Nodes, empty for a non-music post,
+	 *                                          an unpublished post, or when a
+	 *                                          filter disabled the output.
+	 */
+	function wavira_core_structured_data( $post_id = 0 ) {
+		if ( ! class_exists( 'Wavira\\Core\\Seo\\StructuredData' ) || ! class_exists( 'Wavira\\Core\\Seo\\SeoSupport' ) ) {
+			return array();
+		}
+
+		if ( ! \Wavira\Core\Seo\SeoSupport::structured_data_enabled() ) {
+			return array();
+		}
+
+		$post_id = absint( $post_id );
+
+		if ( $post_id < 1 && function_exists( 'get_queried_object_id' ) ) {
+			$post_id = (int) get_queried_object_id();
+		}
+
+		if ( $post_id < 1 ) {
+			return array();
+		}
+
+		/**
+		 * Filters the structured-data graph before it is returned.
+		 *
+		 * @since 0.10.0
+		 * @param array<int, array<string, mixed>> $nodes   Graph nodes.
+		 * @param int                              $post_id Post ID.
+		 */
+		return (array) apply_filters(
+			'wavira_core_structured_data',
+			\Wavira\Core\Seo\StructuredData::graph( $post_id ),
+			$post_id
+		);
+	}
+}
