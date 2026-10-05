@@ -15,14 +15,28 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0008](adr/0008-i18n-and-rtl-first.md) | English source strings, RTL-first with full LTR parity, logical CSS properties, one text domain per artifact | Accepted | 2026-10-05 |
 | [0009](adr/0009-accessibility-and-performance-gates.md) | WCAG 2.2 AA and the performance budget are merge gates, not follow-up work | Accepted | 2026-10-05 |
 | [0010](adr/0010-licensing-and-third-party-policy.md) | Ship only GPL-compatible/OFL/own assets; exclude all legacy encrypted files and unclear-provenance media | Accepted | 2026-10-05 |
+| [0011](adr/0011-slugs-and-permalinks.md) | Permalinks `/artists/ /albums/ /tracks/ /videos/ /genres/`, legacy post slugs preserved, 301 map for `/singer/*` and artist tags | Accepted (owner-approved 2026-10-05) | 2026-10-05 |
+| [0012](adr/0012-relation-storage.md) | Relations are post IDs in registered meta (artist CPT + role-aware meta), **not** a shared taxonomy; no free-text credits | Accepted | 2026-10-05 |
 
-**Open decisions (scheduled)**
+**Resolved open decisions** (were listed as "scheduled" in 0.2.0)
+
+| Topic | Resolution | Where |
+| --- | --- | --- |
+| Permalink slugs and the 301 map | `/artists/ /albums/ /tracks/ /videos/ /genres/`; legacy slugs preserved; redirects specified | ADR 0011 |
+| Relation storage (meta IDs vs. shared taxonomy) | Post IDs in registered meta, role-aware; internal index allowed later behind the service API | ADR 0012 |
+
+**Still open (scheduled)**
 
 | Topic | Phase | Note |
 | --- | --- | --- |
-| Permalink slugs (`/tracks/`, `/artists/`, …) and the 301 map | 0.3.0 | must be final before migration tooling |
-| Relation storage: meta IDs vs. shared taxonomy for artist↔track | 0.3.0 | performance test with 10k tracks decides |
 | Own view counter vs. integration with popular plugins | 0.4.0 | default: own lightweight counter, plugin bridge optional |
-| REST caching strategy (transient vs. object cache vs. HTTP cache headers) | 0.3.0 | must respect page cache and CDN |
+| REST caching strategy (transient vs. object cache vs. HTTP cache headers) | 0.4.0 | must respect page cache and CDN |
 | Elementor: widgets vs. dynamic tags only | 0.7.0 | depends on marketplace demand |
 | Update server (self-hosted vs. marketplace-native) | 0.9.0 | affects licence/update ADR |
+| Localised slug bases for fa_IR (`/خواننده/` …) | 0.6.0 | supported via `wavira_rewrite_slugs` filter (ADR 0011 §5); decision = ship English default, document the filter |
+
+**Attribution decision (product owner, 2026-10-05)**
+
+| Topic | Decision |
+| --- | --- |
+| Designer & author of the theme/plugin | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> — applied to theme `style.css`, plugin header, `composer.json`, `package.json`, `LICENSE.md`, README credits and `BRAND-DECISION.md` |

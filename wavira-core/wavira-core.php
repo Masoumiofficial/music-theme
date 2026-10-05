@@ -3,11 +3,11 @@
  * Plugin Name:       Wavira Core
  * Plugin URI:        https://wavira.com/
  * Description:       Music content engine for Wavira: artists, albums, tracks, videos, genres, playback data and REST API. Theme-independent — your music survives any theme switch.
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.6
  * Requires PHP:      7.4
- * Author:            Wavira
- * Author URI:        https://wavira.com/
+ * Author:            Etehad WP (اتحاد وردپرس)
+ * Author URI:        https://etehadwp.com/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       wavira-core
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WAVIRA_CORE_VERSION', '0.2.0' );
+define( 'WAVIRA_CORE_VERSION', '0.3.0' );
 define( 'WAVIRA_CORE_FILE', __FILE__ );
 define( 'WAVIRA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WAVIRA_CORE_URI', plugin_dir_url( __FILE__ ) );

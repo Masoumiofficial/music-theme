@@ -4,6 +4,7 @@
 	"private": true,
 	"description": "Development tooling for Wavira — WordPress music-publishing ecosystem. Not required to run the product.",
 	"license": "GPL-2.0-or-later",
+	"author": "Etehad WP (اتحاد وردپرس) <https://etehadwp.com/>",
 	"type": "module",
 	"engines": {
 		"node": ">=18"

@@ -6,36 +6,54 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 
 | | |
 | --- | --- |
-| Version | 0.2.0 (architecture phase — content model arrives in 0.3.0) |
+| Version | 0.3.0 (data model implemented — UI arrives in 0.6.0) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
+| Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira-core` |
 | Namespace | `Wavira\Core\` (PSR-4, no Composer runtime dependency) |
 | Constants | `WAVIRA_CORE_VERSION`, `WAVIRA_CORE_FILE`, `WAVIRA_CORE_DIR`, `WAVIRA_CORE_URI` |
 | REST namespace | `wavira/v1` (registered in 0.3.0) |
 | Licence | GPL-2.0-or-later |
 
-## What exists today (0.2.0)
+## What exists today (0.3.0)
 
 ```
-wavira-core.php              plugin header, constants, requirements gate, activation guard
-src/Support/Autoloader.php   PSR-4 autoloader (path-validated, no Composer needed at runtime)
-src/Support/Requirements.php PHP/WordPress version gate (no fatal errors, admin notice instead)
-src/Plugin.php               singleton, i18n, `wavira_core_booted` action, module seam
-src/Contracts/Registrable.php  every module registers its own hooks
-src/Contracts/Cacheable.php    every cached service exposes a key + flush
-src/{Content,Settings,Player,Rest,Search,Related,Downloads,Admin,Import,Demo,Migration,
-     Integrations,Support}/   empty directories with a defined responsibility (see ARCHITECTURE.md)
+wavira-core.php               plugin header, constants, requirements gate, activation guard
+src/Support/Autoloader.php    PSR-4 autoloader (path-validated, no Composer needed at runtime)
+src/Support/Requirements.php  PHP/WordPress version gate (no fatal errors, admin notice instead)
+src/Support/Cache.php         versioned caching helper (object cache + generation bump)
+src/Support/CacheInvalidator.php  flushes caches on music saves, term changes, settings updates
+src/Plugin.php                singleton, i18n, module registry, `wavira_core_booted` seam
+src/Contracts/{Registrable,Cacheable}.php
+src/Content/                  PostTypes, Taxonomies, MetaSchema, Meta, MetaValues, ContentModule
+src/Settings/                 SettingsSchema (one typed schema) + Settings (register/read/update)
+src/Rest/                     AbstractController, ContentController, GenresController, ContentRoutes
+src/Downloads/Access.php      download authorization + quality matrix (no DRM claims)
+src/Admin/Cli.php             `wp wavira verify`, `wp wavira seed` (licence-clean generated content)
+src/{Player,Search,Related,Import,Demo,Migration,Integrations}/   defined seams for later phases
+uninstall.php                 opt-in data removal (default: keep the catalogue)
 ```
+
+Data model, meta keys, REST routes and settings are documented in `docs/DATA-MODEL.md`.
 
 ## What arrives next (in phase order)
 
 | Phase | Modules |
 | --- | --- |
-| 0.3.0 | `Content/*` (CPTs, taxonomies, registered meta), `Settings/*` (typed schema), `Rest/*` skeleton |
-| 0.4.0 | `Search/*`, `Related/*`, `Downloads/*`, counters |
+| 0.4.0 | `Search/*`, `Related/*`, counters; caching behind services |
 | 0.5.0 | `Player/*` + the Player Engine assets (see ADR 0005) |
-| 0.6.0 | `Admin/*` editor UX, admin columns, validation |
+| 0.6.0 | `Admin/*` editor UX (panels, columns, validation) |
+| 0.7.0 | `Integrations/*` (Elementor bridge) |
 | 0.9.0 | `Import/*`, `Demo/*`, `Migration/*` (legacy → Wavira) |
+
+## Quick start
+
+```bash
+wp plugin activate wavira-core
+wp wavira verify     # post types, taxonomies, registered meta, counts
+wp wavira seed       # optional: minimal demo set (generated text only)
+curl https://example.com/wp-json/wavira/v1/tracks?per_page=5
+```
 
 ## Rules this plugin obeys (enforced in review and CI)
 

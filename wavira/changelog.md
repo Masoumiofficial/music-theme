@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — 0.2.1
+- Author/designer credit set to **Etehad WP — اتحاد وردپرس** (`https://etehadwp.com/`) in the theme
+  header, READMEs, `composer.json`, `package.json` and `LICENSE.md` (owner decision 2026-10-05).
+
 ### Added — 0.2.0 (architecture phase)
 - Repository skeleton: `inc/`, `templates/`, `parts/`, `patterns/`, `blocks/`, `assets/`, `languages/`.
 - Thin `functions.php` bootstrap (constants + `require_once` only — no God file).

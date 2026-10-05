@@ -8,6 +8,7 @@ tracks, videos, genres), settings, playback logic and REST endpoints belong to t
 | --- | --- |
 | Version | 0.2.0 (architecture phase — no user-facing UI yet) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
+| Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira` |
 | Namespace | none (theme uses prefixed functions: `wavira_*`) |
 | Licence | GPL-2.0-or-later |

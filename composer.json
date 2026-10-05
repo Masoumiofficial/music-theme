@@ -5,6 +5,12 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": ["wordpress", "theme", "plugin", "music", "audio", "player"],
 	"homepage": "https://wavira.com/",
+	"authors": [
+		{
+			"name": "Etehad WP (اتحاد وردپرس)",
+			"homepage": "https://etehadwp.com/"
+		}
+	],
 	"require": {
 		"php": ">=7.4"
 	},

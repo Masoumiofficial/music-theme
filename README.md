@@ -77,6 +77,13 @@ GPL-2.0-or-later for the product (theme + plugin). Third-party components and th
 in `THIRD-PARTY-NOTICES.md`. The legacy artifact in this repository is **not** part of the product and
 is excluded from every package for licensing reasons (`docs/LICENSE-AUDIT.md`).
 
+## Credits
+
+| Role | Name |
+| --- | --- |
+| Designer & Author (طراح و نویسنده قالب) | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
+| Product & documentation | Etehad WP product team |
+
 ## Brand notice
 
 Preliminary name screening only — professional trademark clearance is still recommended before

@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WAVIRA_THEME_VERSION', '0.2.0' );
+define( 'WAVIRA_THEME_VERSION', '0.2.1' );
 define( 'WAVIRA_THEME_DIR', trailingslashit( get_template_directory() ) );
 define( 'WAVIRA_THEME_URI', trailingslashit( get_template_directory_uri() ) );
 

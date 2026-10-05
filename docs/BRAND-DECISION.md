@@ -105,6 +105,8 @@ Meta prefix:        wavira_                (new meta only — never rewrites leg
 GitHub repository:  wavira-music           (new repo; this legacy repo stays as-is)
 Docs product name:  Wavira Documentation
 Support/product:    wavira.dev / wavira.com (pending registrar verification)
+Author / vendor:    Etehad WP — اتحاد وردپرس · https://etehadwp.com/
+                    (theme + plugin headers, composer/package metadata, docs credits)
 ```
 
 ## Vocabulary rules after Brand Lock
