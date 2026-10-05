@@ -192,7 +192,7 @@ implementations — see the brief's YAGNI rule.
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR | ✅ implemented · **VERIFIED**: CSS/contrast/token gates, 11 theme JS tests, CI run `37309252018` 8/8 |
 | 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | ✅ implemented · **VERIFIED** in CI: runs `37311340378`/`37311334949` and `37314137090`/`37314145602` 8/8, `tests/test-blocks.php` in the integration suite |
 | 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings | ✅ **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2) |
-| 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | 🔄 implemented; verification in `docs/VERIFICATION.md` |
+| 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | ✅ verified: CI `37354185539`/`37354194397` 8/8; evidence in `docs/VERIFICATION.md` |
 | 0.9.0 | SEO + PERF | SEO cooperation, budgets met |
 | 0.10.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |

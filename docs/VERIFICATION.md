@@ -145,6 +145,18 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | The template path (blog index and archives) actually paginates | **IMPLEMENTED** | `home.html` and `archive.html` use core's Query Loop with `inherit: true` and `wp:query-pagination`; rendering the paginated archive needs a real install (`WP-RUNTIME`) |
 | The editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all seven blocks with a `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
 | Jalali dates in the new surfaces | **NOT_STARTED** | decided in ADR 0015 §8 / `docs/DECISIONS.md` 0.9.0: dates use `wp_date()`/`get_the_date()` with the locale |
+| A browsable artist directory | **NOT_STARTED** | `templates/archive-wavira_artist.html` renders the archive hero only; a grid of artists is deliberate design work (it needs a per-artist card), recorded in `docs/ARTIST-AND-NEWS.md` §3 rather than shipped as a second temporary query loop |
+| Every gate is green on the 0.9.0 commit | **VERIFIED** | CI runs `37354185539` (push) and `37354194397` (pull request) at head `25ce032`: all 8 jobs success — `WPCS + PHP compatibility` (0 findings), PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build`, `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (100 tests, 871 assertions)` on both legs, legacy artifact integrity. Run `37353466951`/`37353475364` was the first, red one; its three findings are fixed in `510beef`/`25ce032` and the WPCS one in code, not by silencing the sniff |
+
+**What the first CI run found.** The three new test files ran for the first time in `37353466951` and
+found four defects, three of them in the product: `wavira_get_news()` ignored a `category` that arrived
+without `source => 'category'`, so a typo'd slug rendered the whole blog (a slug now decides the source,
+and `source: category` without a slug is an empty feed); WPCS found an unqualified core hook name
+(`the_content`, now a justified ignore), a reserved parameter name (`$class` → `$class_name`) and one
+alignment. The fourth was the fixture, twice over: WordPress's post factory injects a default
+`post_excerpt` — so the "the editor wrote no excerpt" case was never reached — and publishes with
+`post_author => 0`, whose display name is empty. Both fixtures now build the situation the claim is
+about, and the author assertion checks the id and the name instead of "not empty".
 
 **Notes from building the 0.9.0 surfaces.** The aggregation lives in the plugin and the markup in the
 theme, which is what made the tests cheap: the payload is asserted field by field without a browser,

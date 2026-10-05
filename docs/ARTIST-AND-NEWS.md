@@ -145,6 +145,8 @@ cannot fix one and miss the other. Category chips above the feed come from
 | Artist *events* / concert calendars | an events feature needs dates, venues, tickets and structured data — its own phase, not a by-product of the profile |
 | Artist registration / user profiles | the product is a publishing ecosystem, not a community platform (ADR 0001 non-goals) |
 | Music charts | needs verified play counts across sites, which the product deliberately does not phone home for |
+| A browsable artist directory | `archive-wavira_artist.html` renders the archive hero only. A grid of artists is a different card from a work or a news item, and inventing one at the end of this phase would ship an undesigned list; it is recorded as open in `docs/VERIFICATION.md` |
+| An editor control for every block attribute | the seven blocks share one editor surface: a `ServerSideRender` preview with `save() → null` and no inspector controls (`blocks/editor.js`). Attributes are set by the pattern or the serialized block and validated server-side; a control per attribute is editor work for the release-candidate phase, not a silent promise |
 | An Elementor widget for the new blocks | deferred by decision: it cannot be verified in this environment, and the standing rule is never to claim compatibility without evidence (`docs/DECISIONS.md`) |
 
 ## 4. How a site owner uses it (the five-minute path)
