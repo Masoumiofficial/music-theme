@@ -12,6 +12,8 @@
 
 namespace Wavira\Core\Rest;
 
+use Wavira\Core\Content\OrderArgs;
+
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -146,38 +148,15 @@ abstract class AbstractController {
 	/**
 	 * Convert an `orderby` value into query arguments.
 	 *
+	 * Kept as a thin delegate so third-party controllers extending this class
+	 * keep working; the vocabulary itself lives in Content\OrderArgs.
+	 *
 	 * @param string $orderby Requested field.
 	 * @param string $order   Requested direction.
 	 * @return array<string, string>
 	 */
 	protected function order_args( string $orderby, string $order ): array {
-		$order = 'asc' === strtolower( $order ) ? 'ASC' : 'DESC';
-
-		switch ( $orderby ) {
-			case 'title':
-				return array(
-					'orderby' => 'title',
-					'order'   => $order,
-				);
-			case 'menu_order':
-				return array(
-					'orderby' => 'menu_order',
-					'order'   => $order,
-				);
-			case 'modified':
-				return array(
-					'orderby' => 'modified',
-					'order'   => $order,
-				);
-			case 'rand':
-				return array( 'orderby' => 'rand' );
-			case 'date':
-			default:
-				return array(
-					'orderby' => 'date',
-					'order'   => $order,
-				);
-		}
+		return OrderArgs::get( $orderby, $order );
 	}
 
 	/**

@@ -75,7 +75,7 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `src/Contracts/` | `Registrable`, `Cacheable`, and later `Repository`, `Provider` |
 | `src/Content/` | CPTs, taxonomies, meta registration, term meta, upgrade routines |
 | `src/Settings/` | one typed settings schema, Settings API + REST exposure |
-| `src/Player/` | queue building, playback payloads, Media Session data |
+| `src/Player/` | queue building, playback payloads, Media Session data, bundle registration (`Payload`, `Queue`, `Assets`) — 0.5.0 ✅ |
 | `src/Downloads/` | quality matrix, access gate, **atomic counters** (0.4.0 ✅) |
 | `src/Search/` | cross-type search + suggestions, `SearchService` (0.4.0 ✅) |
 | `src/Related/` | scored related resolution, `RelatedService` (0.4.0 ✅) |
@@ -84,7 +84,7 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `src/Import/`, `src/Demo/`, `src/Migration/` | data in / data out / data converted |
 | `src/Integrations/` | optional third-party bridges |
 | `src/Support/` | autoloader, requirements, cache, logger, capabilities |
-| `public-api.php` | **The only surface a theme may call** (`wavira_core_is_active`, `wavira_core_get_setting`, `wavira_core_related_posts`) — thin, guarded wrappers over the services |
+| `public-api.php` | **The only surface a theme may call** (`wavira_core_is_active`, `wavira_core_get_setting`, `wavira_core_related_posts`, `wavira_core_track_playback`, `wavira_core_enqueue_player`) — thin, guarded wrappers over the services |
 
 ## 4. Runtime boot sequence
 
@@ -130,10 +130,10 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Kind | Name | Phase |
 | --- | --- | --- |
 | Action | `wavira_core_booted` | 0.2.0 ✅ |
-| Action | `wavira_before_play`, `wavira_after_play` (playback events) | 0.5.0 |
 | Filter | `wavira_archive_per_page` | 0.3.0 |
 | Filter | `wavira_setting` (read), `wavira_settings_schema` | 0.3.0 |
-| Filter | `wavira_track_playback_payload` | 0.5.0 |
+| Filter | `wavira_track_playback_payload`, `wavira_player_queue_items`, `wavira_player_settings` | 0.5.0 ✅ |
+| DOM event | `wavira:player:<event>` on a player mount (`trackchange`, `play`, `pause`, `queuechange`, `queueend`, `volumechange`, `repeatchange`, `shufflechange`, `loading`, `ready`, `buffering`, `error`) | 0.5.0 ✅ |
 | Filter | `wavira_related_ids`, `wavira_related_score` | 0.4.0 ✅ |
 | Filter | `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access` | 0.4.0 ✅ |
 | Filter | `wavira_searchable_types` | 0.4.0 ✅ |
@@ -143,6 +143,9 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_icon` (theme) | 0.6.0 |
 | Function | `wavira_get_setting()`, `wavira_has_core()`, `wavira_icon()`, `wavira_related_posts()` (theme) | 0.2.0 / 0.4.0 ✅ |
 | Function | `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (plugin `public-api.php`) | 0.4.0 ✅ |
+| Function | `wavira_core_track_playback()`, `wavira_core_enqueue_player()` (plugin `public-api.php`) | 0.5.0 ✅ |
+| Function | `wavira_player_mount()` (theme `inc/player.php`) — prints a mount point + no-JS `<audio>` fallback | 0.5.0 ✅ |
+| Script handle | `wavira-player` (registered by Core, enqueued by the theme's mount helper) | 0.5.0 ✅ |
 | Function | `wavira_core()` (plugin service accessor) | 0.3.0 |
 | REST | `wavira/v1/*` | 0.3.0 |
 
@@ -175,7 +178,7 @@ implementations — see the brief's YAGNI rule.
 | 0.2.0 | ARCHITECTURE | this document, ADRs, skeleton, coding standard, CI | ✅ |
 | 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 40 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
 | 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, public function API (`public-api.php`), boundary gate, ADR 0013, PHPUnit harness (`tests/`, 49 tests) | ✅ implemented · **VERIFIED**: static gates + 49 integration tests green against a real WordPress on PHP 7.4 and 8.2 (CI run `37301909854`) |
-| 0.5.0 | PLAYER | `assets/js/player/*` module, Media Session, a11y |
+| 0.5.0 | PLAYER | `src/Player/*` + `assets/js/index.js` (state machine, queue, views, Media Session, keyboard, a11y), `wavira/v1/player/*` routes, `wavira_player_mount()`, `tests/js/player.test.mjs` (15 DOM-free tests) | ✅ implemented · **VERIFIED** locally: `node --test tests/js/player.test.mjs` 15/15, `tools/lint.sh` PASS, boundary gate PASS · runtime verification in `docs/VERIFICATION.md` |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR |
 | 0.7.0 | BUILDERS | blocks + Elementor widgets |
 | 0.8.0 | SEO + PERF | SEO cooperation, budgets met |

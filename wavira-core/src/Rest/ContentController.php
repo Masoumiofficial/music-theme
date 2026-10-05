@@ -7,13 +7,14 @@
 
 namespace Wavira\Core\Rest;
 
+use Wavira\Core\Content\Cover;
 use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\QueryFilters;
-use Wavira\Core\Content\Taxonomies;
 use Wavira\Core\Downloads\Access;
 use Wavira\Core\Downloads\Counter;
+use Wavira\Core\Player\Payload as PlayerPayload;
 use Wavira\Core\Related\RelatedService;
 use WP_Post;
 use WP_Query;
@@ -237,14 +238,15 @@ final class ContentController extends AbstractController {
 			'excerpt'   => get_the_excerpt( $post_id ),
 			'date'      => mysql_to_rfc3339( $post->post_date_gmt ),
 			'modified'  => mysql_to_rfc3339( $post->post_modified_gmt ),
-			'cover'     => $this->cover_payload( $post_id ),
+			'cover'     => Cover::payload( $post_id ),
 			'meta'      => $this->meta_payload( $post_id ),
 			'relations' => $this->relations_payload( $post_id ),
-			'genres'    => $this->terms_payload( $post_id ),
+			'genres'    => Terms::genres( $post_id ),
 		);
 
 		if ( PostTypes::TRACK === $post->post_type ) {
 			$payload['player']    = $this->player_payload( $post_id );
+			$payload['playback']  = PlayerPayload::for_track( $post_id );
 			$payload['downloads'] = Access::matrix( $post_id );
 
 			if ( Access::can_download( $post_id ) ) {
@@ -268,60 +270,6 @@ final class ContentController extends AbstractController {
 		 * @param WP_Post              $post    Post object.
 		 */
 		return apply_filters( 'wavira_rest_item', $payload, $post );
-	}
-
-	/**
-	 * Cover image payload (thumbnail, falling back to the dedicated meta field).
-	 *
-	 * @param int $post_id Post ID.
-	 * @return array<string, mixed>
-	 */
-	private function cover_payload( int $post_id ): array {
-		$attachment_id = (int) get_post_thumbnail_id( $post_id );
-
-		if ( ! $attachment_id ) {
-			$attachment_id = MetaValues::int( $post_id, MetaSchema::COVER );
-		}
-
-		if ( ! $attachment_id ) {
-			return array();
-		}
-
-		return array(
-			'id'  => $attachment_id,
-			'url' => $this->cover_url( $attachment_id ),
-			'alt' => (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ),
-		);
-	}
-
-	/**
-	 * Cover URL with a size fallback chain.
-	 *
-	 * `wavira-cover` is registered by the theme. Under any other theme the plugin
-	 * must still return a usable image, so the chain ends at the full size and
-	 * never returns an empty string for an existing attachment.
-	 *
-	 * @param int $attachment_id Attachment ID.
-	 * @return string
-	 */
-	private function cover_url( int $attachment_id ): string {
-		$candidates = array(
-			'wavira-cover',
-			'large',
-			'medium',
-			'thumbnail',
-			'full',
-		);
-
-		foreach ( $candidates as $size ) {
-			$url = wp_get_attachment_image_url( $attachment_id, $size );
-
-			if ( is_string( $url ) && '' !== $url ) {
-				return $url;
-			}
-		}
-
-		return '';
 	}
 
 	/**
@@ -425,35 +373,6 @@ final class ContentController extends AbstractController {
 		);
 	}
 
-	/**
-	 * Genre terms of a post.
-	 *
-	 * @param int $post_id Post ID.
-	 * @return array<int, array<string, mixed>>
-	 */
-	private function terms_payload( int $post_id ): array {
-		if ( ! taxonomy_exists( Taxonomies::GENRE ) ) {
-			return array();
-		}
-
-		$terms = get_the_terms( $post_id, Taxonomies::GENRE );
-
-		if ( ! is_array( $terms ) ) {
-			return array();
-		}
-
-		return array_map(
-			static function ( $term ) {
-				return array(
-					'id'   => (int) $term->term_id,
-					'slug' => $term->slug,
-					'name' => $term->name,
-					'link' => get_term_link( $term ),
-				);
-			},
-			$terms
-		);
-	}
 
 	/**
 	 * Playback payload for a track (public audio sources only).

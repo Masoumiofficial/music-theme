@@ -161,6 +161,35 @@ authorization chain controls the *offer*, not the possibility.
 `rand` ordering is refused above 500 candidate posts. `search` and `related` answers are cached for
 300 s / 3600 s respectively in generation-scoped keys (ADR 0013 §3).
 
+### Player routes (0.5.0)
+
+| Route | Returns |
+| --- | --- |
+| `GET wavira/v1/player/tracks/{id}` | Playback payload of one published track. `200` with empty `sources` when the track exists but has no audio; `404 wavira_not_found` for unknown IDs, drafts and non-track entities. |
+| `GET wavira/v1/player/queue?context=<album\|artist\|genre\|tracks\|related>&id=&slug=&limit=&orderby=&order=` | `{ context, count, items: [payload, …] }` — bounded by `Queue::MAX_ITEMS` (100) and by the site's `tracks_per_page` default; source-less tracks are dropped. `400 wavira_missing_source` when a context needs a source it did not receive. |
+
+Both routes are read-only, public (published content only) and carry
+`Cache-Control: public, max-age=60`.
+
+### Playback payload (`wavira/v1/player/*` and `payload.playback`)
+
+| Key | Type | Notes |
+| --- | --- | --- |
+| `id`, `type`, `title`, `permalink` | int/string | identity and link to the canonical page |
+| `duration`, `duration_label` | int/string | seconds and a localised `m:ss` label |
+| `explicit`, `has_lyrics` | bool | presentation flags (lyrics text itself is not shipped in the player payload) |
+| `artist`, `album` | object | `{ id, name\|title, permalink }`, empty when unset |
+| `cover` | object | `{ id, url, alt, width, height, srcset, sizes }`, empty when the post has no artwork |
+| `genres` | array | `{ id, slug, name, link }` |
+| `sources` | object | quality (`320`, `128`) or `external` → URL; best quality first |
+| `preferred` | int | quality the server recommends (`320`, `128`, or `0` for external-only) |
+| `media_session` | object | `{ title, artist, album, artwork: [{ src, sizes, type }] }` for the OS controls |
+
+The payload is produced by `Wavira\Core\Player\Payload` and filtered by
+`wavira_track_playback_payload`; content items (`/{type}/{id}`) expose the same
+structure under the additive `playback` key (the 0.3.0 `player` key is kept for
+compatibility).
+
 ## 6. Read/write helpers
 
 | Helper | Purpose |

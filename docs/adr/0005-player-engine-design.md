@@ -42,3 +42,28 @@ Build the **Wavira Player Engine** as a standalone, framework-free ES module in 
   poisoning (state is client-side only).
 - The engine is testable without WordPress (plain DOM + events), so it can be unit-tested in CI.
 - Player JS ships as its own bundle, loaded only where a player is rendered (performance budget).
+
+## Implementation notes (0.5.0)
+
+Where each decision above became code, and the small decisions taken while building it.
+
+| Decision | Implementation |
+| --- | --- |
+| §1 no global element ID | `wavira-core/assets/js/index.js` creates one `<audio>` per instance; the theme prints a mount point with `wavira_player_mount()` (`wavira/inc/player.php`). |
+| §2 DOM-independent state | `createStore()` + `createEngine()`; no DOM reference outside the view adapter. 15 unit tests in `tests/js/player.test.mjs` run in `node:vm` with no DOM. |
+| §3 one state, many views | Engine events (`trackchange`, `play`, `pause`, `queuechange`, `volumechange`, …) plus a DOM bridge that re-dispatches them as `wavira:player:<event>` on the mount point for theme JS. |
+| §4 features | play/pause, seek, volume/mute, next/previous, shuffle, repeat off/all/one, queue remove/clear, loading/buffering/error, controlled autoplay, Media Session, keyboard map (`Space`/`k`, `←/→`, `↑/↓`, `m`, `n`, `p`). |
+| §5 accessibility | Native `<button>` and `<input type="range">` with visible labels, `aria-pressed`, `aria-valuetext`, `role="status"` for track changes and `role="alert"` for errors; no icon font is required to operate the controls. |
+| §6 REST data | `GET wavira/v1/player/tracks/{id}` and `GET wavira/v1/player/queue?context=…`; PHP also hands the engine route *templates* (`…/tracks/%d`, plus the queue URL) in `waviraPlayerSettings`, so the engine substitutes an ID and never composes a path. |
+| §7 persistence | `wavira.player.volume`, `.muted`, `.repeat`, `.shuffle` through a facade that never throws (private mode, quota); no cookies, and playback position is intentionally **not** persisted. |
+| §8 conditional bundle | `Wavira\Core\Player\Assets` registers the handle `wavira-player` on `wp_enqueue_scripts` only when `assets/dist/core.js` exists; the theme asks for it from the mount helper. Un-built checkouts degrade to the native `<audio>` fallback. |
+
+Decisions recorded during implementation:
+
+1. **A published track without audio answers `200` with empty `sources`**, not `404`: the track exists and its page must work. Only unknown IDs, drafts and non-track entities return `404 wavira_not_found`. Queue builders drop source-less tracks, so a queue never contains something that cannot play.
+2. **Store field events are namespaced** (`state:volume`): a field literally named `error` or `play` must not impersonate an engine event. The unit tests caught the collision.
+3. **The engine never persists a playback position.** Resuming mid-track after a page load is a privacy/UX decision with no evidence of user demand; volume, mute, repeat and shuffle are the only stored values.
+4. **`wavira_core_track_playback()` and `wavira_core_enqueue_player()`** were added to the plugin's public function API so the theme renders the fallback and requests the bundle without naming a plugin class (ARCHITECTURE §2, gate R3).
+5. **Bundle size:** the built `wavira-core/assets/dist/core.js` is **13.6 KB gzipped** (53 KB raw, source comments included), inside the ≤ 15 KB player budget (PERFORMANCE-AUDIT §3), measured with `gzip -9`. The source stays readable on purpose: the budget is measured on the shipped bytes and minification is a packaging-time decision (0.12.0).
+6. **Deferred to 0.6.0:** the sticky/mini player is a second *view* over this engine, and the inline card player is a third; no engine change is expected. Waveform rendering is not in v1 (ADR 0001 non-goals).
+

@@ -5,6 +5,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.5.0 (player engine)
+- **Player engine** (`assets/js/index.js`): framework-free, one instance per mount point, its own
+  `<audio>` element (no global element ID), a DOM-independent state machine
+  (`currentTrack, queue, currentIndex, isPlaying, isLoading, isBuffering, duration, currentTime,
+  volume, muted, repeatMode, shuffleMode, error`), queue/shuffle/repeat(off·all·one)/remove/clear,
+  loading + buffering + error states, controlled autoplay, Media Session metadata and action
+  handlers, the documented keyboard map, ARIA state with live regions, and `localStorage`
+  preferences under `wavira.player.*` (never cookies). 13.6 KB gzipped (53 KB raw).
+- **Playback data** (`src/Player/Payload.php`, `src/Player/Queue.php`): one payload per track
+  (sources best-quality-first with a server-declared `preferred`, artwork incl. `srcset`/`sizes`,
+  artist/album/genre relations, Media Session text) and five queue contexts
+  (`album`, `artist`, `genre`, `tracks`, `related`) that drop source-less tracks and never exceed
+  100 items.
+- **REST** (`src/Rest/PlayerController.php`): `GET /wavira/v1/player/tracks/{id}` and
+  `GET /wavira/v1/player/queue`, read-only, `Cache-Control: public, max-age=60`; `404 wavira_not_found`
+  for unknown/draft/non-track items and `400 wavira_missing_source` for a context without its source.
+- **Bundle registration** (`src/Player/Assets.php`): handle `wavira-player`, registered only when the
+  built file exists, with `window.waviraPlayerSettings` (route templates, defaults from the site
+  settings, translated strings) attached as an inline script; `wavira_player_settings` filter.
+- **Shared content helpers** (`src/Content/Cover.php`, `Terms.php`, `OrderArgs.php`): artwork
+  resolution (with `srcset`/`sizes`), term payloads and the sort vocabulary now have one
+  implementation used by both the REST controllers and the player.
+- **Public API**: `wavira_core_track_playback()` and `wavira_core_enqueue_player()`.
+- **Content payloads**: tracks expose the same structure under the additive `playback` key; artwork
+  payloads gained `width`, `height`, `srcset` and `sizes` (the 0.3.0 keys are unchanged).
+- **Tests**: `tests/js/player.test.mjs` (15 DOM-free unit tests via `node:vm`, run by
+  `npm run test:js` and by CI) and `tests/test-player.php` (payload, queues, routes, settings
+  contract, public API). CI now builds the bundle before the integration suite so the enqueue path
+  is exercised for real.
+
 ### Added — 0.4.0 (music engine: search, related, downloads, verification)
 - **Search** (`src/Search/SearchService.php`): cross-type search and type-ahead suggestions over
   titles, excerpts and lyrics; TTL 300 s in generation-scoped cache keys; `per_page` clamped to 50,

@@ -151,6 +151,11 @@ jobs:
       - name: Install dev tooling
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Build front-end assets
+        # The player bundle must exist so the suite verifies the real enqueue
+        # path (registered handle + inline settings), not only the fallback.
+        run: node tools/build.mjs
+
       - name: Install database and subversion clients
         run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client rsync
 
@@ -221,11 +226,24 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Build front-end assets
+        # A real build (not --check) so the asset-size report below and the
+        # engine unit tests run against the artefact that ships.
+        run: node tools/build.mjs
+
       - name: Full lint gate
         run: bash tools/lint.sh
 
-      - name: Build dry-run (must not fail while there are no sources yet)
-        run: node tools/build.mjs --check
+      - name: Player engine unit tests (DOM-free)
+        run: node --test tests/js/player.test.mjs
+
+      - name: Bundle size report (gzipped)
+        run: |
+          set -euo pipefail
+          for file in wavira-core/assets/dist/core.js wavira/assets/dist/theme.js; do
+            [ -f "$file" ] || continue
+            printf '%s — %s raw, %s gzipped\n' "$file" "$(du -h "$file" | cut -f1)" "$(gzip -9 -c "$file" | wc -c | awk '{printf "%.1f KB", $1/1024}')"
+          done
 
   # ---------------------------------------------------------------------------
   # Repository hygiene: the legacy artifact must never be modified.

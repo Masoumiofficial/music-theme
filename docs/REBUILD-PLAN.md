@@ -117,7 +117,7 @@ preferences (volume, theme, last queue position) in documented localStorage keys
 | 0.2.0 | ARCHITECTURE | ADRs, folder skeleton, coding standard, CI lint config | repo builds, `php -l` clean, empty namespaces |
 | 0.3.0 | DATA MODEL | Core plugin: CPTs, taxonomies, meta schemas, REST skeleton, settings schema | unit-ish verification via WP-CLI seed script |
 | 0.4.0 | MUSIC ENGINE | related service, search service, download service, counters | functional tests on seeded data |
-| 0.5.0 | PLAYER | Player Engine + theme components + Media Session + a11y | keyboard-only playthrough, no jQuery |
+| 0.5.0 | PLAYER | Player Engine + player REST data + theme mount point + Media Session + a11y | ✅ engine + data shipped, 15 DOM-free unit tests + PHP suite; the visual/keyboard playthrough moves with the 0.6.0 templates (see `docs/VERIFICATION.md`) |
 | 0.6.0 | UI | design tokens, templates, patterns, dark/light, RTL+LTR | breakpoint matrix clean at 360→1920 |
 | 0.7.0 | BUILDERS | blocks + patterns polish; Elementor widgets | editor preview + frontend parity |
 | 0.8.0 | SEO+PERF | SEO cooperation, performance budget met | Lighthouse budget met; no `-1` queries |

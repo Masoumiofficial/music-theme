@@ -10,8 +10,9 @@ script skips PHP checks and says so).
 | `check-boundaries.mjs` | Module-boundary gate (ARCHITECTURE §2): Core never reaches into the theme; dependencies only point downwards (foundation → data → services → entry points); the theme names no Core class; every product file has a direct-access guard; global functions carry the documented prefix | Node 18+ |
 | `annotate-log.mjs` | Turns a log tail into GitHub annotations (job logs are not reachable from every environment) | Node 18+ |
 | `junit-annotate.mjs` | Turns a PHPUnit JUnit report into annotations plus one summary annotation listing every problem | Node 18+ |
-| `build.mjs` | Builds `wavira/assets/dist/theme.css` + `theme.js` and `wavira-core/assets/dist/*.js` from sources in `assets/` | Node 18+ |
+| `build.mjs` | Builds `wavira/assets/dist/theme.css` + `theme.js` and `wavira-core/assets/dist/core.js` from sources in `assets/` (verbatim concatenation in layer order — no bundler, no minifier; measure the shipped bytes with `gzip -9`) | Node 18+ |
 | `lint-js.mjs` | JS-only syntax check (used by npm scripts) | Node 18+ |
+| `tests/js/player.test.mjs` | Player-engine unit tests (DOM-free, `node:vm`); run with `npm run test:js` or `node --test tests/js/player.test.mjs` | Node 18+ |
 
 ## Legacy-echo gate (part of `lint.sh`)
 

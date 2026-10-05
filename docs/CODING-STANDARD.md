@@ -53,6 +53,9 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | J5 | Event delegation via a single listener per component root; remove listeners on destroy (`AbortController` or `destroy()`). |
 | J6 | Accessibility ships with the component: keyboard handlers, ARIA state, focus management, `prefers-reduced-motion` respect. |
 | J7 | Network calls: debounce ≥ 300 ms for typing, cancel in-flight requests, handle non-2xx with a user-visible message (never a raw error). |
+| J8 🔒 | Components ship a DOM-free core: state, queue maths and persistence must run in `node:vm` with no document (`npm run test:js`). Views are adapters over that core. |
+| J9 | Third-party hooks are DOM events on the component root (`wavira:player:<event>`), never reach-in to internals; every listener is removed in `destroy()`. |
+| J10 🔒 | Persistence goes through the storage facade, uses the documented prefix (`wavira.player.`), may fail silently and never writes cookies. |
 
 ## 5. CSS
 

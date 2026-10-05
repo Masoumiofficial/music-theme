@@ -69,3 +69,49 @@ if ( ! function_exists( 'wavira_core_related_posts' ) ) {
 		return (array) \Wavira\Core\Related\RelatedService::posts( (int) $post_id, (int) $limit );
 	}
 }
+
+if ( ! function_exists( 'wavira_core_track_playback' ) ) {
+	/**
+	 * Playback payload of one track, as consumed by the player engine.
+	 *
+	 * A template uses this for the no-JavaScript fallback and for the Media
+	 * Session description; the engine itself asks the REST route so one page can
+	 * hold any number of players (ADR 0005 §1).
+	 *
+	 * @param int $post_id Track post ID.
+	 * @return array<string, mixed> Empty array when the item is not a playable track.
+	 */
+	function wavira_core_track_playback( $post_id ) {
+		if ( ! function_exists( 'wavira_core_is_active' ) || ! wavira_core_is_active() ) {
+			return array();
+		}
+
+		if ( ! class_exists( '\\Wavira\\Core\\Player\\Payload' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Player\Payload::for_track( (int) $post_id );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_enqueue_player' ) ) {
+	/**
+	 * Ask for the player bundle on this request.
+	 *
+	 * The bundle belongs to Wavira Core, so the theme enqueues the registered
+	 * handle instead of pointing at a plugin path. Returns false when the bundle
+	 * was never built (an un-built checkout), which lets a template fall back to
+	 * server-rendered audio.
+	 *
+	 * @return bool Whether the engine will load on this request.
+	 */
+	function wavira_core_enqueue_player() {
+		if ( ! function_exists( 'wp_script_is' ) || ! wp_script_is( 'wavira-player', 'registered' ) ) {
+			return false;
+		}
+
+		wp_enqueue_script( 'wavira-player' );
+
+		return true;
+	}
+}

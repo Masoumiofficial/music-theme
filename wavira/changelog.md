@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.5.0
+- `inc/player.php`: `wavira_player_mount()` prints a player mount point (`data-*` contract, no element
+  IDs) and a native `<audio>` fallback with the preferred source, so a track page works without
+  JavaScript; `wavira_player_preferred_source()` picks 320 → 128 → external. The helper asks Core for
+  the bundle through `wavira_core_enqueue_player()` and for the payload through
+  `wavira_core_track_playback()` — the theme still names no plugin class (gate R3).
+- Theme version aligned with the product (0.5.0). No template renders the mount point yet; that is the
+  first task of 0.6.0.
+
 ### Changed — 0.4.0
 - Version aligned with the product roadmap so the theme and **Wavira Core** 0.4.0 ship as one
   release. **No theme code changed in this phase:** search, related items, counters and the download

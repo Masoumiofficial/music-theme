@@ -1,6 +1,6 @@
 {
 	"name": "wavira-music",
-	"version": "0.2.0",
+	"version": "0.5.0",
 	"private": true,
 	"description": "Development tooling for Wavira — WordPress music-publishing ecosystem. Not required to run the product.",
 	"license": "GPL-2.0-or-later",
@@ -13,6 +13,7 @@
 		"build": "node tools/build.mjs",
 		"lint": "bash tools/lint.sh",
 		"lint:js": "node tools/lint-js.mjs",
-		"check": "npm run lint && npm run build"
+		"test:js": "node --test tests/js/player.test.mjs",
+		"check": "npm run lint && npm run build && npm run test:js"
 	}
 }

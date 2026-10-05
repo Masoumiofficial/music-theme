@@ -9,7 +9,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0002](adr/0002-theme-vs-core-plugin-split.md) | Persistent music data + business logic live in the **Wavira Core** plugin; the theme is presentation only | Accepted | 2026-10-05 |
 | [0003](adr/0003-custom-post-types-over-post-meta.md) | Replace legacy `post` + `musics_type` meta with real CPTs (`artist`, `album`, `track`, `video`) + taxonomies | Accepted | 2026-10-05 |
 | [0004](adr/0004-no-acf-no-optiontree.md) | No ACF and no OptionTree dependency; use registered meta + Settings API + `theme.json` | Accepted | 2026-10-05 |
-| [0005](adr/0005-player-engine-design.md) | Instance-based, DOM-independent Player Engine; no global `#audio`; Media Session + full keyboard support | Accepted (implementation phase 0.5.0) | 2026-10-05 |
+| [0005](adr/0005-player-engine-design.md) | Instance-based, DOM-independent Player Engine; no global `#audio`; Media Session + full keyboard support | Accepted — **implemented in 0.5.0** (see the ADR's implementation notes) | 2026-10-05 |
 | [0006](adr/0006-asset-strategy-and-tooling.md) | Vanilla ES modules, no front-end jQuery, build-aware conditional assets; no Node build required to run the plugin | Accepted | 2026-10-05 |
 | [0007](adr/0007-php-and-wordpress-baseline.md) | PHP 7.4 floor (tested on 8.2/8.3), WordPress 6.6+ floor, autoloader without a Composer runtime requirement | Accepted | 2026-10-05 |
 | [0008](adr/0008-i18n-and-rtl-first.md) | English source strings, RTL-first with full LTR parity, logical CSS properties, one text domain per artifact | Accepted | 2026-10-05 |
