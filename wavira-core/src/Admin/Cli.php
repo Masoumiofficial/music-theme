@@ -134,8 +134,8 @@ final class Cli implements Registrable {
 	public function seed( $args = array(), $assoc_args = array() ): void {
 		unset( $args );
 
-		$force     = isset( $assoc_args['force'] );
-		$count     = wp_count_posts( PostTypes::TRACK );
+		$force      = isset( $assoc_args['force'] );
+		$count      = wp_count_posts( PostTypes::TRACK );
 		$has_tracks = isset( $count->publish ) && (int) $count->publish > 0;
 
 		if ( $has_tracks && ! $force ) {

@@ -62,7 +62,7 @@ final class Settings implements Registrable {
 		}
 
 		$fallback = null === $fallback ? $schema[ $key ]['default'] : $fallback;
-		$options = get_option( SettingsSchema::OPTION, array() );
+		$options  = get_option( SettingsSchema::OPTION, array() );
 
 		if ( ! is_array( $options ) || ! array_key_exists( $key, $options ) ) {
 			return $fallback;

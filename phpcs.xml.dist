@@ -35,15 +35,17 @@
 
 	<!-- File naming vs. PSR-4 (docs/ARCHITECTURE.md, ADR 0002).
 	     wavira-core/src/ is an autoloaded PSR-4 tree: every file is named exactly
-	     after the class it declares (CacheInvalidator.php => Wavira\Core\Support\CacheInvalidator).
-	     WordPress-Core's *strict* mode would demand class-cacheinvalidator.php, which the
-	     autoloader cannot load, so strict mode is off: a file named exactly after its own
-	     class passes, while every other naming rule (lowercase-hyphenated for non-class
-	     files) stays enforced. -->
+	     after the class it declares (CacheInvalidator.php => Wavira\Core\Support\CacheInvalidator),
+	     which the autoloader requires. WPCS 3.x runs its lowercase-hyphenated file name
+	     check unconditionally (strict_class_file_names only governs the extra class- prefix
+	     check), so the sniff is excluded for that one tree and enforced everywhere else
+	     (inc/, templates/, tools/, root files). Rationale and the verification that WPCS
+	     cannot express "PSR-4 file names" otherwise: docs/CODING-STANDARD.md P4. -->
 	<rule ref="WordPress.Files.FileName">
 		<properties>
 			<property name="strict_class_file_names" value="false"/>
 		</properties>
+		<exclude-pattern>*/wavira-core/src/*</exclude-pattern>
 	</rule>
 
 	<!-- Deliberate, documented relaxations. -->

@@ -27,48 +27,48 @@ final class MetaSchema {
 	public const CREDIT_LABEL     = 'wavira_credit_label';
 
 	/* Track audio ---------------------------------------------------------------- */
-	public const AUDIO_128          = 'wavira_audio_128';
-	public const AUDIO_320          = 'wavira_audio_320';
-	public const AUDIO_EXTERNAL     = 'wavira_audio_external';
-	public const DOWNLOAD_ENABLED   = 'wavira_download_enabled';
-	public const FILE_SIZE_128      = 'wavira_file_size_128';
-	public const FILE_SIZE_320      = 'wavira_file_size_320';
-	public const DURATION           = 'wavira_duration';
-	public const LYRICS             = 'wavira_lyrics';
-	public const ISRC               = 'wavira_isrc';
-	public const EXPLICIT           = 'wavira_explicit';
-	public const VERSION_NOTE       = 'wavira_version_note';
+	public const AUDIO_128        = 'wavira_audio_128';
+	public const AUDIO_320        = 'wavira_audio_320';
+	public const AUDIO_EXTERNAL   = 'wavira_audio_external';
+	public const DOWNLOAD_ENABLED = 'wavira_download_enabled';
+	public const FILE_SIZE_128    = 'wavira_file_size_128';
+	public const FILE_SIZE_320    = 'wavira_file_size_320';
+	public const DURATION         = 'wavira_duration';
+	public const LYRICS           = 'wavira_lyrics';
+	public const ISRC             = 'wavira_isrc';
+	public const EXPLICIT         = 'wavira_explicit';
+	public const VERSION_NOTE     = 'wavira_version_note';
 
 	/* Editorial / listing -------------------------------------------------------- */
-	public const RELEASE_DATE      = 'wavira_release_date';
-	public const FEATURED          = 'wavira_featured';
-	public const IN_INDEX_PLAYER   = 'wavira_in_index_player';
-	public const COVER             = 'wavira_cover';
+	public const RELEASE_DATE    = 'wavira_release_date';
+	public const FEATURED        = 'wavira_featured';
+	public const IN_INDEX_PLAYER = 'wavira_in_index_player';
+	public const COVER           = 'wavira_cover';
 
 	/* Album ---------------------------------------------------------------------- */
-	public const ALBUM_TYPE        = 'wavira_album_type';
-	public const CATALOG_NUMBER    = 'wavira_catalog_number';
+	public const ALBUM_TYPE     = 'wavira_album_type';
+	public const CATALOG_NUMBER = 'wavira_catalog_number';
 
 	/* Video ---------------------------------------------------------------------- */
-	public const VIDEO_SOURCE      = 'wavira_video_source';
-	public const VIDEO_URL         = 'wavira_video_url';
-	public const VIDEO_480         = 'wavira_video_480';
-	public const VIDEO_720         = 'wavira_video_720';
-	public const VIDEO_1080        = 'wavira_video_1080';
-	public const VIDEO_POSTER      = 'wavira_video_poster';
+	public const VIDEO_SOURCE = 'wavira_video_source';
+	public const VIDEO_URL    = 'wavira_video_url';
+	public const VIDEO_480    = 'wavira_video_480';
+	public const VIDEO_720    = 'wavira_video_720';
+	public const VIDEO_1080   = 'wavira_video_1080';
+	public const VIDEO_POSTER = 'wavira_video_poster';
 
 	/* Artist --------------------------------------------------------------------- */
-	public const ARTIST_IMAGE      = 'wavira_artist_image';
-	public const ARTIST_COVER      = 'wavira_artist_cover';
-	public const VERIFIED          = 'wavira_verified';
-	public const COUNTRY           = 'wavira_country';
-	public const WEBSITE           = 'wavira_website';
-	public const SOCIAL_FACEBOOK   = 'wavira_social_facebook';
-	public const SOCIAL_INSTAGRAM  = 'wavira_social_instagram';
-	public const SOCIAL_TELEGRAM   = 'wavira_social_telegram';
-	public const SOCIAL_X          = 'wavira_social_x';
-	public const SOCIAL_YOUTUBE    = 'wavira_social_youtube';
-	public const SOCIAL_APARAT     = 'wavira_social_aparat';
+	public const ARTIST_IMAGE     = 'wavira_artist_image';
+	public const ARTIST_COVER     = 'wavira_artist_cover';
+	public const VERIFIED         = 'wavira_verified';
+	public const COUNTRY          = 'wavira_country';
+	public const WEBSITE          = 'wavira_website';
+	public const SOCIAL_FACEBOOK  = 'wavira_social_facebook';
+	public const SOCIAL_INSTAGRAM = 'wavira_social_instagram';
+	public const SOCIAL_TELEGRAM  = 'wavira_social_telegram';
+	public const SOCIAL_X         = 'wavira_social_x';
+	public const SOCIAL_YOUTUBE   = 'wavira_social_youtube';
+	public const SOCIAL_APARAT    = 'wavira_social_aparat';
 
 	/**
 	 * All meta keys with their type, sanitizer, REST shape and owning post types.
@@ -79,9 +79,9 @@ final class MetaSchema {
 	 * @return array<string, array<string, mixed>>
 	 */
 	public static function all(): array {
-		$track = array( PostTypes::TRACK );
-		$album = array( PostTypes::ALBUM );
-		$video = array( PostTypes::VIDEO );
+		$track  = array( PostTypes::TRACK );
+		$album  = array( PostTypes::ALBUM );
+		$video  = array( PostTypes::VIDEO );
 		$artist = array( PostTypes::ARTIST );
 
 		return array(
