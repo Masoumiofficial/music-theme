@@ -33,14 +33,14 @@ final class GenresController extends AbstractController {
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
-						'per_page' => array(
+						'per_page'   => array(
 							'type'              => 'integer',
 							'default'           => 50,
 							'minimum'           => 1,
 							'maximum'           => 200,
 							'sanitize_callback' => 'absint',
 						),
-						'page'     => array(
+						'page'       => array(
 							'type'              => 'integer',
 							'default'           => 1,
 							'minimum'           => 1,

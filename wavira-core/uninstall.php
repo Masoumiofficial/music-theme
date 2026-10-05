@@ -21,10 +21,10 @@ if ( is_array( $wavira_settings ) && ! empty( $wavira_settings['remove_data_on_u
 	foreach ( $wavira_post_types as $wavira_post_type ) {
 		$wavira_posts = get_posts(
 			array(
-				'post_type'      => $wavira_post_type,
-				'post_status'    => 'any',
-				'numberposts'    => -1, // Uninstall only: explicit user opt-in, run once, off the front end.
-				'fields'         => 'ids',
+				'post_type'        => $wavira_post_type,
+				'post_status'      => 'any',
+				'numberposts'      => -1, // Uninstall only: explicit user opt-in, run once, off the front end.
+				'fields'           => 'ids',
 				'suppress_filters' => true,
 			)
 		);

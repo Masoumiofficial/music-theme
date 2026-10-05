@@ -107,15 +107,15 @@ final class Access {
 			}
 
 			$matrix[] = array(
-				'quality'      => (int) $kbps,
-				'label'        => sprintf(
+				'quality'    => (int) $kbps,
+				'label'      => sprintf(
 					/* translators: %d: audio bitrate in kbps. */
 					__( '%d kbps', 'wavira-core' ),
 					(int) $kbps
 				),
-				'url'          => esc_url( $quality['url'] ),
-				'file_size'    => (int) $quality['size'],
-				'size_label'   => $quality['size'] > 0 ? size_format( (int) $quality['size'] ) : '',
+				'url'        => esc_url( $quality['url'] ),
+				'file_size'  => (int) $quality['size'],
+				'size_label' => $quality['size'] > 0 ? size_format( (int) $quality['size'] ) : '',
 			);
 		}
 

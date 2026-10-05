@@ -80,9 +80,9 @@ final class ContentController extends AbstractController {
 					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
 						'id' => array(
-							'description' => __( 'Unique identifier for the object.', 'wavira-core' ),
-							'type'        => 'integer',
-							'required'    => true,
+							'description'       => __( 'Unique identifier for the object.', 'wavira-core' ),
+							'type'              => 'integer',
+							'required'          => true,
 							'sanitize_callback' => 'absint',
 						),
 					),
@@ -324,10 +324,10 @@ final class ContentController extends AbstractController {
 
 			if ( $album_id && PostTypes::ALBUM === get_post_type( $album_id ) ) {
 				$relations['album'] = array(
-					'id'   => $album_id,
-					'slug' => get_post_field( 'post_name', $album_id ),
+					'id'    => $album_id,
+					'slug'  => get_post_field( 'post_name', $album_id ),
 					'title' => get_the_title( $album_id ),
-					'link' => get_permalink( $album_id ),
+					'link'  => get_permalink( $album_id ),
 				);
 			}
 		}

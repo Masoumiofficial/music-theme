@@ -47,15 +47,15 @@ final class Autoloader {
 	/**
 	 * Map a class name to a file and load it.
 	 *
-	 * @param string $class Fully qualified class name.
+	 * @param string $class_name Fully qualified class name.
 	 * @return void
 	 */
-	public static function autoload( string $class ): void {
-		if ( 0 !== strpos( $class, self::PREFIX ) ) {
+	public static function autoload( string $class_name ): void {
+		if ( 0 !== strpos( $class_name, self::PREFIX ) ) {
 			return;
 		}
 
-		$relative = substr( $class, strlen( self::PREFIX ) );
+		$relative = substr( $class_name, strlen( self::PREFIX ) );
 		$relative = str_replace( '\\', '/', $relative );
 		$path     = self::$root . $relative . '.php';
 

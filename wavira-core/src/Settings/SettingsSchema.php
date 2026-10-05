@@ -31,65 +31,65 @@ final class SettingsSchema {
 	public static function all(): array {
 		return array(
 			/* Appearance ------------------------------------------------------- */
-			'dark_toggle'            => array(
+			'dark_toggle'              => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Show the light/dark switch', 'wavira-core' ),
 			),
-			'dark_default'           => array(
+			'dark_default'             => array(
 				'type'    => 'boolean',
 				'default' => false,
 				'label'   => __( 'Start in dark mode', 'wavira-core' ),
 			),
 
 			/* Content ---------------------------------------------------------- */
-			'tracks_per_page'        => array(
+			'tracks_per_page'          => array(
 				'type'    => 'integer',
 				'default' => 20,
 				'min'     => 6,
 				'max'     => 60,
 				'label'   => __( 'Tracks per archive page', 'wavira-core' ),
 			),
-			'related_limit'          => array(
+			'related_limit'            => array(
 				'type'    => 'integer',
 				'default' => 8,
 				'min'     => 3,
 				'max'     => 24,
 				'label'   => __( 'Related items per block', 'wavira-core' ),
 			),
-			'enable_mood'            => array(
+			'enable_mood'              => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Enable the Mood taxonomy', 'wavira-core' ),
 			),
-			'enable_language'        => array(
+			'enable_language'          => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Enable the Language taxonomy', 'wavira-core' ),
 			),
-			'enable_label'           => array(
+			'enable_label'             => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Enable the Label taxonomy', 'wavira-core' ),
 			),
-			'enable_year'            => array(
+			'enable_year'              => array(
 				'type'    => 'boolean',
 				'default' => false,
 				'label'   => __( 'Enable the Release-year taxonomy', 'wavira-core' ),
 			),
 
 			/* Player ----------------------------------------------------------- */
-			'player_sticky'          => array(
+			'player_sticky'            => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Show the sticky player bar', 'wavira-core' ),
 			),
-			'player_autoplay'        => array(
+			'player_autoplay'          => array(
 				'type'    => 'boolean',
 				'default' => false,
 				'label'   => __( 'Autoplay the next track in a queue', 'wavira-core' ),
 			),
-			'player_default_volume'  => array(
+			'player_default_volume'    => array(
 				'type'    => 'integer',
 				'default' => 100,
 				'min'     => 0,
@@ -98,24 +98,24 @@ final class SettingsSchema {
 			),
 
 			/* Downloads -------------------------------------------------------- */
-			'downloads_enabled'      => array(
+			'downloads_enabled'        => array(
 				'type'    => 'boolean',
 				'default' => true,
 				'label'   => __( 'Offer audio downloads', 'wavira-core' ),
 			),
-			'downloads_require_login' => array(
+			'downloads_require_login'  => array(
 				'type'    => 'boolean',
 				'default' => false,
 				'label'   => __( 'Require a logged-in user to download', 'wavira-core' ),
 			),
 
 			/* Footer / social --------------------------------------------------- */
-			'copyright'              => array(
+			'copyright'                => array(
 				'type'    => 'string',
 				'default' => '',
 				'label'   => __( 'Footer copyright text', 'wavira-core' ),
 			),
-			'socials'                => array(
+			'socials'                  => array(
 				'type'    => 'array',
 				'items'   => 'url',
 				'default' => array(),
@@ -123,7 +123,7 @@ final class SettingsSchema {
 			),
 
 			/* Advertising ------------------------------------------------------- */
-			'ads_html'               => array(
+			'ads_html'                 => array(
 				'type'    => 'html',
 				'default' => '',
 				'label'   => __( 'Ad slot HTML (above the player)', 'wavira-core' ),

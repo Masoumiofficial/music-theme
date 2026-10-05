@@ -28,14 +28,14 @@ function wavira_has_core() {
  * "theme switch safety" contract in reverse: the theme never stores music data.
  *
  * @param string $key     Setting key inside the settings array.
- * @param mixed  $default Value returned when the key is missing.
+ * @param mixed  $fallback Value returned when the key is missing.
  * @return mixed
  */
-function wavira_get_setting( $key, $default = null ) {
+function wavira_get_setting( $key, $fallback = null ) {
 	$settings = get_option( 'wavira_settings', array() );
 
 	if ( ! is_array( $settings ) || ! array_key_exists( $key, $settings ) ) {
-		return $default;
+		return $fallback;
 	}
 
 	return $settings[ $key ];

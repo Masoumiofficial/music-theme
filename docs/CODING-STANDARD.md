@@ -16,6 +16,7 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | P5 🔒 | Class names: `StudlyCaps`; methods/properties: `camelCase` for plugin classes, `snake_case` for WordPress-facing functions; hooks: `wavira_lowercase_with_underscores`. |
 | P6 | **MUST NOT** exceed 400 lines per class or 50 lines per method without a documented reason (God-file rule from the audit). |
 | P7 | **MUST NOT** use unprefixed globals, `extract()`, `$$var`, or `compact()`-style variable juggling. |
+| P8 🔒 | Multi-line array literals: **MUST** align every `=>` in an alignment group to the **longest key of that group + one space** (WPCS `WordPress.Arrays.MultipleStatementAlignment`). A group is the run of sibling keys between two comments, statements or sibling arrays; nested arrays align independently, and the outer group continues *across* a nested array block. Alignment padding is spaces; indentation stays tabs (`phpcs.xml.dist`, CI annotations). |
 
 ## 2. WordPress API usage
 

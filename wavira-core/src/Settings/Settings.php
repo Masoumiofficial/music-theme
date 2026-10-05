@@ -51,21 +51,21 @@ final class Settings implements Registrable {
 	 * Read one setting.
 	 *
 	 * @param string $key     Setting key.
-	 * @param mixed  $default Value returned when the key is unknown or unset.
+	 * @param mixed  $fallback Value returned when the key is unknown or unset.
 	 * @return mixed
 	 */
-	public static function get( string $key, $default = null ) {
+	public static function get( string $key, $fallback = null ) {
 		$schema = SettingsSchema::all();
 
 		if ( ! isset( $schema[ $key ] ) ) {
-			return $default;
+			return $fallback;
 		}
 
-		$default = null === $default ? $schema[ $key ]['default'] : $default;
+		$fallback = null === $fallback ? $schema[ $key ]['default'] : $fallback;
 		$options = get_option( SettingsSchema::OPTION, array() );
 
 		if ( ! is_array( $options ) || ! array_key_exists( $key, $options ) ) {
-			return $default;
+			return $fallback;
 		}
 
 		/**
