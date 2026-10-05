@@ -147,7 +147,7 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | No unbounded query or disabled `srcset` anywhere | **VERIFIED** | `[PERF]` gate scans 78 product PHP files for `posts_per_page => -1`, `nopaging => true` and `srcset` overriding; the `[LEGACY]` grep gate keeps its own rule |
 | Lighthouse / field Core Web Vitals numbers | **NOT_STARTED** | no browser and no live install in this environment: the budget is enforced statically and no field number is claimed (ADR 0016 §5) |
 | Editor-side SEO panels (per-post overrides, social previews) | **NOT_STARTED** | an admin UX feature, scheduled with the 0.11.0 release-candidate work; a site that wants it today runs Rank Math |
-| Every gate is green on the 0.10.0 commit | **PENDING** | CI runs for head `581e506` (see the phase commit history in `docs/REBUILD-PLAN.md`); this row is updated with the run ids once the runs complete |
+| Every gate is green on the 0.10.0 commit | **VERIFIED** | CI runs `37358851972` (pull request) and `37358981113` (push) at head `982c261`: all 8 jobs success — WPCS 0 findings, PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build` (includes the new `[PERF]` gate), `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (118 tests, 948 assertions)` on both legs, legacy artifact integrity. The two earlier red runs (`79eb882`, `581e506`) found three test defects and one WPCS finding, all fixed in `581e506`/`982c261` |
 
 **What the 0.10.0 suite found.** Two of the new tests were wrong before the product was: the
 JSON-LD escaping test asserted a raw string suffix (the tag body is wrapped in newlines) and tried to
