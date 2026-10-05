@@ -134,7 +134,12 @@ class Test_News extends Wavira_Test_Case {
 		$this->make_post(
 			'No excerpt',
 			'2026-02-02 10:00:00',
-			array( 'post_content' => 'The editor wrote only a body, so the feed trims one: ' . str_repeat( 'word ', 60 ) )
+			array(
+				// The factory writes a default excerpt; clearing it is what makes the
+				// content-derived excerpt reachable (a real editor leaves it empty).
+				'post_excerpt' => '',
+				'post_content' => 'The editor wrote only a body, so the feed trims one: ' . str_repeat( 'word ', 60 ),
+			)
 		);
 
 		update_post_meta( $with_excerpt, '_thumbnail_id', $this->make_thumbnail( $with_excerpt ) );

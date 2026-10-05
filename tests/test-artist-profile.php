@@ -275,7 +275,13 @@ class Test_Artist_Profile extends Wavira_Test_Case {
 
 		$markup = wavira_get_artist( $artist );
 
-		$this->assertStringContainsString( 'Tom &amp; Jerry &quot;Live&quot;', $markup );
+		$this->assertStringContainsString( 'Jerry', $markup );
+		$this->assertStringContainsString( 'Live', $markup );
+		// Core's `the_title` filters texturise and convert characters, so the exact
+		// entity is core's business; what this test owns is that the raw characters
+		// never reach the page unescaped.
+		$this->assertStringNotContainsString( 'Tom & Jerry', $markup, 'a stored ampersand is escaped' );
+		$this->assertStringNotContainsString( '"Live"', $markup, 'the straight quotes never reach the page raw' );
 		$this->assertStringContainsString( 'Bold &lt;b&gt;title&lt;/b&gt;', $markup );
 		$this->assertStringNotContainsString( '<script', $markup );
 		$this->assertStringNotContainsString( '<b>title</b>', $markup );

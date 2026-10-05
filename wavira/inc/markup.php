@@ -262,10 +262,10 @@ if ( ! function_exists( 'wavira_get_image' ) ) {
 	 *
 	 * @param array<string, mixed> $image Payload: `id`, `url`, `alt`.
 	 * @param string               $size  Registered image size.
-	 * @param string               $class CSS class for the image element.
+	 * @param string               $class_name CSS class for the image element.
 	 * @return string Markup, empty string when there is no image.
 	 */
-	function wavira_get_image( $image, $size = 'wavira-cover-sm', $class = '' ) {
+	function wavira_get_image( $image, $size = 'wavira-cover-sm', $class_name = '' ) {
 		$image = (array) $image;
 		$id    = isset( $image['id'] ) ? absint( $image['id'] ) : 0;
 		$alt   = isset( $image['alt'] ) ? (string) $image['alt'] : '';
@@ -276,7 +276,7 @@ if ( ! function_exists( 'wavira_get_image' ) ) {
 				$size,
 				false,
 				array(
-					'class'    => $class,
+					'class'    => $class_name,
 					'loading'  => 'lazy',
 					'decoding' => 'async',
 					'alt'      => $alt,
@@ -292,7 +292,7 @@ if ( ! function_exists( 'wavira_get_image' ) ) {
 
 		return sprintf(
 			'<img class="%s" src="%s" alt="%s" loading="lazy" decoding="async" />',
-			esc_attr( $class ),
+			esc_attr( $class_name ),
 			esc_url( $url ),
 			esc_attr( $alt )
 		);

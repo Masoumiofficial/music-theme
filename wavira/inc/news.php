@@ -28,7 +28,8 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 	 *
 	 *     @type int    $limit       Items to show (default 6, max 24).
 	 *     @type string $source      `blog` (newest posts) or `category`.
-	 *     @type string $category    Category slug when source is `category`.
+	 *     @type string $category    Category slug. A slug implies the `category` source,
+	 *                               whether or not `source` says so.
 	 *     @type int    $offset      Items to skip.
 	 *     @type bool   $show_date   Print the date line (default true).
 	 *     @type bool   $show_excerpt Print the excerpt (default true).
@@ -56,7 +57,17 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 			return '';
 		}
 
-		$category = 'category' === (string) $args['source'] ? (string) $args['category'] : '';
+		$category = (string) $args['category'];
+
+		// A slug is a request for that category, so it decides the source: asking for
+		// one category and silently getting the whole blog is the misread this guards.
+		// The reverse is refused too — `source=category` without a slug must not mean
+		// "every post".
+		if ( '' !== $category ) {
+			$args['source'] = 'category';
+		} elseif ( 'category' === (string) $args['source'] ) {
+			return '';
+		}
 
 		$items = wavira_core_news_feed(
 			array(

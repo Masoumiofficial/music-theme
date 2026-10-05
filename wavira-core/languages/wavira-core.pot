@@ -43,7 +43,7 @@ msgstr ""
 msgid "Album"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:262
+#: wavira-core/src/Content/ArtistProfile.php:263
 #: wavira-core/src/Content/PostTypes.php:119
 msgid "Albums"
 msgstr ""
@@ -53,7 +53,7 @@ msgstr ""
 msgid "All %s"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:197
+#: wavira-core/src/Content/ArtistProfile.php:198
 msgid "Aparat"
 msgstr ""
 
@@ -146,7 +146,7 @@ msgstr ""
 msgid "Enable the Release-year taxonomy"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:198
+#: wavira-core/src/Content/ArtistProfile.php:199
 msgid "Facebook"
 msgstr ""
 
@@ -178,7 +178,7 @@ msgstr ""
 msgid "Global social profile URLs"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:194
+#: wavira-core/src/Content/ArtistProfile.php:195
 msgid "Instagram"
 msgstr ""
 
@@ -259,7 +259,7 @@ msgstr ""
 msgid "Music video"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:268
+#: wavira-core/src/Content/ArtistProfile.php:269
 #: wavira-core/src/Content/PostTypes.php:133
 msgid "Music videos"
 msgstr ""
@@ -429,7 +429,7 @@ msgstr ""
 msgid "Shuffle"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:265
+#: wavira-core/src/Content/ArtistProfile.php:266
 msgid "Singles"
 msgstr ""
 
@@ -446,7 +446,7 @@ msgstr ""
 msgid "Start in dark mode"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:195
+#: wavira-core/src/Content/ArtistProfile.php:196
 msgid "Telegram"
 msgstr ""
 
@@ -536,14 +536,14 @@ msgstr ""
 msgid "What the queue is built from."
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:271
+#: wavira-core/src/Content/ArtistProfile.php:272
 msgid "Works"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:199
+#: wavira-core/src/Content/ArtistProfile.php:200
 msgid "X (Twitter)"
 msgstr ""
 
-#: wavira-core/src/Content/ArtistProfile.php:196
+#: wavira-core/src/Content/ArtistProfile.php:197
 msgid "YouTube"
 msgstr ""

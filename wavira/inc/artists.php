@@ -262,7 +262,7 @@ if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
 		$columns = (int) $args['columns'];
 		$columns = (int) max( 2, min( 4, $columns ) );
 
-		$html = '<section class="wavira-section wavira-gallery">';
+		$html  = '<section class="wavira-section wavira-gallery">';
 		$html .= wavira_get_section_head( __( 'Photos', 'wavira' ) );
 		$html .= '<ul class="wavira-gallery__items wavira-gallery__items--' . esc_attr( (string) $columns ) . '">';
 

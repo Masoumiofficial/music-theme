@@ -126,6 +126,7 @@ final class ArtistProfile {
 	 */
 	private static function biography( WP_Post $artist ): string {
 		if ( '' !== trim( (string) $artist->post_content ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter; a biography is post content and renders through the same pipeline.
 			return (string) apply_filters( 'the_content', $artist->post_content );
 		}
 

@@ -119,6 +119,8 @@ thumbnail { id, url }, categories[] { name, link }, author { id, name }
   publicly queryable falls back to `post`, so a caller cannot surface a private type by guessing its
   name.
 - `category` restricts the feed to one slug; an unknown slug yields nothing, never everything.
+  In the theme helpers a slug *is* a request for that category, so `category` decides the source
+  on its own; `source: category` with no slug is an empty feed, never the whole blog.
 - Filter: `wavira_core_news_items`.
 
 ### 2.3 Editor and template surfaces
