@@ -30,7 +30,7 @@ class Test_Performance extends Wavira_Test_Case {
 			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'markup', 'performance', 'assets' ) as $file ) {
+		foreach ( array( 'helpers', 'markup', 'hooks', 'performance', 'assets' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {
@@ -122,6 +122,15 @@ class Test_Performance extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_emoji_assets_are_removed_everywhere() {
+		// The removals run on `init`, which has already fired by the time a test
+		// class loads a theme file; the wiring and the effect are asserted
+		// separately, so this test says what it means in both environments.
+		$this->assertNotFalse( has_action( 'init', 'wavira_disable_emoji_assets' ) );
+		$this->assertNotFalse( has_action( 'init', 'wavira_disable_emojis_everywhere' ) );
+
+		wavira_disable_emoji_assets();
+		wavira_disable_emojis_everywhere();
+
 		$this->assertFalse( has_action( 'wp_head', 'print_emoji_detection_script' ) );
 		$this->assertFalse( has_action( 'wp_print_styles', 'print_emoji_styles' ) );
 		$this->assertFalse( has_action( 'admin_print_scripts', 'print_emoji_detection_script' ) );

@@ -265,9 +265,20 @@ class Test_Seo extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_markup_embeds_json_ld_and_cannot_be_closed_early() {
-		$artist = $this->make_artist( array( 'post_title' => 'Closer </script> Artist' ) );
+		$artist = $this->make_artist();
 
-		$markup = wavira_get_structured_data_markup( $artist );
+		// The title is injected through the same filter the builder reads, because
+		// a stored title cannot carry `</script>`: KSES strips it on save. The claim
+		// under test is the encoder's, not the database's.
+		$closer = static function () {
+			return 'Closer </script> Artist';
+		};
+
+		add_filter( 'the_title', $closer );
+
+		$markup = trim( wavira_get_structured_data_markup( $artist ) );
+
+		remove_filter( 'the_title', $closer );
 
 		$this->assertStringStartsWith( '<script type="application/ld+json">', $markup );
 		$this->assertStringEndsWith( '</script>', $markup );

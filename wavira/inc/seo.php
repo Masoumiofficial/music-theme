@@ -88,7 +88,6 @@ if ( ! function_exists( 'wavira_get_structured_data_markup' ) ) {
 		// must not be able to close the tag it sits in.
 		$json = wp_json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG );
 
-
 		if ( ! is_string( $json ) || '' === $json ) {
 			return '';
 		}
