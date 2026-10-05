@@ -8,7 +8,7 @@
 /**
  * Class Test_Content_Registration
  */
-class Test_Content_Registration extends WP_UnitTestCase {
+class Test_Content_Registration extends Wavira_Test_Case {
 
 	/**
 	 * The four music post types exist.

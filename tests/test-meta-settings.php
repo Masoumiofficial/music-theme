@@ -14,7 +14,7 @@ use Wavira\Core\Settings\SettingsSchema;
 /**
  * Class Test_Meta_Settings
  */
-class Test_Meta_Settings extends WP_UnitTestCase {
+class Test_Meta_Settings extends Wavira_Test_Case {
 
 	/**
 	 * Relation IDs are sanitised, deduplicated and freed of zeros.
@@ -38,7 +38,7 @@ class Test_Meta_Settings extends WP_UnitTestCase {
 		$this->assertSame( 'https://example.com/a.mp3', Meta::sanitize_url( 'https://example.com/a.mp3' ) );
 		$this->assertSame( '', Meta::sanitize_url( 'javascript:alert(1)' ) );
 		$this->assertSame( 'album', Meta::sanitize_enum( 'album', array( 'album', 'single' ) ) );
-		$this->assertSame( 'album', Meta::sanitize_enum( 'mixtape', array( 'album', 'single' ) ) );
+		$this->assertSame( '', Meta::sanitize_enum( 'mixtape', array( 'album', 'single' ) ), 'unknown values are dropped, never silently coerced' );
 	}
 
 	/**
@@ -91,9 +91,23 @@ class Test_Meta_Settings extends WP_UnitTestCase {
 			)
 		);
 
-		update_post_meta( $album_id, MetaSchema::TRACKLIST, array( '31', '7', '12' ) );
+		$tracks = array();
 
-		$this->assertSame( array( 31, 7, 12 ), MetaValues::tracklist( $album_id ) );
+		foreach ( array( 'One', 'Two', 'Three' ) as $title ) {
+			$tracks[] = self::factory()->post->create(
+				array(
+					'post_type'   => 'wavira_track',
+					'post_status' => 'publish',
+					'post_title'  => $title,
+				)
+			);
+		}
+
+		// Stored out of order and with an ID that is not a track: the reader keeps
+		// list order and drops foreign IDs (relations are typed, ADR 0012).
+		update_post_meta( $album_id, MetaSchema::TRACKLIST, array( $tracks[2], $tracks[0], '999999', $tracks[1] ) );
+
+		$this->assertSame( array( $tracks[2], $tracks[0], $tracks[1] ), MetaValues::tracklist( $album_id ) );
 	}
 
 	/**

@@ -70,9 +70,9 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `src/Content/` | CPTs, taxonomies, meta registration, term meta, upgrade routines |
 | `src/Settings/` | one typed settings schema, Settings API + REST exposure |
 | `src/Player/` | queue building, playback payloads, Media Session data |
-| `src/Downloads/` | quality matrix, access gate, counters |
-| `src/Search/` | cross-type search (debounced, cached) |
-| `src/Related/` | related artist/album/track/video resolution |
+| `src/Downloads/` | quality matrix, access gate, **atomic counters** (0.4.0 ✅) |
+| `src/Search/` | cross-type search + suggestions, `SearchService` (0.4.0 ✅) |
+| `src/Related/` | scored related resolution, `RelatedService` (0.4.0 ✅) |
 | `src/Rest/` | `wavira/v1` controllers, schemas, permissions |
 | `src/Admin/` | editor panels, columns, validation, bulk actions, notices |
 | `src/Import/`, `src/Demo/`, `src/Migration/` | data in / data out / data converted |
@@ -89,6 +89,8 @@ to WordPress-native loops (posts/pages) when music types are missing.
         Settings → register_setting + rest schema
         Rest     → register_rest_route (rest_api_init)
         Admin    → admin_menu / metaboxes / columns
+        Search / Related / Downloads → services, reached through the REST controllers
+                                       (no public routes of their own beyond 0.4.0's additions)
 4. after_setup_theme         theme: supports, menus, image sizes, i18n
 5. wp_enqueue_scripts        theme: build-aware conditional assets
 6. template render           theme reads Core via helpers; blocks call Core services
@@ -125,8 +127,10 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_archive_per_page` | 0.3.0 |
 | Filter | `wavira_setting` (read), `wavira_settings_schema` | 0.3.0 |
 | Filter | `wavira_track_playback_payload` | 0.5.0 |
-| Filter | `wavira_related_items` | 0.4.0 |
-| Filter | `wavira_download_quality_matrix` | 0.4.0 |
+| Filter | `wavira_related_items`, `wavira_related_score` | 0.4.0 ✅ |
+| Filter | `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_served` | 0.4.0 ✅ |
+| Filter | `wavira_searchable_types` | 0.4.0 ✅ |
+| Action | `wavira_download_counted` | 0.4.0 ✅ |
 | Filter | `wavira_icon` (theme) | 0.6.0 |
 | Function | `wavira_get_setting()`, `wavira_has_core()` (theme) | 0.2.0 ✅ |
 | Function | `wavira_core()` (plugin service accessor) | 0.3.0 |
@@ -141,8 +145,8 @@ Everything else is private. No module may be reached through a global variable.
 | Escaping | Output escaping happens in the layer that renders (theme/blocks/admin). Services return data, never HTML. |
 | Settings | One schema with sanitize callbacks; raw JS ad code is capability-gated (`unfiltered_html`). |
 | REST | Permission callback + args schema + `sanitize_callback` on every route; no route without both. |
-| Downloads | Authorization happens server-side before a URL is handed out; signed URLs optional; **no DRM claims**. |
-| Caching | Expensive reads only through services implementing `Cacheable`; cache keys include all arguments; flush on save. |
+| Downloads | Authorization happens server-side before a URL is handed out; delivery is a `302` to the stored file (never a PHP byte proxy, never token obfuscation); counters increment atomically; **no DRM claims** (ADR 0013). |
+| Caching | Expensive reads only through services implementing `Cacheable`; keys are generation-scoped so one content change invalidates the derived layer; TTLs (search 300 s, related 3600 s) are filterable; no per-user state under a shared key (ADR 0013 §3). |
 | Queries | All list queries paginated; counts via `no_found_rows` or cached counters. |
 | Assets | Build-aware conditional enqueue; no front-end jQuery; player bundle only where a player exists. |
 | A11y | Components ship keyboard support and ARIA in the component itself (not bolted on at the template). |
@@ -160,7 +164,7 @@ implementations — see the brief's YAGNI rule.
 | --- | --- | --- |
 | 0.2.0 | ARCHITECTURE | this document, ADRs, skeleton, coding standard, CI | ✅ |
 | 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 40 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
-| 0.4.0 | MUSIC ENGINE | Search, Related, Downloads, counters |
+| 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, ADR 0013, PHPUnit harness (`tests/`, `bin/install-wp-tests.sh`) | ✅ implemented · static verification **VERIFIED** in CI · runtime verification **pending** (see `docs/VERIFICATION.md`) |
 | 0.5.0 | PLAYER | `assets/js/player/*` module, Media Session, a11y |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR |
 | 0.7.0 | BUILDERS | blocks + Elementor widgets |

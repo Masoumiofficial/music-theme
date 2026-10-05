@@ -13,7 +13,7 @@ use Wavira\Core\Support\Cache;
 /**
  * Class Test_Search_Related
  */
-class Test_Search_Related extends WP_UnitTestCase {
+class Test_Search_Related extends Wavira_Test_Case {
 
 	/**
 	 * SQL captured from `posts_request` during a callback.

@@ -82,7 +82,7 @@ final class Taxonomies implements Registrable {
 	public function register_taxonomies(): void {
 		foreach ( self::definitions() as $taxonomy => $definition ) {
 			// Optional taxonomies can be switched off; genre is always available.
-			if ( '' !== $definition['setting'] && ! Settings::get( $definition['setting'], false ) ) {
+			if ( '' !== $definition['setting'] && ! Settings::get( $definition['setting'] ) ) {
 				continue;
 			}
 

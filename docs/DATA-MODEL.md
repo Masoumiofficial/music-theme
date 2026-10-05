@@ -1,4 +1,4 @@
-# DATA-MODEL.md — Wavira music model (authoritative from 0.3.0)
+# DATA-MODEL.md — Wavira music model (authoritative from 0.4.0)
 
 > **Verification status:** the model below is implemented and passes the static CI gates
 > (WPCS + PHPCompatibilityWP + PHP 7.4/8.2/8.3 syntax). Runtime verification on a live
@@ -7,7 +7,8 @@
 
 **Status:** IMPLEMENTED in code (`wavira-core/src/Content/*`) · **Supersedes:** the reconstructed legacy
 model in `DATA-MODEL-AUDIT.md` (kept for migration purposes only).
-**Contract:** ADR 0003 (real entities), ADR 0011 (slugs), ADR 0012 (relations as post IDs).
+**Contract:** ADR 0003 (real entities), ADR 0011 (slugs), ADR 0012 (relations as post IDs),
+ADR 0013 (counters, delivery, caching).
 
 ---
 
@@ -38,8 +39,9 @@ hardcoded.
 
 ## 3. Registered meta
 
-Every key is registered with `register_post_meta()` (type + single + sanitize_callback +
-auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`.
+**43 keys** are registered with `register_post_meta()` (type + single + sanitize_callback +
+auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`; the count is asserted by
+`wp wavira verify` and by `tests/test-meta-settings.php`.
 
 ### Relations (post IDs — never free text, ADR 0012)
 
@@ -66,6 +68,13 @@ auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`.
 | `wavira_isrc` | text | industry identifier |
 | `wavira_explicit` | bool | explicit-content badge |
 | `wavira_version_note` | text | e.g. "Remix", "Live" |
+
+**Counters (plugin-only, added in 0.4.0)** — `wavira_download_count`, `wavira_download_count_128`,
+`wavira_download_count_320`. Registered integers on tracks with **`show_in_rest => false`**: they are
+accounting state, not public API. Increments are a single atomic
+`UPDATE … SET meta_value = CAST(meta_value AS UNSIGNED) + %d` through `$wpdb->prepare()`
+(`Downloads\Counter`), so concurrent downloads cannot lose a count. Writing them is the **plugin's**
+job only; the theme never touches a counter (ADR 0013 §1).
 
 ### Editorial / listing
 
@@ -129,6 +138,10 @@ Unknown keys are dropped on save; integers are clamped to their bounds; URLs pas
 | `GET /wavira/v1/tracks` · `/tracks/{id}` | track projections incl. `player` + gated `downloads` |
 | `GET /wavira/v1/videos` · `/videos/{id}` | video projections incl. quality sources |
 | `GET /wavira/v1/genres` · `/genres/{id}` | genre terms with counts |
+| `GET /wavira/v1/search?q=…` | rank-ordered cross-type search results (all registered collections) |
+| `GET /wavira/v1/search/suggest?q=…` | lightweight type-ahead suggestions (titles only, capped) |
+| `GET /wavira/v1/{artists\|albums\|tracks\|videos}/{id}/related` | scored related items (genre 3, artist 2, album 1, featured 1 — filterable) |
+| `GET /wavira/v1/download/{id}?quality=320` | `302` to the file when authorized, `403` otherwise; `?format=json` returns the envelope instead |
 
 Collection filters: `page`, `per_page` (≤ 50), `search`, `orderby` (`date`, `title`, `menu_order`,
 `modified`, `rand`), `order`, `genre` (slug), `artist` (ID), `album` (ID), `featured`.
@@ -139,7 +152,13 @@ lean read model used by the front end and headless consumers.
 
 **Download honesty:** `downloads` is populated only when `Downloads\Access::can_download()` passes
 (site setting → per-track opt-out → optional login requirement → `wavira_download_access` filter).
-This is authorization, **not** DRM; the product never claims otherwise.
+The download endpoint **authorizes and redirects** — it never proxies bytes, never hides the URL behind
+a token, and never claims DRM (ADR 0013 §2). Anyone who can play the track can obtain the file; the
+authorization chain controls the *offer*, not the possibility.
+
+**Input limits (0.4.0):** `per_page` is clamped to 50, `page` to ≥ 1, search terms to 100 characters;
+`rand` ordering is refused above 500 candidate posts. `search` and `related` answers are cached for
+300 s / 3600 s respectively in generation-scoped keys (ADR 0013 §3).
 
 ## 6. Read/write helpers
 
@@ -151,7 +170,11 @@ This is authorization, **not** DRM; the product never claims otherwise.
 | `MetaValues::socials( $artist_id )` | social map for templates/REST |
 | `MetaValues::duration_label( $post_id )` | localised `m:ss` |
 | `Settings::get/all/update()` | typed settings access |
-| `Cache::remember/flush` | versioned caching for services (phase 0.4.0) |
+| `Cache::{get,set,remember,flush,generation}` | versioned caching for services; `get()` returns `array{found,value}` so `null` stays cacheable |
+| `Content\QueryFilters::{args,genre,relations,clamp_per_page}` | the single place collection queries are built (no ad-hoc `WP_Query` args in controllers) |
+| `Downloads\Counter::{increment,total,for_quality,summary,reset,supports}` | atomic counters (above) |
+| `Search\SearchService::{search,suggest,summarize,…}` | cross-type search + suggestions, cached |
+| `Related\RelatedService::{supports,ids,posts,limit}` | scored related items, cached |
 
 **Rule:** no code reads music meta through a literal string. Constants only (`MetaSchema::*`).
 
@@ -163,4 +186,12 @@ wp wavira seed [--force]  # minimal licence-clean demo set (generated text only)
 ```
 
 Phase 0.3.0 acceptance: `wp wavira verify` reports zero problems on a clean install and after seeding.
+Phase 0.4.0 adds the automated suite below; its runtime status is tracked in `docs/VERIFICATION.md`
+(the suite has run in CI but **has not yet been observed green** — no claim is made until it is).
+
+```bash
+composer install          # dev-only: phpunit + polyfills
+composer test:install     # downloads the WordPress test library (needs MySQL/MariaDB)
+composer test             # PHPUnit against the real WordPress test suite
+```
 Legacy data conversion is specified in `MIGRATION-BLUEPRINT.md` and implemented in phase 0.9.0.

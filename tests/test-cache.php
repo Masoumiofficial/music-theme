@@ -11,7 +11,7 @@ use Wavira\Core\Support\Cache;
 /**
  * Class Test_Cache
  */
-class Test_Cache extends WP_UnitTestCase {
+class Test_Cache extends Wavira_Test_Case {
 
 	/**
 	 * Values round-trip through the object cache.

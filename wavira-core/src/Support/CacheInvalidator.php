@@ -32,7 +32,12 @@ final class CacheInvalidator implements Registrable {
 		add_action( 'deleted_post', array( $this, 'on_deleted_post' ), 10, 1 );
 		add_action( 'edited_term', array( $this, 'on_term_change' ), 10, 3 );
 		add_action( 'delete_term', array( $this, 'on_term_change' ), 10, 3 );
+		// Both hooks are required: on a site whose settings were never saved,
+		// `update_option()` creates the row and fires `add_option_{$option}`
+		// instead — the update hook alone left computed caches stale after the
+		// first save (caught by the integration suite).
 		add_action( 'update_option_' . SettingsSchema::OPTION, array( $this, 'on_settings_update' ) );
+		add_action( 'add_option_' . SettingsSchema::OPTION, array( $this, 'on_settings_update' ) );
 	}
 
 	/**

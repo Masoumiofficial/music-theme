@@ -73,6 +73,27 @@ for (const raw of blocks) {
 	});
 }
 
+// GitHub caps how MANY annotations a step may produce, not how long each one is.
+// So the complete list of problems is emitted first, in a single annotation, and
+// the per-test detail annotations follow within the budget.
+if (problems.length > 0) {
+	const summary = problems
+		.map((problem) => {
+			const [name, detail = ''] = problem.message.split(' — ');
+
+			// Errors carry an exception type that the per-test annotations often do
+			// not survive (the annotation budget is per step, not per problem), so the
+			// headline keeps a short excerpt of the reason.
+			const reason = problem.kind === 'error' ? ` (${detail.slice(0, 160)})` : '';
+
+			return `${problem.kind === 'error' ? 'ERROR' : 'FAIL'} ${name}${reason}`;
+		})
+		.join(' | ');
+	console.log(
+		`::error file=tests::${problems.length} problem(s): ${summary.slice(0, 6000)}`
+	);
+}
+
 for (const problem of problems.slice(0, max)) {
 	const level = problem.kind === 'error' ? 'error' : 'error';
 	console.log(`::${level} file=${problem.file},line=${problem.line}::${problem.message}`);

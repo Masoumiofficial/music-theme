@@ -10,7 +10,7 @@ use Wavira\Core\Content\MetaSchema;
 /**
  * Class Test_Rest_Api
  */
-class Test_Rest_Api extends WP_UnitTestCase {
+class Test_Rest_Api extends Wavira_Test_Case {
 
 	/**
 	 * A published track with audio, a genre and an artist.
@@ -56,16 +56,6 @@ class Test_Rest_Api extends WP_UnitTestCase {
 			'album'  => $album_id,
 			'genre'  => (int) $term['term_id'],
 		);
-	}
-
-	/**
-	 * Dispatch one GET request against the product API.
-	 *
-	 * @param string $route Route path.
-	 * @return WP_REST_Response|WP_HTTP_Response
-	 */
-	private function dispatch( string $route ) {
-		return rest_get_server()->dispatch( new WP_REST_Request( 'GET', $route ) );
 	}
 
 	/**
@@ -164,7 +154,7 @@ class Test_Rest_Api extends WP_UnitTestCase {
 			)
 		);
 
-		$response = $this->dispatch( '/wavira/v1/search?term=Midnight' );
+		$response = $this->dispatch( '/wavira/v1/search', array( 'term' => 'Midnight' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -183,7 +173,13 @@ class Test_Rest_Api extends WP_UnitTestCase {
 
 		$this->assertSame( 400, $this->dispatch( '/wavira/v1/search' )->get_status() );
 
-		$response = $this->dispatch( '/wavira/v1/search?term=Track&per_page=500' );
+		$response = $this->dispatch(
+			'/wavira/v1/search',
+			array(
+				'term'     => 'Track',
+				'per_page' => 500,
+			)
+		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertLessThanOrEqual( 50, count( $response->get_data() ) );
@@ -197,7 +193,7 @@ class Test_Rest_Api extends WP_UnitTestCase {
 	public function test_suggestions_route() {
 		$this->seed_track();
 
-		$response = $this->dispatch( '/wavira/v1/search/suggest?term=Test%20Artist' );
+		$response = $this->dispatch( '/wavira/v1/search/suggest', array( 'term' => 'Test Artist' ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -224,7 +220,7 @@ class Test_Rest_Api extends WP_UnitTestCase {
 
 		wp_set_post_terms( $sibling_id, array( $ids['genre'] ), 'wavira_genre' );
 
-		$response = $this->dispatch( '/wavira/v1/tracks/' . $ids['track'] . '/related?limit=5' );
+		$response = $this->dispatch( '/wavira/v1/tracks/' . $ids['track'] . '/related', array( 'limit' => 5 ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );

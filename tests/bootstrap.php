@@ -20,6 +20,7 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 	exit( 1 );
 }
 
+require_once __DIR__ . '/wavira-test-case.php';
 require_once $_tests_dir . '/includes/functions.php';
 
 tests_add_filter(

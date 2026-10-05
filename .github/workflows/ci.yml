@@ -196,7 +196,7 @@ jobs:
         if: always()
         run: |
           if [ -f /tmp/phpunit.log ]; then
-            node tools/annotate-log.mjs /tmp/phpunit.log phpunit 40
+            node tools/annotate-log.mjs /tmp/phpunit.log phpunit 60
           else
             echo "::notice::No PHPUnit log — the suite did not run because an earlier step failed."
           fi

@@ -50,8 +50,13 @@ final class Settings implements Registrable {
 	/**
 	 * Read one setting.
 	 *
+	 * The schema default always wins for a key that belongs to the schema: a
+	 * caller supplied `$fallback` only answers for unknown keys. Treating it as
+	 * an override made optional taxonomies vanish on a site whose settings had
+	 * never been saved (caught by the integration suite).
+	 *
 	 * @param string $key     Setting key.
-	 * @param mixed  $fallback Value returned when the key is unknown or unset.
+	 * @param mixed  $fallback Value returned when the key is unknown.
 	 * @return mixed
 	 */
 	public static function get( string $key, $fallback = null ) {
@@ -61,11 +66,10 @@ final class Settings implements Registrable {
 			return $fallback;
 		}
 
-		$fallback = null === $fallback ? $schema[ $key ]['default'] : $fallback;
-		$options  = get_option( SettingsSchema::OPTION, array() );
+		$options = get_option( SettingsSchema::OPTION, array() );
 
 		if ( ! is_array( $options ) || ! array_key_exists( $key, $options ) ) {
-			return $fallback;
+			return $schema[ $key ]['default'];
 		}
 
 		/**

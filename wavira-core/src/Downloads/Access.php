@@ -53,9 +53,12 @@ final class Access {
 			$allowed = false;
 		}
 
-		$stored = get_post_meta( $post_id, MetaSchema::DOWNLOAD_ENABLED, true );
-
-		if ( '' !== $stored && ! filter_var( $stored, FILTER_VALIDATE_BOOLEAN ) ) {
+		// An explicit opt-out must win even though `false` is stored as an empty
+		// string in the database: reading the value alone cannot tell "opt out"
+		// from "never set", so the existence of the row is the signal (the
+		// integration suite caught the difference).
+		if ( metadata_exists( 'post', $post_id, MetaSchema::DOWNLOAD_ENABLED )
+			&& ! MetaValues::bool( $post_id, MetaSchema::DOWNLOAD_ENABLED ) ) {
 			$allowed = false;
 		}
 

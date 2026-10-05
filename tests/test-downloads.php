@@ -13,7 +13,7 @@ use Wavira\Core\Settings\Settings;
 /**
  * Class Test_Downloads
  */
-class Test_Downloads extends WP_UnitTestCase {
+class Test_Downloads extends Wavira_Test_Case {
 
 	/**
 	 * Published track with both audio files.
@@ -39,16 +39,6 @@ class Test_Downloads extends WP_UnitTestCase {
 		update_post_meta( $track_id, MetaSchema::FILE_SIZE_320, 4194304 );
 
 		return $track_id;
-	}
-
-	/**
-	 * Dispatch one GET request.
-	 *
-	 * @param string $route Route path.
-	 * @return WP_REST_Response|WP_HTTP_Response
-	 */
-	private function dispatch( string $route ) {
-		return rest_get_server()->dispatch( new WP_REST_Request( 'GET', $route ) );
 	}
 
 	/**
@@ -138,7 +128,7 @@ class Test_Downloads extends WP_UnitTestCase {
 	public function test_download_endpoint_json_mode() {
 		$track_id = $this->make_track();
 
-		$response = $this->dispatch( '/wavira/v1/download/' . $track_id . '?redirect=0' );
+		$response = $this->dispatch( '/wavira/v1/download/' . $track_id, array( 'redirect' => false ) );
 		$data     = $response->get_data();
 
 		$this->assertSame( 200, $response->get_status() );
@@ -146,7 +136,13 @@ class Test_Downloads extends WP_UnitTestCase {
 		$this->assertSame( 320, $data['quality'] );
 		$this->assertSame( 1, $data['count'] );
 
-		$cheap = $this->dispatch( '/wavira/v1/download/' . $track_id . '?quality=128&redirect=0' );
+		$cheap = $this->dispatch(
+			'/wavira/v1/download/' . $track_id,
+			array(
+				'quality'  => 128,
+				'redirect' => false,
+			)
+		);
 
 		$this->assertSame( 128, $cheap->get_data()['quality'] );
 		$this->assertSame( 2, $cheap->get_data()['count'] );

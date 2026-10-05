@@ -200,9 +200,13 @@ final class Counter {
 		);
 
 		if ( 0 === $updated ) {
-			// No row yet (or a non-numeric value): create it, then retry the update
-			// once so a race between two first downloads cannot drop an increment.
-			add_post_meta( $post_id, $key, $by, true );
+			// First download of this track: create the row with a zero value and
+			// run the same single UPDATE. Creating it with `$by` and then updating
+			// again counted the first download twice (caught by the integration
+			// suite), and `add_post_meta(..., true )` keeps two concurrent first
+			// downloads from creating two rows — each request still adds its own
+			// increment through the UPDATE.
+			add_post_meta( $post_id, $key, 0, true );
 
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- see above.
 				$wpdb->prepare(
