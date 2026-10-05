@@ -122,6 +122,42 @@ appended; `--wp--custom--player--barSpace` and `--wp--custom--player--barHeight`
 (camelCase vs. WordPress' kebab-casing), so two settings silently did nothing; dark-mode chip text
 failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered `wavira.com`.
 
+## 0.10.0 — SEO cooperation and the performance budget
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| An artist page produces a `MusicGroup` node with its profiles | **VERIFIED** | `Test_Seo::test_artist_graph_is_a_music_group_with_profiles` — `@type`, `name`, `url`, `description`, `#musicgroup` fragment and `sameAs` carrying the Telegram and website URLs |
+| An album node lists its published tracks and keeps the editorial release date | **VERIFIED** | `Test_Seo::test_album_graph_lists_published_tracks` — a draft in the tracklist is neither counted nor listed (`numTracks` 1), `datePublished` is `2024-03-05T00:00:00+00:00` from `wavira_release_date`, and `byArtist` names the artist |
+| A track node carries duration, album and ISRC | **VERIFIED** | `Test_Seo::test_track_graph_carries_duration_and_album` — 222 s → `PT3M42S`, `inAlbum.name`, `isrcCode`, credit and description |
+| A hosted video exposes its file; YouTube and Aparat become embed URLs | **VERIFIED** | `Test_Seo::test_video_graph_maps_hosted_and_provider_sources` + `test_embed_url_handles_short_and_unknown_providers` — `contentUrl` for the file, `https://www.youtube.com/embed/AbC123`, `youtu.be/Ty2`, `music.youtube.com`, Aparat `/v/demo1`; an unknown provider maps to an empty string (the URL is kept as `contentUrl` in the node) |
+| Posts, pages, drafts and unknown IDs never produce a node | **VERIFIED** | `Test_Seo::test_only_published_music_produces_a_graph` |
+| The graph is a documented switch, not a hard-coded behaviour | **VERIFIED** | `Test_Seo::test_structured_data_can_be_disabled` — `wavira_core_structured_data_enabled` empties both the payload and the markup |
+| The printed JSON-LD cannot be escaped out of | **VERIFIED** | `Test_Seo::test_markup_embeds_json_ld_and_cannot_be_closed_early` — a title injected as `Closer </script> Artist` appears hex-escaped (`\u003C/script\u003E`) and the markup contains exactly one `</script>` |
+| Plugin detection defaults to off and follows both filters | **VERIFIED** | `Test_Seo::test_seo_plugin_detection_defaults_to_false_and_follows_the_filter` — core answer, theme wrapper, and a theme-level override |
+| The fallback meta tags print only when nothing else does | **VERIFIED** | `Test_Seo::test_social_meta_is_a_fallback_only` — `meta description`, `og:type` (`article` for a post), `og:locale`, `twitter:card`, `article:published_time`; then empty output with `wavira_theme_seo_plugin_active` true |
+| A music single's title gains its artist; other titles are untouched | **VERIFIED** | `Test_Seo::test_document_title_parts_add_the_artist_to_music_singles` — `First track · Demo Artist`, and a blog post unchanged |
+| Credits are ordered, deduplicated and published-only | **VERIFIED** | `Test_Seo::test_credit_names_are_ordered_and_published_only` — `[ 'Demo Artist', 'Featured Artist' ]` even when the featured list is unordered and contains a draft |
+| The gzipped budgets are met by the built bundles | **VERIFIED** | `[PERF]` gate → `theme.css` 7402 B of 25600 B, `theme.js` 2610 B of 30720 B, `core.js` (player bundle) 14271 B of 15360 B; runs locally and in the CI job `JS, JSON, gates, build` |
+| Shipped assets load nothing from another origin | **VERIFIED** | `[PERF]` gate, remote-URL rule → 10 shipped CSS/JS/SVG files, zero third-party URL; the one hint WordPress adds (`s.w.org`) is removed by `wavira_resource_hints()` and asserted in `Test_Performance::test_sw_org_resource_hint_is_removed` |
+| The theme does not cancel core's image optimisation | **VERIFIED** | `Test_Performance::test_theme_images_leave_loading_attributes_to_core` — `wavira_get_image()` output is identical to `wp_get_attachment_image()` for the same arguments, attribute for attribute; the `[PERF]` gate fails if `loading`/`decoding` come back |
+| A payload without an attachment still renders, lazily | **VERIFIED** | `Test_Performance::test_bare_url_images_still_render_lazily` |
+| The emoji script and styles are gone, front end and admin | **VERIFIED** | `Test_Performance::test_emoji_assets_are_removed_everywhere` — the five core callbacks (`wp_head`, `wp_print_styles`, both admin pairs, `wp_mail`) are gone after the two functions run, and the `init` wiring is locked by a source assertion, because WordPress's test case restores `$wp_filter` after every test |
+| The player bundle loads on request, never on every page | **VERIFIED** | `Test_Performance::test_player_bundle_loads_only_on_request` — with the handle registered, `wavira_core_enqueue_player()` enqueues script **and** stylesheet; on an un-built checkout it reports false instead of printing a 404 |
+| The theme script is deferred; an un-built theme enqueues nothing | **VERIFIED** | `Test_Performance::test_theme_script_is_deferred_when_built` — `strategy` is `defer` when the built file exists, and the handle stays unregistered when it does not |
+| No unbounded query or disabled `srcset` anywhere | **VERIFIED** | `[PERF]` gate scans 78 product PHP files for `posts_per_page => -1`, `nopaging => true` and `srcset` overriding; the `[LEGACY]` grep gate keeps its own rule |
+| Lighthouse / field Core Web Vitals numbers | **NOT_STARTED** | no browser and no live install in this environment: the budget is enforced statically and no field number is claimed (ADR 0016 §5) |
+| Editor-side SEO panels (per-post overrides, social previews) | **NOT_STARTED** | an admin UX feature, scheduled with the 0.11.0 release-candidate work; a site that wants it today runs Rank Math |
+| Every gate is green on the 0.10.0 commit | **PENDING** | CI runs for head `581e506` (see the phase commit history in `docs/REBUILD-PLAN.md`); this row is updated with the run ids once the runs complete |
+
+**What the 0.10.0 suite found.** Two of the new tests were wrong before the product was: the
+JSON-LD escaping test asserted a raw string suffix (the tag body is wrapped in newlines) and tried to
+keep `</script>` in a stored title (KSES strips it) — the claim now injects the string through the
+filter the builder reads, which is what "the encoder escapes it" actually means. The emoji test
+assumed `init` hooks had run; by the time a test class loads a theme file, `init` is long past, so it
+now asserts the wiring and the effect separately. The `[PERF]` gate's first real number is worth
+recording: the player bundle is at **93 %** of its 15 KB budget, which is a constraint for the next
+core feature, not a comfortable margin.
+
 ## 0.9.0 — Artist profiles and the music-news section
 
 | Claim | Status | Evidence |

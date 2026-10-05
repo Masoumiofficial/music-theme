@@ -26,13 +26,14 @@ wavira/
 │   ├── helpers.php      small template helpers (core-aware, degrade gracefully)
 │   ├── hooks.php        body classes, small core adjustments
 │   ├── assets.php       conditional, build-aware enqueueing
-│   ├── markup.php       shared markup (tracklist, video, chips) — one implementation
+│   ├── performance.php  no third-party hints; core keeps its LCP image decision
+│   ├── seo.php          music JSON-LD + the meta/OG fallbacks for sites with no SEO plugin
+│   ├── markup.php       shared markup (tracklist, video, cards, chips) — one implementation
 │   ├── player.php       the player mount point + no-JavaScript fallback
 │   ├── artists.php      artist profile markup (works, biography, socials, gallery)
 │   ├── news.php         the music-news feed as cards (+ category chips)
 │   ├── shortcodes.php   classic-editor surfaces, delegating to markup.php
-│   ├── blocks.php       block registration from each blocks/<name>/block.json
-│   └── integrations/    rank-math.php, yoast.php, elementor.php (later phases)
+│   └── blocks.php       block registration from each blocks/<name>/block.json
 ├── templates/           block templates (16: index, home, archive, page, single, search, 404,
 │                        music singles/archives, artist profile, genre archive)
 ├── parts/               block template parts (header, footer, player bar)

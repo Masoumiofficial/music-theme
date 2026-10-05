@@ -41,6 +41,22 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Jalali (Shamsi) dates | **Not implemented in 0.8.0**; date output uses `wp_date()` with `fa_IR` locale data, and a Jalali layer is scheduled as its own tested change | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
 | Persian fonts | The token set prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI`/system fallbacks; no font file bundled yet | bundling a subset font is a packaging and size-budget decision (ADR 0010 licence file must travel with it), not a code change |
 
+### 0.10.0 — SEO cooperation and the performance budget (2026-10-05)
+
+| Decision | Choice | Why | ADR |
+| --- | --- | --- | --- |
+| Who writes `meta description`, OG, Twitter, canonical, sitemaps | **The site's SEO plugin**; the theme only falls back when none is active | two descriptions of one page is worse than one — the legacy theme's duplicate SEO surface is what the audit flagged | ADR 0016 §2 |
+| Music structured data | **always emitted** (bounded, filterable) | every general-purpose SEO plugin is blind to `wavira_artist`/`_album`/`_track`/`_video`; the data already exists in the product's model | ADR 0016 §2 |
+| Where the graph is built | **Core plugin** (`Seo\StructuredData`), printed by the theme | the graph is content logic (a headless consumer or another theme reuses it); the `<script>` tag is presentation | ADR 0016 §3 |
+| Credit resolution | **one helper** (`Content\Credit`: primary, then featured, published only) | the schema, the document title and any future credit line must not be able to disagree | ADR 0016 §3 |
+| Album tracklist inside the graph | **capped at 50 nodes** | machine-readable summary, not a payload larger than the page | ADR 0016 §3 |
+| Release date vs. post date | **release date first** (`wavira_release_date`), post date as fallback | re-publishing an old album must not make it look new | ADR 0016 §3 |
+| Provider URL mapping | **YouTube + Aparat only**, everything else keeps its own URL | the two providers the product documents; oEmbed still handles playback | ADR 0016 §3 |
+| Performance promise | **a gate, not a paragraph**: `[PERF]` fails the build | budgets written in 0.1.0 and measured by hand drifted; the player bundle is already at 93 % of its 15 KB | ADR 0016 §4 |
+| Image `loading`/`decoding`/`fetchpriority` | **never set by the theme** on the core path | hard-coded `loading="lazy"` silently cancels core's LCP promotion — the regression 0.10.0 removed | ADR 0016 §4 |
+| Third-party requests | **zero by default**, including WordPress's own `s.w.org` hint | privacy and speed are product promises, and the emoji script/emoji styles buy nothing here | ADR 0016 §4 |
+| XML sitemaps, breadcrumb graphs, per-post robots | **not built** | a plugin does them better and is already installed on the target sites | ADR 0016 §5 |
+
 ### 0.9.0 — artist profiles and the news section (2026-10-05)
 
 | Topic | Decision | Why |

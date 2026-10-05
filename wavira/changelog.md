@@ -5,6 +5,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.10.0 (SEO cooperation and the performance budget)
+- **`inc/seo.php`** — music structured data printed as one JSON-LD tag from the graph the plugin
+  builds, encoded with `JSON_HEX_TAG` so a title containing `</script>` cannot close the tag; plus
+  `meta description`, Open Graph and Twitter cards **as fallbacks only** — they print when no SEO
+  plugin is active (`wavira_theme_seo_plugin_active` overrides). A music single's document title now
+  carries its artist (`First track · Demo Artist`).
+- **`inc/performance.php`** — the `s.w.org` DNS hint is dropped (the last third-party request
+  WordPress adds); the admin and feed emoji filters go with the front-end ones.
+- `tools/check-perf.mjs`, wired into `tools/lint.sh` as **`[PERF]`**: gzipped budgets, zero
+  third-party URLs in shipped assets, no `posts_per_page => -1`, no `nopaging`, no disabled `srcset`.
+
+### Changed — 0.10.0
+- **LCP fix**: `wavira_get_image()` no longer hard-codes `loading="lazy"`/`decoding="async"` on the
+  core path. Core promotes the first, likely-LCP image to `fetchpriority="high"`; the theme was
+  cancelling that. A bare URL (no attachment) keeps the documented lazy fallback, and `[PERF]` fails
+  the build if the attributes come back.
+- Theme version 0.10.0; the catalogue stays at 215 strings, all translated (no new user-facing text —
+  schema values are content, not interface).
+
 ### Added — 0.9.0 (artist profiles and the news section)
 - **`include inc/artists.php`** — the artist page surfaces: portrait (with a music placeholder), name,
   quote, translated social chips, counts, the works grouped by album/single/video with per-section

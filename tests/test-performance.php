@@ -122,11 +122,20 @@ class Test_Performance extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_emoji_assets_are_removed_everywhere() {
-		// The removals run on `init`, which has already fired by the time a test
-		// class loads a theme file; the wiring and the effect are asserted
-		// separately, so this test says what it means in both environments.
-		$this->assertNotFalse( has_action( 'init', 'wavira_disable_emoji_assets' ) );
-		$this->assertNotFalse( has_action( 'init', 'wavira_disable_emojis_everywhere' ) );
+		// A hook cannot be asserted here: WordPress's test case snapshots
+		// `$wp_filter` once per process and restores it after every test
+		// (`_backup_hooks()` behind a static flag), so a theme file loaded after
+		// the first test can never leave a callback behind. The *effect* of the
+		// two functions is asserted directly, and the wiring is locked in the
+		// source below — which is where a live site reads it from.
+		$this->assertTrue( function_exists( 'wavira_disable_emoji_assets' ) );
+		$this->assertTrue( function_exists( 'wavira_disable_emojis_everywhere' ) );
+
+		$hooks = (string) file_get_contents( WAVIRA_THEME_DIR . 'inc/hooks.php' );
+		$perf  = (string) file_get_contents( WAVIRA_THEME_DIR . 'inc/performance.php' );
+
+		$this->assertStringContainsString( "add_action( 'init', 'wavira_disable_emoji_assets' )", $hooks );
+		$this->assertStringContainsString( "add_action( 'init', 'wavira_disable_emojis_everywhere', 20 )", $perf );
 
 		wavira_disable_emoji_assets();
 		wavira_disable_emojis_everywhere();

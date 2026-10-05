@@ -5,6 +5,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.10.0 (music structured data and the SEO seams)
+- **`src/Seo/StructuredData.php`** — the schema.org graph of a music post: `MusicGroup`,
+  `MusicAlbum` (with its bounded tracklist, `ALBUM_TRACK_LIMIT` = 50), `MusicRecording` (ISO 8601
+  duration, `isrcCode`, `inAlbum`) and `MusicVideoObject` (hosted `contentUrl`, or `embedUrl` mapped
+  for YouTube and Aparat). Published music only; posts and pages produce no node, because the generic
+  surface belongs to the site's SEO plugin.
+- **`src/Seo/SeoSupport.php`** — detection of Yoast, Rank Math, SEOPress and All in One SEO by their
+  stable markers, plus the two switches (`wavira_core_seo_plugin_active`,
+  `wavira_core_structured_data_enabled`).
+- **`src/Content/Credit.php`** — one answer to "who is this by?": primary artist then featured
+  artists, deduplicated, published only. The schema, the document title and any credit line share it.
+- **Four public functions** — `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`,
+  `wavira_core_credit_names()`, `wavira_core_cover_image()`. The graph is the API; the `<script>` tag
+  is the theme's business (ADR 0016).
+
+### Changed — 0.10.0
+- `src/Seo/` is a **service** layer in the boundary gate (it reads the data layer, never the REST or
+  admin layers).
+- Plugin version 0.10.0; catalogue unchanged at 124 strings, all translated.
+
 ### Added — 0.9.0 (artist profile and news payloads)
 - **`src/Content/ArtistProfile.php`** — one payload answers a whole artist page: portrait (featured
   image → `wavira_artist_image` → `wavira_artist_cover`), biography (post content, else the excerpt),

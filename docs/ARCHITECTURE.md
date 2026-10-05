@@ -149,6 +149,8 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_icon` (theme) | 0.6.0 |
 | Function | `wavira_get_setting()`, `wavira_has_core()`, `wavira_icon()`, `wavira_related_posts()` (theme) | 0.2.0 / 0.4.0 ✅ |
 | Function | `wavira_core_artist_profile()`, `wavira_core_news_feed()` | 0.9.0 ✅ |
+| Function | `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`, `wavira_core_credit_names()`, `wavira_core_cover_image()` | 0.10.0 ✅ |
+| Filter | `wavira_core_seo_plugin_active`, `wavira_core_structured_data_enabled`, `wavira_core_structured_data`, `wavira_theme_seo_plugin_active` | 0.10.0 ✅ |
 | Filter | `wavira_core_artist_profile`, `wavira_core_news_items` | 0.9.0 ✅ |
 | Block | `wavira/artist-profile`, `wavira/artist-gallery`, `wavira/news` (+ `wavira/tracklist`, `player`, `video`, `genre-chips`) | 0.7.0 / 0.9.0 ✅ |
 | Shortcode | `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]` (+ the 0.7.0 set) | 0.9.0 ✅ |
@@ -171,7 +173,7 @@ Everything else is private. No module may be reached through a global variable.
 | Downloads | Authorization happens server-side before a URL is handed out; delivery is a `302` to the stored file (never a PHP byte proxy, never token obfuscation); counters increment atomically; **no DRM claims** (ADR 0013). |
 | Caching | Expensive reads only through services implementing `Cacheable`; keys are generation-scoped so one content change invalidates the derived layer; TTLs (search 300 s, related 3600 s) are filterable; no per-user state under a shared key (ADR 0013 §3). |
 | Queries | All list queries paginated; counts via `no_found_rows` or cached counters. |
-| Assets | Build-aware conditional enqueue; no front-end jQuery; player bundle only where a player exists. |
+| Assets | Build-aware conditional enqueue; no front-end jQuery; player bundle only where a player exists; gzipped budgets and zero third-party requests enforced by the `[PERF]` gate (ADR 0016 §4). |
 | A11y | Components ship keyboard support and ARIA in the component itself (not bolted on at the template). |
 | RTL/LTR | Logical CSS properties only; direction verified per component in both modes. |
 
@@ -193,8 +195,8 @@ implementations — see the brief's YAGNI rule.
 | 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | ✅ implemented · **VERIFIED** in CI: runs `37311340378`/`37311334949` and `37314137090`/`37314145602` 8/8, `tests/test-blocks.php` in the integration suite |
 | 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings | ✅ **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2) |
 | 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | ✅ verified: CI `37354185539`/`37354194397` 8/8; evidence in `docs/VERIFICATION.md` |
-| 0.9.0 | SEO + PERF | SEO cooperation, budgets met |
-| 0.10.0 | RC | migration tool, demo import, docs, packaging |
+| 0.10.0 | SEO + PERF | `Seo\StructuredData`, `Seo\SeoSupport`, `Content\Credit`, `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`, `wavira_core_credit_names()`, `wavira_core_cover_image()`, `inc/seo.php`, `inc/performance.php`, `[PERF]` gate | ✅ verified; `docs/SEO-AND-PERF.md`, ADR 0016 |
+| 0.11.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |
 
 See `docs/DECISIONS.md` for the decision list and `docs/CODING-STANDARD.md` for the enforceable rules.
