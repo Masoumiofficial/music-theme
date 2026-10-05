@@ -106,7 +106,7 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | A4 🔒 | Every product PHP file **MUST** refuse direct access (`defined( 'ABSPATH' ) \|\| exit;`; `uninstall.php` uses `WP_UNINSTALL_PLUGIN`). |
 | A5 🔒 | Global functions **MUST** be prefixed: `wavira_core_*` in the plugin, `wavira_*` in the theme. |
 
-Violations fail gate 6 of `tools/lint.sh` and therefore CI.
+Violations fail gate 7 of `tools/lint.sh` and therefore CI.
 
 ## 10. Pre-release "legacy-echo" gate (grep-based)
 

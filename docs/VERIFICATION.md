@@ -19,7 +19,7 @@ never substitute for a real WordPress install.
 | --- | --- | --- | --- |
 | `CI` | GitHub Actions `ubuntu-latest`: PHP 7.4 / 8.2 / 8.3, WPCS 3.x + PHPCompatibilityWP (testVersion `7.4-`), Node 20 | commit `423c020` | PHP syntax, WordPress Coding Standards, i18n domains, PHP compatibility floor, JS/JSON syntax, build dry-run, legacy artifact hash |
 | `LOCAL-AUTHORING` | Sandbox without PHP/Composer (Node 22, Python 3.11 only) | — | JS/JSON lint, grep gates, structural cross-reference checks, array/equals alignment approximation — **never** PHP syntax or PHP behaviour |
-| `WP-CI` | GitHub Actions `wp-integration` job: WordPress (latest) + MariaDB 10.11 + the WordPress test library, PHP 7.4 and 8.2, `composer test`; since 0.5.0 it also builds the front-end bundle (`node tools/build.mjs`) so the enqueue path is exercised for real | commit `d5e0f6e`, first green run `37301535701`; latest verified run `37301909854` | CPT/taxonomy/meta **registration**, settings persistence and clamping, REST dispatch (routes, headers, args), download authorization and counters, search/related services, cache invalidation — everything the 49 integration tests cover |
+| `WP-CI` | GitHub Actions `wp-integration` job: WordPress (latest) + MariaDB 10.11 + the WordPress test library, PHP 7.4 and 8.2, `composer test`; since 0.5.0 it also builds the front-end bundle (`node tools/build.mjs`) so the enqueue path is exercised for real | commit `d5e0f6e`, first green run `37301535701`; latest verified run `37304843180` (66 tests, 569 assertions on both PHP legs) | CPT/taxonomy/meta **registration**, settings persistence and clamping, REST dispatch (routes, headers, args), download authorization and counters, search/related services, cache invalidation — everything the 49 integration tests cover |
 | `WP-RUNTIME` | A real WordPress site, owner-provided or a full WP install with WP-CLI | **not yet available** | Rewrite resolution after activation, `wp wavira verify/seed`, admin UI, real HTTP responses, front-end rendering, performance budgets |
 
 ---
@@ -59,7 +59,7 @@ open until they run on WordPress.
 | Related items are scored from genre/artist/album/featured and cached | **VERIFIED** | `WP-CI` → `Test_Search_Related` (scoring order, cache generation, filter seam) |
 | Download counters increment atomically and exactly once per served request | **VERIFIED** | `WP-CI` → `Test_Downloads::test_counters_increment_and_read_back`, `test_download_endpoint_redirects_by_default` (`X-Wavira-Download-Count: 1`) |
 | The public function API of the plugin behaves as documented | **VERIFIED** | `WP-CI` → `Test_Public_Api` (`wavira_core_is_active/get_setting/related_posts`, schema defaults, safe fallbacks) |
-| The architecture's dependency rules hold in the code | **VERIFIED** | `tools/check-boundaries.mjs`, gate 6 of `tools/lint.sh`, passing locally and in the `JS, JSON, gates, build` job |
+| The architecture's dependency rules hold in the code | **VERIFIED** | `tools/check-boundaries.mjs`, gate 7 of `tools/lint.sh`, passing locally and in the `JS, JSON, gates, build` job |
 | PHPUnit harness runs locally as documented (`composer test`) | **IMPLEMENTED** | `composer.json` scripts + `phpunit.xml.dist` + `bin/install-wp-tests.sh`; executed on CI, not yet re-run by the owner locally |
 
 ---
@@ -73,13 +73,24 @@ open until they run on WordPress.
 | Volume, mute, repeat and shuffle persist under `wavira.player.*`, never in cookies | **TESTED** | same suite: `volume and mute are clamped and persisted under the player prefix`, `the shipped engine keeps the documented safety locks` (no `document.cookie`, no `eval`, no `innerHTML=`, no global element ID) |
 | A failed fetch produces a user-visible error state, not an exception | **TESTED** | same suite: `engines survive a failed fetch and report a usable error` |
 | The player bundle stays inside the ≤ 15 KB (gzip) budget | **TESTED** | `LOCAL-AUTHORING`: `node tools/build.mjs` → `wavira-core/assets/dist/core.js` = 53.1 KB raw, **13.6 KB gzipped** (`gzip -9`); the CI job prints the shipped size on every run |
-| Playback payload, queue builders and the `wavira/v1/player/*` routes answer as documented | **IMPLEMENTED** | `tests/test-player.php` (payload shape, artwork, empty sources, filters, five queue contexts, bounds, route status codes, cache headers, settings contract, public API) — runtime evidence lands with the next `WP-CI` run |
-| The engine bundle is registered and configured by the server, and the theme only asks for the handle | **IMPLEMENTED** | `Wavira\Core\Player\Assets` + `wavira_core_enqueue_player()`; asserted by `Test_Player::test_public_api_exposes_playback_and_enqueue` on CI (the job builds the bundle first) |
+| Playback payload, queue builders and the `wavira/v1/player/*` routes answer as documented | **VERIFIED** | `WP-CI` run `37304843180` (both PHP legs, `OK (66 tests, 569 assertions)`) → `Test_Player`: payload shape, artwork with `srcset`/`sizes`, empty sources for a source-less track, both filters, five queue contexts and their order, `MAX_ITEMS`, route status codes (200/404/400), `Cache-Control`, settings contract, public API, audio-key mapping, no private paths |
+| The engine bundle is registered and configured by the server, and the theme only asks for the handle | **VERIFIED** | `WP-CI` run `37304843180` → `Test_Player::test_public_api_exposes_playback_and_enqueue` (`wavira-player` registered, `waviraPlayerSettings` in the inline script); both integration legs build the bundle (`node tools/build.mjs`) before running the suite |
 | A track page works without JavaScript | **IMPLEMENTED** | `wavira_player_mount()` renders a native `<audio>` fallback with the preferred source; the engine removes it when it takes over. Browser verification is an 0.6.0 template task (`WP-RUNTIME`) |
 | Media Session metadata and action handlers | **IMPLEMENTED** | feature-detected adapter; devices/browsers cannot be verified in this environment — scheduled for manual verification with the 0.6.0 UI |
 | The documented keyboard map works | **IMPLEMENTED** | handler code + map in ADR 0005 §4; browser verification pending with the 0.6.0 UI |
-| Architecture boundaries still hold with the new layers | **VERIFIED** | `tools/lint.sh` gate 6 (`check-boundaries.mjs`): 37 plugin files, 6 theme files → `RESULT: PASS` (`LOCAL-AUTHORING`, 2026-10-05) |
-| No legacy string, jQuery or forbidden pattern entered the player code | **VERIFIED** | `tools/lint.sh` gate 5 (legacy-echo gate) → PASS; the JS lock test additionally forbids `innerHTML=`, `eval(`, `document.cookie` and a global audio ID |
+| Architecture boundaries still hold with the new layers | **VERIFIED** | `tools/lint.sh` gate 7 (`check-boundaries.mjs`): 37 plugin files, 6 theme files → `RESULT: PASS` (`LOCAL-AUTHORING`, 2026-10-05) |
+| No legacy string, jQuery or forbidden pattern entered the player code | **VERIFIED** | `tools/lint.sh` gate 6 (legacy-echo gate) → PASS; the JS lock test additionally forbids `innerHTML=`, `eval(`, `document.cookie` and a global audio ID |
+| Every gate the product ships through is green on the player code | **VERIFIED** | `WP-CI` run `37304843180` (commit `88b6b67`): all 8 jobs success — WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, `WordPress integration` (PHP 7.4 and 8.2), `JS, JSON, gates, build`, legacy artifact integrity |
+| A class member that does not exist fails locally instead of costing a CI round | **VERIFIED** | `tools/lint.sh` gate 5 (`tools/check-class-refs.py`) → `checked 53 file(s); 0 problem(s)`; the gate resolves every `Class::member()` / `new Class()` against the repository and would have caught the missing `MetaSchema::audio_key()` and the missing `Terms` import |
+
+The first two 0.5.0 CI runs were red, and the defects they found are fixed and re-verified by run
+`37304843180`: `MetaSchema::audio_key()` was called before it existed (every player request fatal),
+`Rest\ContentController` used `Content\Terms` without importing it, `Queue` let WordPress re-sort an
+album tracklist by date instead of keeping the editor's playing order (ADR 0012), a queue shortened
+itself when a candidate had no source, the `player` string the engine uses as the mount's accessible
+name was missing from the server's string table, and WPCS flagged four violations (three missing
+translators comments, a missing string, a blank line before a closing brace). The local gate that
+catches the first class of defect now ships as `tools/check-class-refs.py`.
 
 Deliberate limitation: the engine's *visual* behaviour (Media Session surfaces, focus rings,
 `prefers-reduced-motion`) needs a browser and a rendered template, which does not exist before 0.6.0.
@@ -91,8 +102,8 @@ Those rows stay `IMPLEMENTED` rather than being reported as verified.
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
-| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (7 gates incl. `check-boundaries.mjs`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
-| No legacy code, legacy echoes or jQuery in the new product | **VERIFIED** | `tools/lint.sh` gate 5 (grep) — passes |
+| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (8 gates incl. `check-boundaries.mjs`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
+| No legacy code, legacy echoes or jQuery in the new product | **VERIFIED** | `tools/lint.sh` gate 6 (grep) — passes |
 | Coding standard rules marked 🔒 are machine-checked | **IMPLEMENTED** | partially: grep gates + WPCS in CI; the JS/CSS/CSP halves arrive with the assets |
 
 ## 0.1.0 — Forensic audit
@@ -108,9 +119,12 @@ Those rows stay `IMPLEMENTED` rather than being reported as verified.
 ## How to re-run everything
 
 ```bash
-# full local gate (PHP parts skip when PHP is absent)
-bash tools/lint.sh
+# full local gate (PHP and PHPCS parts skip when they are absent)
+bash tools/lint.sh            # 8 gates, incl. PHP class references (tools/check-class-refs.py)
 node tools/build.mjs --check
+
+# the player engine unit tests (no DOM, no browser)
+node --test tests/js/player.test.mjs     # or: npm run test:js
 
 # the authoritative static gate (needs PHP + Composer)
 composer install
@@ -118,7 +132,7 @@ vendor/bin/phpcs --standard=phpcs.xml.dist -q
 
 # the runtime gate (needs MySQL/MariaDB; downloads the WordPress test library)
 composer test:install
-composer test                # 49 tests: data model, settings, REST, downloads, search, related, cache, public API
+composer test                # 66 tests: data model, settings, REST (incl. player), downloads, search, related, cache, public API
 
 # the full-site gate (needs a real install + WP-CLI/site owner)
 wp plugin activate wavira-core

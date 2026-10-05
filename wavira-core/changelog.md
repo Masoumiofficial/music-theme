@@ -52,6 +52,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Tests: the seeded album owns its tracklist (the queue route needs it), the artwork fixture pins
   `_wp_attached_file` so `Cover::url()` has a file to resolve, and the settings contract compares
   route templates after `rawurldecode()` so it holds on plain permalinks too.
+- WPCS: the two assignments of the queue's candidate window were one space short of the alignment
+  `Generic.Formatting.MultipleStatementAlignment` requires, which was the only violation left in the
+  WPCS job.
 
 ### Added — 0.4.0 (music engine: search, related, downloads, verification)
 - **Search** (`src/Search/SearchService.php`): cross-type search and type-ahead suggestions over

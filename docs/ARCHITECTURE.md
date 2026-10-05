@@ -44,7 +44,7 @@ if yes, it lives in **Core**, never in the theme.
 | Public surface | Theme (and third parties) call `wavira_core_*()` functions from `wavira-core/public-api.php`, documented actions/filters, or the REST API | Theme naming a Core class, reading Core internals, or requiring the plugin to render a page |
 | Layer direction | foundation (Contracts, Autoloader/Requirements/Cache) → data (Content, Settings) → services (Downloads, Search, Related) → entry points (Rest, Admin, Plugin) | An upward dependency (service using a controller, content using a service) |
 
-**Enforcement:** `tools/check-boundaries.mjs` (gate 6 of `tools/lint.sh`, `docs/CODING-STANDARD.md` A1–A5) checks
+**Enforcement:** `tools/check-boundaries.mjs` (gate 7 of `tools/lint.sh`, `docs/CODING-STANDARD.md` A1–A5) checks
 every rule above on every commit: no Core → Theme references, downward-only dependencies, no Core class
 names in the theme, a direct-access guard in every product file, and the documented function prefixes.
 
