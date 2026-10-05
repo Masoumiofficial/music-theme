@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — 0.4.0
+- Version aligned with the product roadmap so the theme and **Wavira Core** 0.4.0 ship as one
+  release. **No theme code changed in this phase:** search, related items, counters and the download
+  endpoint are plugin services (ADR 0002), and the theme still renders through
+  `wavira_get_setting()`/`wavira_has_core()` only. Templates and components arrive in 0.6.0.
+
 ### Changed — 0.2.1
 - Author/designer credit set to **Etehad WP — اتحاد وردپرس** (`https://etehadwp.com/`) in the theme
   header, READMEs, `composer.json`, `package.json` and `LICENSE.md` (owner decision 2026-10-05).

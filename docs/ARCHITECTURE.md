@@ -127,10 +127,12 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_archive_per_page` | 0.3.0 |
 | Filter | `wavira_setting` (read), `wavira_settings_schema` | 0.3.0 |
 | Filter | `wavira_track_playback_payload` | 0.5.0 |
-| Filter | `wavira_related_items`, `wavira_related_score` | 0.4.0 ✅ |
-| Filter | `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_served` | 0.4.0 ✅ |
+| Filter | `wavira_related_ids`, `wavira_related_score` | 0.4.0 ✅ |
+| Filter | `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access` | 0.4.0 ✅ |
 | Filter | `wavira_searchable_types` | 0.4.0 ✅ |
-| Action | `wavira_download_counted` | 0.4.0 ✅ |
+| Action | `wavira_download_counted`, `wavira_download_served` | 0.4.0 ✅ |
+| Filter | `wavira_settings_sanitized`, `wavira_rest_item` | 0.3.0 ✅ |
+| Filter | `wavira_archive_per_page` *(documented seam; applied by the archive templates in 0.6.0)* | 0.6.0 |
 | Filter | `wavira_icon` (theme) | 0.6.0 |
 | Function | `wavira_get_setting()`, `wavira_has_core()` (theme) | 0.2.0 ✅ |
 | Function | `wavira_core()` (plugin service accessor) | 0.3.0 |
