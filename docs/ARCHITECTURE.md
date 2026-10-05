@@ -159,7 +159,7 @@ implementations — see the brief's YAGNI rule.
 | Phase | Version | Adds |
 | --- | --- | --- |
 | 0.2.0 | ARCHITECTURE | this document, ADRs, skeleton, coding standard, CI | ✅ |
-| 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 38 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented (verification pending on a live install) |
+| 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 38 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
 | 0.4.0 | MUSIC ENGINE | Search, Related, Downloads, counters |
 | 0.5.0 | PLAYER | `assets/js/player/*` module, Media Session, a11y |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR |

@@ -27,6 +27,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Documentation: `docs/DATA-MODEL.md` (authoritative model), ADR 0011 (slugs/redirects),
   ADR 0012 (relation storage), resolution of the open decisions list.
 
+### Verified
+- PHP syntax on 7.4 / 8.2 / 8.3, WordPress Coding Standards (Core/Docs/Extra) with zero
+  warnings, and PHPCompatibilityWP against the 7.4 floor — all green in CI.
+  Per-claim evidence: `docs/VERIFICATION.md`. Runtime behaviour on a live WordPress
+  install is not verified yet.
+
 ### Added — 0.2.0 (architecture phase)
 - Plugin bootstrap `wavira-core.php`: constants, requirements gate (`Requirements`), activation guard,
   deactivation cleanup, admin notice, `wavira_core_booted` action.

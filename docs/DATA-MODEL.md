@@ -1,5 +1,10 @@
 # DATA-MODEL.md — Wavira music model (authoritative from 0.3.0)
 
+> **Verification status:** the model below is implemented and passes the static CI gates
+> (WPCS + PHPCompatibilityWP + PHP 7.4/8.2/8.3 syntax). Runtime verification on a live
+> WordPress install is `NOT_STARTED` — evidence per claim in `docs/VERIFICATION.md`.
+
+
 **Status:** IMPLEMENTED in code (`wavira-core/src/Content/*`) · **Supersedes:** the reconstructed legacy
 model in `DATA-MODEL-AUDIT.md` (kept for migration purposes only).
 **Contract:** ADR 0003 (real entities), ADR 0011 (slugs), ADR 0012 (relations as post IDs).

@@ -35,6 +35,9 @@ uninstall.php                 opt-in data removal (default: keep the catalogue)
 ```
 
 Data model, meta keys, REST routes and settings are documented in `docs/DATA-MODEL.md`.
+Static verification (WPCS, PHPCompatibilityWP, `php -l` on 7.4/8.2/8.3) runs in CI; the
+per-claim evidence log is `docs/VERIFICATION.md`. Runtime verification on a live
+WordPress install is still open.
 
 ## What arrives next (in phase order)
 
