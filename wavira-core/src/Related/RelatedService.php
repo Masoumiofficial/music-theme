@@ -252,12 +252,12 @@ final class RelatedService {
 		$album    = MetaValues::int( $post_id, MetaSchema::ALBUM );
 		$features = MetaValues::featured_artists( $post_id );
 
-		if ( $artist > 0 && $artist === MetaValues::int( $candidate_id, MetaSchema::ARTIST ) ) {
+		if ( $artist > 0 && MetaValues::int( $candidate_id, MetaSchema::ARTIST ) === $artist ) {
 			$score += 2;
 		}
 
-		if ( $album > 0 && $album === MetaValues::int( $candidate_id, MetaSchema::ALBUM ) ) {
-			$score += 1;
+		if ( $album > 0 && MetaValues::int( $candidate_id, MetaSchema::ALBUM ) === $album ) {
+			++$score;
 		}
 
 		if ( ! empty( $features ) ) {

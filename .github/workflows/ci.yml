@@ -144,17 +144,33 @@ jobs:
       - name: Install dev tooling
         run: composer install --no-interaction --no-progress --prefer-dist
 
+      - name: Install database and subversion clients
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client
+
       - name: Install the WordPress test library
-        run: bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
+        run: |
+          set -o pipefail
+          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest 2>&1 | tee /tmp/install.log
 
       - name: Run the integration suite
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
-        run: vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox || true
+        run: |
+          vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox 2>&1 | tee /tmp/phpunit.log || true
+
+      - name: Report install log
+        if: always()
+        run: node tools/annotate-log.mjs /tmp/install.log install-wp-tests 30 warning
+
+      - name: Report PHPUnit log
+        if: always()
+        run: node tools/annotate-log.mjs /tmp/phpunit.log phpunit 40
 
       - name: Annotate failures (readable without job logs)
         if: always()
-        run: node tools/junit-annotate.mjs /tmp/junit.xml
+        run: |
+          test -f /tmp/junit.xml || { echo "::error::PHPUnit produced no JUnit report — see the annotated log above."; exit 1; }
+          node tools/junit-annotate.mjs /tmp/junit.xml
 
   # ---------------------------------------------------------------------------
   # Assets & gates: JS syntax, JSON validity, legacy-echo gate, build dry-run.

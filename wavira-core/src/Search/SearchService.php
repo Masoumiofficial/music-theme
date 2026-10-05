@@ -99,11 +99,22 @@ final class SearchService {
 				)
 			);
 
-			$slug         = PostTypes::slug_for( $type );
-			$out[ '' !== $slug ? $slug : $type ] = array_map( array( self::class, 'summarize' ), $result['items'] );
+			$out[ self::group_key( $type ) ] = array_map( array( self::class, 'summarize' ), $result['items'] );
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Group key of a suggestion list: the public slug when one exists.
+	 *
+	 * @param string $post_type Post type name.
+	 * @return string
+	 */
+	private static function group_key( string $post_type ): string {
+		$slug = PostTypes::slug_for( $post_type );
+
+		return '' !== $slug ? $slug : $post_type;
 	}
 
 	/**
@@ -257,7 +268,13 @@ final class SearchService {
 				's'                   => (string) $args['term'],
 				'order'               => 'asc' === $args['order'] ? 'ASC' : 'DESC',
 			),
-			QueryFilters::args( array( 'genre' => $args['genre'], 'artist' => $args['artist'] ), '' )
+			QueryFilters::args(
+				array(
+					'genre'  => $args['genre'],
+					'artist' => $args['artist'],
+				),
+				''
+			)
 		);
 
 		$query['orderby'] = self::orderby( (string) $args['orderby'], (string) $args['term'] );
