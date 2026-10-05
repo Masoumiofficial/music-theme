@@ -19,7 +19,7 @@ never substitute for a real WordPress install.
 | --- | --- | --- | --- |
 | `CI` | GitHub Actions `ubuntu-latest`: PHP 7.4 / 8.2 / 8.3, WPCS 3.x + PHPCompatibilityWP (testVersion `7.4-`), Node 20 | commit `423c020` | PHP syntax, WordPress Coding Standards, i18n domains, PHP compatibility floor, JS/JSON syntax, build dry-run, legacy artifact hash |
 | `LOCAL-AUTHORING` | Sandbox without PHP/Composer (Node 22, Python 3.11 only) | — | JS/JSON lint, grep gates, structural cross-reference checks, array/equals alignment approximation — **never** PHP syntax or PHP behaviour |
-| `WP-CI` | GitHub Actions `wp-integration` job: WordPress (latest) + MariaDB 10.11 + the WordPress test library, PHP 7.4 and 8.2, `composer test`; since 0.5.0 it also builds the front-end bundle (`node tools/build.mjs`) so the enqueue path is exercised for real | commit `d5e0f6e`, first green run `37301535701`; latest verified run `37309015331` — commit `beed214` (66 tests, 569 assertions on both PHP legs) | CPT/taxonomy/meta **registration**, settings persistence and clamping, REST dispatch (routes, headers, args), download authorization and counters, search/related services, cache invalidation — everything the 49 integration tests cover |
+| `WP-CI` | GitHub Actions `wp-integration` job: WordPress (latest) + MariaDB 10.11 + the WordPress test library, PHP 7.4 and 8.2, `composer test`; since 0.5.0 it also builds the front-end bundle (`node tools/build.mjs`) so the enqueue path is exercised for real | commit `d5e0f6e`, first green run `37301535701`; latest verified run `37311340378` — commit `8217e13` (76 tests, 673 assertions on both PHP legs) | CPT/taxonomy/meta **registration**, settings persistence and clamping, REST dispatch (routes, headers, args), download authorization and counters, search/related services, cache invalidation — everything the 49 integration tests cover |
 | `WP-RUNTIME` | A real WordPress site, owner-provided or a full WP install with WP-CLI | **not yet available** | Rewrite resolution after activation, `wp wavira verify/seed`, admin UI, real HTTP responses, front-end rendering, performance budgets |
 
 ---
@@ -122,6 +122,34 @@ appended; `--wp--custom--player--barSpace` and `--wp--custom--player--barHeight`
 (camelCase vs. WordPress' kebab-casing), so two settings silently did nothing; dark-mode chip text
 failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered `wavira.com`.
 
+## 0.7.0 — Builders: dynamic blocks
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| A block cannot be half-added: metadata, renderer, registrar and editor registration agree | **VERIFIED** | `[BLOCKS]` gate (`tools/check-blocks.mjs`) → 4 blocks, each `apiVersion` 3, `render: file:./render.php`, `supports.html: false`, direct-access guard in the renderer, no remote asset, listed in `inc/blocks.php` **and** registered in `blocks/editor.js`; runs locally and in the CI job `JS, JSON, gates, build` |
+| Our own templates, parts and patterns contain no shortcode blocks | **VERIFIED** | same gate, rule 5 → 21 content files, none containing `wp:shortcode`; the shortcodes remain for hand-written classic content only |
+| The blocks actually render on a real WordPress | **VERIFIED** | `WP-CI` run `37311340378` → `Test_Blocks` (10 tests, part of `OK (76 tests, 673 assertions)` on both PHP legs): the shipped `block.json` files are parsed by `register_block_type()` and rendered through the shipped `render.php` files |
+| The album tracklist renders in the editor's order and hides drafts | **VERIFIED** | `Test_Blocks::test_tracklist_block_renders_published_tracks_in_order` — a draft and a non-existent ID among the entries are skipped, the two published tracks keep their order |
+| Stored text is escaped, never printed as markup | **VERIFIED** | `Test_Blocks::test_tracklist_block_escapes_stored_text` — a title containing `<b>` is delivered as `&lt;b&gt;…`, a meta subtitle carrying `&` and `"` as `&amp;`/`&quot;` |
+| The subtitle from the 0.7.0 schema reaches the markup | **VERIFIED** | `Test_Blocks::test_tracklist_block_renders_the_subtitle` (`.wavira-tracklist__subtitle`) |
+| A dynamic block with nothing to render prints nothing on the front end | **VERIFIED** | `Test_Blocks::test_empty_album_renders_nothing` — empty string for a tracklist and for a video without a source; `wavira_block_placeholder()` returns early unless `REST_REQUEST` |
+| Video falls back to a link when the provider cannot be embedded | **VERIFIED** | `Test_Blocks::test_video_block_renders_hosted_and_embedded_sources` — hosted file becomes `<video>`; a YouTube URL that cannot be reached becomes `p.wavira-video-link`; the test stubs `pre_http_request`, so the suite never calls the network |
+| Genre chips list terms in the requested order with counts | **VERIFIED** | `Test_Blocks::test_genre_chips_block_lists_terms` — `orderby=count` puts the most used genre first, `showCount` renders `Popular genre (2)`, no terms means no output |
+| The player block emits the documented mount contract | **VERIFIED** | `Test_Blocks::test_player_block_emits_the_mount_contract` — on a singular album: `data-wavira-player="1"`, `data-context="album"`, `data-id="<album>"`, `class="wavira-player…"` |
+| Block and shortcode output are the same markup | **VERIFIED** | `Test_Blocks::test_blocks_and_shortcodes_share_the_markup` — `do_blocks()` output is compared to `do_shortcode()` output, so the two editors cannot diverge |
+| The query-loop context (`block->context['postId']`) and the genre-archive path resolve as documented | **IMPLEMENTED** | the renderers implement both (`usesContext: postId`; the genre view takes the queried term's slug because `Queue::ids()` addresses genres by slug); rendering a Query Loop or a real genre archive needs an editor/`WP-RUNTIME` session |
+| Editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all four blocks with a generic `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
+| Every gate is green on the 0.7.0 commit | **VERIFIED** | CI run `37311340378` (commit `8217e13`): all 8 jobs success — `WPCS + PHP compatibility`, PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build` (includes the new `[BLOCKS]` gate), `WordPress integration` on PHP 7.4 and 8.2, legacy artifact integrity |
+| The theme has PHP-level test coverage of its own | **IMPLEMENTED** | `tests/test-blocks.php` loads the theme's own PHP from the repository (constants + `inc/*.php`, exactly what `functions.php` requires) and renders the shipped block files; templates and parts still need a real install (`WP-RUNTIME`) |
+
+**Notes from writing the 0.7.0 suite:** it is green on its first run — no product defect surfaced. Two
+environment hazards were removed while writing it instead of being left as future flakes: the
+escaping fixture is built from text that survives a KSES-enabled save (`<b>` and a meta value), so the
+assertion does not depend on whether the test user has `unfiltered_html`; and the oEmbed fallback test
+stubs `pre_http_request`, so a unit test never reaches the network. The block registration is exercised
+through `wavira_register_blocks()` — the same function `init` calls — rather than by re-registering
+blocks by hand.
+
 ## 0.2.0 — Architecture
 
 | Claim | Status | Evidence |
@@ -144,8 +172,9 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 
 ```bash
 # full local gate (the PHP and PHPCS gates skip when they are absent; CI runs them)
-bash tools/lint.sh            # named gates incl. [CSS] tools/check-css.mjs, [CONTRAST] tools/check-contrast.mjs,
-                              # [REFS] tools/check-class-refs.py, [BOUNDARIES] tools/check-boundaries.mjs
+bash tools/lint.sh            # named gates incl. [BLOCKS] tools/check-blocks.mjs, [CSS] tools/check-css.mjs,
+                              # [CONTRAST] tools/check-contrast.mjs, [REFS] tools/check-class-refs.py,
+                              # [BOUNDARIES] tools/check-boundaries.mjs
 node tools/build.mjs --check  # sources exist; node tools/build.mjs builds wavira/assets/dist + wavira-core/assets/dist
 
 # both DOM-free unit suites (no browser)
@@ -160,7 +189,8 @@ vendor/bin/phpcs --standard=phpcs.xml.dist -q
 
 # the runtime gate (needs MySQL/MariaDB; downloads the WordPress test library)
 composer test:install
-composer test                # 66 tests: data model, settings, REST (incl. player), downloads, search, related, cache, public API
+composer test                # 76 tests: data model, settings, REST (incl. player), downloads, search, related,
+                             # cache, public API, and the theme's own block layer (tests/test-blocks.php)
 
 # the full-site gate (needs a real install + WP-CLI/site owner)
 wp plugin activate wavira-core

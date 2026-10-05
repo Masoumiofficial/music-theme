@@ -18,7 +18,9 @@
  *   2. `render.php` exists and refuses direct access;
  *   3. the block list in `inc/blocks.php` and the registrations in
  *      `blocks/editor.js` are exactly the directories on disk;
- *   4. no block asset points at a remote URL (WordPress policy, ADR 0010).
+ *   4. no block asset points at a remote URL (WordPress policy, ADR 0010);
+ *   5. no block template, part or pattern still ships a shortcode block — the
+ *      classic fallback exists for hand-written content, not for our own files.
  *
  * Usage:
  *   node tools/check-blocks.mjs          # check, exit 1 on a violation
@@ -178,6 +180,38 @@ if ( existsSync( EDITOR ) ) {
 	notes.push( `editor: ${ registered.size } block(s) registered from the wp.* globals` );
 } else {
 	problems.push( 'wavira/blocks/editor.js is missing' );
+}
+
+// ------------------------------------------- 3. no shortcode blocks in our files
+const CONTENT_DIRS = [ 'wavira/templates', 'wavira/parts', 'wavira/patterns' ];
+let contentFiles = 0;
+
+for ( const directory of CONTENT_DIRS ) {
+	const absolute = join( ROOT, directory );
+
+	if ( ! existsSync( absolute ) ) {
+		continue;
+	}
+
+	for ( const name of readdirSync( absolute ) ) {
+		const path = join( absolute, name );
+
+		if ( ! statSync( path ).isFile() || ! /\.(html|php)$/.test( name ) ) {
+			continue;
+		}
+
+		contentFiles++;
+
+		const source = readFileSync( path, 'utf8' );
+
+		if ( source.includes( 'wp:shortcode' ) ) {
+			problems.push( `${ directory }/${ name }: ships a wp:shortcode block — use the wavira/* block instead` );
+		}
+	}
+}
+
+if ( contentFiles > 0 ) {
+	notes.push( `content: ${ contentFiles } template/part/pattern file(s), no shortcode blocks` );
 }
 
 for ( const line of notes ) {
