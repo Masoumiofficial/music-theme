@@ -176,7 +176,11 @@ final class SettingsSchema {
 					break;
 
 				case 'integer':
-					$value = absint( is_scalar( $raw ) ? $raw : 0 );
+					// Signed cast plus clamping, not absint(): absint() turned an
+					// out-of-range negative (a volume of -20) into a plausible but
+					// wrong positive value instead of clamping it to the minimum
+					// (caught by the integration suite).
+					$value = is_scalar( $raw ) ? (int) $raw : 0;
 
 					if ( isset( $field['min'] ) ) {
 						$value = max( (int) $field['min'], $value );

@@ -64,6 +64,24 @@ abstract class AbstractController {
 	 *
 	 * @return array<string, array<string, mixed>>
 	 */
+	/**
+	 * Sanitize one slug argument.
+	 *
+	 * WordPress calls a REST argument sanitizer with `( $value, $request, $key )`,
+	 * and `sanitize_title()` returns its **second** argument when the value is
+	 * empty — so handing it to WordPress directly made every unfiltered
+	 * collection request store the request object as the value, and casting it
+	 * later raised "Object of class WP_REST_Request could not be converted to
+	 * string" (caught by the integration suite). This one-argument wrapper keeps
+	 * those extra arguments out while still using core's slug rules.
+	 *
+	 * @param mixed $value Raw argument value.
+	 * @return string
+	 */
+	public function sanitize_slug( $value ): string {
+		return (string) sanitize_title( (string) $value );
+	}
+
 	protected function collection_args(): array {
 		return array(
 			'page'     => array(
@@ -103,7 +121,7 @@ abstract class AbstractController {
 				'description'       => __( 'Limit results to a genre slug.', 'wavira-core' ),
 				'type'              => 'string',
 				'default'           => '',
-				'sanitize_callback' => 'sanitize_title',
+				'sanitize_callback' => array( $this, 'sanitize_slug' ),
 			),
 			'artist'   => array(
 				'description'       => __( 'Limit results to an artist post ID.', 'wavira-core' ),

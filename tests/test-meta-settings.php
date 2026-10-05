@@ -132,10 +132,10 @@ class Test_Meta_Settings extends Wavira_Test_Case {
 	public function test_settings_sanitizer_bounds_and_unknown_keys() {
 		$clean = Settings::update(
 			array(
-				'tracks_per_page' => 5000,
-				'related_limit'   => 1,
+				'tracks_per_page'       => 5000,
+				'related_limit'         => 1,
 				'player_default_volume' => -20,
-				'bogus_key'       => 'should be dropped',
+				'bogus_key'             => 'should be dropped',
 			)
 		);
 
