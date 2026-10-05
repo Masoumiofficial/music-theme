@@ -123,10 +123,15 @@ class Test_News extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_items_carry_card_fields_and_an_excerpt() {
+		// The factory publishes with author 0, whose display name is empty; a real
+		// post has an author, and the card prints that name.
+		$author_id = (int) self::factory()->user->create( array( 'display_name' => 'Demo Editor' ) );
+
 		$with_excerpt = $this->make_post(
 			'Has an excerpt',
 			'2026-02-01 10:00:00',
 			array(
+				'post_author'  => $author_id,
 				'post_excerpt' => 'A hand-written summary.',
 				'post_content' => 'Body text that must not become the excerpt.',
 			)
@@ -135,6 +140,7 @@ class Test_News extends Wavira_Test_Case {
 			'No excerpt',
 			'2026-02-02 10:00:00',
 			array(
+				'post_author'  => $author_id,
 				// The factory writes a default excerpt; clearing it is what makes the
 				// content-derived excerpt reachable (a real editor leaves it empty).
 				'post_excerpt' => '',
@@ -161,7 +167,8 @@ class Test_News extends Wavira_Test_Case {
 		$this->assertNotSame( '', $hand['date_label'] );
 		$this->assertGreaterThan( 0, $hand['date'] );
 		$this->assertStringContainsString( 'news.jpg', $hand['thumbnail']['url'] );
-		$this->assertNotSame( '', $hand['author']['name'] );
+		$this->assertSame( $author_id, $hand['author']['id'] );
+		$this->assertSame( 'Demo Editor', $hand['author']['name'], 'the card names the post\'s author' );
 	}
 
 	/**
