@@ -60,7 +60,7 @@ final class Queue {
 		// candidate window is wider than the queue: a three-item queue built
 		// from a catalogue with gaps still contains three playable tracks. The
 		// filter still sees the arguments the caller passed.
-		$candidates         = $args;
+		$candidates          = $args;
 		$candidates['limit'] = min( self::MAX_ITEMS, max( $limit + 5, $limit * 3 ) );
 
 		foreach ( self::ids( $context, $candidates ) as $post_id ) {
