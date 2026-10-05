@@ -103,5 +103,4 @@ final class Cover {
 			'sizes'  => is_string( $sizes ) ? $sizes : '',
 		);
 	}
-
 }

@@ -12,6 +12,7 @@ use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\QueryFilters;
+use Wavira\Core\Content\Terms;
 use Wavira\Core\Downloads\Access;
 use Wavira\Core\Downloads\Counter;
 use Wavira\Core\Player\Payload as PlayerPayload;

@@ -196,6 +196,13 @@ final class Queue {
 			$extra
 		);
 
+		// An album's tracklist is the playing order the editor chose, so a
+		// bounded ID list is never re-sorted by date (ADR 0012).
+		if ( ! empty( $query_args['post__in'] ) ) {
+			$query_args['orderby'] = 'post__in';
+			unset( $query_args['order'] );
+		}
+
 		$ids = get_posts( $query_args );
 
 		return array_map( 'absint', is_array( $ids ) ? $ids : array() );

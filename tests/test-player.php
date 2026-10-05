@@ -439,8 +439,10 @@ class Test_Player extends Wavira_Test_Case {
 	public function test_engine_settings_contract() {
 		$settings = Assets::settings();
 
-		$this->assertStringEndsWith( '%d', $settings['routes']['track'], 'the engine substitutes an ID, it does not build routes' );
-		$this->assertStringContainsString( 'player/queue', $settings['routes']['queue'] );
+		// Routes are compared after decoding: a test site with plain permalinks
+		// gets a percent-encoded `?rest_route=` value from rest_url().
+		$this->assertStringEndsWith( '%d', rawurldecode( $settings['routes']['track'] ), 'the engine substitutes an ID, it does not build routes' );
+		$this->assertStringContainsString( 'player/queue', rawurldecode( $settings['routes']['queue'] ) );
 		$this->assertSame( 1.0, $settings['defaults']['volume'] );
 		$this->assertSame( 'off', $settings['defaults']['repeat'] );
 		$this->assertFalse( $settings['defaults']['shuffle'] );

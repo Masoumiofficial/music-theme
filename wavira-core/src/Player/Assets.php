@@ -155,13 +155,18 @@ final class Assets implements Registrable {
 			'repeatAll'    => __( 'Repeat all', 'wavira-core' ),
 			'repeatOne'    => __( 'Repeat one', 'wavira-core' ),
 			'queue'        => __( 'Play queue', 'wavira-core' ),
+			/* translators: %s: track title. */
+			'remove'       => __( 'Remove from the queue: %s', 'wavira-core' ),
 			'loading'      => __( 'Loading track…', 'wavira-core' ),
 			'buffering'    => __( 'Buffering…', 'wavira-core' ),
 			'error'        => __( 'This track could not be played.', 'wavira-core' ),
 			'empty'        => __( 'There is nothing to play here.', 'wavira-core' ),
+			/* translators: %s: track title. */
 			'nowPlaying'   => __( 'Now playing: %s', 'wavira-core' ),
+			/* translators: 1: position in the queue, 2: queue length. */
 			'ofTotal'      => __( 'Track %1$d of %2$d', 'wavira-core' ),
 			'openTrack'    => __( 'Open the track page', 'wavira-core' ),
+			/* translators: %s: track title. */
 			'removedTrack' => __( 'Removed from the queue: %s', 'wavira-core' ),
 			'blocked'      => __( 'Playback needs a tap on the play button first.', 'wavira-core' ),
 		);

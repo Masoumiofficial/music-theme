@@ -83,6 +83,24 @@ final class MetaSchema {
 	 *
 	 * @return array<string, array<string, mixed>>
 	 */
+	/**
+	 * Meta key that stores the audio file of one quality.
+	 *
+	 * One place maps a bitrate to a meta key, so the player, the download
+	 * controller and the counters cannot drift apart.
+	 *
+	 * @param int $quality Quality in kbps (128 or 320).
+	 * @return string Meta key, or an empty string for an unknown quality.
+	 */
+	public static function audio_key( int $quality ): string {
+		$keys = array(
+			128 => self::AUDIO_128,
+			320 => self::AUDIO_320,
+		);
+
+		return isset( $keys[ $quality ] ) ? $keys[ $quality ] : '';
+	}
+
 	public static function all(): array {
 		$track  = array( PostTypes::TRACK );
 		$album  = array( PostTypes::ALBUM );
