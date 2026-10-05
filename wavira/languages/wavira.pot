@@ -174,7 +174,7 @@ msgstr ""
 msgid "Footer navigation"
 msgstr ""
 
-#: wavira/inc/blocks.php:57
+#: wavira/inc/blocks.php:64
 msgid "Genre chips, most used first."
 msgstr ""
 
@@ -230,7 +230,7 @@ msgstr ""
 msgid "Open %s"
 msgstr ""
 
-#: wavira/inc/blocks.php:55
+#: wavira/inc/blocks.php:60
 msgid "Player for an album, artist or genre queue."
 msgstr ""
 
@@ -268,7 +268,7 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr ""
 
-#: wavira/inc/blocks.php:56
+#: wavira/inc/blocks.php:62
 msgid "The video of this post: file, embed or link."
 msgstr ""
 
@@ -276,7 +276,7 @@ msgstr ""
 msgid "This post has no video source yet."
 msgstr ""
 
-#: wavira/inc/blocks.php:54
+#: wavira/inc/blocks.php:58
 msgid "Tracklist of the album chosen in the sidebar."
 msgstr ""
 

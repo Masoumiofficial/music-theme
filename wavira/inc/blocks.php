@@ -50,12 +50,20 @@ if ( ! function_exists( 'wavira_block_editor_strings' ) ) {
 	 * @return array<string, string> Source string to translated string.
 	 */
 	function wavira_block_editor_strings() {
-		return array(
-			'Tracklist of the album chosen in the sidebar.' => __( 'Tracklist of the album chosen in the sidebar.', 'wavira' ),
-			'Player for an album, artist or genre queue.'   => __( 'Player for an album, artist or genre queue.', 'wavira' ),
-			'The video of this post: file, embed or link.'  => __( 'The video of this post: file, embed or link.', 'wavira' ),
-			'Genre chips, most used first.'                 => __( 'Genre chips, most used first.', 'wavira' ),
-		);
+		$strings = array();
+
+		// One statement per string: a four-row array of these keys would have to be
+		// padded to its longest key, and the padding is unreadable next to a
+		// sentence. The key is the English source, which is also the gettext msgid.
+		$strings['Tracklist of the album chosen in the sidebar.'] = __( 'Tracklist of the album chosen in the sidebar.', 'wavira' );
+
+		$strings['Player for an album, artist or genre queue.'] = __( 'Player for an album, artist or genre queue.', 'wavira' );
+
+		$strings['The video of this post: file, embed or link.'] = __( 'The video of this post: file, embed or link.', 'wavira' );
+
+		$strings['Genre chips, most used first.'] = __( 'Genre chips, most used first.', 'wavira' );
+
+		return $strings;
 	}
 }
 
