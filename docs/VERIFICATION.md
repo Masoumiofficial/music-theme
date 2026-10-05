@@ -127,12 +127,12 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | Claim | Status | Evidence |
 | --- | --- | --- |
 | A block cannot be half-added: metadata, renderer, registrar and editor registration agree | **VERIFIED** | `[BLOCKS]` gate (`tools/check-blocks.mjs`) → 4 blocks, each `apiVersion` 3, `render: file:./render.php`, `supports.html: false`, direct-access guard in the renderer, no remote asset, listed in `inc/blocks.php` **and** registered in `blocks/editor.js`; runs locally and in the CI job `JS, JSON, gates, build` |
-| Our own templates, parts and patterns contain no shortcode blocks | **VERIFIED** | same gate, rule 5 → 21 content files, none containing `wp:shortcode`; the shortcodes remain for hand-written classic content only |
+| Our own templates, parts and patterns contain no shortcode blocks | **VERIFIED** | same gate, rule 5 → 32 content files (14 templates + 3 parts + 15 patterns) and not one `wp:shortcode`; the shortcodes remain for hand-written classic content only |
 | The blocks actually render on a real WordPress | **VERIFIED** | `WP-CI` run `37311340378` → `Test_Blocks` (10 tests, part of `OK (76 tests, 673 assertions)` on both PHP legs): the shipped `block.json` files are parsed by `register_block_type()` and rendered through the shipped `render.php` files |
 | The album tracklist renders in the editor's order and hides drafts | **VERIFIED** | `Test_Blocks::test_tracklist_block_renders_published_tracks_in_order` — a draft and a non-existent ID among the entries are skipped, the two published tracks keep their order |
 | Stored text is escaped, never printed as markup | **VERIFIED** | `Test_Blocks::test_tracklist_block_escapes_stored_text` — a title containing `<b>` is delivered as `&lt;b&gt;…`, a meta subtitle carrying `&` and `"` as `&amp;`/`&quot;` |
 | The subtitle from the 0.7.0 schema reaches the markup | **VERIFIED** | `Test_Blocks::test_tracklist_block_renders_the_subtitle` (`.wavira-tracklist__subtitle`) |
-| A dynamic block with nothing to render prints nothing on the front end | **VERIFIED** | `Test_Blocks::test_empty_album_renders_nothing` — empty string for a tracklist and for a video without a source; `wavira_block_placeholder()` returns early unless `REST_REQUEST` |
+| A dynamic block with nothing to render prints nothing on the front end | **VERIFIED** | `Test_Blocks::test_empty_album_renders_nothing` — no `wavira-tracklist` markup ever, and an empty string for a tracklist and a video without a source when the process is not rendering a REST request (`REST_REQUEST` is process-wide, so the test asserts both branches; the REST branch expects `wavira-block-placeholder`, which is what the editor needs — `WP-RUNTIME` for the visual half) |
 | Video falls back to a link when the provider cannot be embedded | **VERIFIED** | `Test_Blocks::test_video_block_renders_hosted_and_embedded_sources` — hosted file becomes `<video>`; a YouTube URL that cannot be reached becomes `p.wavira-video-link`; the test stubs `pre_http_request`, so the suite never calls the network |
 | Genre chips list terms in the requested order with counts | **VERIFIED** | `Test_Blocks::test_genre_chips_block_lists_terms` — `orderby=count` puts the most used genre first, `showCount` renders `Popular genre (2)`, no terms means no output |
 | The player block emits the documented mount contract | **VERIFIED** | `Test_Blocks::test_player_block_emits_the_mount_contract` — on a singular album: `data-wavira-player="1"`, `data-context="album"`, `data-id="<album>"`, `class="wavira-player…"` |
@@ -140,6 +140,12 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | The query-loop context (`block->context['postId']`) and the genre-archive path resolve as documented | **IMPLEMENTED** | the renderers implement both (`usesContext: postId`; the genre view takes the queried term's slug because `Queue::ids()` addresses genres by slug); rendering a Query Loop or a real genre archive needs an editor/`WP-RUNTIME` session |
 | Editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all four blocks with a generic `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
 | Every gate is green on the 0.7.0 commit | **VERIFIED** | CI run `37311340378` (commit `8217e13`): all 8 jobs success — `WPCS + PHP compatibility`, PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build` (includes the new `[BLOCKS]` gate), `WordPress integration` on PHP 7.4 and 8.2, legacy artifact integrity |
+| Template and part text is translatable | **VERIFIED** | `[I18N]` gate (`tools/check-i18n.mjs`) → 17 template/part files with no text node and no text-bearing block attribute, 15 patterns, 21 `wp:pattern` references all resolving; the strings live in `patterns/hidden-*.php` because a block template is static HTML — the mechanism core documents in `wp-includes/block-template.php` and uses itself (`twentytwentyfour/hidden-404`) |
+| Every `wp:pattern` reference points at a pattern that exists, and every hidden pattern is used | **VERIFIED** | same gate, second half: a reference to a missing slug, a duplicate slug, a pattern without `Title:`/`Slug:`, or a hidden pattern no template references each fail the build |
+| No block attribute freezes a string in one language | **VERIFIED** | same gate: `buttonText`, `label`, `placeholder`, `alt`, `caption`, `text`, `content`, `moreText`, `summary` are rejected in `templates/*.html` and `parts/*.html`; the 404 search block now relies on core's translated defaults |
+| The footer year and the colour-mode button come from PHP, not from the template | **VERIFIED** | `patterns/hidden-footer-legal.php` prints `wp_date( 'Y' )`; the toggle lives in `patterns/hidden-theme-toggle.php` and keeps the `data-wavira-theme-toggle` / `data-wavira-theme-label` hooks the theme script binds to (`tests/js/theme.test.mjs`) |
+| Non-translatable text is a deliberate, visible decision | **VERIFIED** | the author attribution carries `<!-- wavira:i18n-exempt author attribution -->` on its own line and the gate reads that marker; there is no blanket ignore |
+| `docs/MIGRATION-BLUEPRINT.md` only names keys that exist | **VERIFIED** | `[MAPPING]` gate (`tools/check-mapping.mjs`) → 36 `wavira_*` names resolve against `MetaSchema`, `PostTypes`, `Taxonomies` and `SettingsSchema`; rows marked `[DEFERRED]` are exempt by design. Writing the gate found two promises the code did not keep (`wavira_track_order`, `wavira_views`) and two rows that promised a settings key generically — all four are now either implemented or explicitly deferred |
 | The theme has PHP-level test coverage of its own | **IMPLEMENTED** | `tests/test-blocks.php` loads the theme's own PHP from the repository (constants + `inc/*.php`, exactly what `functions.php` requires) and renders the shipped block files; templates and parts still need a real install (`WP-RUNTIME`) |
 
 **Notes from writing the 0.7.0 suite:** it is green on its first run — no product defect surfaced. Two
@@ -154,7 +160,7 @@ blocks by hand.
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
-| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (named gates: `[PHP] [PHPCS] [JS] [JSON] [REFS] [CSS] [CONTRAST] [LEGACY] [BOUNDARIES] [SIZE]`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
+| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (named gates: `[PHP] [PHPCS] [JS] [JSON] [REFS] [BLOCKS] [I18N] [MAPPING] [CSS] [CONTRAST] [LEGACY] [BOUNDARIES] [SIZE]`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
 | No legacy code, legacy echoes or jQuery in the new product | **VERIFIED** | `tools/lint.sh` gate `[LEGACY]` (grep) — passes |
 | Coding standard rules marked 🔒 are machine-checked | **IMPLEMENTED** | partially: grep gates + WPCS in CI; the JS/CSS/CSP halves arrive with the assets |
 
@@ -172,7 +178,8 @@ blocks by hand.
 
 ```bash
 # full local gate (the PHP and PHPCS gates skip when they are absent; CI runs them)
-bash tools/lint.sh            # named gates incl. [BLOCKS] tools/check-blocks.mjs, [CSS] tools/check-css.mjs,
+bash tools/lint.sh            # named gates incl. [BLOCKS] tools/check-blocks.mjs, [I18N] tools/check-i18n.mjs,
+                              #   [MAPPING] tools/check-mapping.mjs, [CSS] tools/check-css.mjs,
                               # [CONTRAST] tools/check-contrast.mjs, [REFS] tools/check-class-refs.py,
                               # [BOUNDARIES] tools/check-boundaries.mjs
 node tools/build.mjs --check  # sources exist; node tools/build.mjs builds wavira/assets/dist + wavira-core/assets/dist

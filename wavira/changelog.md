@@ -5,6 +5,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.7.0 (patterns polish)
+- **Translatable template text** (`patterns/hidden-*.php`): a block template cannot execute PHP, so
+  every sentence in `templates/*.html` and `parts/*.html` moved into a hidden pattern
+  (`Inserter: no`) referenced with `wp:pattern` — the practice the core themes use. The colour-mode
+  button, both footer lines and the 404 copy are included.
+- **`[I18N]` gate** (`tools/check-i18n.mjs`): no hard-coded text node and no text-bearing block
+  attribute in a template or part, every `wp:pattern` reference must resolve, every hidden pattern must
+  be referenced. Non-translatable strings (the author attribution) carry an explicit
+  `wavira:i18n-exempt` marker.
+- **`[MAPPING]` gate** (`tools/check-mapping.mjs`): every `wavira_*` name promised by
+  `docs/MIGRATION-BLUEPRINT.md` must exist in the schema, unless the row is marked `[DEFERRED]`.
+- Insertable patterns (`album-grid`, `featured-album`, `latest-tracks`, `genre-chips`) now translate
+  their own headings and labels with `esc_html_x()`.
+
+### Fixed — 0.7.0 (patterns polish)
+- **The footer year was a literal `2026`** in `parts/footer.html` and could never change; it is now
+  printed by `wp_date( 'Y' )` from the footer pattern.
+- **The 404 search block stored `buttonText`/`label` literals** in the template; both are omitted so
+  core's translated defaults apply.
+- Six sections shipped untranslatable English headings ("Latest albums", "Listen now", "Latest
+  tracks", "Music videos", "Tracks", "Watch") and a "Nothing published here yet." message; all of them
+  now come from patterns.
+
 ### Added — 0.7.0 (block layer)
 - **Four dynamic blocks** (`blocks/{tracklist,player,video,genre-chips}/`): each ships `block.json`
   (apiVersion 3, `category: wavira-music`, `textdomain: wavira`, `render: file:./render.php`,

@@ -15,10 +15,10 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:group {"className":"wavira-section","layout":{"type":"constrained"}} -->
 <div class="wp-block-group wavira-section">
 <!-- wp:heading {"level":2} -->
-<h2>Listen now</h2>
+<h2><?php echo esc_html_x( 'Listen now', 'heading of the catalogue player pattern', 'wavira' ); ?></h2>
 <!-- /wp:heading -->
 <!-- wp:paragraph -->
-<p>Play straight through the catalogue — shuffle, repeat and the queue are in the player.</p>
+<p><?php echo esc_html_x( 'Play straight through the catalogue — shuffle, repeat and the queue are in the player.', 'description in the catalogue player pattern', 'wavira' ); ?></p>
 <!-- /wp:paragraph -->
 <!-- wp:wavira/player {"context": "tracks", "limit": 20, "sticky": false} /-->
 <!-- wp:query {"queryId":3,"query":{"perPage":6,"pages":0,"offset":0,"postType":"wavira_track","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":3}} -->

@@ -40,6 +40,10 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Genre context for the player | The genre player addresses the queue by **term slug** (`Queue::ids()` has no term-ID path) | the engine's queue contract is slug-based; inventing an ID path would have widened the REST surface for one template |
 | What was **not** added | No static block styles beyond the shared layer, no block variations, no custom block category beyond `wavira-music`, no `wp.data` store | v1 scope: the blocks exist to render music content, not to become an editor framework |
 
+| Where user-visible template text lives | In PHP patterns (`patterns/hidden-*.php`, `Inserter: no`), referenced from templates with `wp:pattern` | a block template is static HTML: any sentence written inside one is frozen in English, and this product is RTL-first for a non-English market. This is what the core themes do (`twentytwentyfour/hidden-404`), and `tools/check-i18n.mjs` keeps it that way |
+| Non-translatable strings | An explicit `<!-- wavira:i18n-exempt reason -->` marker on the same line, e.g. the author attribution | the gate must never be silenced by a blanket ignore, and a proper noun has to be visible in the file as deliberate |
+| Copyright line | Printed by PHP (`wp_date( 'Y' )`) instead of a literal year in the template part | the template's year was frozen; a pattern runs on every request |
+
 **Deferred by the 0.7.0 schema reconciliation** (recorded, deliberately not implemented — see
 `docs/MIGRATION-BLUEPRINT.md` §2 for the migration rows that now point at these)
 
@@ -53,7 +57,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 
 | Topic | Phase | Note |
 | --- | --- | --- |
-| Elementor: widgets vs. dynamic tags only | 0.7.0 | depends on marketplace demand |
+| Elementor integration | 0.7.0+ | **decided 2026-10-05: deferred.** It cannot be verified in this environment (no Elementor install, no CI job) and the standing rule is to never claim compatibility without evidence. Re-open when marketplace demand is confirmed, with widgets that CI can test against a pinned Elementor version. |
 | Update server (self-hosted vs. marketplace-native) | 0.9.0 | affects licence/update ADR |
 | Localised slug bases for fa_IR (`/خواننده/` …) | 0.6.0 | supported via `wavira_rewrite_slugs` filter (ADR 0011 §5); decision = ship English default, document the filter |
 | `custom.player.miniHeight` is a setting nothing consumes | 0.6.1 | either implement the compact/mini bar variant or remove the setting; recorded in ADR 0014 (Consequences) — no silent settings |

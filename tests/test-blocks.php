@@ -222,9 +222,21 @@ class Test_Blocks extends Wavira_Test_Case {
 	 */
 	public function test_empty_album_renders_nothing() {
 		$album = $this->make_album();
+		$html  = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
 
-		$this->assertSame( '', do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' ) );
-		$this->assertSame( '', do_blocks( '<!-- wp:wavira/video {"videoId":' . $album . '} /-->' ) );
+		// Never any tracklist markup. The front end prints nothing at all; a
+		// REST render is the editor's ServerSideRender preview, where an empty
+		// block is invisible, so the render file prints a hint instead.
+		// REST_REQUEST is a process-wide constant: a REST test that ran earlier
+		// in the same process defines it, so both branches are asserted for.
+		$this->assertStringNotContainsString( 'wavira-tracklist', $html );
+
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			$this->assertSame( '', $html, 'the front end prints nothing for an album without tracks' );
+			$this->assertSame( '', do_blocks( '<!-- wp:wavira/video {"videoId":' . $album . '} /-->' ) );
+		} else {
+			$this->assertStringContainsString( 'wavira-block-placeholder', $html );
+		}
 	}
 
 	/**
@@ -284,7 +296,15 @@ class Test_Blocks extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_genre_chips_block_lists_terms() {
-		$this->assertSame( '', do_blocks( '<!-- wp:wavira/genre-chips /-->' ), 'no terms means no output' );
+		$none = do_blocks( '<!-- wp:wavira/genre-chips /-->' );
+
+		// No terms yet: no chips. The REST preview (editor) gets a hint instead
+		// of an invisible block; see test_empty_album_renders_nothing().
+		$this->assertStringNotContainsString( 'wavira-chip', $none );
+
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			$this->assertSame( '', $none, 'no terms means no output on the front end' );
+		}
 
 		$popular = self::factory()->term->create(
 			array(

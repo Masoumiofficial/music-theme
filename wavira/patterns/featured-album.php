@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:buttons -->
 <div class="wp-block-buttons">
 <!-- wp:button -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="/albums/">Browse all albums</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="/albums/"><?php echo esc_html_x( 'Browse all albums', 'button label in the featured album pattern', 'wavira' ); ?></a></div>
 <!-- /wp:button -->
 </div>
 <!-- /wp:buttons -->

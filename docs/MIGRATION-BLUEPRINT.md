@@ -12,13 +12,13 @@ reported, not guessed.
 | --- | --- | --- |
 | `post` with `musics_type=mp3` | `wavira_track` | convert post type, keep ID and slug; copy meta |
 | `post` with `musics_type=mp4` | `wavira_video` | convert; single chosen source → quality map; the other two → download sources |
-| `post` with `musics_type=album` | `wavira_album` | convert; expand the ACF `album` repeater into child `wavira_track` posts preserving order, or into `wavira_track_order` when the source URL cannot be mapped |
+| `post` with `musics_type=album` | `wavira_album` | convert; expand the ACF `album` repeater into child `wavira_track` posts preserving order (`menu_order` on the track, plus the album's `wavira_tracklist` meta, ADR 0012) |
 | `post` (no `musics_type`) | `post` (editorial) | untouched |
 | `page` | `page` | untouched |
 | `singer` term | `wavira_artist` (CPT) | create artist post per term: name = term name, slug = term slug, bio = term description, image/socials from term meta; then link all posts to their artist entity |
 | `post_tag` used as artist (when `reltag=on`) | `wavira_artist` | merge with `singer` entity when name/slug matches; otherwise create and mark `needs_review` |
 | `category` used as genre | `wavira_genre` term | convert all categories that contain music posts; editorial categories keep `category` |
-| `views` meta | `wavira_views` (counter table) | copy integer, note that historical accuracy is plugin-dependent |
+| `views` meta | **`[DEFERRED]`** — no view counter in the model | the value is copied to `_migration_raw`; downloads are counted (`wavira_download_count*`), views are a separate decision (`docs/DECISIONS.md`) |
 
 ## 2. Meta field map
 
@@ -50,11 +50,11 @@ reported, not guessed.
 | Legacy option | New option | Note |
 | --- | --- | --- |
 | `sun_moon`, `dark_modes` | `wavira_settings['dark_toggle']`, `['dark_default']` | boolean casts |
-| `fixbvip`, `vip_num`, `indpl`, `v_num`, `index_hj`, `index_pv`, `index_nm`, `index_ct`, `index_pt`, `arti_off`, `arti_title`, `arti_url` | block/template attributes + `wavira_settings` | homepage composition becomes template content, not options |
+| `fixbvip`, `vip_num`, `indpl`, `v_num`, `index_hj`, `index_pv`, `index_nm`, `index_ct`, `index_pt`, `arti_off`, `arti_title`, `arti_url` | **block/template attributes** (no option) | homepage composition is template content in the new product, not a settings screen; per-section counts become block attributes (`perPage`) |
 | `hty` (list) | block instances in the front page | import as "Track Grid" blocks with genre + count |
 | `siing_t` (list) | Artist Slider block instance (`manual` list) | images imported as attachments/URLs |
 | `pppf` | `wavira_settings['related_limit']` | clamp 3–24 |
-| `share_off`, `tag_off`, `cm_off`, `upb`, `fixbtn` | `wavira_settings[...]` booleans | — |
+| `share_off`, `tag_off`, `cm_off`, `upb`, `fixbtn` | **`[DEFERRED]`** — no matching option | the new product ships no share-button or fixed-button feature, and comment/tag visibility belongs to core's own settings; recorded so nothing is silently reinterpreted |
 | `copyright` | footer block attribute | KSES-filtered |
 | `telegram`, `teltxt`, `instagram`, `instxt`, `facebook`, `twitter`, `youtube`, `aparat` | `wavira_settings['socials']` | `esc_url_raw` |
 | `ads_bt`, `ads_sg` | `wavira_settings['ads_html']` | one KSES-allow-listed field; placement is decided by where the block sits, not by a second option |

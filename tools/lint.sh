@@ -11,6 +11,8 @@
 #   [JSON]      JSON validity
 #   [REFS]      PHP class references (tools/check-class-refs.py)
 #   [BLOCKS]    Block metadata / renderer / registrar / editor consistency
+#   [I18N]      Translatable text and pattern references (tools/check-i18n.mjs)
+#   [MAPPING]   Migration blueprint targets exist (tools/check-mapping.mjs)
 #   [CSS]       CSS rules + size budgets (tools/check-css.mjs)
 #   [CONTRAST]  WCAG 2.2 AA contrast of the documented pairs (tools/check-contrast.mjs)
 #   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
@@ -130,6 +132,37 @@ if command -v node >/dev/null 2>&1; then
     :
   else
     say "      FAIL  the block gate reported violations (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
+# ------------------------------------------------------------------ I18N
+# A block template cannot run PHP, so text written inside one is frozen in
+# English: the strings live in patterns and this gate keeps it that way.
+say "[I18N] Translatable text"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-i18n.mjs; then
+    :
+  else
+    say "      FAIL  the text gate reported violations (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
+# --------------------------------------------------------------- MAPPING
+# docs/MIGRATION-BLUEPRINT.md is what the migration tool will be written from.
+# This gate resolves every wavira_* name it promises against the implemented
+# schema, so a plan cannot outlive the code it describes.
+say "[MAPPING] Migration blueprint targets"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-mapping.mjs; then
+    :
+  else
+    say "      FAIL  the mapping gate reported violations (see above)"
     FAIL=1
   fi
 else

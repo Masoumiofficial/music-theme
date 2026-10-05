@@ -65,7 +65,8 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `blocks/<name>/` | a dynamic block: `block.json` + `render.php`, plus the shared `editor.js` | stored block HTML, a renderer that bypasses `inc/markup.php`, or a build step the runtime depends on |
 | `templates/` | block templates | PHP template hierarchy duplicates |
 | `parts/` | template parts | logic |
-| `patterns/` | editor patterns (`register_block_pattern`) | data queries beyond what blocks expose |
+| `patterns/` | editor patterns (`register_block_pattern`): insertable sections, plus `hidden-*` patterns that only templates reference | data queries beyond what blocks expose |
+| `patterns/hidden-*.php` | every user-visible string of a template or part (`Inserter: no`, translated with `esc_html_x()`) — a `.html` template cannot run PHP, so template text would be untranslatable | layout or queries; a hidden pattern that no template references |
 | `assets/css/` | token → base → components → utilities sources | framework dumps |
 | `assets/css/editor.css` | editor-only parity styles, loaded through `add_editor_style()` | front-end rules (those belong in the layered build) |
 | `assets/js/` | ES modules, no jQuery, scoped to `window.Wavira` when global is unavoidable | globals, duplicated handlers |
@@ -184,7 +185,7 @@ implementations — see the brief's YAGNI rule.
 | 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, public function API (`public-api.php`), boundary gate, ADR 0013, PHPUnit harness (`tests/`, 49 tests) | ✅ implemented · **VERIFIED**: static gates + 49 integration tests green against a real WordPress on PHP 7.4 and 8.2 (CI run `37301909854`) |
 | 0.5.0 | PLAYER | `src/Player/*` + `assets/js/index.js` (state machine, queue, views, Media Session, keyboard, a11y), `wavira/v1/player/*` routes, `wavira_player_mount()`, `tests/js/player.test.mjs` (15 DOM-free tests) | ✅ implemented · **VERIFIED** locally: `node --test tests/js/player.test.mjs` 15/15, `tools/lint.sh` PASS, boundary gate PASS · runtime verification in `docs/VERIFICATION.md` |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR | ✅ implemented · **VERIFIED**: CSS/contrast/token gates, 11 theme JS tests, CI run `37309252018` 8/8 |
-| 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, `docs/DECISIONS.md` 0.7.0 entries; Elementor widgets still open | 🔄 blocks implemented · runtime verification in `docs/VERIFICATION.md` |
+| 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | 🔄 blocks implemented, templates carry no untranslatable text · runtime verification in `docs/VERIFICATION.md` |
 | 0.8.0 | SEO + PERF | SEO cooperation, budgets met |
 | 0.9.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |

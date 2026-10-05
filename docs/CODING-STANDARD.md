@@ -73,7 +73,9 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | # | Rule |
 | --- | --- |
 | I1 🔒 | Every user-facing string uses `__()`, `_e()`, `esc_html__()`, `esc_attr__()`, `_n()` with the correct text domain (`wavira` in the theme, `wavira-core` in the plugin). |
-| I2 | No hardcoded Persian/English copy in templates. No translatable string built by concatenation — use `sprintf` with placeholders. |
+| I2 🔒 | **No literal user-visible text and no text-bearing block attribute** (`buttonText`, `label`, `placeholder`, …) in `templates/*.html` or `parts/*.html`: a block template cannot execute PHP, so such a string is frozen in one language. The text lives in a pattern (`patterns/*.php`, `esc_html_x()` / `esc_html__()`) and the template references it with `<!-- wp:pattern {"slug":"wavira/…"} /-->`; a string that must not be translated carries an explicit `<!-- wavira:i18n-exempt <reason> -->` marker on the same line. Checked by `tools/check-i18n.mjs`. |
+| I2b 🔒 | Every `wp:pattern` reference resolves to a pattern file, every hidden pattern (`Inserter: no`) is referenced by at least one template/part, and every pattern declares `Title:` and a `wavira/`-namespaced `Slug:`. Same gate. |
+| I2c | No translatable string built by concatenation — use `sprintf` with placeholders. |
 | I3 | Dates/numbers use WordPress' localisation helpers (`wp_date`, `number_format_i18n`) — never PHP `date()`. |
 | I4 🔒 | No direction-specific markup: `dir` comes from `language_attributes()` / `is_rtl()` only. |
 
@@ -92,7 +94,7 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | # | Rule |
 | --- | --- |
 | T1 | Each module lands with: the code, its docblock-level documentation, and at least one verification path (WP-CLI seed script, PHPUnit test in `tests/`, or a documented manual test in `docs/QA.md`). |
-| T2 🔒 | `tools/lint.sh` must pass (PHP syntax + WPCS where available, JS syntax, JSON validity, module boundaries, asset-size report), and the integration suite (`composer test`, CI job `WordPress integration`) must be green on PHP 7.4 and 8.2. |
+| T2 🔒 | `tools/lint.sh` must pass — `[PHP]` syntax, `[PHPCS]` where available, `[JS]`, `[JSON]`, `[REFS]`, `[BLOCKS]`, `[I18N]`, `[MAPPING]`, `[CSS]`, `[CONTRAST]`, `[LEGACY]`, `[BOUNDARIES]`, `[SIZE]` — and the integration suite (`composer test`, CI job `WordPress integration`) must be green on PHP 7.4 and 8.2. |
 | T3 | Every architectural decision that changes these rules requires an ADR in `docs/adr/` and an update to this file. |
 | T4 | Definition of Done (per brief): implemented · tested · documented · translated · accessible · responsive · secure · performant · compatible · reviewed. |
 

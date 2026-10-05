@@ -32,7 +32,8 @@ wavira/
 │   └── integrations/    rank-math.php, yoast.php, elementor.php (later phases)
 ├── templates/           block templates (14: index, page, single, search, 404, music singles/archives)
 ├── parts/               block template parts (header, footer, player bar)
-├── patterns/            editor patterns for homepage sections
+├── patterns/            insertable patterns + hidden-* patterns holding every
+│                        user-visible template string (.html templates run no PHP)
 ├── blocks/              dynamic block sources: <name>/block.json + render.php + shared editor.js
 ├── assets/
 │   ├── css/             token/base/component sources

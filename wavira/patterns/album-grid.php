@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:group {"className":"wavira-section","layout":{"type":"constrained"}} -->
 <div class="wp-block-group wavira-section">
 <!-- wp:heading {"level":2} -->
-<h2>Latest albums</h2>
+<h2><?php echo esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ); ?></h2>
 <!-- /wp:heading -->
 <!-- wp:query {"queryId":2,"query":{"perPage":6,"pages":0,"offset":0,"postType":"wavira_album","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":3}} -->
 <div class="wp-block-query">
@@ -26,7 +26,7 @@ defined( 'ABSPATH' ) || exit;
 <!-- /wp:post-template -->
 <!-- wp:query-no-results -->
 <!-- wp:paragraph -->
-<p>Nothing published here yet.</p>
+<p><?php echo esc_html_x( 'Nothing published here yet.', 'message shown when a query returns no posts', 'wavira' ); ?></p>
 <!-- /wp:paragraph -->
 <!-- /wp:query-no-results -->
 <!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
