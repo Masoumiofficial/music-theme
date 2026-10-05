@@ -9,6 +9,7 @@
  * @package Wavira\Theme
  * @since   0.6.0
  */
+
 defined( 'ABSPATH' ) || exit;
 ?>
 <!-- wp:group {"className":"wavira-surface","layout":{"type":"constrained"}} -->
