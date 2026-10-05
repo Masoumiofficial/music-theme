@@ -91,7 +91,7 @@ final class MetaValues {
 			array_filter(
 				$ids,
 				static function ( $id ) use ( $target_type ) {
-					return $target_type === get_post_type( $id );
+					return get_post_type( $id ) === $target_type;
 				}
 			)
 		);
