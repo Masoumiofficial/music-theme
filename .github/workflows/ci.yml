@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # PHP: syntax on the declared floor, behaviour on modern releases.
+  # ---------------------------------------------------------------------------
+  php-lint:
+    name: "PHP ${{ matrix.php }} syntax"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: Syntax check (theme + core plugin + tools)
+        run: |
+          set -euo pipefail
+          find wavira wavira-core -type f -name '*.php' -not -path '*/vendor/*' -not -path '*/assets/dist/*' -print0 \
+            | xargs -0 -r -n1 php -l
+          echo "PHP syntax OK on ${{ matrix.php }}"
+
+  # ---------------------------------------------------------------------------
+  # WordPress Coding Standards + PHPCompatibilityWP (declared floor 7.4).
+  # ---------------------------------------------------------------------------
+  phpcs:
+    name: WPCS + PHP compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.json') }}
+          restore-keys: composer-
+
+      - name: Install dev tooling
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPCS
+        run: vendor/bin/phpcs --standard=phpcs.xml.dist -q
+
+  # ---------------------------------------------------------------------------
+  # Assets & gates: JS syntax, JSON validity, legacy-echo gate, build dry-run.
+  # ---------------------------------------------------------------------------
+  assets-and-gates:
+    name: JS, JSON, gates, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Full lint gate
+        run: bash tools/lint.sh
+
+      - name: Build dry-run (must not fail while there are no sources yet)
+        run: node tools/build.mjs --check
+
+  # ---------------------------------------------------------------------------
+  # Repository hygiene: the legacy artifact must never be modified.
+  # ---------------------------------------------------------------------------
+  legacy-untouched:
+    name: Legacy artifact integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the audited legacy ZIP hash
+        run: |
+          set -euo pipefail
+          EXPECTED="a23269c2b92a3ba08721dba79a50f1dd"
+          ACTUAL="$(md5sum music-theme.zip | awk '{print $1}')"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::music-theme.zip changed (expected $EXPECTED, got $ACTUAL) — the audit baseline must stay immutable."
+            exit 1
+          fi
+          echo "Legacy artifact unchanged: $ACTUAL"

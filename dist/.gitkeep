@@ -1,0 +1,11 @@
+# Release packages land here (generated, git-ignored).
+#
+# Expected artifacts from phase 0.9.0:
+#   wavira-theme-<version>.zip        theme only
+#   wavira-core-<version>.zip         plugin only
+#   wavira-demo-content-<version>.zip licence-clean demo import
+#   wavira-documentation-<version>.zip user + developer docs
+#   wavira-<version>-full.zip         theme + plugin + docs (marketplace package)
+#
+# Packaging is gated on: THIRD-PARTY-NOTICES.md up to date, DEMO-ASSET-LICENCES.md complete,
+# tools/lint.sh green, and the legacy artifact excluded (docs/LICENSE-AUDIT.md).

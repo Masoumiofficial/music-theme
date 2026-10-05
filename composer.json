@@ -1,0 +1,32 @@
+{
+	"name": "wavira/wavira-music",
+	"description": "Wavira — WordPress music-publishing ecosystem (theme + core plugin). Development tooling only; the product has no Composer runtime dependency.",
+	"type": "wordpress-theme",
+	"license": "GPL-2.0-or-later",
+	"keywords": ["wordpress", "theme", "plugin", "music", "audio", "player"],
+	"homepage": "https://wavira.com/",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"php-parallel-lint/php-parallel-lint": "^1.4"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"sort-packages": true
+	},
+	"scripts": {
+		"lint": "parallel-lint --exclude vendor --exclude node_modules wavira wavira-core",
+		"phpcs": "phpcs",
+		"phpcbf": "phpcbf",
+		"check": [
+			"@lint",
+			"@phpcs"
+		]
+	}
+}
