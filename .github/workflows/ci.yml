@@ -111,6 +111,9 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: wordpress_test
+          # The official image only creates root@localhost unless a host is given;
+          # the test library connects from the runner, i.e. from another host.
+          MYSQL_ROOT_HOST: '%'
         ports:
           - 3306:3306
         options: >-

@@ -42,10 +42,14 @@ const lines = content
 	.map((line) => line.replace(/\u001b\[[0-9;]*m/g, '').trimEnd())
 	.filter((line) => line.trim() !== '');
 
-const tail = lines.slice(-Number.parseInt(lineCount, 10));
+const limit = Number.parseInt(lineCount, 10);
+const interesting = /error|fail|denied|refused|cannot|can't|unable|not found|no such|fatal|exception/i;
+const flagged = lines.filter((line) => interesting.test(line)).slice(-20);
+const tail = lines.slice(-limit);
+const chosen = [...new Set([...flagged, ...tail])];
 
-for (const line of tail) {
+for (const line of chosen) {
 	console.log(`::${level} file=ci/${label}::${escape(line)}`);
 }
 
-console.log(`${label}: annotated the last ${tail.length} of ${lines.length} line(s).`);
+console.log(`${label}: annotated ${chosen.length} of ${lines.length} line(s) (${flagged.length} error-like + tail).`);
