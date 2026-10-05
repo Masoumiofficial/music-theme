@@ -141,6 +141,7 @@ final class Assets implements Registrable {
 	 */
 	private static function strings(): array {
 		return array(
+			'player'       => __( 'Audio player', 'wavira-core' ),
 			'play'         => __( 'Play', 'wavira-core' ),
 			'pause'        => __( 'Pause', 'wavira-core' ),
 			'next'         => __( 'Next track', 'wavira-core' ),

@@ -76,14 +76,6 @@ final class MetaSchema {
 	public const SOCIAL_APARAT    = 'wavira_social_aparat';
 
 	/**
-	 * All meta keys with their type, sanitizer, REST shape and owning post types.
-	 *
-	 * `sanitize` maps to a method on Meta; `rest_items` is used when the value is
-	 * an array of integers. `enum` restricts allowed string values.
-	 *
-	 * @return array<string, array<string, mixed>>
-	 */
-	/**
 	 * Meta key that stores the audio file of one quality.
 	 *
 	 * One place maps a bitrate to a meta key, so the player, the download
@@ -101,6 +93,14 @@ final class MetaSchema {
 		return isset( $keys[ $quality ] ) ? $keys[ $quality ] : '';
 	}
 
+	/**
+	 * All meta keys with their type, sanitizer, REST shape and owning post types.
+	 *
+	 * `sanitize` maps to a method on Meta; `rest_items` is used when the value is
+	 * an array of integers. `enum` restricts allowed string values.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
 	public static function all(): array {
 		$track  = array( PostTypes::TRACK );
 		$album  = array( PostTypes::ALBUM );

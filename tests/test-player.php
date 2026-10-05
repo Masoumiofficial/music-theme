@@ -57,6 +57,7 @@ class Test_Player extends Wavira_Test_Case {
 		update_post_meta( $track_id, MetaSchema::AUDIO_128, 'https://example.com/audio-128.mp3' );
 		update_post_meta( $track_id, MetaSchema::AUDIO_320, 'https://example.com/audio-320.mp3' );
 		update_post_meta( $track_id, MetaSchema::DURATION, 245 );
+		update_post_meta( $album_id, MetaSchema::TRACKLIST, array( $track_id ) );
 
 		foreach ( $track_meta as $key => $value ) {
 			update_post_meta( $track_id, $key, $value );
@@ -145,11 +146,16 @@ class Test_Player extends Wavira_Test_Case {
 
 		$attachment_id = self::factory()->attachment->create(
 			array(
+				'file'           => 'artwork.jpg',
 				'post_mime_type' => 'image/jpeg',
 				'post_title'     => 'Artwork',
 				'post_status'    => 'inherit',
 			)
 		);
+
+		// The factory does not always write the file meta, and the cover URL
+		// helper needs it: without a file the attachment has no public URL.
+		update_post_meta( $attachment_id, '_wp_attached_file', 'artwork.jpg' );
 
 		set_post_thumbnail( $ids['track'], $attachment_id );
 		update_post_meta( $attachment_id, '_wp_attachment_image_alt', 'Cover alt text' );

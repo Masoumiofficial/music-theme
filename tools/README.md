@@ -6,7 +6,7 @@ script skips PHP checks and says so).
 
 | Script | What it does | Requires |
 | --- | --- | --- |
-| `lint.sh` | Full gate: PHP syntax (via `php -l`), PHPCS (if installed), JS syntax (`node --check` on every `.js/.mjs`), JSON validity, legacy-echo grep gate, module boundaries, asset-size report | bash; PHP/Node optional |
+| `lint.sh` | Full gate: PHP syntax (via `php -l`), PHPCS (if installed), JS syntax (`node --check` on every `.js/.mjs`), JSON validity, PHP class references, legacy-echo grep gate, module boundaries, asset-size report | bash; PHP/Node/Python optional |
 | `check-boundaries.mjs` | Module-boundary gate (ARCHITECTURE §2): Core never reaches into the theme; dependencies only point downwards (foundation → data → services → entry points); the theme names no Core class; every product file has a direct-access guard; global functions carry the documented prefix | Node 18+ |
 | `annotate-log.mjs` | Turns a log tail into GitHub annotations (job logs are not reachable from every environment) | Node 18+ |
 | `junit-annotate.mjs` | Turns a PHPUnit JUnit report into annotations plus one summary annotation listing every problem | Node 18+ |
@@ -27,6 +27,23 @@ Fails the build when a legacy pattern reappears in product code:
 | `getElementById('audio'` / `id="audio"` | the global player-ID anti-pattern (ADR 0005) |
 | `create_function`, `wp_title(` | deprecated APIs (ADR 0007) |
 | `jQuery` / `$( ` in `assets/js` | no front-end jQuery (ADR 0006) |
+
+## PHP class-reference gate (`check-class-refs.py`)
+
+PHP cannot be installed in every development sandbox, so a missing `use` statement or a method
+that was never written would otherwise surface only as a fatal error in CI (0.5.0 lost a full CI
+round to `MetaSchema::audio_key()` being called before it existed). This pass walks every product
+and test PHP file, collects the classes, constants and methods the repository declares, and reports
+`Class::member()` / `new Class()` references that resolve to nothing. Comments are stripped first,
+so prose never looks like code; fully-qualified references are left to PHPCS.
+
+```
+python3 tools/check-class-refs.py
+checked 53 file(s); 0 problem(s)
+```
+
+The gate is a static heuristic, not a PHP parser: it checks names, not signatures, and it cannot
+see callables built at runtime. PHPCS and the integration suite stay authoritative.
 
 ## Module-boundary gate (`check-boundaries.mjs`)
 

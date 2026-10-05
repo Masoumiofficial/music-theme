@@ -17,7 +17,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (sources best-quality-first with a server-declared `preferred`, artwork incl. `srcset`/`sizes`,
   artist/album/genre relations, Media Session text) and five queue contexts
   (`album`, `artist`, `genre`, `tracks`, `related`) that drop source-less tracks and never exceed
-  100 items.
+  100 items. A queue is filled to the requested length even when the catalogue contains unplayable
+  tracks, because the candidate window is wider than the queue.
 - **REST** (`src/Rest/PlayerController.php`): `GET /wavira/v1/player/tracks/{id}` and
   `GET /wavira/v1/player/queue`, read-only, `Cache-Control: public, max-age=60`; `404 wavira_not_found`
   for unknown/draft/non-track items and `400 wavira_missing_source` for a context without its source.
@@ -34,6 +35,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `npm run test:js` and by CI) and `tests/test-player.php` (payload, queues, routes, settings
   contract, public API). CI now builds the bundle before the integration suite so the enqueue path
   is exercised for real.
+
+### Fixed — 0.5.0 (defects the first 0.5.0 CI run found)
+- `MetaSchema::audio_key()` — the one place that maps a bitrate to a meta key — was called by
+  `Player\Payload` but had never been committed: every player request died with a fatal error.
+  The helper now exists, and the new `tools/check-class-refs.py` gate (run by `tools/lint.sh`)
+  fails a build that calls a class member the repository does not declare.
+- `Rest\ContentController` called `Content\Terms::genres()` without importing the class, so the
+  track/album payload threw `Class "Wavira\Core\Rest\Terms" not found`. Imported.
+- `Player\Queue` let WordPress re-sort the ID list of an album tracklist by date, losing the
+  playing order the editor chose (ADR 0012). A bounded `post__in` list now sorts by `post__in`.
+- The settings string table was missing `player`, the accessible name of the mount point, so the
+  engine fell back to its own copy instead of the translated one.
+- WPCS: translators comments for the three strings that use placeholders, the `remove` string was
+  missing from the table entirely, and `Content\Cover` had a blank line before its closing brace.
+- Tests: the seeded album owns its tracklist (the queue route needs it), the artwork fixture pins
+  `_wp_attached_file` so `Cover::url()` has a file to resolve, and the settings contract compares
+  route templates after `rawurldecode()` so it holds on plain permalinks too.
 
 ### Added — 0.4.0 (music engine: search, related, downloads, verification)
 - **Search** (`src/Search/SearchService.php`): cross-type search and type-ahead suggestions over

@@ -54,12 +54,24 @@ final class Queue {
 	 */
 	public static function items( string $context, array $args = array() ): array {
 		$items = array();
+		$limit = self::clamp_limit( isset( $args['limit'] ) ? $args['limit'] : 0 );
 
-		foreach ( self::ids( $context, $args ) as $post_id ) {
+		// Unplayable tracks are dropped after the payload filter has run, so the
+		// candidate window is wider than the queue: a three-item queue built
+		// from a catalogue with gaps still contains three playable tracks. The
+		// filter still sees the arguments the caller passed.
+		$candidates         = $args;
+		$candidates['limit'] = min( self::MAX_ITEMS, max( $limit + 5, $limit * 3 ) );
+
+		foreach ( self::ids( $context, $candidates ) as $post_id ) {
 			$payload = Payload::for_track( (int) $post_id );
 
 			if ( array() !== $payload && ! empty( $payload['sources'] ) ) {
 				$items[] = $payload;
+
+				if ( count( $items ) === $limit ) {
+					break;
+				}
 			}
 		}
 
