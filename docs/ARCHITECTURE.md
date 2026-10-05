@@ -41,6 +41,12 @@ if yes, it lives in **Core**, never in the theme.
 | Missing plugin | Theme renders a usable site and shows a documented admin notice | Fatal error, white screen, broken layout |
 | Missing theme | Core keeps all data and REST endpoints working (headless-ready) | Data loss, orphaned CPTs |
 | Third-party runtime deps | None | ACF, OptionTree, jQuery, page builders (all optional, integrated only) |
+| Public surface | Theme (and third parties) call `wavira_core_*()` functions from `wavira-core/public-api.php`, documented actions/filters, or the REST API | Theme naming a Core class, reading Core internals, or requiring the plugin to render a page |
+| Layer direction | foundation (Contracts, Autoloader/Requirements/Cache) → data (Content, Settings) → services (Downloads, Search, Related) → entry points (Rest, Admin, Plugin) | An upward dependency (service using a controller, content using a service) |
+
+**Enforcement:** `tools/check-boundaries.mjs` (gate 6 of `tools/lint.sh`, `docs/CODING-STANDARD.md` A1–A5) checks
+every rule above on every commit: no Core → Theme references, downward-only dependencies, no Core class
+names in the theme, a direct-access guard in every product file, and the documented function prefixes.
 
 **Degradation contract:** the theme must never assume Core is active. `wavira_has_core()`,
 `wavira_get_setting()` and post-type checks guard every data-dependent render, and templates fall back
@@ -78,6 +84,7 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `src/Import/`, `src/Demo/`, `src/Migration/` | data in / data out / data converted |
 | `src/Integrations/` | optional third-party bridges |
 | `src/Support/` | autoloader, requirements, cache, logger, capabilities |
+| `public-api.php` | **The only surface a theme may call** (`wavira_core_is_active`, `wavira_core_get_setting`, `wavira_core_related_posts`) — thin, guarded wrappers over the services |
 
 ## 4. Runtime boot sequence
 
@@ -134,7 +141,8 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_settings_sanitized`, `wavira_rest_item` | 0.3.0 ✅ |
 | Filter | `wavira_archive_per_page` *(documented seam; applied by the archive templates in 0.6.0)* | 0.6.0 |
 | Filter | `wavira_icon` (theme) | 0.6.0 |
-| Function | `wavira_get_setting()`, `wavira_has_core()` (theme) | 0.2.0 ✅ |
+| Function | `wavira_get_setting()`, `wavira_has_core()`, `wavira_icon()`, `wavira_related_posts()` (theme) | 0.2.0 / 0.4.0 ✅ |
+| Function | `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (plugin `public-api.php`) | 0.4.0 ✅ |
 | Function | `wavira_core()` (plugin service accessor) | 0.3.0 |
 | REST | `wavira/v1/*` | 0.3.0 |
 
@@ -166,7 +174,7 @@ implementations — see the brief's YAGNI rule.
 | --- | --- | --- |
 | 0.2.0 | ARCHITECTURE | this document, ADRs, skeleton, coding standard, CI | ✅ |
 | 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 40 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
-| 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, ADR 0013, PHPUnit harness (`tests/`, `bin/install-wp-tests.sh`) | ✅ implemented · static verification **VERIFIED** in CI · runtime verification **pending** (see `docs/VERIFICATION.md`) |
+| 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, public function API (`public-api.php`), boundary gate, ADR 0013, PHPUnit harness (`tests/`, 45 tests) | ✅ implemented · **VERIFIED**: static gates + 45 integration tests green against a real WordPress on PHP 7.4 and 8.2 (CI run `37301535701`) |
 | 0.5.0 | PLAYER | `assets/js/player/*` module, Media Session, a11y |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR |
 | 0.7.0 | BUILDERS | blocks + Elementor widgets |

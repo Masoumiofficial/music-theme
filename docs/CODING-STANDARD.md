@@ -89,11 +89,23 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 | # | Rule |
 | --- | --- |
 | T1 | Each module lands with: the code, its docblock-level documentation, and at least one verification path (WP-CLI seed script, PHPUnit test in `tests/`, or a documented manual test in `docs/QA.md`). |
-| T2 🔒 | `tools/lint.sh` must pass (PHP syntax + WPCS where available, JS syntax, JSON validity, asset-size report). |
+| T2 🔒 | `tools/lint.sh` must pass (PHP syntax + WPCS where available, JS syntax, JSON validity, module boundaries, asset-size report), and the integration suite (`composer test`, CI job `WordPress integration`) must be green on PHP 7.4 and 8.2. |
 | T3 | Every architectural decision that changes these rules requires an ADR in `docs/adr/` and an update to this file. |
 | T4 | Definition of Done (per brief): implemented · tested · documented · translated · accessible · responsive · secure · performant · compatible · reviewed. |
 
-## 9. Pre-release "legacy-echo" gate (grep-based)
+## 9. Module boundaries (enforced by `tools/check-boundaries.mjs`)
+
+| # | Rule |
+| --- | --- |
+| A1 🔒 | Core **MUST NOT** reference the theme — no `get_template_directory*()`, no theme constants, no theme helper functions. The plugin stays usable with any theme (ADR 0002). |
+| A2 🔒 | Dependencies **MUST** point downwards only: `foundation` (Contracts, Autoloader, Requirements, Cache) < `data` (Content, Settings) < `services` (Downloads, Search, Related, Player, CacheInvalidator, CLI) < `entry point` (Rest, Admin, Plugin, public API, bootstrap). A service **MUST NOT** use a controller; content **MUST NOT** use a service. |
+| A3 🔒 | The theme **MUST NOT** name a `Wavira\Core\*` class. It calls the public functions in `wavira-core/public-api.php`, actions and filters only, always behind `function_exists()`/`did_action()` guards so a missing plugin degrades instead of fataling. |
+| A4 🔒 | Every product PHP file **MUST** refuse direct access (`defined( 'ABSPATH' ) \|\| exit;`; `uninstall.php` uses `WP_UNINSTALL_PLUGIN`). |
+| A5 🔒 | Global functions **MUST** be prefixed: `wavira_core_*` in the plugin, `wavira_*` in the theme. |
+
+Violations fail gate 6 of `tools/lint.sh` and therefore CI.
+
+## 10. Pre-release "legacy-echo" gate (grep-based)
 
 Run before every package build; every hit must be fixed or explicitly justified in the release notes:
 

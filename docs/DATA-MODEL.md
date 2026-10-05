@@ -1,8 +1,9 @@
 # DATA-MODEL.md — Wavira music model (authoritative from 0.4.0)
 
-> **Verification status:** the model below is implemented and passes the static CI gates
-> (WPCS + PHPCompatibilityWP + PHP 7.4/8.2/8.3 syntax). Runtime verification on a live
-> WordPress install is `NOT_STARTED` — evidence per claim in `docs/VERIFICATION.md`.
+> **Verification status:** the model below is implemented, passes the static CI gates
+> (WPCS + PHPCompatibilityWP + PHP 7.4/8.2/8.3 syntax) **and** is covered by the integration
+> suite that runs against a real WordPress test library in CI (45 tests green on PHP 7.4 and
+> 8.2). Per-claim evidence and what is still open: `docs/VERIFICATION.md`.
 
 
 **Status:** IMPLEMENTED in code (`wavira-core/src/Content/*`) · **Supersedes:** the reconstructed legacy
@@ -175,6 +176,7 @@ authorization chain controls the *offer*, not the possibility.
 | `Downloads\Counter::{increment,total,for_quality,summary,reset,supports}` | atomic counters (above) |
 | `Search\SearchService::{search,suggest,summarize,…}` | cross-type search + suggestions, cached |
 | `Related\RelatedService::{supports,ids,posts,limit}` | scored related items, cached |
+| `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (`wavira-core/public-api.php`) | the public function API: the only surface a theme may call (ARCHITECTURE §2, enforced by `tools/check-boundaries.mjs`) |
 
 **Rule:** no code reads music meta through a literal string. Constants only (`MetaSchema::*`).
 

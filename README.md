@@ -92,6 +92,7 @@ enqueues nothing and the front end degrades gracefully (see ADR 0006).
 | REST | `wavira/v1`: typed collections for each entity with pagination headers, `/genres`, `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`. |
 | Downloads | Authorization chain (site setting → per-track opt-out → optional login → filter) and atomic counters. Delivery is a redirect to the file: **authorization and accounting, never DRM** (ADR 0013). |
 | WP-CLI | `wp wavira verify`, `wp wavira seed`. |
+| Function API | Plugin: `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (`wavira-core/public-api.php`). Theme: `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. A theme never names a Core class — enforced by `tools/check-boundaries.mjs`. |
 | Hooks | Filters `wavira_related_ids`, `wavira_related_score`, `wavira_searchable_types`, `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access`, `wavira_setting`, `wavira_settings_sanitized`, `wavira_rest_item`, `wavira_content_width`; actions `wavira_core_booted`, `wavira_download_counted`, `wavira_download_served`. Themes call `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. |
 
 ## Contributing rules in one paragraph
