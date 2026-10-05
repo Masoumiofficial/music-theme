@@ -43,6 +43,13 @@ const lines = content
 	.filter((line) => line.trim() !== '');
 
 const limit = Number.parseInt(lineCount, 10);
+
+// First annotation is always a log summary: how long the log is and where it
+// ends. Without job logs this is the quickest way to see whether a step was cut
+// short or never started.
+console.log(
+	`::${level} file=ci/${label}::LOG STATS — ${lines.length} line(s); last line: ${escape(lines[lines.length - 1] ?? '(empty log)')}`
+);
 const interesting = /error|fail|denied|refused|cannot|can't|unable|not found|no such|fatal|exception/i;
 const flagged = lines.filter((line) => interesting.test(line)).slice(-20);
 const tail = lines.slice(-limit);

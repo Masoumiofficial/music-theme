@@ -150,6 +150,18 @@ jobs:
       - name: Install database and subversion clients
         run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client rsync
 
+      - name: Check database connectivity (annotated)
+        run: |
+          set -o pipefail
+          {
+            echo "mysql client: $(mysql --version 2>&1)"
+            echo "ping: $(mysqladmin ping -h 127.0.0.1 -proot 2>&1)"
+            mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wordpress_probe;" 2>&1 || true
+            echo "create database exit: $?"
+            mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;" 2>&1 || true
+          } 2>&1 | tee /tmp/dbcheck.log
+          node tools/annotate-log.mjs /tmp/dbcheck.log dbcheck 12 warning
+
       - name: Install the WordPress test library
         run: |
           set -o pipefail
