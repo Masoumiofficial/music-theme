@@ -148,6 +148,10 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_archive_per_page` *(documented seam; applied by the archive templates in 0.6.0)* | 0.6.0 |
 | Filter | `wavira_icon` (theme) | 0.6.0 |
 | Function | `wavira_get_setting()`, `wavira_has_core()`, `wavira_icon()`, `wavira_related_posts()` (theme) | 0.2.0 / 0.4.0 ✅ |
+| Function | `wavira_core_artist_profile()`, `wavira_core_news_feed()` | 0.9.0 ✅ |
+| Filter | `wavira_core_artist_profile`, `wavira_core_news_items` | 0.9.0 ✅ |
+| Block | `wavira/artist-profile`, `wavira/artist-gallery`, `wavira/news` (+ `wavira/tracklist`, `player`, `video`, `genre-chips`) | 0.7.0 / 0.9.0 ✅ |
+| Shortcode | `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]` (+ the 0.7.0 set) | 0.9.0 ✅ |
 | Function | `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (plugin `public-api.php`) | 0.4.0 ✅ |
 | Function | `wavira_core_track_playback()`, `wavira_core_enqueue_player()` (plugin `public-api.php`) | 0.5.0 ✅ |
 | Function | `wavira_player_mount()` (theme `inc/player.php`) — prints a mount point + no-JS `<audio>` fallback | 0.5.0 ✅ |
@@ -187,7 +191,8 @@ implementations — see the brief's YAGNI rule.
 | 0.5.0 | PLAYER | `src/Player/*` + `assets/js/index.js` (state machine, queue, views, Media Session, keyboard, a11y), `wavira/v1/player/*` routes, `wavira_player_mount()`, `tests/js/player.test.mjs` (15 DOM-free tests) | ✅ implemented · **VERIFIED** locally: `node --test tests/js/player.test.mjs` 15/15, `tools/lint.sh` PASS, boundary gate PASS · runtime verification in `docs/VERIFICATION.md` |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR | ✅ implemented · **VERIFIED**: CSS/contrast/token gates, 11 theme JS tests, CI run `37309252018` 8/8 |
 | 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | ✅ implemented · **VERIFIED** in CI: runs `37311340378`/`37311334949` and `37314137090`/`37314145602` 8/8, `tests/test-blocks.php` in the integration suite |
-| 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings; artist profile and music-news surfaces | 🔄 localisation implemented and gated; **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2); artist/news surfaces still to land |
+| 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings | ✅ **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2) |
+| 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | 🔄 implemented; verification in `docs/VERIFICATION.md` |
 | 0.9.0 | SEO + PERF | SEO cooperation, budgets met |
 | 0.10.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |

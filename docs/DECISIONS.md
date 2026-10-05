@@ -41,6 +41,20 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Jalali (Shamsi) dates | **Not implemented in 0.8.0**; date output uses `wp_date()` with `fa_IR` locale data, and a Jalali layer is scheduled as its own tested change | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
 | Persian fonts | The token set prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI`/system fallbacks; no font file bundled yet | bundling a subset font is a packaging and size-budget decision (ADR 0010 licence file must travel with it), not a code change |
 
+### 0.9.0 — artist profiles and the news section (2026-10-05)
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| News content type | **Posts and categories**, no `wavira_news` post type (and therefore no core change in 0.9.0) | posts already carry the archive, the feed, the sitemap and every SEO plugin's expectations; a second type would split the site's archives and feeds in two and force each integration to learn it |
+| News templates | `home.html` and `archive.html` use **core's Query Loop**, while the `wavira/news` block serves a feed inside a page or an article | pagination, `?paged=`, feeds and the archive title are core's business; the block must not reimplement a query loop the editor cannot inspect |
+| News items payload | One service (`News/NewsFeed.php`) behind `wavira_core_news_feed()`, clamped to 1–24 items, `post_type` resolved through `get_post_type_object()` (a non-public type falls back to `post`) | the theme must not query content itself (ADR 0002), and a caller must never be able to surface a private type by guessing its name |
+| Artist works | Read from the **existing** `wavira_artist` relation meta on albums, tracks and videos — the payload aggregates, it does not store a second list | the relation already exists for REST payloads and related items (ADR 0012); a profile-specific list would drift from it |
+| Artist gallery | Images **attached** to the artist post (`post_parent`), in `menu_order` | WordPress-native: upload from the artist screen and the file is attached to it; no second gallery meta, no options row |
+| Social channels | Labels are translated in Core (`Instagram`, `Telegram`, `YouTube`, `Aparat`, `Facebook`, `X (Twitter)`) and rendered as text chips, not brand logos | Aparat is a first-class Iranian platform, the labels are readable in Persian, and shipping third-party logo art is a trademark/asset question the product does not need |
+| Artist section limits | `limit` (default 6) and `gallery_limit` (default 8), clamped to 1–24 (`ArtistProfile::MAX_ITEMS`); a section with more items links to its archive | the coding standard forbids unbounded queries; an artist page must stay a page |
+| Artist payload caching | Once per request per artist + options (`wavira_artist_data()`, static cache); the profile block asks three times and the queries run once | the profile header, the works and the gallery are three helpers over one payload; a transient would need invalidation the theme cannot see |
+| Persian calendar in the new surfaces | Dates are printed with `wp_date()`/`get_the_date()` and the locale, **not** with a Jalali conversion | unchanged from ADR 0015 §8: an unverified conversion would put a wrong date on every news card |
+
 ### 0.7.0 — block layer (2026-10-05)
 
 | Topic | Decision | Why |

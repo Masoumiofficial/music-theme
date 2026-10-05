@@ -120,9 +120,10 @@ preferences (volume, theme, last queue position) in documented localStorage keys
 | 0.5.0 | PLAYER | Player Engine + player REST data + theme mount point + Media Session + a11y | ✅ engine + data shipped, 15 DOM-free unit tests + PHP suite; the visual/keyboard playthrough moves with the 0.6.0 templates (see `docs/VERIFICATION.md`) |
 | 0.6.0 | UI | design tokens, templates, patterns, dark/light, RTL+LTR | ✅ breakpoint matrix clean at 360→1920; CI run `37309252018` 8/8 |
 | 0.7.0 | BUILDERS | blocks + patterns polish; Elementor widgets | ✅ four dynamic blocks, patterns migrated to native blocks, template text moved into translatable hidden patterns, `[BLOCKS]`/`[I18N]`/`[MAPPING]` gates; CI runs `37314137090`/`37314145602` 8/8. Elementor deferred by decision (docs/DECISIONS.md) |
-| 0.8.0 | PERSIAN-FIRST | fa_IR catalogues for both artifacts, translation pipeline + `[FA]` gate, Persian admin surfaces, artist profile page (works, biography, socials, gallery), music-news/blog section | 🔄 localisation **VERIFIED** (CI runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2); artist and news surfaces land in the same phase |
-| 0.9.0 | SEO + PERF | SEO cooperation, performance budget met | Lighthouse budget met; no `-1` queries |
-| 0.10.0 | RELEASE CANDIDATE | migration tool, demo import, docs, packaging | migration acceptance tests pass; docs complete |
+| 0.8.0 | PERSIAN-FIRST | fa_IR catalogues for both artifacts, translation pipeline + `[FA]` gate, Persian admin surfaces | ✅ **VERIFIED** (CI runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2) |
+| 0.9.0 | ARTIST + NEWS | artist profile (works, biography, socials, gallery) and the music-news section (blog templates + feed block) | 🔄 implemented; `docs/ARTIST-AND-NEWS.md`; verification in `docs/VERIFICATION.md` |
+| 0.10.0 | SEO + PERF | SEO cooperation, performance budget met | Lighthouse budget met; no unbounded queries |
+| 0.11.0 | RELEASE CANDIDATE | migration tool, demo import, docs, packaging | migration acceptance tests pass; docs complete |
 | 1.0.0 | PRODUCTION | marketplace packages | final quality gate (§88 of the brief) fully green |
 
 Every phase ends with: implemented → tested → documented → translated → accessible → responsive →

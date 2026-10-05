@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira 0.8.0\n"
+"Project-Id-Version: wavira 0.9.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05 12:00+0000\n"
 "PO-Revision-Date: 2026-10-05 12:00+0000\n"
@@ -17,12 +17,25 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: wavira\n"
 
+#: wavira/inc/artists.php:131
+msgid "(opens in a new tab)"
+msgstr "(در زبانهٔ جدید باز می‌شود)"
 
 #: wavira/inc/markup.php:225
 #. translators: 1: genre name, 2: number of published items.
 #, keep-latin
 msgid "%1$s (%2$d)"
 msgstr "%1$s (%2$d)"
+
+#: wavira/inc/artists.php:209
+#. translators: 1: section name, 2: number of items in that section, formatted for the locale.
+#, keep-latin
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
+
+#: wavira/inc/artists.php:140
+msgid "Album"
+msgstr "آلبوم"
 
 #: wavira/inc/assets.php:59
 msgid "Auto"
@@ -33,10 +46,25 @@ msgctxt "block description"
 msgid "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post."
 msgstr "یک نمونهٔ پخشکننده که به آلبوم، هنرمند، سبک، جدیدترین قطعهها یا موارد مرتبط با نوشتهٔ جاری متصل میشود."
 
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block description"
+msgid "An artist: portrait, biography, social channels, counts, their albums, singles and music videos, and their photo gallery."
+msgstr "یک هنرمند: تصویر، زندگی‌نامه، شبکه‌های اجتماعی، شمار آثار، آلبوم‌ها، تک‌آهنگ‌ها، موزیک‌ویدیوها و گالری تصاویر."
+
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block description"
 msgid "Linked genre terms as chips, most used first."
 msgstr "سبکها بهصورت برچسبهای پیوندی، پرکاربردترین در ابتدا."
+
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block description"
+msgid "Photos attached to an artist: the images uploaded on the artist screen."
+msgstr "تصاویر پیوست‌شده به هنرمند: همان تصاویری که در صفحهٔ هنرمند بارگذاری می‌شوند."
+
+#: wavira/blocks/news/block.json
+msgctxt "block description"
+msgid "The newest news posts as cards, optionally restricted to one category. Pair it with the blog templates for a full news section."
+msgstr "تازه‌ترین خبرها به‌صورت کارت، به‌صورت اختیاری محدود به یک دسته. برای بخش خبری کامل، آن را با قالب‌های وبلاگ به کار ببرید."
 
 #: wavira/blocks/tracklist/block.json
 msgctxt "block description"
@@ -53,10 +81,31 @@ msgctxt "block keyword"
 msgid "album"
 msgstr "آلبوم"
 
+#: wavira/blocks/artist-gallery/block.json
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block keyword"
+msgid "artist"
+msgstr "هنرمند"
+
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
 msgid "audio"
 msgstr "صدا"
+
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block keyword"
+msgid "band"
+msgstr "گروه"
+
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block keyword"
+msgid "biography"
+msgstr "زندگی‌نامه"
+
+#: wavira/blocks/news/block.json
+msgctxt "block keyword"
+msgid "blog"
+msgstr "وبلاگ"
 
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block keyword"
@@ -73,18 +122,46 @@ msgctxt "block keyword"
 msgid "embed"
 msgstr "جایگذاری"
 
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block keyword"
+msgid "gallery"
+msgstr "گالری"
+
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block keyword"
 msgid "genre"
 msgstr "سبک"
 
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block keyword"
+msgid "images"
+msgstr "تصاویر"
+
+#: wavira/blocks/news/block.json
+msgctxt "block keyword"
+msgid "magazine"
+msgstr "مجله"
+
+#: wavira/blocks/artist-gallery/block.json
+#: wavira/blocks/artist-profile/block.json
 #: wavira/blocks/genre-chips/block.json
+#: wavira/blocks/news/block.json
 #: wavira/blocks/player/block.json
 #: wavira/blocks/tracklist/block.json
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
 msgid "music"
 msgstr "موسیقی"
+
+#: wavira/blocks/news/block.json
+msgctxt "block keyword"
+msgid "news"
+msgstr "خبر"
+
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block keyword"
+msgid "photos"
+msgstr "تصویرها"
 
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
@@ -96,10 +173,25 @@ msgctxt "block keyword"
 msgid "playlist"
 msgstr "فهرست پخش"
 
+#: wavira/blocks/news/block.json
+msgctxt "block keyword"
+msgid "posts"
+msgstr "نوشته‌ها"
+
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block keyword"
+msgid "profile"
+msgstr "نما"
+
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
 msgid "queue"
 msgstr "صف پخش"
+
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block keyword"
+msgid "singer"
+msgstr "خواننده"
 
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block keyword"
@@ -131,10 +223,25 @@ msgctxt "block title"
 msgid "Album tracklist"
 msgstr "فهرست قطعههای آلبوم"
 
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block title"
+msgid "Artist photo gallery"
+msgstr "گالری تصاویر هنرمند"
+
+#: wavira/blocks/artist-profile/block.json
+msgctxt "block title"
+msgid "Artist profile"
+msgstr "نمای هنرمند"
+
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block title"
 msgid "Genre chips"
 msgstr "برچسبهای سبک"
+
+#: wavira/blocks/news/block.json
+msgctxt "block title"
+msgid "Music news"
+msgstr "اخبار موسیقی"
 
 #: wavira/blocks/player/block.json
 msgctxt "block title"
@@ -150,6 +257,10 @@ msgstr "موزیکویدیو"
 msgctxt "button label in the featured album pattern"
 msgid "Browse all albums"
 msgstr "مشاهدهٔ همهٔ آلبومها"
+
+#: wavira/blocks/artist-profile/render.php:51
+msgid "Choose an artist for this block, or open it on an artist page."
+msgstr "هنرمندی را برای این بلوک انتخاب کنید یا آن را در صفحهٔ یک هنرمند باز کنید."
 
 #: wavira/inc/assets.php:56
 msgid "Colour theme"
@@ -183,9 +294,14 @@ msgstr "— همهٔ حقوق محفوظ است."
 msgid "Footer navigation"
 msgstr "ناوبری پاورقی"
 
-#: wavira/inc/blocks.php:57
+#: wavira/inc/blocks.php:64
 msgid "Genre chips, most used first."
 msgstr "برچسبهای سبک، پرکاربردترین در ابتدا."
+
+#: wavira/patterns/hidden-heading-music-news.php:20
+msgctxt "heading above the news feed"
+msgid "Music news"
+msgstr "اخبار موسیقی"
 
 #: wavira/patterns/hidden-404.php:20
 msgctxt "heading of the 404 template"
@@ -230,6 +346,10 @@ msgstr "هنوز چیزی اینجا منتشر نشده است."
 msgid "No genres with published music yet."
 msgstr "هنوز سبکی با موسیقی منتشرشده نداریم."
 
+#: wavira/blocks/news/render.php:43
+msgid "No news posts yet. Publish one and it appears here."
+msgstr "هنوز خبری منتشر نشده است. نخستین خبر را منتشر کنید تا اینجا نمایش داده شود."
+
 #: wavira/blocks/tracklist/render.php:37
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
@@ -239,13 +359,29 @@ msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست
 msgid "Open %s"
 msgstr "باز کردن %s"
 
-#: wavira/inc/blocks.php:55
+#: wavira/inc/artists.php:143
+msgid "Photo"
+msgstr "تصویر"
+
+#: wavira/inc/artists.php:266
+msgid "Photos"
+msgstr "تصاویر"
+
+#: wavira/inc/blocks.php:68
+msgid "Photos attached to an artist."
+msgstr "تصاویر پیوست‌شده به یک هنرمند."
+
+#: wavira/inc/blocks.php:60
 msgid "Player for an album, artist or genre queue."
 msgstr "پخشکننده برای آلبوم، هنرمند یا صف سبک."
 
 #: wavira/inc/setup.php:46
 msgid "Primary navigation"
 msgstr "ناوبری اصلی"
+
+#: wavira/inc/blocks.php:66
+msgid "Profile, works and photos of an artist."
+msgstr "نمای هنرمند: آثار، زندگی‌نامه، شبکه‌های اجتماعی و تصاویر."
 
 #: wavira/patterns/hidden-heading-watch.php:16
 msgctxt "section heading above a music video"
@@ -277,17 +413,37 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr "موزیکویدیوها"
 
-#: wavira/inc/blocks.php:56
+#: wavira/inc/artists.php:141
+msgid "Single"
+msgstr "تک‌آهنگ"
+
+#: wavira/inc/blocks.php:70
+msgid "The newest news posts as cards."
+msgstr "تازه‌ترین خبرها به‌صورت کارت."
+
+#: wavira/inc/blocks.php:62
 msgid "The video of this post: file, embed or link."
 msgstr "ویدیوی این نوشته: فایل، جایگذاری یا پیوند."
+
+#: wavira/blocks/artist-gallery/render.php:41
+msgid "This artist has no photos yet. Upload them from the artist’s media library."
+msgstr "این هنرمند هنوز تصویری ندارد. آن‌ها را از کتابخانهٔ رسانهٔ هنرمند بارگذاری کنید."
 
 #: wavira/blocks/video/render.php:27
 msgid "This post has no video source yet."
 msgstr "این نوشته هنوز منبع ویدیویی ندارد."
 
-#: wavira/inc/blocks.php:54
+#: wavira/inc/blocks.php:58
 msgid "Tracklist of the album chosen in the sidebar."
 msgstr "فهرست قطعههای آلبومی که در نوار کناری انتخاب شده است."
+
+#: wavira/inc/artists.php:142
+msgid "Video"
+msgstr "ویدیو"
+
+#: wavira/inc/artists.php:215
+msgid "View all"
+msgstr "مشاهدهٔ همه"
 
 #: wavira/inc/markup.php:159
 msgid "Watch the video"

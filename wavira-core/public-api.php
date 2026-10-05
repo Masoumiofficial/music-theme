@@ -172,6 +172,58 @@ if ( ! function_exists( 'wavira_core_album_tracklist' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_core_artist_profile' ) ) {
+	/**
+	 * The complete profile payload of an artist.
+	 *
+	 * One call answers a whole artist page — biography, avatar, social channels,
+	 * counts, the works grouped by type and the image gallery — so the theme
+	 * never queries the music model itself (ARCHITECTURE §1). Empty array when the
+	 * plugin is inactive, when the ID is not a published artist, or when a filter
+	 * removed the service.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      Optional: `limit`, `gallery_limit`, `sections`.
+	 * @return array<string, mixed> See Wavira\Core\Content\ArtistProfile::for_artist().
+	 */
+	function wavira_core_artist_profile( $artist_id, $args = array() ) {
+		if ( ! function_exists( 'wavira_core_is_active' ) || ! wavira_core_is_active() ) {
+			return array();
+		}
+
+		if ( ! class_exists( 'Wavira\\Core\\Content\\ArtistProfile' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\ArtistProfile::for_artist( (int) $artist_id, (array) $args );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_news_feed' ) ) {
+	/**
+	 * The site's news feed as lean items (title, excerpt, date, thumbnail, …).
+	 *
+	 * News is published as ordinary posts; this is the one place that decides
+	 * what a news item contains, so the blog index, a category archive, a home
+	 * page section and a shortcode all render the same card.
+	 *
+	 * @param array<string, mixed> $args Optional: `limit`, `category`, `offset`,
+	 *                                   `exclude`, `post_type`.
+	 * @return array<int, array<string, mixed>> Empty array when the plugin is inactive.
+	 */
+	function wavira_core_news_feed( $args = array() ) {
+		if ( ! function_exists( 'wavira_core_is_active' ) || ! wavira_core_is_active() ) {
+			return array();
+		}
+
+		if ( ! class_exists( 'Wavira\\Core\\News\\NewsFeed' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\News\NewsFeed::items( (array) $args );
+	}
+}
+
 if ( ! function_exists( 'wavira_core_video_source' ) ) {
 	/**
 	 * Where a video post plays from.

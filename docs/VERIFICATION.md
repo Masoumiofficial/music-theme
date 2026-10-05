@@ -122,6 +122,37 @@ appended; `--wp--custom--player--barSpace` and `--wp--custom--player--barHeight`
 (camelCase vs. WordPress' kebab-casing), so two settings silently did nothing; dark-mode chip text
 failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered `wavira.com`.
 
+## 0.9.0 — Artist profiles and the music-news section
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| One call answers a whole artist page | **VERIFIED** | `Test_Artist_Profile::test_payload_carries_profile_works_and_gallery` — name, biography, quote, socials, counts, the three work sections and the gallery come back from `wavira_core_artist_profile()`; `docs/ARTIST-AND-NEWS.md` §1.2 is the field-by-field contract |
+| The works are the artist's own, newest first, drafts excluded | **VERIFIED** | same suite — another artist's album never appears, drafts are neither listed nor counted, and the two albums come back in date-descending order (`test_drafts_and_unknown_ids_are_refused`) |
+| Sections and the gallery are bounded | **VERIFIED** | `test_limits_are_honoured_and_capped` — `limit: 2` returns two items with the full count, `limit: 0` returns one (not every) item, `ArtistProfile::MAX_ITEMS` is 24 |
+| The gallery is the images attached to the artist | **VERIFIED** | `test_payload_carries_profile_works_and_gallery` — an attachment whose `post_parent` is the artist appears with its caption; the count in `counts.gallery` matches |
+| Unknown or unpublished artists are refused | **VERIFIED** | `test_drafts_and_unknown_ids_are_refused` — a non-existent ID and a track ID both return an empty payload; the theme renders an empty string for either (`test_rendering_an_unknown_artist_is_empty`) |
+| The theme renders profile, works and gallery, and escapes stored text | **VERIFIED** | `Test_Artist_Profile::test_theme_markup_renders_profile_works_and_gallery` + `test_theme_markup_escapes_stored_text` — a title with `&`/`"` reaches the page as `&amp;`/`&quot;`, a `<b>` title as `&lt;b&gt;`, and a `<script>` in a biography is stripped |
+| Shortcode and helper produce the same markup | **VERIFIED** | `Test_Artist_Profile::test_shortcode_and_helper_share_the_markup` — `[wavira_artist]` renders through `wavira_get_artist()` |
+| The news feed is newest first and never shows a draft | **VERIFIED** | `Test_News::test_feed_is_newest_first_and_skips_drafts` |
+| A category restricts the feed; an unknown category yields nothing | **VERIFIED** | `Test_News::test_feed_can_be_restricted_to_a_category` — the unknown-slug case is asserted explicitly, because "no filter" and "empty filter" must not behave alike |
+| Items carry the fields a card needs, and an excerpt always exists | **VERIFIED** | `Test_News::test_items_carry_card_fields_and_an_excerpt` — a post without an excerpt gets a trimmed, markup-free one; a post with one keeps it; thumbnail URL, date, permalink, author and categories are present |
+| A private or unknown post type cannot be surfaced | **VERIFIED** | `Test_News::test_non_public_post_types_cannot_be_read` — a registered non-public type falls back to `post` and its published post ID is absent from the feed |
+| The theme renders the feed as cards and the markup path honours its own filters | **VERIFIED** | `Test_News::test_theme_markup_renders_news_cards` + `test_news_categories_render_as_chips` — `wavira-news__list`, `wavira-card--news`, `<time datetime=`, category chips, and an empty string for an empty category |
+| The three new blocks are registered, render on a real WordPress and degrade to an editor hint | **VERIFIED** | `Test_Blocks` — `wavira_block_names()` (7 blocks) is asserted against metadata, registrar and editor registration; `test_artist_profile_block_renders_the_profile`, `test_artist_gallery_block_renders_attached_images`, `test_news_block_renders_cards` render them through `do_blocks()` |
+| The new template text is translatable and the pattern references resolve | **VERIFIED** | `[I18N]` gate → 19 template/part files, 16 patterns, 24 references; the news heading lives in `patterns/hidden-heading-music-news.php` |
+| Both artifacts ship the new strings in Persian | **VERIFIED** | `[FA]` gate → 215/215 strings translated (91 theme + 124 core), POT/PO/MO in sync; `Test_I18n::test_artist_and_news_strings_come_back_in_persian` asserts the shipped `.mo` returns Persian for `Instagram`, `Aparat`, `Singles`, `Works` and the block titles |
+| The new CSS keeps the product's promises | **VERIFIED** | `[CSS]` gate — no `!important`, no physical direction property (so the artist and news layouts mirror on an RTL site), every token resolvable, and the size budget still met |
+| The template path (blog index and archives) actually paginates | **IMPLEMENTED** | `home.html` and `archive.html` use core's Query Loop with `inherit: true` and `wp:query-pagination`; rendering the paginated archive needs a real install (`WP-RUNTIME`) |
+| The editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all seven blocks with a `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
+| Jalali dates in the new surfaces | **NOT_STARTED** | decided in ADR 0015 §8 / `docs/DECISIONS.md` 0.9.0: dates use `wp_date()`/`get_the_date()` with the locale |
+
+**Notes from building the 0.9.0 surfaces.** The aggregation lives in the plugin and the markup in the
+theme, which is what made the tests cheap: the payload is asserted field by field without a browser,
+and the rendering is asserted on the same fixtures. Two behaviours were decided *by* the tests instead
+of by taste: `limit: 0` returns one item rather than everything (an unbounded profile is the unbounded
+query the coding standard forbids), and a non-public post type silently falls back to `post` rather
+than erroring (a feed caller must not be able to enumerate private types by guessing names).
+
 ## 0.8.0 — Persian-first localisation
 
 | Claim | Status | Evidence |
@@ -207,13 +238,13 @@ blocks by hand.
 ```bash
 # full local gate (the PHP and PHPCS gates skip when they are absent; CI runs them)
 bash tools/lint.sh            # named gates incl. [BLOCKS] tools/check-blocks.mjs, [I18N] tools/check-i18n.mjs,
-                              #   [MAPPING] tools/check-mapping.mjs, [CSS] tools/check-css.mjs,
+                              #   [MAPPING] tools/check-mapping.mjs, [FA] tools/i18n.mjs check, [CSS] tools/check-css.mjs,
                               # [CONTRAST] tools/check-contrast.mjs, [REFS] tools/check-class-refs.py,
                               # [BOUNDARIES] tools/check-boundaries.mjs
 node tools/build.mjs --check  # sources exist; node tools/build.mjs builds wavira/assets/dist + wavira-core/assets/dist
 
 # both DOM-free unit suites (no browser)
-node --test tests/js/player.test.mjs tests/js/theme.test.mjs   # or: npm run test:js
+node --test tests/js/player.test.mjs tests/js/theme.test.mjs tests/js/i18n.test.mjs   # or: npm run test:js
 
 # the component harness (dev only): real browser, real shipped CSS/JS, stubbed REST
 node tools/preview/serve.mjs  # → http://localhost:4173/tools/preview/ (colour modes, RTL/LTR, 360→1920)
@@ -224,8 +255,10 @@ vendor/bin/phpcs --standard=phpcs.xml.dist -q
 
 # the runtime gate (needs MySQL/MariaDB; downloads the WordPress test library)
 composer test:install
-composer test                # 76 tests: data model, settings, REST (incl. player), downloads, search, related,
-                             # cache, public API, and the theme's own block layer (tests/test-blocks.php)
+composer test                # 90+ tests: data model, settings, REST (incl. player), downloads, search, related,
+                             # cache, public API, the Persian catalogues (tests/test-i18n.php), the theme's own
+                             # block layer (tests/test-blocks.php), artist profiles (tests/test-artist-profile.php)
+                             # and the news feed (tests/test-news.php)
 
 # the full-site gate (needs a real install + WP-CLI/site owner)
 wp plugin activate wavira-core

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.8.0\n"
+"Project-Id-Version: wavira-core 0.9.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05 12:00+0000\n"
 "PO-Revision-Date: 2026-10-05 12:00+0000\n"
@@ -16,7 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: wavira-core\n"
-
 
 #: wavira-core/src/Downloads/Access.php:116
 #. translators: %d: audio bitrate in kbps.
@@ -51,6 +50,7 @@ msgstr "افزودن %s تازه"
 msgid "Album"
 msgstr "آلبوم"
 
+#: wavira-core/src/Content/ArtistProfile.php:262
 #: wavira-core/src/Content/PostTypes.php:119
 msgid "Albums"
 msgstr "آلبومها"
@@ -59,6 +59,10 @@ msgstr "آلبومها"
 #. translators: %s: taxonomy plural name.
 msgid "All %s"
 msgstr "همهٔ %s"
+
+#: wavira-core/src/Content/ArtistProfile.php:197
+msgid "Aparat"
+msgstr "آپارات"
 
 #: wavira-core/src/Content/PostTypes.php:113
 msgid "Artist"
@@ -149,6 +153,10 @@ msgstr "فعالسازی طبقهبندی حالوهوا"
 msgid "Enable the Release-year taxonomy"
 msgstr "فعالسازی طبقهبندی سال انتشار"
 
+#: wavira-core/src/Content/ArtistProfile.php:198
+msgid "Facebook"
+msgstr "فیس‌بوک"
+
 #: wavira-core/src/Settings/SettingsSchema.php:116
 msgid "Footer copyright text"
 msgstr "متن حق نشر پاورقی"
@@ -176,6 +184,10 @@ msgstr "سبکها"
 #: wavira-core/src/Settings/SettingsSchema.php:122
 msgid "Global social profile URLs"
 msgstr "نشانی شبکههای اجتماعی سراسری"
+
+#: wavira-core/src/Content/ArtistProfile.php:194
+msgid "Instagram"
+msgstr "اینستاگرام"
 
 #: wavira-core/src/Content/Taxonomies.php:132
 msgid "Label"
@@ -254,6 +266,7 @@ msgstr "تنظیمات محصول موسیقی: ظاهر، محتوا، پخشک
 msgid "Music video"
 msgstr "موزیکویدیو"
 
+#: wavira-core/src/Content/ArtistProfile.php:268
 #: wavira-core/src/Content/PostTypes.php:133
 msgid "Music videos"
 msgstr "موزیکویدیوها"
@@ -423,6 +436,10 @@ msgstr "نمایش نوار چسبان پخشکننده"
 msgid "Shuffle"
 msgstr "پخش تصادفی"
 
+#: wavira-core/src/Content/ArtistProfile.php:265
+msgid "Singles"
+msgstr "تک‌آهنگ‌ها"
+
 #: wavira-core/src/Rest/AbstractController.php:111
 #: wavira-core/src/Rest/PlayerController.php:97
 msgid "Sort collection by field."
@@ -435,6 +452,10 @@ msgstr "شناسهٔ نوشتهٔ مبدأ برای صفهای آلبوم، هن
 #: wavira-core/src/Settings/SettingsSchema.php:42
 msgid "Start in dark mode"
 msgstr "شروع در حالت تاریک"
+
+#: wavira-core/src/Content/ArtistProfile.php:195
+msgid "Telegram"
+msgstr "تلگرام"
 
 #: wavira-core/src/Player/Assets.php:196
 msgid "There is nothing to play here."
@@ -522,3 +543,15 @@ msgstr "تنظیمات واویرا"
 #: wavira-core/src/Rest/PlayerController.php:71
 msgid "What the queue is built from."
 msgstr "صف از چه چیزی ساخته میشود."
+
+#: wavira-core/src/Content/ArtistProfile.php:271
+msgid "Works"
+msgstr "آثار"
+
+#: wavira-core/src/Content/ArtistProfile.php:199
+msgid "X (Twitter)"
+msgstr "ایکس (توییتر)"
+
+#: wavira-core/src/Content/ArtistProfile.php:196
+msgid "YouTube"
+msgstr "یوتیوب"

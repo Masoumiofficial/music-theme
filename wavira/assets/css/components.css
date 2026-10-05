@@ -379,6 +379,318 @@
 	margin-block: 0;
 }
 
+/* ---- cards: works, artists, news --------------------------------------- */
+
+/* One card component for every grid the product renders — artist sections and
+   the news feed share it, so a restyle cannot fix one and miss the other. */
+.wavira-cards,
+.wavira-news__list {
+	display: grid;
+	gap: var(--wp--preset--spacing--40, 1rem);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+}
+
+.wavira-cards__item,
+.wavira-news__item {
+	display: flex;
+	min-inline-size: 0;
+}
+
+.wavira-card {
+	display: flex;
+	flex-direction: column;
+	inline-size: 100%;
+	overflow: hidden;
+	border: var(--wavira-hairline);
+	border-radius: var(--wavira-cover-radius);
+	background: var(--wp--preset--color--surface);
+	box-shadow: var(--wavira-cover-shadow);
+}
+
+.wavira-card__media {
+	margin: 0;
+	aspect-ratio: var(--wavira-cover-ratio);
+	background: var(--wp--preset--color--border);
+}
+
+.wavira-card__image {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.wavira-card__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 0.375rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+}
+
+.wavira-card__kicker {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin: 0;
+}
+
+.wavira-card__title {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--medium, 1.0625rem);
+	line-height: 1.4;
+}
+
+.wavira-card__title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.wavira-card__title a:hover {
+	text-decoration: underline;
+}
+
+.wavira-card__subtitle,
+.wavira-card__meta {
+	margin: 0;
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+.wavira-card__excerpt {
+	margin: 0;
+	color: var(--wp--preset--color--muted);
+}
+
+/* The whole cover is the link target, so a coarse pointer does not have to hit
+   the title text; the title link keeps the accessible name. */
+.wavira-card__cover {
+	display: block;
+	block-size: 100%;
+}
+
+/* ---- artist profile ---------------------------------------------------- */
+
+.wavira-artist {
+	display: grid;
+	gap: var(--wp--preset--spacing--60, 2.5rem);
+}
+
+.wavira-artist__profile {
+	display: grid;
+	gap: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+@media (min-width: 768px) {
+	.wavira-artist__profile {
+		grid-template-columns: minmax(11rem, 18rem) minmax(0, 1fr);
+		align-items: start;
+	}
+}
+
+.wavira-artist__avatar {
+	display: grid;
+	place-items: center;
+	margin: 0;
+	overflow: hidden;
+	aspect-ratio: var(--wavira-cover-ratio);
+	border-radius: var(--wavira-cover-radius);
+	background: var(--wp--preset--color--surface);
+	box-shadow: var(--wavira-cover-shadow);
+}
+
+.wavira-artist__portrait {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.wavira-artist__avatar--placeholder {
+	color: var(--wp--preset--color--muted);
+}
+
+.wavira-artist__avatar--placeholder svg {
+	inline-size: 45%;
+	block-size: auto;
+}
+
+.wavira-artist__name {
+	margin-block: 0 0.5rem;
+}
+
+.wavira-artist__quote {
+	margin-block: 0 1rem;
+	color: var(--wp--preset--color--muted);
+}
+
+.wavira-artist__socials,
+.wavira-artist__counts {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wavira-artist__socials {
+	margin-block-end: 1rem;
+}
+
+.wavira-artist__social a {
+	display: inline-flex;
+	align-items: center;
+	min-block-size: 2.75rem;
+}
+
+.wavira-artist__count {
+	display: flex;
+	align-items: baseline;
+	gap: 0.375rem;
+	padding-inline: 0.75rem;
+	border: var(--wavira-hairline);
+	border-radius: 999px;
+	background: var(--wp--preset--color--surface);
+}
+
+.wavira-artist__count dt {
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+.wavira-artist__count dd {
+	margin: 0;
+	font-weight: 700;
+}
+
+.wavira-artist__bio {
+	margin-block-start: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+/* ---- artist gallery ---------------------------------------------------- */
+
+.wavira-gallery__items {
+	display: grid;
+	gap: var(--wp--preset--spacing--40, 1rem);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wavira-gallery__figure {
+	margin: 0;
+}
+
+.wavira-gallery__image {
+	display: block;
+	inline-size: 100%;
+	aspect-ratio: var(--wavira-cover-ratio);
+	border-radius: var(--wavira-cover-radius);
+	object-fit: cover;
+}
+
+.wavira-gallery__caption {
+	margin-block-start: 0.5rem;
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+@media (min-width: 768px) {
+	.wavira-gallery__items--3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.wavira-gallery__items--4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+/* ---- music news -------------------------------------------------------- */
+
+.wavira-news__filters {
+	margin-block-end: var(--wp--preset--spacing--40, 1rem);
+}
+
+@media (min-width: 768px) {
+	.wavira-news--cols-2 .wavira-news__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.wavira-news--cols-3 .wavira-news__list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.wavira-news--cols-4 .wavira-news__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.wavira-news--cols-4 .wavira-news__list {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+/* The blog templates use core's Query Loop (pagination, feeds and the archive
+   title stay core's business), so the same card look is applied to the loop's
+   own blocks instead of rendering a second component. */
+.wavira-news-grid > li {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+	border: var(--wavira-hairline);
+	border-radius: var(--wavira-cover-radius);
+	background: var(--wp--preset--color--surface);
+	box-shadow: var(--wavira-cover-shadow);
+}
+
+.wavira-news-grid .wp-block-post-featured-image {
+	margin: 0 0 0.5rem;
+	overflow: hidden;
+	aspect-ratio: 16 / 9;
+	border-radius: var(--wp--custom--radius--sm, 6px);
+}
+
+.wavira-news-grid .wp-block-post-featured-image img {
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+.wavira-news-grid .wp-block-post-title {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--medium, 1.0625rem);
+}
+
+.wavira-news-grid .wp-block-post-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.wavira-news-grid .wp-block-post-title a:hover {
+	text-decoration: underline;
+}
+
+.wavira-news-grid .wp-block-post-excerpt,
+.wavira-news-grid .wp-block-post-date {
+	margin: 0;
+	color: var(--wp--preset--color--muted);
+}
+
+.wavira-news-grid .wp-block-post-excerpt__excerpt {
+	margin: 0;
+}
+
+.wavira-news-grid .wp-block-post-excerpt__more-text {
+	margin-block: 0.5rem 0;
+}
+
 /* ---- media ------------------------------------------------------------- */
 
 .wavira-video-frame,

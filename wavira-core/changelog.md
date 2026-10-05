@@ -5,6 +5,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.9.0 (artist profile and news payloads)
+- **`src/Content/ArtistProfile.php`** — one payload answers a whole artist page: portrait (featured
+  image → `wavira_artist_image` → `wavira_artist_cover`), biography (post content, else the excerpt),
+  the translated social channels (`wavira_social_*`, Aparat included), counts, the works grouped by
+  type from the existing `wavira_artist` relation meta, and the images attached to the artist post.
+  Bounded (1–24 per section via `ArtistProfile::MAX_ITEMS`), public-only, filterable
+  (`wavira_core_artist_profile`).
+- **`src/News/NewsFeed.php`** — the site's news as lean items (title, excerpt, permalink, date,
+  thumbnail, categories, author). Posts and categories, newest first, 1–24 items; a non-public post
+  type falls back to `post`; an unknown category yields nothing. Filterable (`wavira_core_news_items`).
+- **Two public functions** — `wavira_core_artist_profile()` and `wavira_core_news_feed()`, both
+  degrading to an empty array when the plugin is inactive or a service is removed.
+- `docs/ARTIST-AND-NEWS.md` documents both payloads field by field.
+
+### Changed — 0.9.0
+- `src/News/` is a **service** layer in the boundary gate (it may read data, never the REST layer);
+  `src/Content/ArtistProfile.php` stays in the data layer.
+- Plugin version 0.9.0; the Persian catalogue grew to 124 strings, all translated.
+
 ### Added — 0.8.0 (Persian-first)
 - **Persian ships with the plugin**: `languages/fa_IR.po` (116 strings, hand-written) and the compiled
   `languages/fa_IR.mo`. Settings labels and descriptions, post-type and taxonomy labels, REST argument

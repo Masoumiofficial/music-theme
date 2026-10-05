@@ -84,3 +84,69 @@
 	border-radius: var(--wp--custom--radius--md, 12px);
 	color: var(--wp--preset--color--muted);
 }
+
+/* ---- artist and news surfaces ------------------------------------------ */
+
+/* The editor loads this file plus theme.json, not the layered stylesheets, so
+   the components a block preview contains need their shape here as well. Only
+   structure and tokens: colours come from the shared presets, which is why the
+   editor stays in sync with light/dark without a second palette. */
+.editor-styles-wrapper .wavira-card {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wp--preset--color--surface);
+}
+
+.editor-styles-wrapper .wavira-card__media img {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+}
+
+.editor-styles-wrapper .wavira-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+}
+
+.editor-styles-wrapper .wavira-cards,
+.editor-styles-wrapper .wavira-news__list,
+.editor-styles-wrapper .wavira-gallery__items {
+	display: grid;
+	gap: var(--wp--preset--spacing--40, 1rem);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+}
+
+.editor-styles-wrapper .wavira-artist__profile {
+	display: grid;
+	gap: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+.editor-styles-wrapper .wavira-artist__avatar {
+	display: grid;
+	place-items: center;
+	margin: 0;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wp--preset--color--surface);
+}
+
+.editor-styles-wrapper .wavira-artist__avatar--placeholder svg {
+	inline-size: 45%;
+	block-size: auto;
+}
+
+.editor-styles-wrapper .wavira-gallery__image {
+	display: block;
+	inline-size: 100%;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--wp--custom--radius--md, 12px);
+	object-fit: cover;
+}

@@ -34,7 +34,7 @@ if ( ! function_exists( 'wavira_block_names' ) ) {
 	 * @return string[]
 	 */
 	function wavira_block_names() {
-		return array( 'tracklist', 'player', 'video', 'genre-chips' );
+		return array( 'tracklist', 'player', 'video', 'genre-chips', 'artist-profile', 'artist-gallery', 'news' );
 	}
 }
 
@@ -62,6 +62,12 @@ if ( ! function_exists( 'wavira_block_editor_strings' ) ) {
 		$strings['The video of this post: file, embed or link.'] = __( 'The video of this post: file, embed or link.', 'wavira' );
 
 		$strings['Genre chips, most used first.'] = __( 'Genre chips, most used first.', 'wavira' );
+
+		$strings['Profile, works and photos of an artist.'] = __( 'Profile, works and photos of an artist.', 'wavira' );
+
+		$strings['Photos attached to an artist.'] = __( 'Photos attached to an artist.', 'wavira' );
+
+		$strings['The newest news posts as cards.'] = __( 'The newest news posts as cards.', 'wavira' );
 
 		return $strings;
 	}

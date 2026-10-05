@@ -6,7 +6,7 @@ tracks, videos, genres), settings, playback logic and REST endpoints belong to t
 
 | | |
 | --- | --- |
-| Version | 0.8.0 (Persian-first: fa_IR catalogue, block layer) |
+| Version | 0.9.0 (Persian-first, artist profiles, music news) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira` |
@@ -28,18 +28,22 @@ wavira/
 │   ├── assets.php       conditional, build-aware enqueueing
 │   ├── markup.php       shared markup (tracklist, video, chips) — one implementation
 │   ├── player.php       the player mount point + no-JavaScript fallback
+│   ├── artists.php      artist profile markup (works, biography, socials, gallery)
+│   ├── news.php         the music-news feed as cards (+ category chips)
 │   ├── shortcodes.php   classic-editor surfaces, delegating to markup.php
 │   ├── blocks.php       block registration from each blocks/<name>/block.json
 │   └── integrations/    rank-math.php, yoast.php, elementor.php (later phases)
-├── templates/           block templates (14: index, page, single, search, 404, music singles/archives)
+├── templates/           block templates (16: index, home, archive, page, single, search, 404,
+│                        music singles/archives, artist profile, genre archive)
 ├── parts/               block template parts (header, footer, player bar)
 ├── patterns/            insertable patterns + hidden-* patterns holding every
 │                        user-visible template string (.html templates run no PHP)
-├── blocks/              dynamic block sources: <name>/block.json + render.php + shared editor.js
+├── blocks/              dynamic block sources: <name>/block.json + render.php for tracklist,
+│                        player, video, genre-chips, artist-profile, artist-gallery and news
 ├── assets/
 │   ├── css/             token/base/component sources
 │   ├── js/              ES modules (no jQuery)
-│   ├── icons/           SVG icon files used by wavira_icon()
+│   ├── icons/           SVG icon files used by wavira_icon() (music placeholder, external link)
 │   ├── fonts/           OFL-licensed fonts only
 │   ├── images/          owned/CC0 demo art only
 │   └── dist/            build output (generated — not committed)

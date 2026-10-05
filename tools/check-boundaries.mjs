@@ -72,7 +72,7 @@ function layerOf(relPath) {
 		return 2;
 	}
 	if (path.startsWith('src/')) {
-		if (/^src\/(Player|Downloads|Search|Related|Import|Demo|Migration|Integrations)\//.test(path)) {
+		if (/^src\/(Player|Downloads|Search|Related|News|Import|Demo|Migration|Integrations)\//.test(path)) {
 			return 2;
 		}
 		if (/^src\/(Rest|Admin)\//.test(path) || path === 'src/Plugin.php') {

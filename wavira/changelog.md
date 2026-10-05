@@ -5,6 +5,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.9.0 (artist profiles and the news section)
+- **`include inc/artists.php`** — the artist page surfaces: portrait (with a music placeholder), name,
+  quote, translated social chips, counts, the works grouped by album/single/video with per-section
+  counts and "view all" links, the biography and the photo gallery. Renders the payload the core
+  plugin builds (`wavira_core_artist_profile()`), read once per request (`wavira_artist_data()`).
+- **`inc/news.php`** — the music-news feed as cards (`wavira_get_news()`, `wavira_get_news_categories()`)
+  on top of `wavira_core_news_feed()`.
+- **Three blocks** — `wavira/artist-profile`, `wavira/artist-gallery` and `wavira/news` (seven in
+  total) with editor strings printed from PHP, so the Persian catalogue covers the editor too.
+- **Three shortcodes** — `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]`; each delegates to the
+  same helper as its block.
+- **Shared card component** (`wavira_get_card()`, `wavira_get_image()`, `wavira_get_section_head()`) —
+  the artist sections and the news feed render one component, and every image goes through
+  `wp_get_attachment_image()`, so `srcset`/`sizes`/`width`/`height` always come from core.
+- **Templates** — `single-wavira_artist.html` (profile + the artist's queue), `home.html` (the blog
+  index as the news section, paginated) and `archive.html` (category/tag/author/date archives with the
+  term title and description).
+- **Pattern** — `hidden-heading-music-news.php`, because the news heading is template text and
+  template text must stay translatable (`hidden-*.php`).
+- **Icons** — `assets/icons/music.svg` (placeholder portrait) and `external.svg`.
+- **Styles** — cards, artist profile, gallery and news grids in `components.css`, with editor parity in
+  `editor.css`; logical properties and tokens only.
+
+### Changed — 0.9.0
+- Six of the ten theme templates now carry the artist/news surfaces; `wavira-news-grid` styles core's
+  Query Loop in the blog templates instead of rendering a second card component.
+- Theme version 0.9.0; both catalogues grew to 215 strings (91 theme + 124 core), all translated.
+
 ### Added — 0.8.0 (Persian-first)
 - **Persian ships with the theme**: `languages/fa_IR.po` (58 strings, hand-written) and the compiled
   `languages/fa_IR.mo` WordPress loads, plus a generated `languages/wavira.pot`. The front-end copy,

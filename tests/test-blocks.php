@@ -37,10 +37,10 @@ class Test_Blocks extends Wavira_Test_Case {
 		if ( ! defined( 'WAVIRA_THEME_DIR' ) ) {
 			define( 'WAVIRA_THEME_DIR', trailingslashit( dirname( __DIR__ ) . '/wavira' ) );
 			define( 'WAVIRA_THEME_URI', 'https://example.test/wp-content/themes/wavira/' );
-			define( 'WAVIRA_THEME_VERSION', '0.8.0-test' );
+			define( 'WAVIRA_THEME_VERSION', '0.9.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'markup', 'assets', 'player', 'shortcodes', 'blocks' ) as $file ) {
+		foreach ( array( 'helpers', 'markup', 'assets', 'player', 'artists', 'news', 'shortcodes', 'blocks' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {
@@ -379,6 +379,87 @@ class Test_Blocks extends Wavira_Test_Case {
 			);
 			$this->assertSame( $source, $translated, 'without a loaded catalogue the payload falls back to the source string' );
 		}
+	}
+
+	/**
+	 * The artist profile block renders the artist page surfaces.
+	 *
+	 * @return void
+	 */
+	public function test_artist_profile_block_renders_the_profile() {
+		$artist = self::factory()->post->create(
+			array(
+				'post_type'    => 'wavira_artist',
+				'post_status'  => 'publish',
+				'post_title'   => 'Block artist',
+				'post_content' => '<p>Biography from the block fixture.</p>',
+			)
+		);
+
+		$html = do_blocks( '<!-- wp:wavira/artist-profile {"artistId":' . $artist . ',"showGallery":false} /-->' );
+
+		$this->assertStringContainsString( 'wavira-artist__name', $html );
+		$this->assertStringContainsString( 'Block artist', $html );
+		$this->assertStringContainsString( 'Biography from the block fixture.', $html );
+		$this->assertStringNotContainsString( 'wavira-gallery', $html, 'a disabled section is not rendered' );
+
+		// Without an artist to resolve, the block explains itself in the editor
+		// instead of printing an empty page element.
+		$empty = do_blocks( '<!-- wp:wavira/artist-profile /-->' );
+		$this->assertStringNotContainsString( 'wavira-artist__name', $empty );
+	}
+
+	/**
+	 * The gallery block renders the images attached to the artist.
+	 *
+	 * @return void
+	 */
+	public function test_artist_gallery_block_renders_attached_images() {
+		$artist = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_artist',
+				'post_status' => 'publish',
+				'post_title'  => 'Gallery artist',
+			)
+		);
+
+		self::factory()->attachment->create_object(
+			'live.jpg',
+			$artist,
+			array(
+				'post_mime_type' => 'image/jpeg',
+				'post_excerpt'   => 'Live on stage',
+			)
+		);
+
+		$html = do_blocks( '<!-- wp:wavira/artist-gallery {"artistId":' . $artist . '} /-->' );
+
+		$this->assertStringContainsString( 'wavira-gallery__items', $html );
+		$this->assertStringContainsString( 'Live on stage', $html );
+	}
+
+	/**
+	 * The news block renders posts as cards and honours its own limit.
+	 *
+	 * @return void
+	 */
+	public function test_news_block_renders_cards() {
+		foreach ( array( 'First headline', 'Second headline' ) as $index => $title ) {
+			self::factory()->post->create(
+				array(
+					'post_type'   => 'post',
+					'post_status' => 'publish',
+					'post_title'  => $title,
+					'post_date'   => sprintf( '2026-05-%02d 10:00:00', $index + 1 ),
+				)
+			);
+		}
+
+		$html = do_blocks( '<!-- wp:wavira/news {"perPage":1,"showCategories":true} /-->' );
+
+		$this->assertStringContainsString( 'wavira-news__list', $html );
+		$this->assertStringContainsString( 'wavira-card--news', $html );
+		$this->assertSame( 1, substr_count( $html, 'wavira-card--news' ), 'perPage limits the feed' );
 	}
 
 	/**

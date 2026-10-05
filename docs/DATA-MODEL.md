@@ -115,6 +115,18 @@ job only; the theme never touches a counter (ADR 0013 §1).
 | `wavira_website` | url | official site |
 | `wavira_social_facebook` / `_instagram` / `_telegram` / `_x` / `_youtube` / `_aparat` | url | profile links |
 
+## 3b. Derived payloads (no new storage)
+
+Two surfaces read the model and build a payload; neither introduces a meta key, an option or a table.
+
+| Payload | Source | Contract |
+| --- | --- | --- |
+| Artist profile — `wavira_core_artist_profile()` | `wavira_artist_image`/`_cover` + featured image (portrait), post content (biography), `wavira_social_*`, `wavira_artist` relation meta on albums/tracks/videos, images attached to the artist post | `docs/ARTIST-AND-NEWS.md` §1.2; bounded by `limit`/`gallery_limit` (1–24); drafts and other artists' works are excluded |
+| News feed — `wavira_core_news_feed()` | published posts of a public post type, `post_excerpt`/content (excerpt fallback), featured image, categories, author | `docs/ARTIST-AND-NEWS.md` §2.2; newest first, 1–24 items, an unknown category yields nothing |
+
+News is deliberately **not** a post type: the archive, the RSS feed, the sitemap and every SEO plugin
+already understand posts (`docs/DECISIONS.md` 0.9.0).
+
 ## 4. Settings
 
 One option (`wavira_settings`), one schema (`src/Settings/SettingsSchema.php`), one sanitizer:

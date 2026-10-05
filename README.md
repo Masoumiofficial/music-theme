@@ -44,8 +44,9 @@ and survive. Deactivate the plugin and the theme still renders a clean post/page
 | `docs/ARCHITECTURE.md` | **Target architecture** (binding) |
 | `docs/CODING-STANDARD.md` | Enforceable rules (PHP/JS/CSS/i18n/security/perf) |
 | `docs/DECISIONS.md` + `docs/adr/` | Architecture decision records |
-| `docs/DATA-MODEL.md` | **Authoritative music data model** (0.4.0: entities, 43 meta keys, settings, REST, services) |
+| `docs/DATA-MODEL.md` | **Authoritative music data model** (entities, 46 meta keys, settings, REST, services) |
 | `docs/VERIFICATION.md` | **Per-claim evidence log** (what is VERIFIED vs. still open) |
+| `docs/ARTIST-AND-NEWS.md` | Artist profiles and the music-news section (the 0.9.0 surfaces) |
 | `docs/MIGRATION-BLUEPRINT.md` | Legacy → Wavira data migration plan |
 | `docs/REBUILD-PLAN.md` | Phases 0.1.0 → 1.0.0 with exit criteria |
 | `docs/TECH-DEBT.md` | 35 legacy debt items and their disposition |

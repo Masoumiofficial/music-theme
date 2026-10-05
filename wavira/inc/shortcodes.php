@@ -112,3 +112,109 @@ function wavira_video_shortcode( $atts = array() ) {
 	return wavira_get_video( $post_id );
 }
 add_shortcode( 'wavira_video', 'wavira_video_shortcode' );
+
+/**
+ * Print a complete artist page section: profile, works and gallery.
+ *
+ * The classic-editor surface of the `wavira/artist-profile` block. Both call
+ * `wavira_get_artist()`, so a shortcode and a block cannot drift apart.
+ *
+ * @param array<string, mixed>|string $atts `id` (or `current`), `sections`,
+ *                                          `limit`, `gallery`, `columns`.
+ * @return string Markup, empty string when there is nothing to show.
+ */
+function wavira_artist_shortcode( $atts = array() ) {
+	$atts = shortcode_atts(
+		array(
+			'id'       => 'current',
+			'sections' => 'albums,tracks,videos',
+			'limit'    => '6',
+			'gallery'  => '8',
+			'columns'  => '3',
+		),
+		$atts,
+		'wavira_artist'
+	);
+
+	$artist_id = wavira_shortcode_post_id( $atts['id'] );
+
+	if ( $artist_id < 1 ) {
+		return '';
+	}
+
+	return wavira_get_artist(
+		$artist_id,
+		array(
+			'sections'      => array_filter( array_map( 'sanitize_key', explode( ',', (string) $atts['sections'] ) ) ),
+			'limit'         => absint( $atts['limit'] ),
+			'gallery_limit' => absint( $atts['gallery'] ),
+			'columns'       => absint( $atts['columns'] ),
+		)
+	);
+}
+add_shortcode( 'wavira_artist', 'wavira_artist_shortcode' );
+
+/**
+ * Print an artist photo gallery.
+ *
+ * @param array<string, mixed>|string $atts `id` (or `current`), `limit`, `columns`.
+ * @return string Markup, empty string when the artist has no photos.
+ */
+function wavira_gallery_shortcode( $atts = array() ) {
+	$atts = shortcode_atts(
+		array(
+			'id'      => 'current',
+			'limit'   => '12',
+			'columns' => '3',
+		),
+		$atts,
+		'wavira_gallery'
+	);
+
+	$artist_id = wavira_shortcode_post_id( $atts['id'] );
+
+	if ( $artist_id < 1 ) {
+		return '';
+	}
+
+	return wavira_get_artist_gallery_only(
+		$artist_id,
+		array(
+			'limit'   => absint( $atts['limit'] ),
+			'columns' => absint( $atts['columns'] ),
+		)
+	);
+}
+add_shortcode( 'wavira_gallery', 'wavira_gallery_shortcode' );
+
+/**
+ * Print the site's news feed.
+ *
+ * @param array<string, mixed>|string $atts `count`, `category`, `date`, `excerpt`, `image`.
+ * @return string Markup, empty string when there is nothing to show.
+ */
+function wavira_news_shortcode( $atts = array() ) {
+	$atts = shortcode_atts(
+		array(
+			'count'    => '6',
+			'category' => '',
+			'date'     => '1',
+			'excerpt'  => '1',
+			'image'    => '1',
+		),
+		$atts,
+		'wavira_news'
+	);
+
+	return wavira_get_news(
+		array(
+			'limit'        => absint( $atts['count'] ),
+			'source'       => '' === (string) $atts['category'] ? 'blog' : 'category',
+			'category'     => function_exists( 'wavira_shortcode_term_slug' ) ? sanitize_title( (string) $atts['category'] ) : '',
+			'show_date'    => (bool) filter_var( $atts['date'], FILTER_VALIDATE_BOOLEAN ),
+			'show_excerpt' => (bool) filter_var( $atts['excerpt'], FILTER_VALIDATE_BOOLEAN ),
+			'show_image'   => (bool) filter_var( $atts['image'], FILTER_VALIDATE_BOOLEAN ),
+		)
+	);
+}
+add_shortcode( 'wavira_news', 'wavira_news_shortcode' );

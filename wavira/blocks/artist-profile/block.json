@@ -1,0 +1,77 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/artist-profile",
+	"title": "Artist profile",
+	"category": "wavira-music",
+	"description": "An artist: portrait, biography, social channels, counts, their albums, singles and music videos, and their photo gallery.",
+	"keywords": [
+		"artist",
+		"singer",
+		"band",
+		"biography",
+		"profile",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"artistId": {
+			"type": "number",
+			"default": 0
+		},
+		"sections": {
+			"type": "array",
+			"default": [
+				"albums",
+				"tracks",
+				"videos"
+			],
+			"items": {
+				"type": "string"
+			}
+		},
+		"limit": {
+			"type": "number",
+			"default": 6
+		},
+		"galleryLimit": {
+			"type": "number",
+			"default": 8
+		},
+		"columns": {
+			"type": "number",
+			"default": 3
+		},
+		"showQuote": {
+			"type": "boolean",
+			"default": true
+		},
+		"showBio": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSocials": {
+			"type": "boolean",
+			"default": true
+		},
+		"showCounts": {
+			"type": "boolean",
+			"default": true
+		},
+		"showWorks": {
+			"type": "boolean",
+			"default": true
+		},
+		"showGallery": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

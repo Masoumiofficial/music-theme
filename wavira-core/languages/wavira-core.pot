@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.8.0\n"
+"Project-Id-Version: wavira-core 0.9.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +43,7 @@ msgstr ""
 msgid "Album"
 msgstr ""
 
+#: wavira-core/src/Content/ArtistProfile.php:262
 #: wavira-core/src/Content/PostTypes.php:119
 msgid "Albums"
 msgstr ""
@@ -50,6 +51,10 @@ msgstr ""
 #: wavira-core/src/Content/Taxonomies.php:168
 #. translators: %s: taxonomy plural name.
 msgid "All %s"
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:197
+msgid "Aparat"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:113
@@ -141,6 +146,10 @@ msgstr ""
 msgid "Enable the Release-year taxonomy"
 msgstr ""
 
+#: wavira-core/src/Content/ArtistProfile.php:198
+msgid "Facebook"
+msgstr ""
+
 #: wavira-core/src/Settings/SettingsSchema.php:116
 msgid "Footer copyright text"
 msgstr ""
@@ -167,6 +176,10 @@ msgstr ""
 
 #: wavira-core/src/Settings/SettingsSchema.php:122
 msgid "Global social profile URLs"
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:194
+msgid "Instagram"
 msgstr ""
 
 #: wavira-core/src/Content/Taxonomies.php:132
@@ -246,6 +259,7 @@ msgstr ""
 msgid "Music video"
 msgstr ""
 
+#: wavira-core/src/Content/ArtistProfile.php:268
 #: wavira-core/src/Content/PostTypes.php:133
 msgid "Music videos"
 msgstr ""
@@ -415,6 +429,10 @@ msgstr ""
 msgid "Shuffle"
 msgstr ""
 
+#: wavira-core/src/Content/ArtistProfile.php:265
+msgid "Singles"
+msgstr ""
+
 #: wavira-core/src/Rest/AbstractController.php:111
 #: wavira-core/src/Rest/PlayerController.php:97
 msgid "Sort collection by field."
@@ -426,6 +444,10 @@ msgstr ""
 
 #: wavira-core/src/Settings/SettingsSchema.php:42
 msgid "Start in dark mode"
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:195
+msgid "Telegram"
 msgstr ""
 
 #: wavira-core/src/Player/Assets.php:196
@@ -512,4 +534,16 @@ msgstr ""
 
 #: wavira-core/src/Rest/PlayerController.php:71
 msgid "What the queue is built from."
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:271
+msgid "Works"
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:199
+msgid "X (Twitter)"
+msgstr ""
+
+#: wavira-core/src/Content/ArtistProfile.php:196
+msgid "YouTube"
 msgstr ""

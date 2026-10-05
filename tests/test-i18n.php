@@ -73,6 +73,13 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->assertSame( 'همین حالا بشنوید', esc_html_x( 'Listen now', 'heading of the catalogue player pattern', 'wavira' ) );
 		$this->assertSame( 'صفحه یافت نشد', esc_html_x( 'Page not found', 'heading of the 404 template', 'wavira' ) );
 
+		// The 0.9.0 surfaces: the artist profile and the news section ship
+		// Persian on install too, not only the strings that predate them.
+		$this->assertSame( 'اخبار موسیقی', esc_html_x( 'Music news', 'heading above the news feed', 'wavira' ) );
+		$this->assertSame( 'تصاویر', esc_html__( 'Photos', 'wavira' ) );
+		$this->assertSame( 'مشاهدهٔ همه', esc_html__( 'View all', 'wavira' ) );
+		$this->assertSame( 'تازه‌ترین خبرها به‌صورت کارت.', esc_html__( 'The newest news posts as cards.', 'wavira' ) );
+
 		// A string that is not in the catalogue must keep its source text: a
 		// missing translation degrades to English, it never prints nothing.
 		$this->assertSame( 'Not in the catalogue', __( 'Not in the catalogue', 'wavira' ) );
@@ -93,6 +100,23 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->assertSame( 'پخشکنندهٔ موسیقی', _x( 'Music player', 'block title', 'wavira' ) );
 		$this->assertSame( 'برچسبهای سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
 		$this->assertSame( 'موسیقی', _x( 'music', 'block keyword', 'wavira' ) );
+		$this->assertSame( 'نمای هنرمند', _x( 'Artist profile', 'block title', 'wavira' ) );
+		$this->assertSame( 'گالری تصاویر هنرمند', _x( 'Artist photo gallery', 'block title', 'wavira' ) );
+		$this->assertSame( 'هنرمند', _x( 'artist', 'block keyword', 'wavira' ) );
+	}
+
+	/**
+	 * The artist and news strings the core plugin builds are Persian too.
+	 *
+	 * @return void
+	 */
+	public function test_artist_and_news_strings_come_back_in_persian() {
+		$this->load_catalogue( 'wavira-core', 'wavira-core/languages/fa_IR.mo' );
+
+		$this->assertSame( 'اینستاگرام', __( 'Instagram', 'wavira-core' ) );
+		$this->assertSame( 'آپارات', __( 'Aparat', 'wavira-core' ) );
+		$this->assertSame( 'تک‌آهنگ‌ها', __( 'Singles', 'wavira-core' ) );
+		$this->assertSame( 'آثار', __( 'Works', 'wavira-core' ) );
 	}
 
 	/**

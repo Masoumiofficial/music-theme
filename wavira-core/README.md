@@ -6,7 +6,7 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 
 | | |
 | --- | --- |
-| Version | 0.8.0 |
+| Version | 0.9.0 |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira-core` |
@@ -15,7 +15,7 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 | REST namespace | `wavira/v1` (registered in 0.3.0) |
 | Licence | GPL-2.0-or-later |
 
-## What exists today (0.3.0)
+## What exists today (0.9.0)
 
 ```
 wavira-core.php               plugin header, constants, requirements gate, activation guard
@@ -25,10 +25,12 @@ src/Support/Cache.php         versioned caching helper (object cache + generatio
 src/Support/CacheInvalidator.php  flushes caches on music saves, term changes, settings updates
 src/Plugin.php                singleton, i18n, module registry, `wavira_core_booted` seam
 src/Contracts/{Registrable,Cacheable}.php
-src/Content/                  PostTypes, Taxonomies, MetaSchema, Meta, MetaValues, ContentModule
+src/Content/                  PostTypes, Taxonomies, MetaSchema, Meta, MetaValues, Terms, Cover,
+                              ContentModule, ArtistProfile (profile payload: works, bio, socials, gallery)
 src/Settings/                 SettingsSchema (one typed schema) + Settings (register/read/update)
 src/Rest/                     AbstractController, ContentController, GenresController, ContentRoutes
 src/Downloads/Access.php      download authorization + quality matrix (no DRM claims)
+src/News/NewsFeed.php         the site's news as lean items (posts + categories, 1–24, public types only)
 src/Admin/Cli.php             `wp wavira verify`, `wp wavira seed` (licence-clean generated content)
 src/{Player,Search,Related,Import,Demo,Migration,Integrations}/   defined seams for later phases
 uninstall.php                 opt-in data removal (default: keep the catalogue)
@@ -43,11 +45,11 @@ WordPress install is still open.
 
 | Phase | Modules |
 | --- | --- |
-| 0.4.0 | `Search/*`, `Related/*`, counters; caching behind services |
-| 0.5.0 | `Player/*` + the Player Engine assets (see ADR 0005) |
-| 0.6.0 | `Admin/*` editor UX (panels, columns, validation) |
-| 0.7.0 | `Integrations/*` (Elementor bridge) |
-| 0.9.0 | `Import/*`, `Demo/*`, `Migration/*` (legacy → Wavira) |
+| 0.4.0 | `Search/*`, `Related/*`, counters — **shipped** |
+| 0.5.0 | `Player/*` + the Player Engine assets (ADR 0005) — **shipped** |
+| 0.9.0 | `Content/ArtistProfile.php`, `News/NewsFeed.php` — **shipped** |
+| 0.11.0 | `Admin/*` editor UX, `Import/*`, `Demo/*`, `Migration/*` (legacy → Wavira) |
+| 1.0.0 | marketplace packages (`docs/REBUILD-PLAN.md`) |
 
 ## Quick start
 

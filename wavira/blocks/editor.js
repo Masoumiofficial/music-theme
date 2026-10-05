@@ -86,6 +86,15 @@
 	register( 'wavira/video', __( 'The video of this post: file, embed or link.', 'wavira' ) );
 
 	register( 'wavira/genre-chips', __( 'Genre chips, most used first.', 'wavira' ) );
+
+	register(
+		'wavira/artist-profile',
+		__( 'Profile, works and photos of an artist.', 'wavira' )
+	);
+
+	register( 'wavira/artist-gallery', __( 'Photos attached to an artist.', 'wavira' ) );
+
+	register( 'wavira/news', __( 'The newest news posts as cards.', 'wavira' ) );
 } )(
 	window.wp.blocks,
 	window.wp.element,
