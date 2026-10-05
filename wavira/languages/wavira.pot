@@ -1,0 +1,289 @@
+# Copyright (C) 2026 Etehad WP — اتحاد وردپرس
+# This file is distributed under the GPL-2.0-or-later licence.
+msgid ""
+msgstr ""
+"Project-Id-Version: wavira 0.8.0\n"
+"Report-Msgid-Bugs-To: https://etehadwp.com/\n"
+"POT-Creation-Date: 2026-10-05\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: wavira\n"
+
+#: wavira/inc/markup.php:225
+#. translators: 1: genre name, 2: number of published items.
+msgid "%1$s (%2$d)"
+msgstr ""
+
+#: wavira/inc/assets.php:59
+msgid "Auto"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block description"
+msgid "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post."
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block description"
+msgid "Linked genre terms as chips, most used first."
+msgstr ""
+
+#: wavira/blocks/tracklist/block.json
+msgctxt "block description"
+msgid "The ordered, linked tracklist of an album. Renders nothing when the album has no published tracks."
+msgstr ""
+
+#: wavira/blocks/video/block.json
+msgctxt "block description"
+msgid "The video of a video post: a hosted file, an embed, or a link when the provider cannot be embedded."
+msgstr ""
+
+#: wavira/blocks/tracklist/block.json
+msgctxt "block keyword"
+msgid "album"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block keyword"
+msgid "audio"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block keyword"
+msgid "chips"
+msgstr ""
+
+#: wavira/blocks/video/block.json
+msgctxt "block keyword"
+msgid "clip"
+msgstr ""
+
+#: wavira/blocks/video/block.json
+msgctxt "block keyword"
+msgid "embed"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block keyword"
+msgid "genre"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+#: wavira/blocks/player/block.json
+#: wavira/blocks/tracklist/block.json
+#: wavira/blocks/video/block.json
+msgctxt "block keyword"
+msgid "music"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block keyword"
+msgid "player"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block keyword"
+msgid "playlist"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block keyword"
+msgid "queue"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block keyword"
+msgid "taxonomy"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block keyword"
+msgid "terms"
+msgstr ""
+
+#: wavira/blocks/tracklist/block.json
+msgctxt "block keyword"
+msgid "tracklist"
+msgstr ""
+
+#: wavira/blocks/tracklist/block.json
+msgctxt "block keyword"
+msgid "tracks"
+msgstr ""
+
+#: wavira/blocks/video/block.json
+msgctxt "block keyword"
+msgid "video"
+msgstr ""
+
+#: wavira/blocks/tracklist/block.json
+msgctxt "block title"
+msgid "Album tracklist"
+msgstr ""
+
+#: wavira/blocks/genre-chips/block.json
+msgctxt "block title"
+msgid "Genre chips"
+msgstr ""
+
+#: wavira/blocks/player/block.json
+msgctxt "block title"
+msgid "Music player"
+msgstr ""
+
+#: wavira/blocks/video/block.json
+msgctxt "block title"
+msgid "Music video"
+msgstr ""
+
+#: wavira/patterns/featured-album.php:33
+msgctxt "button label in the featured album pattern"
+msgid "Browse all albums"
+msgstr ""
+
+#: wavira/inc/assets.php:56
+msgid "Colour theme"
+msgstr ""
+
+#: wavira/patterns/hidden-theme-toggle.php:21
+msgctxt "colour-mode label shown until the theme script runs"
+msgid "Auto"
+msgstr ""
+
+#: wavira/patterns/hidden-footer-credit.php:19
+msgctxt "credit label before the author link"
+msgid "Design and development:"
+msgstr ""
+
+#: wavira/inc/assets.php:58
+msgid "Dark"
+msgstr ""
+
+#: wavira/patterns/latest-tracks.php:21
+msgctxt "description in the catalogue player pattern"
+msgid "Play straight through the catalogue — shuffle, repeat and the queue are in the player."
+msgstr ""
+
+#: wavira/patterns/hidden-footer-legal.php:20
+msgctxt "footer legal line after the copyright year"
+msgid "— all rights reserved."
+msgstr ""
+
+#: wavira/inc/setup.php:47
+msgid "Footer navigation"
+msgstr ""
+
+#: wavira/inc/blocks.php:57
+msgid "Genre chips, most used first."
+msgstr ""
+
+#: wavira/patterns/hidden-404.php:20
+msgctxt "heading of the 404 template"
+msgid "Page not found"
+msgstr ""
+
+#: wavira/patterns/album-grid.php:18
+msgctxt "heading of the album grid pattern"
+msgid "Latest albums"
+msgstr ""
+
+#: wavira/patterns/latest-tracks.php:18
+msgctxt "heading of the catalogue player pattern"
+msgid "Listen now"
+msgstr ""
+
+#: wavira/patterns/genre-chips.php:18
+msgctxt "heading of the genre chips pattern"
+msgid "Browse by genre"
+msgstr ""
+
+#: wavira/inc/setup.php:48
+msgid "Legal links (license, privacy)"
+msgstr ""
+
+#: wavira/inc/assets.php:57
+msgid "Light"
+msgstr ""
+
+#: wavira/patterns/hidden-404.php:23
+msgctxt "message of the 404 template"
+msgid "The page you were looking for does not exist. Try a search, or browse the latest releases."
+msgstr ""
+
+#: wavira/patterns/album-grid.php:29
+#: wavira/patterns/hidden-no-results.php:20
+msgctxt "message shown when a query returns no posts"
+msgid "Nothing published here yet."
+msgstr ""
+
+#: wavira/blocks/genre-chips/render.php:23
+msgid "No genres with published music yet."
+msgstr ""
+
+#: wavira/blocks/tracklist/render.php:37
+msgid "No published tracks in this album yet."
+msgstr ""
+
+#: wavira/inc/player.php:138
+#. translators: %s: track title.
+msgid "Open %s"
+msgstr ""
+
+#: wavira/inc/blocks.php:55
+msgid "Player for an album, artist or genre queue."
+msgstr ""
+
+#: wavira/inc/setup.php:46
+msgid "Primary navigation"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-watch.php:16
+msgctxt "section heading above a music video"
+msgid "Watch"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-tracks.php:16
+msgctxt "section heading above an album tracklist"
+msgid "Tracks"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-listen-now.php:16
+msgctxt "section heading above the catalogue player"
+msgid "Listen now"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-latest-albums.php:16
+msgctxt "section heading on the home and 404 templates"
+msgid "Latest albums"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-latest-tracks.php:16
+msgctxt "section heading on the home template"
+msgid "Latest tracks"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-music-videos.php:16
+msgctxt "section heading on the home template"
+msgid "Music videos"
+msgstr ""
+
+#: wavira/inc/blocks.php:56
+msgid "The video of this post: file, embed or link."
+msgstr ""
+
+#: wavira/blocks/video/render.php:27
+msgid "This post has no video source yet."
+msgstr ""
+
+#: wavira/inc/blocks.php:54
+msgid "Tracklist of the album chosen in the sidebar."
+msgstr ""
+
+#: wavira/inc/markup.php:159
+msgid "Watch the video"
+msgstr ""
+
+#: wavira/inc/setup.php:66
+msgid "Wavira music"
+msgstr ""

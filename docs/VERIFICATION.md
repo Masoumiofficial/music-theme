@@ -122,6 +122,27 @@ appended; `--wp--custom--player--barSpace` and `--wp--custom--player--barHeight`
 (camelCase vs. WordPress' kebab-casing), so two settings silently did nothing; dark-mode chip text
 failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered `wavira.com`.
 
+## 0.8.0 — Persian-first localisation
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| Both artifacts ship a complete Persian catalogue | **VERIFIED** | `[FA]` gate (`node tools/i18n.mjs check`): 174/174 strings translated — 58 in `wavira` (patterns, block metadata, template strings, player payload) and 116 in `wavira-core` (settings, labels, REST descriptions, player strings, CLI demo content) — with the `.pot` matching the sources and the `.mo` matching the `.po` |
+| The `.mo` WordPress loads is a valid GNU catalogue | **VERIFIED** | `tests/js/i18n.test.mjs`: a compiled catalogue round-trips through the reader; the string table keeps every id before every value and the ids are sorted (the writer's first version interleaved the offsets — the file looked fine and translated nothing, which is why this is a test and not a review) |
+| WordPress returns Persian for the strings the product prints | **VERIFIED** | `tests/test-i18n.php` loads both shipped `.mo` files with `load_textdomain()` and asserts the front-end, admin, block-metadata, player and placeholder strings come back in Persian; a string outside the catalogue falls through to its source instead of printing nothing |
+| Block metadata is translated in the contexts core looks it up with | **VERIFIED** | the extractor reads `block.json` and emits `block title` / `block description` / `block keyword` (the contexts of `wp-includes/block-i18n.json`, applied by core's `translate_settings_using_i18n_schema()`); `Test_I18n::test_block_metadata_is_persian` asserts the lookup end to end |
+| The editor is Persian without a JSON script translation | **VERIFIED** | `wavira_block_editor_strings()` is printed into `window.waviraBlocks` by `wp_add_inline_script()`; `Test_Blocks::test_editor_strings_are_in_the_catalogue` asserts every key is a msgid of the shipped catalogue, so a string edited in one place only cannot leave the editor English |
+| Admin labels are translated before they are registered | **VERIFIED** | `Plugin::boot()` calls `load_textdomain()` before the modules register post types, taxonomies and settings, so `PostTypes` labels are built from translated strings (code path read in `wavira-core/src/Plugin.php`; the strings themselves are asserted in `Test_I18n::test_admin_strings_come_back_in_persian`) |
+| RTL is a build failure, not a habit | **VERIFIED** | `tools/check-css.mjs` rule 2 rejects physical direction properties (`margin-left`, `padding-right`, `text-align: left`, `left:`/`right:`, `inset-left/right`) across all six stylesheets; the RTL guarantee therefore holds for every future component too |
+| A translation cannot break `sprintf` | **VERIFIED** | the `[FA]` gate compares the placeholders of every translation with its source (`%d kbps` → `%d کیلوبیتبرثانیه`), and `Test_I18n::test_placeholders_survive_translation` asserts the rendered result |
+| Jalali (Shamsi) dates | **NOT_STARTED** | decided in ADR 0015 §8 / `docs/DECISIONS.md`: a calendar conversion ships only with verified anchor dates; until then `wp_date()` with `fa_IR` locale data is used |
+| A bundled Persian font | **NOT_STARTED** | the token set already prefers Vazirmatn (OFL-1.1) with system fallbacks; bundling a subset font is a packaging decision (ADR 0010 licence handling, ADR 0009 size budget) |
+
+**Notes from writing the 0.8.0 catalogue:** the theme's translatable surface is small (58 strings) because
+template text already lives in patterns (0.7.0); the plugin's 116 strings are almost entirely admin and
+player surfaces, which is exactly where an Iranian site owner spends their time. The catalogue was
+generated with `tools/i18n.mjs extract` and then translated by hand — the gate compares the two, so a
+string added later cannot slip through untranslated.
+
 ## 0.7.0 — Builders: dynamic blocks
 
 | Claim | Status | Evidence |

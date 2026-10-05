@@ -122,7 +122,7 @@ final class Assets implements Registrable {
 	 */
 	public static function settings(): array {
 		$settings = array(
-			'version'  => defined( 'WAVIRA_CORE_VERSION' ) ? WAVIRA_CORE_VERSION : '0.7.0',
+			'version'  => defined( 'WAVIRA_CORE_VERSION' ) ? WAVIRA_CORE_VERSION : '0.8.0',
 			'routes'   => array(
 				'track' => rest_url( 'wavira/v1/player/tracks/' ) . '%d',
 				'queue' => rest_url( 'wavira/v1/player/queue' ),

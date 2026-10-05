@@ -37,7 +37,7 @@ class Test_Blocks extends Wavira_Test_Case {
 		if ( ! defined( 'WAVIRA_THEME_DIR' ) ) {
 			define( 'WAVIRA_THEME_DIR', trailingslashit( dirname( __DIR__ ) . '/wavira' ) );
 			define( 'WAVIRA_THEME_URI', 'https://example.test/wp-content/themes/wavira/' );
-			define( 'WAVIRA_THEME_VERSION', '0.7.0-test' );
+			define( 'WAVIRA_THEME_VERSION', '0.8.0-test' );
 		}
 
 		foreach ( array( 'helpers', 'markup', 'assets', 'player', 'shortcodes', 'blocks' ) as $file ) {
@@ -354,6 +354,31 @@ class Test_Blocks extends Wavira_Test_Case {
 		$this->assertStringContainsString( 'data-context="album"', $html );
 		$this->assertStringContainsString( 'data-id="' . $album . '"', $html );
 		$this->assertStringContainsString( 'class="wavira-player', $html );
+	}
+
+	/**
+	 * The editor's strings are translated through the theme catalogue.
+	 *
+	 * `wavira_block_editor_strings()` is keyed by the English source string, so
+	 * every key must exist as a msgid in `languages/fa_IR.po` — otherwise the
+	 * editor shows English on a Persian site while the front end is translated.
+	 *
+	 * @return void
+	 */
+	public function test_editor_strings_are_in_the_catalogue() {
+		$catalogue = (string) file_get_contents( WAVIRA_THEME_DIR . 'languages/fa_IR.po' );
+		$strings   = wavira_block_editor_strings();
+
+		$this->assertNotEmpty( $strings, 'the editor script must receive its strings from PHP' );
+
+		foreach ( $strings as $source => $translated ) {
+			$this->assertStringContainsString(
+				'msgid "' . $source . '"',
+				$catalogue,
+				"the editor string “{$source}” must exist in the theme catalogue"
+			);
+			$this->assertSame( $source, $translated, 'without a loaded catalogue the payload falls back to the source string' );
+		}
 	}
 
 	/**

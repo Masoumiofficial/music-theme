@@ -10,12 +10,21 @@
  * The preview uses `ServerSideRender`, which calls the block's render file
  * through the REST API; a block with nothing to show renders the placeholder the
  * render file prints in that context.
+ *
+ * The strings of this file are translated in PHP, not with a JSON script
+ * translation: `wavira_block_editor_strings()` is printed into
+ * `window.waviraBlocks` by `wp_add_inline_script()`, so one catalogue
+ * (`languages/fa_IR.mo`) covers the editor and the front end, and the theme
+ * needs neither a build step nor a hash-named JSON file (ADR 0015).
  */
-( function ( blocks, element, i18n, serverSideRender, blockEditor ) {
+( function ( blocks, element, serverSideRender, blockEditor ) {
 	'use strict';
 
 	var el = element.createElement;
-	var __ = i18n.__;
+	var catalogue = ( window.waviraBlocks && window.waviraBlocks.strings ) || {};
+	var __ = function ( text ) {
+		return Object.prototype.hasOwnProperty.call( catalogue, text ) ? catalogue[ text ] : text;
+	};
 	var SSR = serverSideRender && serverSideRender.default ? serverSideRender.default : serverSideRender;
 	var useBlockProps = blockEditor && blockEditor.useBlockProps ? blockEditor.useBlockProps : function () {
 		return {};
@@ -66,21 +75,20 @@
 
 	register(
 		'wavira/tracklist',
-		__( 'Tracklist of the album this block sits in, or of the album chosen in the sidebar.', 'wavira' )
+		__( 'Tracklist of the album chosen in the sidebar.', 'wavira' )
 	);
 
 	register(
 		'wavira/player',
-		__( 'Player instance: an album, an artist, a genre, the latest tracks or the related items of this post.', 'wavira' )
+		__( 'Player for an album, artist or genre queue.', 'wavira' )
 	);
 
-	register( 'wavira/video', __( 'The video of this post, as a hosted file, an embed or a link.', 'wavira' ) );
+	register( 'wavira/video', __( 'The video of this post: file, embed or link.', 'wavira' ) );
 
-	register( 'wavira/genre-chips', __( 'Linked genre chips, most used first.', 'wavira' ) );
+	register( 'wavira/genre-chips', __( 'Genre chips, most used first.', 'wavira' ) );
 } )(
 	window.wp.blocks,
 	window.wp.element,
-	window.wp.i18n,
 	window.wp.serverSideRender,
 	window.wp.blockEditor
 );

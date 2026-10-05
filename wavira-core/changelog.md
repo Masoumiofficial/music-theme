@@ -5,6 +5,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.8.0 (Persian-first)
+- **Persian ships with the plugin**: `languages/fa_IR.po` (116 strings, hand-written) and the compiled
+  `languages/fa_IR.mo`. Settings labels and descriptions, post-type and taxonomy labels, REST argument
+  descriptions, every player string (play, shuffle, repeat, queue, buffering, errors) and the CLI
+  demo content are Persian. The text domain is loaded in `Plugin::boot()` before the modules register,
+  so admin labels are built from translated strings.
+
+### Changed — 0.8.0
+- Version 0.8.0.
+
 ### Added — 0.7.0 (data for the block layer)
 - **Three schema keys** (`src/Content/MetaSchema.php`, now **46 registered keys**):
   `wavira_subtitle` (display subtitle on track, album and video — the legacy `song` value when it was

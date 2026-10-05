@@ -29,6 +29,18 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Own download counter vs. integration with popular plugins | **Own** lightweight atomic counter (`wavira_download_count*`, plugin-only, never REST-exposed); a third-party bridge stays possible behind the same `Counter` API | ADR 0013 §1 |
 | REST caching strategy (transient vs. object cache vs. HTTP cache headers) | Generation-scoped `Support\Cache` keys (bump on content change), TTL 300 s search / 3600 s related, filterable; no per-user state on shared keys; HTTP caching left to the site | ADR 0013 §3 |
 
+### 0.8.0 — Persian-first localisation (2026-10-05)
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Where the Persian catalogue lives | `wavira/languages/fa_IR.{po,mo}` and `wavira-core/languages/fa_IR.{po,mo}` are committed; the `.po` is the translation source of truth, the `.mo` is a committed build output | a theme that must be translated before it is usable is not a Persian product; and a release must not depend on the translator's toolchain (ADR 0015) |
+| Translation toolchain | `tools/i18n.mjs` (extract, build, check) — no gettext, no WP-CLI, no Composer | the repository must be buildable and verifiable with the runtime it already declares (Node 18+), consistent with ADR 0006 |
+| Editor strings | Printed from PHP by `wp_add_inline_script()` (`wavira_block_editor_strings()`, keyed by the English source string) | `wp_set_script_translations()` needs a hash-named JSON file (`wp i18n make-json`) that nothing in this repository generates; a wrong hash fails silently and leaves the editor English on a Persian site |
+| Block metadata | Extracted from `block.json` with the exact contexts core uses (`block title`, `block description`, `block keyword`, from `wp-includes/block-i18n.json`) | core translates those fields itself (`translate_settings_using_i18n_schema()`), so the catalogue must use the same contexts or the inserter stays English |
+| Non-Persian translations | Allowed only with an explicit `#, keep-latin` flag on the entry, reviewed in the diff (`%1$s (%2$d)`, `%1$s:%2$s`) | the gate must stay strict enough to catch an untranslated sentence, and explicit enough that a format string does not need a fake translation |
+| Jalali (Shamsi) dates | **Not implemented in 0.8.0**; date output uses `wp_date()` with `fa_IR` locale data, and a Jalali layer is scheduled as its own tested change | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
+| Persian fonts | The token set prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI`/system fallbacks; no font file bundled yet | bundling a subset font is a packaging and size-budget decision (ADR 0010 licence file must travel with it), not a code change |
+
 ### 0.7.0 — block layer (2026-10-05)
 
 | Topic | Decision | Why |

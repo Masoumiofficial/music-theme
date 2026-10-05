@@ -6,10 +6,11 @@ tracks, videos, genres), settings, playback logic and REST endpoints belong to t
 
 | | |
 | --- | --- |
-| Version | 0.7.0 (theme UI + block layer) |
+| Version | 0.8.0 (Persian-first: fa_IR catalogue, block layer) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira` |
+| Languages | Persian (`fa_IR`) ships in `languages/` as `.po` **and** compiled `.mo` — the theme is usable in Persian on install, and `npm run i18n:check` fails when a string is added without its translation |
 | Namespace | none (theme uses prefixed functions: `wavira_*`) |
 | Licence | GPL-2.0-or-later |
 
@@ -42,7 +43,7 @@ wavira/
 │   ├── fonts/           OFL-licensed fonts only
 │   ├── images/          owned/CC0 demo art only
 │   └── dist/            build output (generated — not committed)
-└── languages/           wavira.pot + translations
+└── languages/           wavira.pot (generated) + fa_IR.po (translation) + fa_IR.mo (compiled, loaded by WordPress)
 ```
 
 ## Theme rules (from the audit)

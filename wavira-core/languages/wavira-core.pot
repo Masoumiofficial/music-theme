@@ -1,0 +1,515 @@
+# Copyright (C) 2026 Etehad WP — اتحاد وردپرس
+# This file is distributed under the GPL-2.0-or-later licence.
+msgid ""
+msgstr ""
+"Project-Id-Version: wavira-core 0.8.0\n"
+"Report-Msgid-Bugs-To: https://etehadwp.com/\n"
+"POT-Creation-Date: 2026-10-05\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: wavira-core\n"
+
+#: wavira-core/src/Downloads/Access.php:116
+#. translators: %d: audio bitrate in kbps.
+msgid "%d kbps"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:182
+#. translators: %s: content type plural name.
+msgid "%s archive"
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:182
+#. translators: %s: queue context, e.g. "album".
+msgid "A %s queue needs the ID of its source item."
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:192
+msgid "A genre queue needs a genre slug."
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:129
+msgid "Ad slot HTML (above the player)"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:155
+#: wavira-core/src/Content/Taxonomies.php:183
+#. translators: %s: content type singular name (e.g. "Track").
+msgid "Add new %s"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:120
+msgid "Album"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:119
+msgid "Albums"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:168
+#. translators: %s: taxonomy plural name.
+msgid "All %s"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:113
+msgid "Artist"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:112
+msgid "Artists"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:176
+msgid "Audio player"
+msgstr ""
+
+#: wavira-core/src/Rest/DownloadController.php:56
+msgid "Audio quality in kbps. Omit to use the best available."
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:90
+msgid "Autoplay the next track in a queue"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:194
+#. translators: %s: track title.
+msgid "Buffering…"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:185
+#. translators: %s: content type plural name.
+msgid "Cover image"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:90
+msgid "Current page of the collection."
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:97
+msgid "Default player volume (percent)"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:136
+msgid "Delete all music content when the plugin is uninstalled"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:163
+msgid "Demo Album"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:149
+msgid "Demo Artist"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:221
+msgid "Demo Genre"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:209
+msgid "Demo Music Video"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:181
+#. translators: %d: demo track number.
+msgid "Demo Track %d"
+msgstr ""
+
+#: wavira-core/src/Rest/DownloadController.php:85
+msgid "Downloads are not available for this track."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:160
+#: wavira-core/src/Content/Taxonomies.php:173
+#. translators: %s: content type singular name.
+msgid "Edit %s"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:73
+msgid "Enable the Label taxonomy"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:68
+msgid "Enable the Language taxonomy"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:63
+msgid "Enable the Mood taxonomy"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:78
+msgid "Enable the Release-year taxonomy"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:116
+msgid "Footer copyright text"
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:150
+msgid "Generated demo biography. Replace with real content."
+msgstr ""
+
+#: wavira-core/src/Admin/Cli.php:197
+msgid "Generated demo lyrics — replace this text."
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:105
+msgid "Genre"
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:83
+msgid "Genre slug for a genre queue."
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:104
+msgid "Genres"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:122
+msgid "Global social profile URLs"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:132
+msgid "Label"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:131
+msgid "Labels"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:123
+msgid "Language"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:122
+msgid "Languages"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:123
+msgid "Limit results to a genre slug."
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:135
+msgid "Limit results to an album post ID."
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:129
+msgid "Limit results to an artist post ID."
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:141
+msgid "Limit results to featured items."
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:105
+msgid "Limit results to items matching a search term."
+msgstr ""
+
+#: wavira-core/src/Rest/SearchController.php:148
+msgid "Limit results to one entity type."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:193
+#. translators: %s: track title.
+msgid "Loading track…"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:97
+msgid "Maximum number of items returned."
+msgstr ""
+
+#: wavira-core/src/Rest/ContentController.php:95
+msgid "Maximum number of related items."
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:89
+msgid "Maximum number of tracks in the queue."
+msgstr ""
+
+#: wavira-core/src/Rest/SearchController.php:68
+msgid "Maximum suggestions per entity."
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:114
+msgid "Mood"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:113
+msgid "Moods"
+msgstr ""
+
+#: wavira-core/src/Settings/Settings.php:42
+msgid "Music product settings: appearance, content, player, downloads and data handling."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:134
+msgid "Music video"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:133
+msgid "Music videos"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:183
+msgid "Mute"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:165
+#. translators: %s: content type singular name.
+msgid "New %s"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:188
+#. translators: %s: taxonomy singular name.
+msgid "New %s name"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:179
+msgid "Next track"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:189
+#. translators: %s: entity name, e.g. "track".
+msgid "No %s found for the requested ID."
+msgstr ""
+
+#: wavira-core/src/Rest/DownloadController.php:106
+#: wavira-core/src/Rest/DownloadController.php:116
+msgid "No downloadable audio file is available for this track."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:179
+#. translators: %s: content type plural name.
+msgid "Nothing found in Trash."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:178
+#. translators: %s: content type plural name.
+msgid "Nothing found."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:198
+#. translators: %s: track title.
+msgid "Now playing: %s"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:104
+msgid "Offer audio downloads"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:201
+#. translators: 1: position in the queue, 2: queue length.
+msgid "Open the track page"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:117
+#: wavira-core/src/Rest/PlayerController.php:103
+msgid "Order direction."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:178
+msgid "Pause"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:177
+msgid "Play"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:190
+msgid "Play queue"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:204
+#. translators: %s: track title.
+msgid "Playback needs a tap on the play button first."
+msgstr ""
+
+#: wavira-core/wavira-core.php:119
+msgid "Plugin activation failed"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:180
+msgid "Previous track"
+msgstr ""
+
+#: wavira-core/src/Rest/DownloadController.php:62
+msgid "Redirect to the file (default) instead of returning its URL as JSON."
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:58
+msgid "Related items per block"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:141
+msgid "Release year"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:140
+msgid "Release years"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:187
+#. translators: %s: content type plural name.
+msgid "Remove cover image"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:192
+#. translators: %s: track title.
+msgid "Remove from the queue: %s"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:203
+#. translators: %s: track title.
+msgid "Removed from the queue: %s"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:188
+msgid "Repeat all"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:186
+msgid "Repeat mode"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:187
+msgid "Repeat off"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:189
+msgid "Repeat one"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:109
+msgid "Require a logged-in user to download"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:175
+#: wavira-core/src/Content/Taxonomies.php:163
+#. translators: %s: content type plural name.
+msgid "Search %s"
+msgstr ""
+
+#: wavira-core/src/Rest/SearchController.php:62
+#: wavira-core/src/Rest/SearchController.php:141
+msgid "Search term."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:181
+msgid "Seek"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:186
+#. translators: %s: content type plural name.
+msgid "Set cover image"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:37
+msgid "Show the light/dark switch"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:85
+msgid "Show the sticky player bar"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:185
+msgid "Shuffle"
+msgstr ""
+
+#: wavira-core/src/Rest/AbstractController.php:111
+#: wavira-core/src/Rest/PlayerController.php:97
+msgid "Sort collection by field."
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:77
+msgid "Source post ID for album, artist and related queues."
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:42
+msgid "Start in dark mode"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:196
+msgid "There is nothing to play here."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:195
+#. translators: %s: track title.
+msgid "This track could not be played."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:127
+msgid "Track"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:200
+#. translators: 1: position in the queue, 2: queue length.
+msgid "Track %1$d of %2$d"
+msgstr ""
+
+#: wavira-core/src/Content/MetaValues.php:175
+#. translators: 1: minutes, 2: seconds, zero-padded.
+msgctxt "track duration"
+msgid "%1$s:%2$s"
+msgstr ""
+
+#: wavira-core/src/Rest/DownloadController.php:50
+#: wavira-core/src/Rest/PlayerController.php:53
+msgid "Track post ID."
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:126
+msgid "Tracks"
+msgstr ""
+
+#: wavira-core/src/Settings/SettingsSchema.php:51
+msgid "Tracks per archive page"
+msgstr ""
+
+#: wavira-core/src/Rest/ContentController.php:89
+#: wavira-core/src/Rest/ContentController.php:117
+msgid "Unique identifier for the object."
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:184
+msgid "Unmute"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:178
+#. translators: %s: taxonomy singular name.
+msgid "Update %s"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:188
+msgid "Use as cover image"
+msgstr ""
+
+#: wavira-core/src/Content/PostTypes.php:170
+#. translators: %s: content type singular name.
+msgid "View %s"
+msgstr ""
+
+#: wavira-core/src/Player/Assets.php:182
+msgid "Volume"
+msgstr ""
+
+#: wavira-core/wavira-core.php:96
+#. translators: 1: required PHP version, 2: required WordPress version.
+msgid "Wavira Core needs PHP %1$s+ and WordPress %2$s+ to run. Music features are disabled until the server meets these versions."
+msgstr ""
+
+#: wavira-core/wavira-core.php:47
+#. translators: 1: required PHP version, 2: current PHP version.
+msgid "Wavira Core requires PHP %1$s or newer. This server runs PHP %2$s, so music features are disabled."
+msgstr ""
+
+#: wavira-core/wavira-core.php:118
+msgid "Wavira Core was deactivated: your server does not meet the minimum PHP or WordPress version."
+msgstr ""
+
+#: wavira-core/src/Settings/Settings.php:41
+msgid "Wavira settings"
+msgstr ""
+
+#: wavira-core/src/Rest/PlayerController.php:71
+msgid "What the queue is built from."
+msgstr ""

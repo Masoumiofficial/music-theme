@@ -6,7 +6,7 @@ Everything persistent lives here — **not** in the theme — so the catalogue s
 
 | | |
 | --- | --- |
-| Version | 0.3.0 (data model implemented — UI arrives in 0.6.0) |
+| Version | 0.8.0 |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira-core` |

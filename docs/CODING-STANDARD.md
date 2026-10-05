@@ -72,12 +72,14 @@ Rules marked 🔒 are additionally checked by tooling (`tools/lint.sh`, CI) or b
 
 | # | Rule |
 | --- | --- |
-| I1 🔒 | Every user-facing string uses `__()`, `_e()`, `esc_html__()`, `esc_attr__()`, `_n()` with the correct text domain (`wavira` in the theme, `wavira-core` in the plugin). |
+| I1 🔒 | Every user-facing string uses `__()`, `_e()`, `esc_html__()`, `esc_attr__()`, `_n()` with the correct text domain (`wavira` in the theme, `wavira-core` in the plugin). **Every such string also has a Persian translation in `languages/fa_IR.po` and a compiled `fa_IR.mo`**: the `[FA]` gate (`node tools/i18n.mjs check`) fails on a missing, empty or still-Latin translation, on changed placeholders, on a stale `.pot`, and on a `.mo` that no longer matches its `.po`. |
 | I2 🔒 | **No literal user-visible text and no text-bearing block attribute** (`buttonText`, `label`, `placeholder`, …) in `templates/*.html` or `parts/*.html`: a block template cannot execute PHP, so such a string is frozen in one language. The text lives in a pattern (`patterns/*.php`, `esc_html_x()` / `esc_html__()`) and the template references it with `<!-- wp:pattern {"slug":"wavira/…"} /-->`; a string that must not be translated carries an explicit `<!-- wavira:i18n-exempt <reason> -->` marker on the same line. Checked by `tools/check-i18n.mjs`. |
 | I2b 🔒 | Every `wp:pattern` reference resolves to a pattern file, every hidden pattern (`Inserter: no`) is referenced by at least one template/part, and every pattern declares `Title:` and a `wavira/`-namespaced `Slug:`. Same gate. |
 | I2c | No translatable string built by concatenation — use `sprintf` with placeholders. |
 | I3 | Dates/numbers use WordPress' localisation helpers (`wp_date`, `number_format_i18n`) — never PHP `date()`. |
 | I4 🔒 | No direction-specific markup: `dir` comes from `language_attributes()` / `is_rtl()` only. |
+| I5 🔒 | Translating a string means updating the source **and** the catalogue in the same commit (`npm run i18n:extract`, `npm run i18n:build`). A string that must stay Latin carries `#, keep-latin` in the `.po`, with the reason in the diff. |
+| I6 🔒 | Editor-facing strings are printed from PHP (`wavira_block_editor_strings()` / `wp_add_inline_script()`); **no** JSON script translation, and **no** second catalogue. Block metadata strings come from `block.json` and are translated by core with the contexts of `wp-includes/block-i18n.json`. |
 
 ## 7. Performance
 

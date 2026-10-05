@@ -120,6 +120,7 @@ preferences (volume, theme, last queue position) in documented localStorage keys
 | 0.5.0 | PLAYER | Player Engine + player REST data + theme mount point + Media Session + a11y | ✅ engine + data shipped, 15 DOM-free unit tests + PHP suite; the visual/keyboard playthrough moves with the 0.6.0 templates (see `docs/VERIFICATION.md`) |
 | 0.6.0 | UI | design tokens, templates, patterns, dark/light, RTL+LTR | ✅ breakpoint matrix clean at 360→1920; CI run `37309252018` 8/8 |
 | 0.7.0 | BUILDERS | blocks + patterns polish; Elementor widgets | 🔄 four dynamic blocks, patterns migrated to native blocks, template text moved into translatable hidden patterns, `[BLOCKS]`/`[I18N]`/`[MAPPING]` gates; Elementor deferred by decision (docs/DECISIONS.md) |
+| 0.8.0 | PERSIAN-FIRST | fa_IR catalogues for both artifacts, translation pipeline + `[FA]` gate, Persian admin surfaces, artist profile page (works, biography, socials, gallery), music-news/blog section | theme and plugin fully usable in Persian on install; artist and news surfaces render in both directions |
 | 0.7.0 | BUILDERS | blocks + patterns polish; Elementor widgets | editor preview + frontend parity |
 | 0.8.0 | SEO+PERF | SEO cooperation, performance budget met | Lighthouse budget met; no `-1` queries |
 | 0.9.0 | RELEASE CANDIDATE | migration tool, demo import, docs, packaging | migration acceptance tests pass; docs complete |

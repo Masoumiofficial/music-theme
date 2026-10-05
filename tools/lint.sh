@@ -13,6 +13,7 @@
 #   [BLOCKS]    Block metadata / renderer / registrar / editor consistency
 #   [I18N]      Translatable text and pattern references (tools/check-i18n.mjs)
 #   [MAPPING]   Migration blueprint targets exist (tools/check-mapping.mjs)
+#   [FA]        Persian catalogues complete and compiled (tools/i18n.mjs check)
 #   [CSS]       CSS rules + size budgets (tools/check-css.mjs)
 #   [CONTRAST]  WCAG 2.2 AA contrast of the documented pairs (tools/check-contrast.mjs)
 #   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
@@ -163,6 +164,22 @@ if command -v node >/dev/null 2>&1; then
     :
   else
     say "      FAIL  the mapping gate reported violations (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
+# ------------------------------------------------------------------- FA
+# The product ships Persian in the repository: every translatable string must
+# have a Persian translation, the POT must match the sources, and the compiled
+# .mo must match the .po (WordPress loads the .mo, never the .po).
+say "[FA] Persian catalogues"
+if command -v node >/dev/null 2>&1; then
+  if node tools/i18n.mjs check; then
+    :
+  else
+    say "      FAIL  the catalogue gate reported violations (see above)"
     FAIL=1
   fi
 else

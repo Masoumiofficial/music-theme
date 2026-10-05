@@ -5,6 +5,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.8.0 (Persian-first)
+- **Persian ships with the theme**: `languages/fa_IR.po` (58 strings, hand-written) and the compiled
+  `languages/fa_IR.mo` WordPress loads, plus a generated `languages/wavira.pot`. The front-end copy,
+  the block titles/descriptions/keywords and the block editor's own strings are all translated — the
+  editor gets its strings from PHP (`wavira_block_editor_strings()` + `wp_add_inline_script()`) instead
+  of a hash-named JSON file, so one catalogue covers everything.
+- **`[FA]` gate** (`tools/i18n.mjs check`, wired into `tools/lint.sh`): a string with no Persian
+  translation, a translation that is still Latin without an explicit `#, keep-latin` flag, changed
+  placeholders, a stale `.pot` or a `.mo` that no longer matches its `.po` all fail the build.
+- **`npm run i18n:extract` / `i18n:build` / `i18n:check`** for the whole pipeline, and
+  `tests/js/i18n.test.mjs` + `tests/test-i18n.php` to pin the file format and the runtime behaviour.
+
+### Changed — 0.8.0
+- Version 0.8.0; the editor script no longer depends on `wp-i18n` or `wp-components` and takes its
+  strings from `window.waviraBlocks`.
+- Block metadata strings are extracted from `block.json` with the contexts core uses
+  (`block title`, `block description`, `block keyword`).
+
 ### Added — 0.7.0 (patterns polish)
 - **Translatable template text** (`patterns/hidden-*.php`): a block template cannot execute PHP, so
   every sentence in `templates/*.html` and `parts/*.html` moved into a hidden pattern

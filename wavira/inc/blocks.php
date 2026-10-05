@@ -11,6 +11,10 @@
  * - the editor script is registered by hand and passed to every block through
  *   `editor_script_handles`, because `block.json` cannot declare script
  *   dependencies and the product must run with no build step (ADR 0006);
+ * - the editor's own strings are printed from PHP
+ *   (`wavira_block_editor_strings()` + `wp_add_inline_script()`), so the one
+ *   gettext catalogue that translates the front end translates the editor too
+ *   (ADR 0015);
  * - blocks are registered before the patterns (`init` priority 5), so a pattern
  *   that contains a `wavira/*` block is never validated against a missing block.
  *
@@ -34,9 +38,30 @@ if ( ! function_exists( 'wavira_block_names' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_block_editor_strings' ) ) {
+	/**
+	 * Strings the block editor script prints.
+	 *
+	 * The array is keyed by the English source string — the same key the gettext
+	 * catalogue uses — so the editor needs no separate JSON translation file: one
+	 * catalogue covers the editor and the front end (ADR 0015). A string missing
+	 * from the payload falls back to its English key in the script.
+	 *
+	 * @return array<string, string> Source string to translated string.
+	 */
+	function wavira_block_editor_strings() {
+		return array(
+			'Tracklist of the album chosen in the sidebar.' => __( 'Tracklist of the album chosen in the sidebar.', 'wavira' ),
+			'Player for an album, artist or genre queue.'   => __( 'Player for an album, artist or genre queue.', 'wavira' ),
+			'The video of this post: file, embed or link.'  => __( 'The video of this post: file, embed or link.', 'wavira' ),
+			'Genre chips, most used first.'                 => __( 'Genre chips, most used first.', 'wavira' ),
+		);
+	}
+}
+
 if ( ! function_exists( 'wavira_register_block_editor_script' ) ) {
 	/**
-	 * Register the shared editor script.
+	 * Register the shared editor script and hand it its translated strings.
 	 *
 	 * @return void
 	 */
@@ -51,14 +76,16 @@ if ( ! function_exists( 'wavira_register_block_editor_script' ) ) {
 		wp_register_script(
 			'wavira-blocks-editor',
 			WAVIRA_THEME_URI . $relative,
-			array( 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-block-editor', 'wp-components', 'wp-server-side-render' ),
+			array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-server-side-render' ),
 			wavira_asset_version( $relative ),
 			true
 		);
 
-		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( 'wavira-blocks-editor', 'wavira', WAVIRA_THEME_DIR . 'languages' );
-		}
+		wp_add_inline_script(
+			'wavira-blocks-editor',
+			'window.waviraBlocks = ' . wp_json_encode( array( 'strings' => wavira_block_editor_strings() ) ) . ';',
+			'before'
+		);
 	}
 }
 add_action( 'init', 'wavira_register_block_editor_script', 5 );

@@ -21,7 +21,7 @@
 ( function ( global ) {
 	'use strict';
 
-	var VERSION = '0.7.0';
+	var VERSION = '0.8.0';
 	var STORAGE_KEY = 'wavira.theme';
 	var MODES = [ 'light', 'dark', 'auto' ];
 	var BASE_STRINGS = {
