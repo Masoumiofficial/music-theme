@@ -9,7 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Content layer** (`src/Content/`): post types `wavira_artist`, `wavira_album`, `wavira_track`,
   `wavira_video` (slugs `/artists/ /albums/ /tracks/ /videos/`, REST bases, archives — ADR 0011);
   taxonomies `wavira_genre` (always) plus optional `wavira_mood`, `wavira_language`, `wavira_label`,
-  `wavira_year`; 38 registered meta keys with type, sanitizer, auth callback and REST schema
+  `wavira_year`; 40 registered meta keys with type, sanitizer, auth callback and REST schema
   (ADR 0003, ADR 0012); typed readers in `MetaValues`; one-time rewrite flush per plugin version.
 - **Settings** (`src/Settings/`): single option `wavira_settings`, one typed schema with bounds and
   sanitizers, REST exposure, `Settings::get/all/update()`, cache invalidation on update.

@@ -33,7 +33,7 @@ never substitute for a real WordPress install.
 | i18n text domains are `wavira` / `wavira-core` | **VERIFIED** | `WordPress.WP.I18n` configured with those domains; part of the passing WPCS job |
 | Legacy `music-theme.zip` is byte-identical to the audit baseline | **VERIFIED** | CI job `Legacy artifact integrity`, md5 `a23269c2b92a3ba08721dba79a50f1dd` |
 | JS/JSON assets parse; build dry-run has no missing sources | **VERIFIED** | CI job `JS, JSON, gates, build` → success |
-| Post types, taxonomies and the 38 meta keys register correctly | **NOT_STARTED** | requires `WP-RUNTIME` — `wp wavira verify` is the intended check |
+| Post types, taxonomies and the 40 registered meta keys register correctly | **NOT_STARTED** | requires `WP-RUNTIME` — `wp wavira verify` is the intended check |
 | REST routes answer with the documented shapes and headers | **NOT_STARTED** | requires `WP-RUNTIME` |
 | Download authorization chain behaves as documented | **NOT_STARTED** | requires `WP-RUNTIME` (unit tests planned with the test suite in 0.6.0) |
 | Cache invalidation fires on the intended hooks | **NOT_STARTED** | requires `WP-RUNTIME` |
