@@ -68,7 +68,30 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Run PHPCS
-        run: vendor/bin/phpcs --standard=phpcs.xml.dist -q
+        # Emits every violation as a GitHub annotation (file, line, column, rule)
+        # so the report is readable from the PR "Files changed" view and the
+        # Checks API — not only inside the raw job log.
+        run: |
+          set -uo pipefail
+          vendor/bin/phpcs --standard=phpcs.xml.dist --report=json -q > /tmp/phpcs.json || true
+          php -r '
+            $data = json_decode( (string) file_get_contents( "/tmp/phpcs.json" ), true );
+            if ( ! is_array( $data ) ) { fwrite( STDERR, "phpcs produced no JSON report\n" ); exit( 2 ); }
+            $total = (int) ( $data["totals"]["errors"] ?? 0 ) + (int) ( $data["totals"]["warnings"] ?? 0 );
+            $n     = 0;
+            foreach ( ( $data["files"] ?? [] ) as $file => $info ) {
+              foreach ( ( $info["messages"] ?? [] ) as $m ) {
+                $n++;
+                $line = (int) ( $m["line"] ?? 1 );
+                $col  = (int) ( $m["column"] ?? 1 );
+                $msg  = str_replace( ["\r", "\n", "::"], " ", (string) ( $m["message"] ?? "" ) );
+                $type = ( "ERROR" === ( $m["type"] ?? "" ) ) ? "error" : "warning";
+                echo "::{$type} file=" . $file . ",line=" . $line . ",col=" . $col . "::[" . ( $m["source"] ?? "phpcs" ) . "] " . $msg . "\n";
+              }
+            }
+            echo "PHPCS annotations emitted: {$n}; reported totals: {$total}\n";
+            if ( $total > 0 ) { exit( 1 ); }
+          '
 
   # ---------------------------------------------------------------------------
   # Assets & gates: JS syntax, JSON validity, legacy-echo gate, build dry-run.
