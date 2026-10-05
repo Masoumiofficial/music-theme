@@ -2,7 +2,7 @@
 
 > **Verification status:** the model below is implemented, passes the static CI gates
 > (WPCS + PHPCompatibilityWP + PHP 7.4/8.2/8.3 syntax) **and** is covered by the integration
-> suite that runs against a real WordPress test library in CI (45 tests green on PHP 7.4 and
+> suite that runs against a real WordPress test library in CI (49 tests green on PHP 7.4 and
 > 8.2). Per-claim evidence and what is still open: `docs/VERIFICATION.md`.
 
 

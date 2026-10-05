@@ -21,7 +21,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   filters and the `per_page` clamp — controllers no longer build `WP_Query` arguments inline.
 - **ADR 0013**: counters are plugin-side and never public; delivery is authorization plus a redirect,
   never a byte proxy, token obfuscation or a DRM claim; caches are generation-scoped.
-- **Verification harness**: PHPUnit 9 integration suite (`tests/`, 45 tests) running against a real
+- **Verification harness**: PHPUnit 9 integration suite (`tests/`, 49 tests) running against a real
   WordPress test library, `bin/install-wp-tests.sh` (vendored, MIT), `phpunit.xml.dist`,
   `composer.json` (`composer test`) and a CI job on PHP 7.4 and 8.2 with MariaDB.
 

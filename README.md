@@ -18,7 +18,7 @@ full LTR support, dark/light, Gutenberg and Elementor ready, built for performan
 | `docs/` | Audit reports, brand decision, architecture, coding standard, ADRs. Start at `docs/EXECUTIVE-SUMMARY.md`. |
 | `wavira/` | **Wavira Music** theme (presentation layer) — skeleton in place, templates arrive in 0.6.0. |
 | `wavira-core/` | **Wavira Core** plugin (all music data + business logic) — content model (0.3.0) and music engine (0.4.0) implemented. |
-| `tests/` | PHPUnit integration suite for a real WordPress test library (45 tests, phase 0.4.0). |
+| `tests/` | PHPUnit integration suite for a real WordPress test library (49 tests, phase 0.4.0). |
 | `tools/` | Development tooling: `lint.sh`, asset build scripts, CI log/JUnit annotators. |
 | `dist/` | Release packages (generated; never committed with binaries). |
 
@@ -69,7 +69,7 @@ node tools/build.mjs
 # 5. Run the integration suite against a real WordPress (MySQL/MariaDB required)
 composer install          # phpunit + polyfills, dev-only
 composer test:install     # downloads the WordPress test library (bin/install-wp-tests.sh)
-composer test             # 45 tests: data model, REST, downloads, search, related, cache
+composer test             # 49 tests: data model, REST, downloads, search, related, cache
 ```
 
 `composer test:install` mirrors what CI does: it creates the `wordpress_test` database itself, so an
