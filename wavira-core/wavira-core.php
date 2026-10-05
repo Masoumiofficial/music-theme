@@ -3,7 +3,7 @@
  * Plugin Name:       Wavira Core
  * Plugin URI:        https://etehadwp.com/
  * Description:       Music content engine for Wavira: artists, albums, tracks, videos, genres, playback data and REST API. Theme-independent — your music survives any theme switch.
- * Version:           0.10.0
+ * Version:           0.10.1
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Etehad WP (اتحاد وردپرس)
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WAVIRA_CORE_VERSION', '0.10.0' );
+define( 'WAVIRA_CORE_VERSION', '0.10.1' );
 define( 'WAVIRA_CORE_FILE', __FILE__ );
 define( 'WAVIRA_CORE_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WAVIRA_CORE_URI', plugin_dir_url( __FILE__ ) );

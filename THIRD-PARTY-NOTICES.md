@@ -12,7 +12,7 @@ and a release-package build fails if it is out of date.
 
 | Component | Version | Licence | Source | Used by | Ship? |
 | --- | --- | --- | --- | --- | --- |
-| _(none yet)_ | — | — | — | — | — |
+| Jalali (Shamsi) conversion algorithm — Borkowski, as published in `jalaali/jalaali-js` | algorithm as of `master` (2026-10-05) | MIT — Copyright (c) 2020 Behrang Norouzinia | https://github.com/jalaali/jalaali-js (`src/index.ts`, `LICENSE`) | `wavira-core/src/Content/Jalali.php` (PHP port) | Ported, not bundled: no JavaScript from the project is redistributed; the MIT notice below travels with the port (ADR 0010, ADR 0017 §1) |
 
 ### Planned / candidate components (must be confirmed before bundling)
 
@@ -32,6 +32,37 @@ and a release-package build fails if it is out of date.
 | IcoFont 1.0.1 (until its licence is verified in writing) | URL-only licence statement — L12 |
 | `jquery.js`, `owl.carousel.js`, `jquery.cookie` bundle, `mediaqueries.js`, `html5shiv.js` | replaced by vanilla ES modules; IE-era payload — L7/L8/L9/L10/L11 |
 | Legacy author/marketplace branding strings and URLs | third-party brand identity — L19, `docs/BRAND-DECISION.md` |
+
+## Bundled licence texts
+
+### jalaali-js (MIT) — the Jalali conversion algorithm
+
+Reproduced because the PHP port in `wavira-core/src/Content/Jalali.php` is a transcription of the
+published algorithm.
+
+```
+MIT License
+
+Copyright (c) 2020 Behrang Norouzinia
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## How to add a component
 

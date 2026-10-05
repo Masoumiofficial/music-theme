@@ -19,6 +19,7 @@
 namespace Wavira\Core\News;
 
 use Wavira\Core\Content\Cover;
+use Wavira\Core\Content\Dates;
 use WP_Post;
 use WP_Query;
 
@@ -130,7 +131,7 @@ final class NewsFeed {
 			'excerpt'    => self::excerpt( $post ),
 			'permalink'  => (string) get_permalink( $post ),
 			'date'       => (int) get_post_time( 'U', true, $post ),
-			'date_label' => (string) get_the_date( '', $post ),
+			'date_label' => Dates::label_for_post( $post ),
 			'thumbnail'  => $thumbnail_id ? array(
 				'id'  => $thumbnail_id,
 				'url' => Cover::url( $thumbnail_id ),

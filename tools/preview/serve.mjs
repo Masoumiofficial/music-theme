@@ -102,6 +102,16 @@ function toneWav( frequency ) {
 }
 
 /**
+ * Persian numerals for the placeholder artwork.
+ *
+ * @param {string|number} value Text to convert.
+ * @return {string} Converted text.
+ */
+function fa( value ) {
+	return String( value ).replace( /[0-9]/g, ( digit ) => '۰۱۲۳۴۵۶۷۸۹'[ Number( digit ) ] );
+}
+
+/**
  * Placeholder artwork in the product palette.
  *
  * @param {number} index Cover number (1-based).
@@ -112,7 +122,7 @@ function coverSvg( index ) {
 	const to = PALETTE[ index % PALETTE.length ];
 
 	return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-label="Demo cover ${ index }">
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-label="جلد نمایشی ${ fa( index ) }">
 	<defs>
 		<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
 			<stop offset="0" stop-color="${ from }"/>
@@ -122,7 +132,7 @@ function coverSvg( index ) {
 	<rect width="400" height="400" fill="url(#g)"/>
 	<circle cx="200" cy="200" r="112" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="10"/>
 	<circle cx="200" cy="200" r="18" fill="rgba(255,255,255,.85)"/>
-	<text x="200" y="372" text-anchor="middle" font-family="system-ui, sans-serif" font-size="42" fill="rgba(255,255,255,.9)">${ index }</text>
+	<text x="200" y="372" text-anchor="middle" font-family="system-ui, sans-serif" font-size="42" fill="rgba(255,255,255,.9)">${ fa( index ) }</text>
 </svg>`;
 }
 

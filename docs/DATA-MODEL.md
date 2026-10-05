@@ -228,7 +228,7 @@ compatibility).
 
 ```bash
 wp wavira verify          # post types, taxonomies, registered meta, content counts
-wp wavira seed [--force]  # minimal licence-clean demo set (generated text only)
+wp wavira seed [--force] [--english] [--no-site]  # Persian demo (Iranian defaults) or the English fixture; generated text only
 ```
 
 Phase 0.3.0 acceptance: `wp wavira verify` reports zero problems on a clean install and after seeding.

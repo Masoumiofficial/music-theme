@@ -3,7 +3,8 @@
 - **Status:** Accepted
 - **Date:** 2026-10-05
 - **Phase:** 0.8.0
-- **Related:** ADR 0008 (i18n and RTL-first, of which this is the delivery decision), ADR 0006 (no
+- **Related:** ADR 0008 (i18n and RTL-first, of which this is the delivery decision), ADR 0017
+  (Jalali dates and Iranian defaults — amends §6 and §8), ADR 0006 (no
   build step at runtime), ADR 0010 (OFL fonts), `tools/i18n.mjs`, `tools/check-css.mjs` rule 2,
   `wavira/languages/*`, `wavira-core/languages/*`, `tests/test-i18n.php`, `tests/js/i18n.test.mjs`
 
@@ -54,6 +55,11 @@ Three concrete failures were possible, and each one is a real WordPress practice
    Persian label rather than a translated-with-delay one.
 6. **Iranian demo content.** The CLI seeder's sample content is Persian in the catalogue, so a fresh
    install demonstrates a Persian site instead of an English demo with Persian chrome.
+   *Amended by [ADR 0017](0017-jalali-dates-and-iranian-defaults.md) §10–§12:* the seeder now has a
+   Persian catalogue written as content (titles, biography, lyrics, genres, a release date, a video and
+   a `primary` menu), applies the Iranian site defaults when it seeds it, and keeps the English fixture
+   behind `--english`. A Persian demo must be Persian for a site whose locale is `fa_IR` **and** for one
+   that has not been switched yet.
 7. **RTL is already gated, and stays that way.** `tools/check-css.mjs` rule 2 rejects physical
    direction properties; the RTL guarantee is therefore a build failure, not a review habit, and this
    ADR adds nothing to it.
@@ -63,6 +69,11 @@ Three concrete failures were possible, and each one is a real WordPress practice
    output uses `wp_date()` with locale data (Persian digits and month names come from `fa_IR` locale
    files), and a Jalali layer is a separate, tested change (see the open item in
    `docs/REBUILD-PLAN.md`) rather than an unverified line of arithmetic.
+   *Superseded in 0.10.1 by [ADR 0017](0017-jalali-dates-and-iranian-defaults.md):* the deferral's exit
+   condition was met — the converter ships with a verified anchor set, a forty-year round trip and a
+   documented policy (`Wavira\Core\Content\Jalali`, `Dates`, `tests/test-jalali.php`). `fa_IR` locale
+   files are no longer load-bearing for dates, and a site that runs another Jalali plugin filters the
+   style to `gregorian`.
 9. **Fonts.** The token set already prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI` and
    system fallbacks; no font file is bundled yet. Bundling a subset OFL font is a packaging decision
    (size budget) that needs the licence file to travel with it (ADR 0010), not a code decision.

@@ -17,6 +17,12 @@ node tools/preview/serve.mjs 8080   # or choose a port
 (360/480/768/1024/1440/1920). The stage is a real `iframe`, so media queries respond to the chosen
 width instead of the window.
 
+**The demo is Persian** (ADR 0017 §12): the stage loads as `dir="rtl" lang="fa-IR"` with Persian
+content — artist, releases, tracks, lyrics, video, news — Jalali dates on the cards («۱۳ مهر ۱۴۰۵»)
+and Persian player strings taken from the shipped `wavira-core` catalogue, so the harness judges the
+interface a Persian customer buys. Switching the chrome to LTR is the LTR-parity check of the same
+page. The chrome itself speaks Persian too.
+
 ## What is real
 
 - `wavira/assets/css/{tokens,base,components,utilities}.css` — the four shipping layers, in build
@@ -35,6 +41,7 @@ width instead of the window.
 | Audio sources | `serve.mjs` generates short sine tones on request | the engine's URL lock rejects `data:` and `blob:`, and the harness must not fetch anything external |
 | Cover art | `serve.mjs` generates palette-coloured SVGs | same reason; no binary assets in the repository |
 | Templates, patterns, shortcodes | static markup mirroring what the PHP prints | the PHP needs WordPress; the CSS/JS under test is identical |
+| Jalali dates | printed literally in the static markup | the PHP policy (`Content\\Dates`) needs WordPress; the strings match what `wavira_core_date_label()` returns for the same Gregorian dates |
 
 ## Known difference from a live site
 

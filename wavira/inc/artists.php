@@ -154,7 +154,7 @@ if ( ! function_exists( 'wavira_get_artist_profile' ) ) {
 
 				$html .= '<div class="wavira-artist__count">';
 				$html .= '<dt>' . esc_html( $label ) . '</dt>';
-				$html .= '<dd>' . esc_html( number_format_i18n( $count ) ) . '</dd>';
+				$html .= '<dd>' . esc_html( wavira_core_digits( number_format_i18n( $count ) ) ) . '</dd>';
 				$html .= '</div>';
 			}
 
@@ -208,7 +208,7 @@ if ( ! function_exists( 'wavira_get_artist_works' ) ) {
 				/* translators: 1: section name, 2: number of items in that section, formatted for the locale. */
 				__( '%1$s (%2$s)', 'wavira' ),
 				$label,
-				number_format_i18n( $count )
+				wavira_core_digits( number_format_i18n( $count ) )
 			);
 
 			$html .= '<section class="wavira-section wavira-artist__works">';

@@ -26,6 +26,9 @@ final class ContentModule implements Registrable {
 		( new Taxonomies() )->register();
 		( new Meta() )->register();
 
+		// The front end speaks the site's calendar (fa → Jalali, ADR 0017).
+		Dates::register();
+
 		add_action( 'init', array( $this, 'maybe_flush_rewrite_rules' ), 20 );
 	}
 

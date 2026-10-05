@@ -170,11 +170,13 @@ final class MetaValues {
 		$minutes = (int) floor( $seconds / 60 );
 		$rest    = $seconds % 60;
 
-		return sprintf(
-			/* translators: 1: minutes, 2: seconds, zero-padded. */
-			_x( '%1$s:%2$s', 'track duration', 'wavira-core' ),
-			number_format_i18n( $minutes ),
-			str_pad( (string) $rest, 2, '0', STR_PAD_LEFT )
+		return Dates::digits(
+			sprintf(
+				/* translators: 1: minutes, 2: seconds, zero-padded. */
+				_x( '%1$s:%2$s', 'track duration', 'wavira-core' ),
+				number_format_i18n( $minutes ),
+				str_pad( (string) $rest, 2, '0', STR_PAD_LEFT )
+			)
 		);
 	}
 }

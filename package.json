@@ -1,6 +1,6 @@
 {
 	"name": "wavira-music",
-	"version": "0.10.0",
+	"version": "0.10.1",
 	"private": true,
 	"description": "Development tooling for Wavira — WordPress music-publishing ecosystem. Not required to run the product.",
 	"license": "GPL-2.0-or-later",

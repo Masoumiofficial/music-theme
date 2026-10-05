@@ -77,7 +77,7 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 			$subtitle = isset( $row['subtitle'] ) ? (string) $row['subtitle'] : '';
 
 			$html .= '<li class="wavira-tracklist__item">';
-			$html .= '<span class="wavira-tracklist__index" aria-hidden="true">' . esc_html( (string) ( $index + 1 ) ) . '</span>';
+			$html .= '<span class="wavira-tracklist__index" aria-hidden="true">' . esc_html( wavira_core_digits( $index + 1 ) ) . '</span>';
 			$html .= '<span class="wavira-tracklist__title">';
 			$html .= '<a href="' . esc_url( (string) $row['permalink'] ) . '">' . esc_html( (string) $row['title'] ) . '</a>';
 
@@ -224,7 +224,7 @@ if ( ! function_exists( 'wavira_get_genre_chips' ) ) {
 				/* translators: 1: genre name, 2: number of published items. */
 				__( '%1$s (%2$d)', 'wavira' ),
 				$term->name,
-				(int) $term->count
+				wavira_core_digits( (int) $term->count )
 			) : $term->name;
 
 			$html .= '<a class="wavira-chip" href="' . esc_url( (string) get_term_link( $term ) ) . '">' . esc_html( $label ) . '</a> ';

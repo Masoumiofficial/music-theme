@@ -295,6 +295,65 @@ if ( ! function_exists( 'wavira_core_video_source' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_core_digits' ) ) {
+	/**
+	 * Persian numerals on a Persian site, Latin digits everywhere else.
+	 *
+	 * Every number a template prints (durations, bitrates, counts, sizes) goes
+	 * through this, so a Persian page never mixes numeral systems. Machine
+	 * output — IDs, JSON, slugs — never does.
+	 *
+	 * @param string|int|float $value Value to convert.
+	 * @return string
+	 */
+	function wavira_core_digits( $value ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Dates' ) ) {
+			return (string) $value;
+		}
+
+		return \Wavira\Core\Content\Dates::digits( (string) $value );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_date_style' ) ) {
+	/**
+	 * Which calendar the front end prints: `jalali` or `gregorian`.
+	 *
+	 * Persian sites default to Jalali (Shamsi); every other locale to Gregorian.
+	 * A site that runs another Persian-date plugin sets `wavira_core_date_style`
+	 * to `gregorian` and the product steps aside (ADR 0017).
+	 *
+	 * @return string
+	 */
+	function wavira_core_date_style() {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Dates' ) ) {
+			return 'gregorian';
+		}
+
+		return (string) \Wavira\Core\Content\Dates::style();
+	}
+}
+
+if ( ! function_exists( 'wavira_core_date_label' ) ) {
+	/**
+	 * A localised date label for a timestamp.
+	 *
+	 * Returns «۱۳ مهر ۱۴۰۵» on a Persian site and the site's own `date_format`
+	 * everywhere else, so a template never has to know which calendar is in use.
+	 *
+	 * @param int    $timestamp Unix timestamp.
+	 * @param string $format    Optional display format for the Gregorian style.
+	 * @return string
+	 */
+	function wavira_core_date_label( $timestamp, $format = '' ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Dates' ) ) {
+			return '';
+		}
+
+		return (string) \Wavira\Core\Content\Dates::label( (int) $timestamp, (string) $format );
+	}
+}
+
 if ( ! function_exists( 'wavira_core_cover_image' ) ) {
 	/**
 	 * The cover image of a post: `id`, `url`, `alt`, `width`, `height`.

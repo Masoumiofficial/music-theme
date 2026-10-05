@@ -432,7 +432,7 @@ final class ArtistProfile {
 			'subtitle'   => MetaValues::text( $post->ID, MetaSchema::SUBTITLE ),
 			'permalink'  => (string) get_permalink( $post ),
 			'date'       => (int) get_post_time( 'U', true, $post ),
-			'date_label' => (string) get_the_date( '', $post ),
+			'date_label' => Dates::label_for_post( $post ),
 			'cover'      => $attachment_id ? array(
 				'id'  => $attachment_id,
 				'url' => Cover::url( $attachment_id ),

@@ -30,13 +30,28 @@
 	}
 
 	/**
+	 * Persian numerals, so the readout matches the product interface.
+	 *
+	 * @param {string|number} value Text to convert.
+	 * @return {string} Converted text.
+	 */
+	function digits( value ) {
+		return String( value ).replace( /[0-9]/g, function ( digit ) {
+			return '۰۱۲۳۴۵۶۷۸۹'[ Number( digit ) ];
+		} );
+	}
+
+	/**
 	 * Print the current state.
 	 *
 	 * @return {void}
 	 */
 	function report() {
+		var directions = { rtl: 'راست‌به‌چپ', ltr: 'چپ‌به‌راست' };
+		var modes = { auto: 'خودکار', light: 'روشن', dark: 'تاریک' };
+
 		if ( readout ) {
-			readout.textContent = state.dir + ' · ' + state.mode + ' · ' + state.width + ' px';
+			readout.textContent = [ directions[ state.dir ], modes[ state.mode ], digits( state.width ) + ' پیکسل' ].join( ' · ' );
 		}
 	}
 

@@ -12,6 +12,7 @@
 
 namespace Wavira\Core\Downloads;
 
+use Wavira\Core\Content\Dates;
 use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
@@ -111,14 +112,16 @@ final class Access {
 
 			$matrix[] = array(
 				'quality'    => (int) $kbps,
-				'label'      => sprintf(
-					/* translators: %d: audio bitrate in kbps. */
-					__( '%d kbps', 'wavira-core' ),
-					(int) $kbps
+				'label'      => Dates::digits(
+					sprintf(
+						/* translators: %d: audio bitrate in kbps. */
+						__( '%d kbps', 'wavira-core' ),
+						(int) $kbps
+					)
 				),
 				'url'        => esc_url( $quality['url'] ),
 				'file_size'  => (int) $quality['size'],
-				'size_label' => $quality['size'] > 0 ? size_format( (int) $quality['size'] ) : '',
+				'size_label' => $quality['size'] > 0 ? Dates::digits( (string) size_format( (int) $quality['size'] ) ) : '',
 			);
 		}
 

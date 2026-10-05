@@ -19,6 +19,9 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0012](adr/0012-relation-storage.md) | Relations are post IDs in registered meta (artist CPT + role-aware meta), **not** a shared taxonomy; no free-text credits | Accepted | 2026-10-05 |
 | [0013](adr/0013-download-counters-and-delivery.md) | Download counters are atomic plugin-side meta increments (never REST-exposed); delivery is authorization + `302`, never a byte proxy, token obfuscation or a DRM claim | Accepted | 2026-10-05 |
 | [0014](adr/0014-dark-mode-and-token-mapping.md) | Colour modes: one palette in `theme.json`, dark mode as a `--wp--preset--color--*` remap, `data-theme` on `<html>`, neutral plugin tokens mapped by the theme, and a gate that fails unresolvable token references | Accepted — **implemented in 0.6.0** (two casing defects found and fixed) | 2026-10-05 |
+| [0015](adr/0015-persian-first-localisation.md) | Persian ships in the repository for both artifacts; one catalogue covers the front end, the admin and the editor; Jalali deferred with a named exit condition (§8, amended by 0017) | Accepted — **implemented in 0.8.0**; §6/§8 amended in 0.10.1 | 2026-10-05 |
+| [0016](adr/0016-seo-cooperation-and-performance-gates.md) | The site's SEO plugin owns meta tags; the product always emits its own structured data and enforces the performance budget as a build gate | Accepted — **implemented in 0.10.0** | 2026-10-05 |
+| [0017](adr/0017-jalali-dates-and-iranian-defaults.md) | Jalali (Shamsi) dates on `fa*` locales from a verified, anchored converter; machine surfaces stay Gregorian; Iranian defaults are applied by the seeder, and the demo/harness are Persian | Accepted — **implemented in 0.10.1** | 2026-10-05 |
 
 **Resolved open decisions** (were listed as "scheduled" in 0.2.0)
 
@@ -38,8 +41,24 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Editor strings | Printed from PHP by `wp_add_inline_script()` (`wavira_block_editor_strings()`, keyed by the English source string) | `wp_set_script_translations()` needs a hash-named JSON file (`wp i18n make-json`) that nothing in this repository generates; a wrong hash fails silently and leaves the editor English on a Persian site |
 | Block metadata | Extracted from `block.json` with the exact contexts core uses (`block title`, `block description`, `block keyword`, from `wp-includes/block-i18n.json`) | core translates those fields itself (`translate_settings_using_i18n_schema()`), so the catalogue must use the same contexts or the inserter stays English |
 | Non-Persian translations | Allowed only with an explicit `#, keep-latin` flag on the entry, reviewed in the diff (`%1$s (%2$d)`, `%1$s:%2$s`) | the gate must stay strict enough to catch an untranslated sentence, and explicit enough that a format string does not need a fake translation |
-| Jalali (Shamsi) dates | **Not implemented in 0.8.0**; date output uses `wp_date()` with `fa_IR` locale data, and a Jalali layer is scheduled as its own tested change | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
+| Jalali (Shamsi) dates | **Deferred in 0.8.0**, delivered in 0.10.1: date output shipped with `wp_date()` and `fa_IR` locale data until the converter had a verified anchor set (`docs/REBUILD-PLAN.md`, ADR 0017) | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
 | Persian fonts | The token set prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI`/system fallbacks; no font file bundled yet | bundling a subset font is a packaging and size-budget decision (ADR 0010 licence file must travel with it), not a code change |
+
+### 0.10.1 — Persian localisation: Jalali dates and Iranian defaults (2026-10-05)
+
+| Decision | Choice | Why | ADR |
+| --- | --- | --- | --- |
+| Calendar | **Jalali (Shamsi) on `fa*` locales**, Gregorian everywhere else | a Persian music site reads Shamsi dates; `fa_IR` locale data only translates Gregorian month names | ADR 0017 §2–§4 |
+| Converter | Own PHP port of the Borkowski algorithm as published in `jalaali-js` (MIT), accurate 1178–1633 Jalali, clamped outside | no runtime dependency, and the algorithm is arithmetic rather than a package; the notice travels in `THIRD-PARTY-NOTICES.md` | ADR 0017 §1–§3 |
+| Trust in the converter | **The anchor set is the test**: Nowruz 1400–1405, 2025-03-20 → 1403/12/30, 1357/11/22, a forty-year day-by-day round trip, leap rule, Saturday-first weekdays | the first port had a month-modulus bug (`4` instead of `12`) that the anchors caught; a calendar without anchors is a guess | ADR 0017 §3 |
+| Conversion seam | `wp_date()` **and** the four `get_the_*` date functions, wired from `ContentModule` | core's own `core/post-date` block renders through `wp_date()`, so the product's markup and a site's own Query Loop cannot drift apart | ADR 0017 §5 |
+| Machine surfaces | Never converted: `c U r Y-m-d Ymd Y-m-d H:i:s Y-m-d\TH:i:sP d/m/Y`, formats with a time part, and admin/REST/AJAX/cron/feeds/`robots.txt` | `<time datetime>`, JSON-LD, REST and the editor are read by machines; a Jalali date there is a bug | ADR 0017 §6 |
+| Other Jalali plugins | `wavira_core_date_style` = `gregorian` makes the product step aside | two converters filtering `wp_date()` would fight over every date on the page | ADR 0017 §4 |
+| Persian numerals | `Dates::digits()` → `wavira_core_digits()`, applied to dates, durations, bitrates, sizes, counts and tracklist indices | a Persian page must not mix numeral systems; machine output stays Latin | ADR 0017 §8 |
+| Month and weekday names | **Calendar data as constants**, not translatable msgids | a Persian date is written the same way in every language; the catalogue must not grow twelve strings no translator would change | ADR 0017 §9 |
+| Iranian site defaults | Applied by `wp wavira seed` only (`fa_IR`, `Asia/Tehran`, `start_of_week = 6`, `j F Y`, `H:i`, Persian description, `primary` menu), with `--english` / `--no-site` opt-outs; **no runtime option writes** | a default belongs where a site is created, not on every page view | ADR 0017 §10 |
+| Demo content | Persian catalogue by default (artist, album + single, four tracks with generated lyrics, three genres, video, menu); the English fixture stays behind `--english` and keeps its translatable strings | content is data, not interface copy — it must not enter the interface catalogue, and the neutral fixture must stay useful | ADR 0017 §11 |
+| Developer harness | `tools/preview/` renders the Persian demo (`dir="rtl"`, `lang="fa-IR"`, Persian titles, Jalali dates, Persian player strings from the shipped catalogue) | a harness that judges an RTL/Persian product in English only proves the Latin half | ADR 0017 §12 |
 
 ### 0.10.0 — SEO cooperation and the performance budget (2026-10-05)
 
@@ -69,7 +88,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Social channels | Labels are translated in Core (`Instagram`, `Telegram`, `YouTube`, `Aparat`, `Facebook`, `X (Twitter)`) and rendered as text chips, not brand logos | Aparat is a first-class Iranian platform, the labels are readable in Persian, and shipping third-party logo art is a trademark/asset question the product does not need |
 | Artist section limits | `limit` (default 6) and `gallery_limit` (default 8), clamped to 1–24 (`ArtistProfile::MAX_ITEMS`); a section with more items links to its archive | the coding standard forbids unbounded queries; an artist page must stay a page |
 | Artist payload caching | Once per request per artist + options (`wavira_artist_data()`, static cache); the profile block asks three times and the queries run once | the profile header, the works and the gallery are three helpers over one payload; a transient would need invalidation the theme cannot see |
-| Persian calendar in the new surfaces | Dates are printed with `wp_date()`/`get_the_date()` and the locale, **not** with a Jalali conversion | unchanged from ADR 0015 §8: an unverified conversion would put a wrong date on every news card |
+| Persian calendar in the new surfaces | Dates were printed with `wp_date()`/`get_the_date()` and the locale while Jalali was deferred; **superseded in 0.10.1** — the news cards and artist pages now render through `Content\Dates` (ADR 0017) | the deferral's condition was a verified conversion; until then an unverified one would put a wrong date on every news card |
 
 ### 0.7.0 — block layer (2026-10-05)
 

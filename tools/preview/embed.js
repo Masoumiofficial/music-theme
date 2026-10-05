@@ -6,16 +6,22 @@
  * because the player's REST routes need WordPress, and the demo audio is served
  * as real HTTP URLs (the engine's URL lock deliberately rejects `data:` and
  * `blob:`), generated on request by serve.mjs.
+ *
+ * The demo catalogue and the interface strings are Persian, matching the `fa_IR`
+ * demo the seeder produces (phase 0.10.1); the strings are copied from
+ * `wavira-core/languages/fa_IR.po` through the same keys
+ * `Wavira\Core\Player\Assets::strings()` localises.
  */
 ( function ( window ) {
 	'use strict';
 
 	var STUB = '/wp-json/wavira/v1/player';
+	var ARTIST = 'آرمان راد';
 	var DEMO = [
-		{ id: 101, title: 'Demo track one', album: 'Demo album one', cover: 1, hz: 294, genre: 'Dream pop' },
-		{ id: 102, title: 'Demo track two', album: 'Demo album one', cover: 2, hz: 330, genre: 'Dream pop' },
-		{ id: 103, title: 'Demo track three', album: 'Demo album two', cover: 3, hz: 392, genre: 'Post-rock' },
-		{ id: 104, title: 'Demo track four', album: 'Demo album three', cover: 4, hz: 440, genre: 'Ambient' }
+		{ id: 101, title: 'راه بارانی', album: 'شب‌های تهران', cover: 1, hz: 294, genre: 'پاپ رؤیایی' },
+		{ id: 102, title: 'سکوت', album: 'شب‌های تهران', cover: 2, hz: 330, genre: 'پاپ رؤیایی' },
+		{ id: 103, title: 'پرواز', album: 'سفر شمال', cover: 3, hz: 392, genre: 'راک تجربی' },
+		{ id: 104, title: 'باران بهاری', album: 'باران بهاری', cover: 4, hz: 440, genre: 'امبینت' }
 	];
 
 	/**
@@ -35,18 +41,18 @@
 			title: item.title,
 			permalink: '#tracks',
 			duration: 3,
-			duration_label: '0:03',
+			duration_label: '۰:۰۳',
 			explicit: false,
 			has_lyrics: true,
-			artist: { id: 11, name: 'Demo artist', permalink: '#artists' },
+			artist: { id: 11, name: ARTIST, permalink: '#artists' },
 			album: { id: 21, title: item.album, permalink: '#albums' },
-			cover: { url: cover, alt: item.title + ' cover art', srcset: '', sizes: '' },
-			genres: [ { id: 31, name: item.genre, slug: 'demo-genre', permalink: '#genres' } ],
+			cover: { url: cover, alt: item.title + ' — جلد', srcset: '', sizes: '' },
+			genres: [ { id: 31, name: item.genre, slug: 'persian-demo', permalink: '#genres' } ],
 			sources: { 320: source },
 			preferred: 320,
 			media_session: {
 				title: item.title,
-				artist: 'Demo artist',
+				artist: ARTIST,
 				album: item.album,
 				artwork: [ { src: cover, sizes: '400x400', type: 'image/svg+xml' } ]
 			}
@@ -73,7 +79,7 @@
 
 	// The settings the plugin prints through wp_add_inline_script().
 	window.waviraPlayerSettings = {
-		version: '0.6.0',
+		version: '0.10.1',
 		routes: {
 			track: STUB + '/tracks/%d',
 			queue: STUB + '/queue'
@@ -91,7 +97,33 @@
 			sticky: true
 		},
 		storage: { prefix: 'wavira.player.' },
-		strings: {}
+		strings: {
+			player: 'پخشکنندهٔ صوتی',
+			play: 'پخش',
+			pause: 'توقف',
+			next: 'قطعهٔ بعدی',
+			previous: 'قطعهٔ قبلی',
+			seek: 'جابهجایی در قطعه',
+			volume: 'بلندی صدا',
+			mute: 'بیصدا',
+			unmute: 'باصدا',
+			shuffle: 'پخش تصادفی',
+			repeat: 'حالت تکرار',
+			repeatOff: 'بدون تکرار',
+			repeatAll: 'تکرار همه',
+			repeatOne: 'تکرار یک قطعه',
+			queue: 'پخش صف',
+			remove: 'حذف از صف: %s',
+			loading: 'در حال بارگذاری قطعه…',
+			buffering: 'در حال آمادهسازی…',
+			error: 'این قطعه پخش نشد.',
+			empty: 'اینجا چیزی برای پخش نیست.',
+			nowPlaying: 'در حال پخش: %s',
+			ofTotal: 'قطعهٔ %1$d از %2$d',
+			openTrack: 'باز کردن صفحهٔ قطعه',
+			removedTrack: 'از صف حذف شد: %s',
+			blocked: 'برای پخش، نخست دکمهٔ پخش را بزنید.',
+		}
 	};
 
 	// Answer the two player routes from memory; everything else stays untouched.

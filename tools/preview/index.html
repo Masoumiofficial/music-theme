@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="fa-IR" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Wavira — component harness (dev only)</title>
+<title>واویرا — کارگاه مؤلفه‌ها (فقط توسعه)</title>
 <link rel="stylesheet" href="preview.css">
 </head>
 <body>
 <header class="chrome-bar">
 	<div class="chrome-group">
-		<span>Colour mode</span>
-		<button type="button" data-mode="auto" aria-pressed="true">Auto</button>
-		<button type="button" data-mode="light" aria-pressed="false">Light</button>
-		<button type="button" data-mode="dark" aria-pressed="false">Dark</button>
+		<span>حالت رنگ</span>
+		<button type="button" data-mode="auto" aria-pressed="true">خودکار</button>
+		<button type="button" data-mode="light" aria-pressed="false">روشن</button>
+		<button type="button" data-mode="dark" aria-pressed="false">تاریک</button>
 	</div>
 	<div class="chrome-group">
-		<span>Direction</span>
-		<button type="button" data-dir="rtl" aria-pressed="true">RTL</button>
-		<button type="button" data-dir="ltr" aria-pressed="false">LTR</button>
+		<span>جهت</span>
+		<button type="button" data-dir="rtl" aria-pressed="true">راست‌به‌چپ</button>
+		<button type="button" data-dir="ltr" aria-pressed="false">چپ‌به‌راست</button>
 	</div>
 	<div class="chrome-group">
-		<span>Viewport</span>
+		<span>پهنا</span>
 		<button type="button" data-width="360" aria-pressed="false">360</button>
 		<button type="button" data-width="480" aria-pressed="false">480</button>
 		<button type="button" data-width="768" aria-pressed="false">768</button>
@@ -28,25 +28,27 @@
 		<button type="button" data-width="1440" aria-pressed="true">1440</button>
 		<button type="button" data-width="1920" aria-pressed="false">1920</button>
 	</div>
-	<p class="chrome-readout" id="readout">rtl · auto · 1440 px</p>
+	<p class="chrome-readout" id="readout">راست‌به‌چپ · خودکار · ۱۴۴۰ پیکسل</p>
 </header>
 
 <main class="chrome-stage">
-	<iframe id="stage" src="embed.html" title="Wavira components"></iframe>
+	<iframe id="stage" src="embed.html" title="مؤلفه‌های واویرا"></iframe>
 	<p class="chrome-notes">
-		<strong>Dev harness — not part of the product package.</strong>
-		The frame loads the shipped theme layers
-		(<code>wavira/assets/css/{tokens,base,components,utilities}.css</code>),
-		the shipped player stylesheet (<code>wavira-core/assets/css/player.css</code>)
-		and the shipped scripts (<code>wavira/assets/js/index.js</code>,
-		<code>wavira-core/assets/js/index.js</code>). The player's WordPress REST
-		routes are stubbed with in-memory demo data and generated tones, so no
-		network and no server are involved. Media queries respond to the frame
-		width because the frame is a real viewport. The 0.9.0 artist and news
-		sections are static reproductions of the markup the PHP renderers print
-		(the renderers are covered by the PHP suite), placed here so their styles
-		can be judged in a real browser.
+		<strong>کارگاه توسعه — بخشی از بستهٔ محصول نیست.</strong>
+		این قاب، لایه‌های پوستهٔ محصول
+		(<code>wavira/assets/css/{tokens,base,components,utilities}.css</code>)،
+		شیوه‌نامهٔ پخش‌کنندهٔ محصول (<code>wavira-core/assets/css/player.css</code>)
+		و اسکریپت‌های محصول (<code>wavira/assets/js/index.js</code>،
+		<code>wavira-core/assets/js/index.js</code>) را بارگذاری می‌کند. مسیرهای REST
+		وردپرس با دادهٔ نمایشی درون‌حافظه‌ای و آهنگ‌های تولیدشده جایگزین شده‌اند، پس
+		هیچ شبکه و سروری در کار نیست. پرس‌وجوهای رسانه‌ای به پهنای قاب پاسخ می‌دهند،
+		چون قاب یک نمای واقعی است. بخش‌های هنرمند و اخبار (۰.۹.۰) بازتولید ایستای
+		نشانه‌گذاری‌ای هستند که رندرکننده‌های PHP چاپ می‌کنند (خود رندرکننده‌ها در
+		مجموعه‌آزمون PHP پوشش دارند) و اینجا آمده‌اند تا ظاهرشان در مرورگر واقعی
+		داوری شود. محتوای نمایشی فارسی و بر پایهٔ قراردادهای ایرانی است: تقویم
+		جلالی، ارقام فارسی و سایت نمونهٔ <code>fa_IR</code>.
 	</p>
+
 </main>
 
 <script src="chrome.js"></script>

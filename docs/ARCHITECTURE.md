@@ -152,6 +152,8 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Function | `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`, `wavira_core_credit_names()`, `wavira_core_cover_image()` | 0.10.0 ✅ |
 | Filter | `wavira_core_seo_plugin_active`, `wavira_core_structured_data_enabled`, `wavira_core_structured_data`, `wavira_theme_seo_plugin_active` | 0.10.0 ✅ |
 | Filter | `wavira_core_artist_profile`, `wavira_core_news_items` | 0.9.0 ✅ |
+| Function | `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()` | 0.10.1 ✅ |
+| Filter | `wavira_core_date_style`, `wavira_core_date_format`, `wavira_core_date_label` | 0.10.1 ✅ |
 | Block | `wavira/artist-profile`, `wavira/artist-gallery`, `wavira/news` (+ `wavira/tracklist`, `player`, `video`, `genre-chips`) | 0.7.0 / 0.9.0 ✅ |
 | Shortcode | `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]` (+ the 0.7.0 set) | 0.9.0 ✅ |
 | Function | `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (plugin `public-api.php`) | 0.4.0 ✅ |
@@ -176,6 +178,7 @@ Everything else is private. No module may be reached through a global variable.
 | Assets | Build-aware conditional enqueue; no front-end jQuery; player bundle only where a player exists; gzipped budgets and zero third-party requests enforced by the `[PERF]` gate (ADR 0016 §4). |
 | A11y | Components ship keyboard support and ARIA in the component itself (not bolted on at the template). |
 | RTL/LTR | Logical CSS properties only; direction verified per component in both modes. |
+| Calendar | One policy class (`Content\Dates`) decides between Jalali and Gregorian from the site locale; machine surfaces (REST, feeds, `<time datetime>`, JSON-LD, the admin) are never converted, and a second Jalali plugin can take over with one filter (ADR 0017). |
 
 ## 8. What is **not** in v1 (explicitly deferred)
 
@@ -196,6 +199,7 @@ implementations — see the brief's YAGNI rule.
 | 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings | ✅ **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2) |
 | 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | ✅ verified: CI `37354185539`/`37354194397` 8/8; evidence in `docs/VERIFICATION.md` |
 | 0.10.0 | SEO + PERF | `Seo\StructuredData`, `Seo\SeoSupport`, `Content\Credit`, `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`, `wavira_core_credit_names()`, `wavira_core_cover_image()`, `inc/seo.php`, `inc/performance.php`, `[PERF]` gate | ✅ **VERIFIED**: CI `37358851972`/`37358981113` 8/8, 118 tests / 948 assertions; `docs/SEO-AND-PERF.md`, ADR 0016 |
+| 0.10.1 | LOCALISATION | `Content\Jalali`, `Content\Dates`, `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()`, Persian demo seeder, Persian `tools/preview/` | ✅ **IMPLEMENTED**: verified anchor set + forty-year round trip + policy tests in `tests/test-jalali.php`; ADR 0017, `docs/PERSIAN-LOCALIZATION.md`; CI verdict in `docs/VERIFICATION.md` |
 | 0.11.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |
 

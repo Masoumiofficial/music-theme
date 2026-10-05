@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.10.0\n"
+"Project-Id-Version: wavira-core 0.10.1\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Downloads/Access.php:116
+#: wavira-core/src/Downloads/Access.php:118
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
 msgstr ""
@@ -99,23 +99,23 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:163
+#: wavira-core/src/Admin/Cli.php:499
 msgid "Demo Album"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:149
+#: wavira-core/src/Admin/Cli.php:493
 msgid "Demo Artist"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:221
+#: wavira-core/src/Admin/Cli.php:473
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:209
+#: wavira-core/src/Admin/Cli.php:508
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:181
+#: wavira-core/src/Admin/Cli.php:480
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -154,11 +154,11 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:150
+#: wavira-core/src/Admin/Cli.php:494
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:197
+#: wavira-core/src/Admin/Cli.php:472
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 
@@ -468,7 +468,7 @@ msgstr ""
 msgid "Track %1$d of %2$d"
 msgstr ""
 
-#: wavira-core/src/Content/MetaValues.php:175
+#: wavira-core/src/Content/MetaValues.php:176
 #. translators: 1: minutes, 2: seconds, zero-padded.
 msgctxt "track duration"
 msgid "%1$s:%2$s"
