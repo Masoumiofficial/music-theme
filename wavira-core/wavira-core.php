@@ -61,6 +61,12 @@ require_once WAVIRA_CORE_DIR . 'src/Support/Requirements.php';
 
 \Wavira\Core\Support\Autoloader::register();
 
+/*
+ * Public function API: the only surface a theme may call. Loaded before the boot
+ * sequence so a template that renders early still finds the functions.
+ */
+require_once WAVIRA_CORE_DIR . 'public-api.php';
+
 /**
  * Boot the plugin on `plugins_loaded`, after the requirements gate.
  *
@@ -123,6 +129,15 @@ register_activation_hook( __FILE__, 'wavira_core_activate' );
  * @return void
  */
 function wavira_core_deactivate() {
-	delete_transient( 'wavira_related_cache_version' );
+	// Derived data only: dropping the generation orphans every versioned cache
+	// key, while content and settings are never touched on deactivation.
+	delete_option( 'wavira_cache_version' );
+
+	/**
+	 * Fires after Wavira Core was deactivated.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'wavira_core_deactivated' );
 }
 register_deactivation_hook( __FILE__, 'wavira_core_deactivate' );

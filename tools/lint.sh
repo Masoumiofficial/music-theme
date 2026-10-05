@@ -7,7 +7,10 @@
 #   3. JS syntax             (node --check on every .js/.mjs, excluding node_modules/vendor/dist)
 #   4. JSON validity         (every .json in the product folders)
 #   5. Legacy-echo gate      (forbidden legacy patterns — see tools/README.md)
-#   6. Asset-size report     (informational; budget enforced in the release checklist)
+#   6. Module boundaries     (ARCHITECTURE §2: Core → Theme coupling, layer direction,
+#                             theme uses the public function API only, access guards,
+#                             global function prefixes — tools/check-boundaries.mjs)
+#   7. Asset-size report     (informational; budget enforced in the release checklist)
 #
 # Exit code 0 = all gates passed. Any failure prints the offending lines.
 
@@ -27,7 +30,7 @@ say "Wavira lint gate — $(date -u '+%Y-%m-%d %H:%M UTC')"
 hr
 
 # ---------------------------------------------------------------- 1. PHP syntax
-say "[1/6] PHP syntax"
+say "[1/7] PHP syntax"
 if command -v php >/dev/null 2>&1; then
   PHP_FILES=$(find "${SOURCES[@]}" -type f -name '*.php' \
     -not -path '*/node_modules/*' -not -path '*/vendor/*' -not -path '*/assets/dist/*' 2>/dev/null)
@@ -48,7 +51,7 @@ else
 fi
 
 # ------------------------------------------------------------------- 2. PHPCS
-say "[2/6] WordPress Coding Standards (PHPCS)"
+say "[2/7] WordPress Coding Standards (PHPCS)"
 if [ -x "vendor/bin/phpcs" ]; then
   if vendor/bin/phpcs --standard=phpcs.xml.dist -q; then
     say "      OK    PHPCS clean"
@@ -61,7 +64,7 @@ else
 fi
 
 # ------------------------------------------------------------------ 3. JS syntax
-say "[3/6] JavaScript syntax"
+say "[3/7] JavaScript syntax"
 if command -v node >/dev/null 2>&1; then
   JS_FAIL=0
   while IFS= read -r file; do
@@ -79,7 +82,7 @@ else
 fi
 
 # --------------------------------------------------------------- 4. JSON validity
-say "[4/6] JSON validity"
+say "[4/7] JSON validity"
 if command -v node >/dev/null 2>&1; then
   while IFS= read -r file; do
     if ! node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$file" >/dev/null 2>&1; then
@@ -94,7 +97,7 @@ else
 fi
 
 # ------------------------------------------------------------ 5. Legacy-echo gate
-say "[5/6] Legacy-echo gate"
+say "[5/7] Legacy-echo gate"
 LEGACY_HITS=$(grep -rniE \
   "javanseda|javan seda|جوان صدا|tarlanweb|rkianoosh|rtl-theme|rezakianoosh|09158856205" \
   "${SOURCES[@]}" --include='*.php' --include='*.js' --include='*.mjs' --include='*.css' --include='*.json' \
@@ -124,8 +127,16 @@ if [ -n "$JQUERY_HITS" ]; then
 fi
 [ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && say "      OK    no legacy echoes, no forbidden patterns, no jQuery"
 
-# ------------------------------------------------------------ 6. Asset-size report
-say "[6/6] Asset-size report (informational)"
+# -------------------------------------------------------------- 7. Module boundaries
+say "[6/7] Module boundaries (ARCHITECTURE §2)"
+if node tools/check-boundaries.mjs; then
+  :
+else
+  FAIL=1
+fi
+
+# ------------------------------------------------------------ 7. Asset-size report
+say "[7/7] Asset-size report (informational)"
 for dist in wavira/assets/dist wavira-core/assets/dist; do
   if [ -d "$dist" ]; then
     SIZE=$(du -sk "$dist" 2>/dev/null | awk '{print $1}')

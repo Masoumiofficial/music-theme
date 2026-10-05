@@ -60,11 +60,6 @@ abstract class AbstractController {
 	}
 
 	/**
-	 * Collection arguments shared by every music endpoint.
-	 *
-	 * @return array<string, array<string, mixed>>
-	 */
-	/**
 	 * Sanitize one slug argument.
 	 *
 	 * WordPress calls a REST argument sanitizer with `( $value, $request, $key )`,
@@ -82,6 +77,11 @@ abstract class AbstractController {
 		return (string) sanitize_title( (string) $value );
 	}
 
+	/**
+	 * Collection arguments shared by every music endpoint.
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
 	protected function collection_args(): array {
 		return array(
 			'page'     => array(

@@ -14,31 +14,34 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Whether the Wavira Core plugin is active and providing music features.
  *
+ * Asks the plugin's own signal instead of a class name: the theme is not
+ * supposed to know anything about the plugin's internals (ARCHITECTURE §2,
+ * enforced by `tools/check-boundaries.mjs`).
+ *
  * @return bool
  */
 function wavira_has_core() {
-	return class_exists( '\Wavira\Core\Plugin' );
+	return function_exists( 'wavira_core_is_active' ) && wavira_core_is_active();
 }
 
 /**
  * Read a theme setting managed by Wavira Core.
  *
- * Falls back to the stored option array so the theme still renders a usable
- * site (with empty settings) when the plugin is deactivated. This is the
- * "theme switch safety" contract in reverse: the theme never stores music data.
+ * Delegates to the plugin's public function so the theme sees exactly the value
+ * the plugin acts on: schema defaults, sanitized stored value and the
+ * `wavira_setting` filter. Without the plugin the fallback is returned, so the
+ * theme still renders a usable site (theme-switch safety, ADR 0002).
  *
- * @param string $key     Setting key inside the settings array.
- * @param mixed  $fallback Value returned when the key is missing.
+ * @param string $key      Setting key inside the settings array.
+ * @param mixed  $fallback Value returned when the plugin is unavailable.
  * @return mixed
  */
 function wavira_get_setting( $key, $fallback = null ) {
-	$settings = get_option( 'wavira_settings', array() );
-
-	if ( ! is_array( $settings ) || ! array_key_exists( $key, $settings ) ) {
+	if ( ! function_exists( 'wavira_core_get_setting' ) ) {
 		return $fallback;
 	}
 
-	return $settings[ $key ];
+	return wavira_core_get_setting( $key, $fallback );
 }
 
 /**
@@ -75,9 +78,9 @@ function wavira_icon( $name ) {
  * @return WP_Post[]
  */
 function wavira_related_posts( int $post_id, int $limit = 0 ): array {
-	if ( ! wavira_has_core() || ! class_exists( '\\Wavira\\Core\\Related\\RelatedService' ) ) {
+	if ( ! function_exists( 'wavira_core_related_posts' ) ) {
 		return array();
 	}
 
-	return \Wavira\Core\Related\RelatedService::posts( $post_id, $limit );
+	return (array) wavira_core_related_posts( $post_id, $limit );
 }
