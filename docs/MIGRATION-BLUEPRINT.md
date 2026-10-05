@@ -24,22 +24,26 @@ reported, not guessed.
 
 | Legacy meta | New meta | Transform | Risk |
 | --- | --- | --- | --- |
-| `artist` (free text) | `wavira_artist_credit` + resolved `wavira_artist` | copy text; resolve to artist post by exact name / slug match; unresolved → `needs_review` list | Medium (misspellings, multiple artists in one string) |
+<!-- Verified against the implemented schema in 0.7.0: every target key below is a constant in
+     wavira-core/src/Content/MetaSchema.php (meta) or a field in SettingsSchema::all() (options).
+     Rows marked [DEFERRED] are recorded, not implemented; tools/check-mapping.mjs fails the build
+     when a row points at a key that does not exist. -->
+| `artist` (free text) | `wavira_credit_label` + resolved `wavira_artist` | copy text; resolve to artist post by exact name / slug match; unresolved → `needs_review` list | Medium (misspellings, multiple artists in one string) |
 | `song` | track **title** if title is generic, else `wavira_subtitle` | prefer existing post title; keep album track name in subtitle when needed | Low |
 | `music128` | `wavira_audio_128` | keep URL; if local attachment → remap to attachment ID; record size/duration by probing metadata if available | Medium (external/hotlinked files) |
 | `music320` | `wavira_audio_320` | as above | Medium |
 | `music_text` | `wavira_lyrics` | store cleaned HTML (KSES allow-list), keep raw copy in a `_migration_raw` meta for audit | Low |
-| `album128` / `album320` | `wavira_album_128` / `_320` | move to album post | Low |
-| `album` (repeater) | child tracks + order | each row → track with title from `song_names`, sources from `albumlink128/320`, `wavira_parent_album` = album ID, `menu_order` = index | **High** (URLs may be dead) |
-| `video480/720/1080` | `wavira_video_sources` | map to quality keys; keep original order; verify playable URL format | Medium |
+| `album128` / `album320` | `wavira_album_audio_128` / `wavira_album_audio_320` | move to the album post; the album audio is reachable through the REST API and reserved for the full-album download in the migration phase | Low |
+| `album` (repeater) | child tracks + order | each row → track with title from `song_names`, sources from `albumlink128/320`, `wavira_album` = album ID, `menu_order` = index | **High** (URLs may be dead) |
+| `video480/720/1080` | `wavira_video_480` / `wavira_video_720` / `wavira_video_1080` | map to the matching quality key; verify the playable URL format and record the provider in `wavira_video_source` | Medium |
 | `musics_type` | — | dropped; recorded as `_migration_legacy_type` | Low |
 | `vip_song` | `wavira_featured` | `1`/`LIKE 1` → boolean true | Low |
-| `vip_img` | `wavira_featured_image` | URL → attachment ID if local, else URL kept | Low |
+| `vip_img` | `wavira_cover` (attachment ID) | import a local image as an attachment and store its ID; a remote URL cannot become a registered attachment ID, so it is kept in `_migration_raw` and reported for manual import | Low |
 | `plym` | `wavira_in_index_player` | boolean | Low |
-| `views` | `wavira_views` | integer | Low |
+| `views` | **`[DEFERRED]`** — the new model counts downloads (`wavira_download_count*`), not views | the value is copied to `_migration_raw`; a view counter needs its own decision (storage + privacy), tracked in `DECISIONS.md` | Low |
 | `_thumbnail_id` | unchanged | — | — |
 | term meta `aimg2` | `wavira_artist_image` | URL → attachment if local | Medium |
-| term meta `afacebook/atelegram/ainstagram/atwitter/ayoutube` | `wavira_social_{network}` | `esc_url_raw`, keep | Low |
+| term meta `afacebook/atelegram/ainstagram/atwitter/ayoutube` | `wavira_social_facebook` · `wavira_social_telegram` · `wavira_social_instagram` · `wavira_social_x` · `wavira_social_youtube` (plus `wavira_social_aparat` when the legacy site had it) | `esc_url_raw`, keep; `atwitter` becomes `_x` because the platform was renamed | Low |
 
 ## 3. Option (settings) map
 
@@ -53,8 +57,8 @@ reported, not guessed.
 | `share_off`, `tag_off`, `cm_off`, `upb`, `fixbtn` | `wavira_settings[...]` booleans | — |
 | `copyright` | footer block attribute | KSES-filtered |
 | `telegram`, `teltxt`, `instagram`, `instxt`, `facebook`, `twitter`, `youtube`, `aparat` | `wavira_settings['socials']` | `esc_url_raw` |
-| `ads_bt`, `ads_sg` | `wavira_settings['ads'][placement]['html']` | KSES allow-list |
-| `adsjs_bt`, `adsjs_sg` | capability-gated ad slot `js` | only for `unfiltered_html` roles |
+| `ads_bt`, `ads_sg` | `wavira_settings['ads_html']` | one KSES-allow-listed field; placement is decided by where the block sits, not by a second option |
+| `adsjs_bt`, `adsjs_sg` | **`[DEFERRED]`** — no script ad slot exists | a JS ad slot needs its own capability decision; until then the migration reports it and copies nothing |
 | `favicon`, `logo` | Site Identity | do not migrate as theme options |
 | `head_h1` | **dropped** | SEO anti-pattern (see SEO-AUDIT E2) |
 | `navar_txt` | **dropped** | contained the original author's sales contact |

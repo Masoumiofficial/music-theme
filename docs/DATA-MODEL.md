@@ -40,7 +40,7 @@ hardcoded.
 
 ## 3. Registered meta
 
-**43 keys** are registered with `register_post_meta()` (type + single + sanitize_callback +
+**46 keys** are registered with `register_post_meta()` (type + single + sanitize_callback +
 auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`; the count is asserted by
 `wp wavira verify` and by `tests/test-meta-settings.php`.
 
@@ -82,6 +82,7 @@ job only; the theme never touches a counter (ADR 0013 §1).
 | Key | Type | On | Notes |
 | --- | --- | --- | --- |
 | `wavira_release_date` | date `Y-m-d` | track, album, video | sorting + display |
+| `wavira_subtitle` | text | track, album, video | display subtitle (legacy `song` when it differed from the title): "feat. …", "Live", edition name |
 | `wavira_featured` | bool | track, album, video | hero/featured surfaces (legacy `vip_song`) |
 | `wavira_in_index_player` | bool | track | include in the global/index player (legacy `plym`) |
 | `wavira_cover` | int (attachment) | all | cover override when the featured image is not the artwork |
@@ -92,6 +93,7 @@ job only; the theme never touches a counter (ADR 0013 §1).
 | --- | --- | --- |
 | `wavira_album_type` | enum | `album`, `single`, `ep`, `compilation` |
 | `wavira_catalog_number` | text | label catalogue number |
+| `wavira_album_audio_128` / `_320` | url | album-level audio (legacy `album128` / `album320`), reserved for the full-album download; playback stays track-based |
 
 ### Video
 

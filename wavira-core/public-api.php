@@ -135,8 +135,8 @@ if ( ! function_exists( 'wavira_core_album_tracklist' ) ) {
 	 * file must keep working while the plugin boots and after a service filter.
 	 *
 	 * @param int $album_id Album post ID.
-	 * @return array<int, array<string, mixed>> Rows of `id`, `title`, `permalink`,
-	 *                                          `duration`, `duration_label`.
+	 * @return array<int, array<string, mixed>> Rows of `id`, `title`, `subtitle`,
+	 *                                          `permalink`, `duration`, `duration_label`.
 	 */
 	function wavira_core_album_tracklist( $album_id ) {
 		$rows = array();
@@ -161,6 +161,7 @@ if ( ! function_exists( 'wavira_core_album_tracklist' ) ) {
 			$rows[] = array(
 				'id'             => (int) $track->ID,
 				'title'          => get_the_title( $track ),
+				'subtitle'       => \Wavira\Core\Content\MetaValues::text( $track->ID, \Wavira\Core\Content\MetaSchema::SUBTITLE ),
 				'permalink'      => (string) get_permalink( $track ),
 				'duration'       => \Wavira\Core\Content\MetaValues::int( $track->ID, \Wavira\Core\Content\MetaSchema::DURATION ),
 				'duration_label' => \Wavira\Core\Content\MetaValues::duration_label( $track->ID ),

@@ -292,6 +292,11 @@
 	text-underline-offset: 0.3em;
 }
 
+.wavira-tracklist__subtitle {
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
 .wavira-tracklist__duration {
 	color: var(--wp--preset--color--muted);
 	font-variant-numeric: tabular-nums;
@@ -365,6 +370,13 @@
 	padding: 0.625rem 1.25rem;
 	font-weight: 600;
 	cursor: pointer;
+}
+
+/* ---- genre chips ------------------------------------------------------- */
+
+/* Chips wrap on their own; the cluster utility supplies the gap. */
+.wavira-genre-chips {
+	margin-block: 0;
 }
 
 /* ---- media ------------------------------------------------------------- */

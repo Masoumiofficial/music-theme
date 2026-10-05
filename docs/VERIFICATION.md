@@ -34,7 +34,7 @@ never substitute for a real WordPress install.
 | i18n text domains are `wavira` / `wavira-core` | **VERIFIED** | `WordPress.WP.I18n` configured with those domains; part of the passing WPCS job |
 | Legacy `music-theme.zip` is byte-identical to the audit baseline | **VERIFIED** | CI job `Legacy artifact integrity`, md5 `a23269c2b92a3ba08721dba79a50f1dd` |
 | JS/JSON assets parse; build dry-run has no missing sources | **VERIFIED** | CI job `JS, JSON, gates, build` → success |
-| Post types, taxonomies and the 43 registered meta keys register correctly | **VERIFIED** | `WP-CI` run `37301909854` → `Test_Content_Registration` (post types, archive slugs, rewrite bases, `show_in_rest`, meta registry incl. the counters staying out of REST) |
+| Post types, taxonomies and the 46 registered meta keys register correctly | **VERIFIED** | `WP-CI` run `37301909854` → `Test_Content_Registration` (post types, archive slugs, rewrite bases, `show_in_rest`, meta registry incl. the counters staying out of REST) |
 | REST routes answer with the documented shapes and headers | **VERIFIED** | `WP-CI` run `37301909854` → `Test_Rest_Api` (collection pagination headers, `X-WP-Total(-Pages)`, `per_page` clamp, draft exclusion, search/suggest/related payloads) |
 | Download authorization chain behaves as documented | **VERIFIED** | `WP-CI` run `37301909854` → `Test_Downloads::test_access_rules` + `test_forbidden_download_is_refused` (403/401 without leaking a URL) |
 | Cache invalidation fires on the intended hooks | **VERIFIED** | `WP-CI` run `37301909854` → `Test_Cache` (content save, settings update incl. the first save, generation isolation) |

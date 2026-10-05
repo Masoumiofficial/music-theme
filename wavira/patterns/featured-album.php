@@ -26,9 +26,7 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:post-date /-->
 </div>
 <!-- /wp:group -->
-<!-- wp:shortcode -->
-[wavira_player context="album" id="current" sticky="0"]
-<!-- /wp:shortcode -->
+<!-- wp:wavira/player {"context": "album", "sticky": false} /-->
 <!-- wp:buttons -->
 <div class="wp-block-buttons">
 <!-- wp:button -->

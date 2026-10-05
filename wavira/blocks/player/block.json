@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/player",
+	"title": "Music player",
+	"category": "wavira-music",
+	"description": "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post.",
+	"keywords": [
+		"player",
+		"audio",
+		"queue",
+		"playlist",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"context": {
+			"type": "string",
+			"default": "tracks",
+			"enum": [
+				"tracks",
+				"album",
+				"artist",
+				"genre",
+				"related"
+			]
+		},
+		"sourceId": {
+			"type": "number",
+			"default": 0
+		},
+		"trackId": {
+			"type": "number",
+			"default": 0
+		},
+		"slug": {
+			"type": "string",
+			"default": ""
+		},
+		"limit": {
+			"type": "number",
+			"default": 0
+		},
+		"sticky": {
+			"type": "boolean",
+			"default": true
+		},
+		"autoplay": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

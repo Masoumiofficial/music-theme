@@ -29,6 +29,26 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Own download counter vs. integration with popular plugins | **Own** lightweight atomic counter (`wavira_download_count*`, plugin-only, never REST-exposed); a third-party bridge stays possible behind the same `Counter` API | ADR 0013 §1 |
 | REST caching strategy (transient vs. object cache vs. HTTP cache headers) | Generation-scoped `Support\Cache` keys (bump on content change), TTL 300 s search / 3600 s related, filterable; no per-user state on shared keys; HTTP caching left to the site | ADR 0013 §3 |
 
+### 0.7.0 — block layer (2026-10-05)
+
+| Topic | Decision | Why |
+| --- | --- | --- |
+| Block source of truth | Blocks are **dynamic** (theme-resident `block.json` + `render.php`) and render through `inc/markup.php`; shortcodes were reduced to delegates of the same helpers | `theme.json` cannot bind arbitrary post meta, so a static-block layer could never reach `wavira_audio_128`, lyrics or an ordered tracklist; and two implementations of "the album's tracklist" would diverge |
+| Block metadata vs. registration | `block.json` carries metadata only; the editor script is registered by hand (`wp_register_script`) and passed through `editor_script_handles` | `block.json` cannot declare script dependencies, and the product must run with no build step (ADR 0006) |
+| Missing-content behaviour | A dynamic block that has nothing to render prints nothing on the front end and a placeholder **only during a REST request** | an invisible block looks like a bug to the editor; a placeholder on the front end would be visible content nobody asked for |
+| Registration order | Blocks register on `init` priority 5, before `register_block_pattern` work | a pattern that contains a `wavira/*` block must never be validated against a missing block |
+| Genre context for the player | The genre player addresses the queue by **term slug** (`Queue::ids()` has no term-ID path) | the engine's queue contract is slug-based; inventing an ID path would have widened the REST surface for one template |
+| What was **not** added | No static block styles beyond the shared layer, no block variations, no custom block category beyond `wavira-music`, no `wp.data` store | v1 scope: the blocks exist to render music content, not to become an editor framework |
+
+**Deferred by the 0.7.0 schema reconciliation** (recorded, deliberately not implemented — see
+`docs/MIGRATION-BLUEPRINT.md` §2 for the migration rows that now point at these)
+
+| Item | Legacy source | Status |
+| --- | --- | --- |
+| Full-album download | `album128` / `album320` | **data shipped** (`wavira_album_audio_128/_320`); the download endpoint is track-based in v1 |
+| View counter | `views` | **deferred** — needs a storage/privacy decision (download counts are implemented, views are not) |
+| Script ad slot | `adsjs_bt` / `adsjs_sg` | **deferred** — needs a capability decision; the settings API ships KSES-allow-listed `ads_html` only |
+
 **Still open (scheduled)**
 
 | Topic | Phase | Note |

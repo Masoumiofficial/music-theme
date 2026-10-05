@@ -5,6 +5,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.7.0 (block layer)
+- **Four dynamic blocks** (`blocks/{tracklist,player,video,genre-chips}/`): each ships `block.json`
+  (apiVersion 3, `category: wavira-music`, `textdomain: wavira`, `render: file:./render.php`,
+  `supports.html: false`) and a `render.php`. Registered on `init` priority 5 — that is before the
+  patterns, so a pattern that contains a `wavira/*` block is never validated against a missing block.
+- **Shared markup** (`inc/markup.php`): `wavira_get_tracklist()`, `wavira_get_video()` and
+  `wavira_get_genre_chips()` return escaped markup, their print wrappers echo it, and blocks,
+  shortcodes and templates all render through them — the same content cannot look different because
+  of the editor that produced the page. `wavira_block_placeholder()` prints an editor-only hint when
+  a dynamic block has nothing to render (REST requests only), so an empty block does not look broken.
+- **Block editor script** (`blocks/editor.js`): registers the four blocks against the `wp.*` globals
+  with a generic `ServerSideRender` preview and `save() → null`. No build step and no `@wordpress/*`
+  import in the shipped theme (ADR 0006).
+- **Templates and patterns moved to native blocks**: all 10 shortcode blocks in `templates/*.html`
+  and `patterns/*.php` are now `wp:wavira/*` blocks; `wp:shortcode` appears nowhere in the product.
+- **New styles**: `.wavira-genre-chips`, `.wavira-tracklist__subtitle` and the block-editor preview
+  classes (`.wavira-block`, `.wavira-block-hint`, `.wavira-block-placeholder`).
+- **Block gate**: `tools/check-blocks.mjs`, wired into `tools/lint.sh` as `[BLOCKS]` — metadata,
+  renderer, registrar and editor registrations must agree, and the renderer must refuse direct access.
+
+### Changed — 0.7.0
+- `[wavira_tracklist]` gained `duration` and `subtitle` attributes and now delegates to the shared
+  helper; `[wavira_video]` follows the same path, so shortcode and block output are identical.
+- Theme version 0.7.0.
+
 ### Added — 0.6.0 (theme UI)
 - **Four CSS layers** (`assets/css/tokens.css`, `base.css`, `components.css`, `utilities.css`): design
   tokens (incl. the `--wavira-on-accent` token), element defaults, components (header, footer, hero,

@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/tracklist",
+	"title": "Album tracklist",
+	"category": "wavira-music",
+	"description": "The ordered, linked tracklist of an album. Renders nothing when the album has no published tracks.",
+	"keywords": [
+		"album",
+		"tracks",
+		"tracklist",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"albumId": {
+			"type": "number",
+			"default": 0
+		},
+		"showDuration": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSubtitle": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

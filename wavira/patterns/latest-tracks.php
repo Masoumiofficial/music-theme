@@ -20,9 +20,7 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:paragraph -->
 <p>Play straight through the catalogue — shuffle, repeat and the queue are in the player.</p>
 <!-- /wp:paragraph -->
-<!-- wp:shortcode -->
-[wavira_player context="tracks" limit="20" sticky="0"]
-<!-- /wp:shortcode -->
+<!-- wp:wavira/player {"context": "tracks", "limit": 20, "sticky": false} /-->
 <!-- wp:query {"queryId":3,"query":{"perPage":6,"pages":0,"offset":0,"postType":"wavira_track","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":3}} -->
 <div class="wp-block-query">
 <!-- wp:post-template {"layout":{"type":"grid","columnCount":3}} -->

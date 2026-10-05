@@ -5,6 +5,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.7.0 (data for the block layer)
+- **Three schema keys** (`src/Content/MetaSchema.php`, now **46 registered keys**):
+  `wavira_subtitle` (display subtitle on track, album and video — the legacy `song` value when it was
+  never the real title), and `wavira_album_audio_128` / `wavira_album_audio_320` (album-level audio,
+  legacy `album128`/`album320`, reserved for the full-album download; playback stays track-based).
+- **Track subtitle in the album tracklist**: `wavira_core_album_tracklist()` rows now carry
+  `subtitle` beside `title`, `permalink`, `duration` and `duration_label`, so a theme renders an
+  album without a second data source.
+- Version 0.7.0.
+
 ### Added — 0.6.0 (theme UI, player component skin)
 - **Player stylesheet** (`assets/css/player.css`, new): the component's own neutral skin and token
   contract (`--wavira-player-bg/surface/fg/muted/accent/accent-fg/border/danger/focus/radius/gap/

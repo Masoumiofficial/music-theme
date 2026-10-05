@@ -17,6 +17,6 @@ defined( 'ABSPATH' ) || exit;
 <!-- wp:heading {"level":2} -->
 <h2>Browse by genre</h2>
 <!-- /wp:heading -->
-<!-- wp:tag-cloud {"taxonomy":"wavira_genre","numberOfTags":20,"showTagCounts":false,"className":"wavira-cluster"} /-->
+<!-- wp:wavira/genre-chips {"limit":20,"orderby":"count","order":"DESC"} /-->
 </div>
 <!-- /wp:group -->

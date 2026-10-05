@@ -6,7 +6,7 @@ tracks, videos, genres), settings, playback logic and REST endpoints belong to t
 
 | | |
 | --- | --- |
-| Version | 0.2.0 (architecture phase — no user-facing UI yet) |
+| Version | 0.7.0 (theme UI + block layer) |
 | Requires | WordPress 6.6+ · PHP 7.4+ |
 | Author | **Etehad WP — اتحاد وردپرس** · <https://etehadwp.com/> |
 | Text domain | `wavira` |
@@ -25,11 +25,15 @@ wavira/
 │   ├── helpers.php      small template helpers (core-aware, degrade gracefully)
 │   ├── hooks.php        body classes, small core adjustments
 │   ├── assets.php       conditional, build-aware enqueueing
+│   ├── markup.php       shared markup (tracklist, video, chips) — one implementation
+│   ├── player.php       the player mount point + no-JavaScript fallback
+│   ├── shortcodes.php   classic-editor surfaces, delegating to markup.php
+│   ├── blocks.php       block registration from each blocks/<name>/block.json
 │   └── integrations/    rank-math.php, yoast.php, elementor.php (later phases)
-├── templates/           block templates (phases 0.6.0+)
+├── templates/           block templates (14: index, page, single, search, 404, music singles/archives)
 ├── parts/               block template parts (header, footer, player bar)
-├── patterns/            editor patterns for homepage sections (phase 0.6.0)
-├── blocks/              block sources (phase 0.4.0+)
+├── patterns/            editor patterns for homepage sections
+├── blocks/              dynamic block sources: <name>/block.json + render.php + shared editor.js
 ├── assets/
 │   ├── css/             token/base/component sources
 │   ├── js/              ES modules (no jQuery)

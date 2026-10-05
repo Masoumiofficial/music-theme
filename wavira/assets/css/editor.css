@@ -62,3 +62,25 @@
 	font-family: var(--wp--preset--font-family--mono, monospace);
 	font-size: 0.875rem;
 }
+
+/* ---- dynamic block previews -------------------------------------------- */
+
+/* The block's own wrapper carries .wavira-block (editor.js adds it through
+   useBlockProps), so the preview sits in the same box as the front end. */
+.editor-styles-wrapper .wavira-block {
+	min-block-size: 1px;
+}
+
+.editor-styles-wrapper .wavira-block-hint {
+	margin-block: 0 0.5rem;
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+.editor-styles-wrapper .wavira-block-placeholder {
+	margin-block: 0;
+	padding: var(--wp--preset--spacing--40, 1rem);
+	border: 1px dashed var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	color: var(--wp--preset--color--muted);
+}

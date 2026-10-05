@@ -10,6 +10,7 @@
 #                                    wavira-core/assets/js, because it must be valid without a build)
 #   [JSON]      JSON validity
 #   [REFS]      PHP class references (tools/check-class-refs.py)
+#   [BLOCKS]    Block metadata / renderer / registrar / editor consistency
 #   [CSS]       CSS rules + size budgets (tools/check-css.mjs)
 #   [CONTRAST]  WCAG 2.2 AA contrast of the documented pairs (tools/check-contrast.mjs)
 #   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
@@ -118,6 +119,21 @@ if command -v python3 >/dev/null 2>&1; then
   fi
 else
   say "      SKIP  python3 not installed"
+fi
+
+# --------------------------------------------------------------- BLOCKS
+# A block lives in four places (block.json, render.php, inc/blocks.php,
+# blocks/editor.js) and a mismatch only shows up when somebody opens the editor.
+say "[BLOCKS] Dynamic block consistency"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-blocks.mjs; then
+    :
+  else
+    say "      FAIL  the block gate reported violations (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
 fi
 
 # ------------------------------------------------------------------ CSS

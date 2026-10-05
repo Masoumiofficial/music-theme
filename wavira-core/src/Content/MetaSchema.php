@@ -38,6 +38,7 @@ final class MetaSchema {
 	public const ISRC             = 'wavira_isrc';
 	public const EXPLICIT         = 'wavira_explicit';
 	public const VERSION_NOTE     = 'wavira_version_note';
+	public const SUBTITLE         = 'wavira_subtitle';
 
 	/* Download metrics (written by the plugin only) ------------------------------- */
 	public const DOWNLOAD_COUNT     = 'wavira_download_count';
@@ -51,8 +52,10 @@ final class MetaSchema {
 	public const COVER           = 'wavira_cover';
 
 	/* Album ---------------------------------------------------------------------- */
-	public const ALBUM_TYPE     = 'wavira_album_type';
-	public const CATALOG_NUMBER = 'wavira_catalog_number';
+	public const ALBUM_TYPE      = 'wavira_album_type';
+	public const ALBUM_AUDIO_128 = 'wavira_album_audio_128';
+	public const ALBUM_AUDIO_320 = 'wavira_album_audio_320';
+	public const CATALOG_NUMBER  = 'wavira_catalog_number';
 
 	/* Video ---------------------------------------------------------------------- */
 	public const VIDEO_SOURCE = 'wavira_video_source';
@@ -199,6 +202,11 @@ final class MetaSchema {
 				'sanitize' => 'text',
 				'entities' => $track,
 			),
+			self::SUBTITLE           => array(
+				'type'     => 'string',
+				'sanitize' => 'text',
+				'entities' => array_merge( $track, $album, $video ),
+			),
 
 			/* Download metrics (plugin-written; not writable through the API) --- */
 			self::DOWNLOAD_COUNT     => array(
@@ -243,6 +251,16 @@ final class MetaSchema {
 			),
 
 			/* Album ------------------------------------------------------------- */
+			self::ALBUM_AUDIO_128    => array(
+				'type'     => 'string',
+				'sanitize' => 'url',
+				'entities' => $album,
+			),
+			self::ALBUM_AUDIO_320    => array(
+				'type'     => 'string',
+				'sanitize' => 'url',
+				'entities' => $album,
+			),
 			self::ALBUM_TYPE         => array(
 				'type'     => 'string',
 				'sanitize' => 'enum',

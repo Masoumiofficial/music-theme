@@ -60,10 +60,14 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `functions.php` | constants + `require_once` | any logic (God-file rule) |
 | `inc/` | one concern per file, prefixed functions or namespaced classes | business logic for music data |
 | `inc/integrations/` | third-party adapters (Rank Math, Yoast, Elementor, WPML) | anything loaded when the integration is absent |
+| `inc/markup.php` | the **one** implementation of tracklist, video and genre-chip markup, shared by blocks, shortcodes and templates | a second copy of any content markup, or business logic |
+| `inc/blocks.php` | registration of every `blocks/<name>/block.json` (one list, `wavira_block_names()`) | markup or queries of its own |
+| `blocks/<name>/` | a dynamic block: `block.json` + `render.php`, plus the shared `editor.js` | stored block HTML, a renderer that bypasses `inc/markup.php`, or a build step the runtime depends on |
 | `templates/` | block templates | PHP template hierarchy duplicates |
 | `parts/` | template parts | logic |
 | `patterns/` | editor patterns (`register_block_pattern`) | data queries beyond what blocks expose |
 | `assets/css/` | token → base → components → utilities sources | framework dumps |
+| `assets/css/editor.css` | editor-only parity styles, loaded through `add_editor_style()` | front-end rules (those belong in the layered build) |
 | `assets/js/` | ES modules, no jQuery, scoped to `window.Wavira` when global is unavoidable | globals, duplicated handlers |
 | `assets/dist/` | build output (git-ignored) | source files |
 | `languages/` | `wavira.pot` + `.po/.mo` | hardcoded UI strings anywhere else |
@@ -176,11 +180,11 @@ implementations — see the brief's YAGNI rule.
 | Phase | Version | Adds |
 | --- | --- | --- |
 | 0.2.0 | ARCHITECTURE | this document, ADRs, skeleton, coding standard, CI | ✅ |
-| 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 40 registered meta keys), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
+| 0.3.0 | DATA MODEL | `src/Content/*` (CPTs, taxonomies, 40 registered meta keys at the time; 46 today), `src/Settings/*`, `wavira/v1` REST, `wp wavira verify/seed`, `docs/DATA-MODEL.md` | ✅ implemented · static verification **VERIFIED** in CI (WPCS + PHPCompatibilityWP + `php -l` on 7.4/8.2/8.3) · runtime verification **NOT_STARTED** — see `docs/VERIFICATION.md` |
 | 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, public function API (`public-api.php`), boundary gate, ADR 0013, PHPUnit harness (`tests/`, 49 tests) | ✅ implemented · **VERIFIED**: static gates + 49 integration tests green against a real WordPress on PHP 7.4 and 8.2 (CI run `37301909854`) |
 | 0.5.0 | PLAYER | `src/Player/*` + `assets/js/index.js` (state machine, queue, views, Media Session, keyboard, a11y), `wavira/v1/player/*` routes, `wavira_player_mount()`, `tests/js/player.test.mjs` (15 DOM-free tests) | ✅ implemented · **VERIFIED** locally: `node --test tests/js/player.test.mjs` 15/15, `tools/lint.sh` PASS, boundary gate PASS · runtime verification in `docs/VERIFICATION.md` |
-| 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR |
-| 0.7.0 | BUILDERS | blocks + Elementor widgets |
+| 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR | ✅ implemented · **VERIFIED**: CSS/contrast/token gates, 11 theme JS tests, CI run `37309252018` 8/8 |
+| 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, `docs/DECISIONS.md` 0.7.0 entries; Elementor widgets still open | 🔄 blocks implemented · runtime verification in `docs/VERIFICATION.md` |
 | 0.8.0 | SEO + PERF | SEO cooperation, budgets met |
 | 0.9.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |
