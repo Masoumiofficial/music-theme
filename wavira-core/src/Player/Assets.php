@@ -37,12 +37,44 @@ final class Assets implements Registrable {
 	public const BUNDLE = 'assets/dist/core.js';
 
 	/**
+	 * Relative path of the built component stylesheet inside the plugin.
+	 *
+	 * The engine builds its own DOM, so the styles that make that DOM usable
+	 * travel with it (ADR 0002/0014): a site keeps a working player when it
+	 * switches theme.
+	 *
+	 * @var string
+	 */
+	public const STYLE = 'assets/dist/player.css';
+
+	/**
 	 * Register the hooks that publish the player bundle.
 	 *
 	 * @return void
 	 */
 	public function register(): void {
 		add_action( 'wp_enqueue_scripts', array( $this, 'register_script' ), 5 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_style' ), 5 );
+	}
+
+	/**
+	 * Register the component stylesheet (never force-enqueue it).
+	 *
+	 * @return void
+	 */
+	public function register_style(): void {
+		$path = WAVIRA_CORE_DIR . self::STYLE;
+
+		if ( ! file_exists( $path ) ) {
+			return;
+		}
+
+		wp_register_style(
+			self::HANDLE,
+			WAVIRA_CORE_URI . self::STYLE,
+			array(),
+			(string) filemtime( $path )
+		);
 	}
 
 	/**
@@ -90,7 +122,7 @@ final class Assets implements Registrable {
 	 */
 	public static function settings(): array {
 		$settings = array(
-			'version'  => defined( 'WAVIRA_CORE_VERSION' ) ? WAVIRA_CORE_VERSION : '0.5.0',
+			'version'  => defined( 'WAVIRA_CORE_VERSION' ) ? WAVIRA_CORE_VERSION : '0.6.0',
 			'routes'   => array(
 				'track' => rest_url( 'wavira/v1/player/tracks/' ) . '%d',
 				'queue' => rest_url( 'wavira/v1/player/queue' ),

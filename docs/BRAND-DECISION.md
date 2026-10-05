@@ -51,6 +51,13 @@ Music Server*, *Lyrist*, *Lyrica*), Ostinata (near-identical *Ostinato* music so
   `.io`/`.net` defensively if budget allows.
 - **Never state "the domain is available" until the registrar says so.**
 
+## PRODUCT URIS IN SHIPPED METADATA
+Until the domain is registered, every shipped URI points at the vendor page that actually resolves —
+`https://etehadwp.com/` — never at `wavira.com`, which returned no DNS record on 2026-10-05 and is
+therefore not a URL this product controls. Corrected in `wavira/style.css` (Theme URI),
+`wavira-core/wavira-core.php` (Plugin URI) and `composer.json` (homepage). When `wavira.com` is
+acquired and serving, the product URIs move there in a single metadata commit.
+
 ## WORDPRESS CONFLICT
 None found. `wordpress.org/themes` search returned no `Wavira`; no plugin with this slug was found.
 Post-lock action: check `wordpress.org/plugins/search/wavira` again immediately before submitting the

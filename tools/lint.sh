@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 #
 # Wavira — quality gate.
-# Runs every check that can run without a WordPress installation:
-#   1. PHP syntax            (skipped with a notice when PHP is not installed)
-#   2. PHPCS                 (skipped when vendor/bin/phpcs is missing)
-#   3. JS syntax             (node --check on every .js/.mjs, excluding node_modules/vendor/dist)
-#   4. JSON validity         (every .json in the product folders)
-#   5. PHP class references  (every Class::method() / new Class() resolves — tools/check-class-refs.py)
-#   6. Legacy-echo gate      (forbidden legacy patterns — see tools/README.md)
-#   7. Module boundaries     (ARCHITECTURE §2: Core → Theme coupling, layer direction,
-#                             theme uses the public function API only, access guards,
-#                             global function prefixes — tools/check-boundaries.mjs)
-#   8. Asset-size report     (informational; budget enforced in the release checklist)
+# Runs every check that can run without a WordPress installation. Gates are named,
+# not numbered, so inserting one never invalidates a reference in the docs:
+#
+#   [PHP]       PHP syntax          (skipped with a notice when PHP is not installed)
+#   [PHPCS]     WordPress standards (skipped when vendor/bin/phpcs is missing)
+#   [JS]        JS syntax           (node --check on every .js/.mjs; module syntax for
+#                                    wavira-core/assets/js, because it must be valid without a build)
+#   [JSON]      JSON validity
+#   [REFS]      PHP class references (tools/check-class-refs.py)
+#   [CSS]       CSS rules + size budgets (tools/check-css.mjs)
+#   [CONTRAST]  WCAG 2.2 AA contrast of the documented pairs (tools/check-contrast.mjs)
+#   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
+#   [BOUNDARIES] Module boundaries (ARCHITECTURE §2, tools/check-boundaries.mjs)
+#   [SIZE]      Asset-size report (informational)
 #
 # Exit code 0 = all gates passed. Any failure prints the offending lines.
 
@@ -31,7 +34,7 @@ say "Wavira lint gate — $(date -u '+%Y-%m-%d %H:%M UTC')"
 hr
 
 # ---------------------------------------------------------------- 1. PHP syntax
-say "[1/8] PHP syntax"
+say "[PHP] PHP syntax"
 if command -v php >/dev/null 2>&1; then
   PHP_FILES=$(find "${SOURCES[@]}" -type f -name '*.php' \
     -not -path '*/node_modules/*' -not -path '*/vendor/*' -not -path '*/assets/dist/*' 2>/dev/null)
@@ -52,7 +55,7 @@ else
 fi
 
 # ------------------------------------------------------------------- 2. PHPCS
-say "[2/8] WordPress Coding Standards (PHPCS)"
+say "[PHPCS] WordPress Coding Standards (PHPCS)"
 if [ -x "vendor/bin/phpcs" ]; then
   if vendor/bin/phpcs --standard=phpcs.xml.dist -q; then
     say "      OK    PHPCS clean"
@@ -65,9 +68,12 @@ else
 fi
 
 # ------------------------------------------------------------------ 3. JS syntax
-say "[3/8] JavaScript syntax"
+say "[JS] JavaScript syntax"
 if command -v node >/dev/null 2>&1; then
   JS_FAIL=0
+  # The repository is `"type": "module"`, so every .js file here is parsed as an
+  # ES module: `node --check` must accept the player sources as they ship, because
+  # the plugin enqueues them directly and works with no build step (ADR 0006).
   while IFS= read -r file; do
     if ! out=$(node --check "$file" 2>&1); then
       say "      FAIL  $file"
@@ -83,7 +89,7 @@ else
 fi
 
 # --------------------------------------------------------------- 4. JSON validity
-say "[4/8] JSON validity"
+say "[JSON] JSON validity"
 if command -v node >/dev/null 2>&1; then
   while IFS= read -r file; do
     if ! node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$file" >/dev/null 2>&1; then
@@ -102,7 +108,7 @@ fi
 # method that was never written. This static pass reads class references and
 # reports any that do not resolve inside the repository — the exact class of
 # defect that cost a full CI round in 0.5.0.
-say "[5/8] PHP class references"
+say "[REFS] PHP class references"
 if command -v python3 >/dev/null 2>&1; then
   if python3 tools/check-class-refs.py; then
     :
@@ -114,8 +120,39 @@ else
   say "      SKIP  python3 not installed"
 fi
 
+# ------------------------------------------------------------------ CSS
+# The rules the product promises about its stylesheets: no !important, logical
+# properties only (one stylesheet for both directions), dark-mode parity for every
+# palette colour, component-class parity, and the ADR 0009 size budgets.
+say "[CSS] CSS rules and size budgets"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-css.mjs; then
+    :
+  else
+    say "      FAIL  the CSS gate reported violations (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
+# --------------------------------------------------------------- CONTRAST
+# WCAG 2.2 AA is a launch requirement, so the documented colour pairs are
+# machine-checked in both modes instead of being asserted in prose.
+say "[CONTRAST] WCAG 2.2 AA colour pairs"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-contrast.mjs; then
+    :
+  else
+    say "      FAIL  a colour pair misses its WCAG threshold (see above)"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
+fi
+
 # ------------------------------------------------------------ 6. Legacy-echo gate
-say "[6/8] Legacy-echo gate"
+say "[LEGACY] Legacy-echo gate"
 LEGACY_HITS=$(grep -rniE \
   "javanseda|javan seda|جوان صدا|tarlanweb|rkianoosh|rtl-theme|rezakianoosh|09158856205" \
   "${SOURCES[@]}" --include='*.php' --include='*.js' --include='*.mjs' --include='*.css' --include='*.json' \
@@ -146,7 +183,7 @@ fi
 [ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && say "      OK    no legacy echoes, no forbidden patterns, no jQuery"
 
 # -------------------------------------------------------------- 7. Module boundaries
-say "[7/8] Module boundaries (ARCHITECTURE §2)"
+say "[BOUNDARIES] Module boundaries (ARCHITECTURE §2)"
 if node tools/check-boundaries.mjs; then
   :
 else
@@ -154,7 +191,7 @@ else
 fi
 
 # ------------------------------------------------------------ 7. Asset-size report
-say "[8/8] Asset-size report (informational)"
+say "[SIZE] Asset-size report (informational)"
 for dist in wavira/assets/dist wavira-core/assets/dist; do
   if [ -d "$dist" ]; then
     SIZE=$(du -sk "$dist" 2>/dev/null | awk '{print $1}')

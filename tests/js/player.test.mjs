@@ -471,3 +471,23 @@ test( 'the shipped engine keeps the documented safety locks', () => {
 	assert.equal( /wavira:player:/.test( SOURCE ), true, 'the documented DOM event bridge is present' );
 	assert.equal( /wavira-player/.test( SOURCE ), true );
 } );
+
+test( 'the view builder mounts the queue list and wires its toggle', () => {
+	// Regression lock for the 0.6.0 defect where the queue <ol> was created and
+	// populated but never appended, so the panel could not appear. A DOM-free
+	// suite cannot observe rendered output, so the shipped source is asserted
+	// directly (ADR 0005 §2, ADR 0009 §3).
+	assert.match(
+		SOURCE,
+		/var queueList = el\( 'ol', 'wavira-player__queue'/,
+		'the queue list is an <ol> owned by the view'
+	);
+	assert.match( SOURCE, /root\.appendChild\( queueList \)/, 'the queue list must be appended to the player root' );
+	assert.match(
+		SOURCE,
+		/queueToggle\.setAttribute\( 'aria-controls', queueList\.id \)/,
+		'the toggle must point at the queue list it discloses'
+	);
+	assert.match( SOURCE, /mount\.setAttribute\( 'data-queue-open'/, 'the open state is exposed on the mount for CSS' );
+	assert.match( SOURCE, /controls\.appendChild\( queueToggle \)/, 'the toggle lives in the controls group' );
+} );

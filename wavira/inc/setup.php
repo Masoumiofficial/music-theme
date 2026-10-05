@@ -22,6 +22,7 @@ function wavira_setup() {
 	add_theme_support( 'responsive-embeds' );
 	add_theme_support( 'align-wide' );
 	add_theme_support( 'editor-styles' );
+	add_editor_style( 'assets/css/editor.css' );
 	add_theme_support( 'html5', array( 'search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
 	add_theme_support(
 		'custom-logo',
@@ -49,6 +50,23 @@ function wavira_setup() {
 	);
 }
 add_action( 'after_setup_theme', 'wavira_setup' );
+
+/**
+ * Register the pattern category the theme's patterns live in.
+ *
+ * @return void
+ */
+function wavira_register_pattern_category() {
+	if ( ! function_exists( 'register_block_pattern_category' ) ) {
+		return;
+	}
+
+	register_block_pattern_category(
+		'wavira-music',
+		array( 'label' => __( 'Wavira music', 'wavira' ) )
+	);
+}
+add_action( 'init', 'wavira_register_pattern_category' );
 
 /**
  * Set the content width used by embeds and oEmbeds.

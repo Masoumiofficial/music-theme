@@ -5,6 +5,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.6.0 (theme UI)
+- **Four CSS layers** (`assets/css/tokens.css`, `base.css`, `components.css`, `utilities.css`): design
+  tokens (incl. the `--wavira-on-accent` token), element defaults, components (header, footer, hero,
+  sections, tracklist, chips, video frame, site player, theme toggle) and layout utilities. Logical
+  properties only, no `!important`; 5.9 KB gzipped together (budget 25 KB).
+- **Dark mode** (`tokens.css` + `styles/dark.json` style variation): the palette is remapped for dark,
+  the mode lives on `<html>` as `light|dark|auto`, and `auto` follows the system through
+  `prefers-color-scheme` (ADR 0014).
+- **Editor parity** (`assets/css/editor.css`, loaded through `add_editor_style()`): palettes, cover
+  radius, chips, hero grid and the shortcode placeholder match the front end.
+- **Templates and parts**: `index`, `page`, `single`, `search`, `404`, `single-wavira_{album,track,
+  artist,video}`, `archive-wavira_{album,track,artist,video}`, `taxonomy-wavira_genre` — 14 templates —
+  plus `parts/{header,footer,player-bar}.html`.
+- **Patterns** (`patterns/{featured-album,album-grid,latest-tracks,genre-chips}.php`) and the
+  `wavira-music` pattern category.
+- **Shortcodes** (`inc/shortcodes.php`): `[wavira_tracklist]` and `[wavira_video]`, both resolving
+  `current` to the queried object, so a block-less site keeps the classic workflow.
+- **Player mounting** (`inc/player.php`): `[wavira_player context=… id=… slug=… limit=… track=…
+  orderby=… order=… autoplay=… sticky=… fallback=… class=…]`; the mount point and its `<audio>`
+  fallback render even when the plugin is inactive (theme-switch safety, ADR 0002).
+- **Assets pipeline** (`inc/assets.php`): conditional enqueue, `filemtime` cache busting, the
+  `wavira_theme_settings` filter, and the pre-paint colour-mode script on `wp_head`.
+- Theme version 0.6.0.
+
+### Fixed — 0.6.0
+- **`--wp--custom--player--barSpace` never resolved** (camelCase vs. WordPress' kebab-cased custom
+  properties), so the fixed-bar space setting had no effect. Corrected to `--player--bar-space`; the
+  new `tools/check-css.mjs` rule 6 fails the build for unresolvable token references (ADR 0014).
+- **Accent-chip text failed WCAG in dark mode** (1.51:1 — a light-mode colour was hard-coded on the
+  dark accent fill). Replaced by the `--wavira-on-accent` token; `tools/check-contrast.mjs` now checks
+  21 mode-specific pairs, including this one.
+- `Theme URI` no longer points at the unregistered `wavira.com` (see `docs/BRAND-DECISION.md`).
+
 ### Added — 0.5.0
 - `inc/player.php`: `wavira_player_mount()` prints a player mount point (`data-*` contract, no element
   IDs) and a native `<audio>` fallback with the preferred source, so a track page works without

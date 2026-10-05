@@ -18,6 +18,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0011](adr/0011-slugs-and-permalinks.md) | Permalinks `/artists/ /albums/ /tracks/ /videos/ /genres/`, legacy post slugs preserved, 301 map for `/singer/*` and artist tags | Accepted (owner-approved 2026-10-05) | 2026-10-05 |
 | [0012](adr/0012-relation-storage.md) | Relations are post IDs in registered meta (artist CPT + role-aware meta), **not** a shared taxonomy; no free-text credits | Accepted | 2026-10-05 |
 | [0013](adr/0013-download-counters-and-delivery.md) | Download counters are atomic plugin-side meta increments (never REST-exposed); delivery is authorization + `302`, never a byte proxy, token obfuscation or a DRM claim | Accepted | 2026-10-05 |
+| [0014](adr/0014-dark-mode-and-token-mapping.md) | Colour modes: one palette in `theme.json`, dark mode as a `--wp--preset--color--*` remap, `data-theme` on `<html>`, neutral plugin tokens mapped by the theme, and a gate that fails unresolvable token references | Accepted — **implemented in 0.6.0** (two casing defects found and fixed) | 2026-10-05 |
 
 **Resolved open decisions** (were listed as "scheduled" in 0.2.0)
 
@@ -35,6 +36,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Elementor: widgets vs. dynamic tags only | 0.7.0 | depends on marketplace demand |
 | Update server (self-hosted vs. marketplace-native) | 0.9.0 | affects licence/update ADR |
 | Localised slug bases for fa_IR (`/خواننده/` …) | 0.6.0 | supported via `wavira_rewrite_slugs` filter (ADR 0011 §5); decision = ship English default, document the filter |
+| `custom.player.miniHeight` is a setting nothing consumes | 0.6.1 | either implement the compact/mini bar variant or remove the setting; recorded in ADR 0014 (Consequences) — no silent settings |
 
 **Attribution decision (product owner, 2026-10-05)**
 

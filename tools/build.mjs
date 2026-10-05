@@ -37,6 +37,13 @@ const TARGETS = [
 		pattern: /\.js$/,
 	},
 	{
+		name: 'core CSS',
+		sourceDir: join(ROOT, 'wavira-core/assets/css'),
+		outFile: join(ROOT, 'wavira-core/assets/dist/player.css'),
+		layerOrder: ['player'],
+		pattern: /\.css$/,
+	},
+	{
 		name: 'core JS',
 		sourceDir: join(ROOT, 'wavira-core/assets/js'),
 		outFile: join(ROOT, 'wavira-core/assets/dist/core.js'),

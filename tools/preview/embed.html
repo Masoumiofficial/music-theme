@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wavira — components (dev harness)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="presets.css">
+<link rel="stylesheet" href="../../wavira/assets/css/tokens.css">
+<link rel="stylesheet" href="../../wavira/assets/css/base.css">
+<link rel="stylesheet" href="../../wavira/assets/css/components.css">
+<link rel="stylesheet" href="../../wavira/assets/css/utilities.css">
+<link rel="stylesheet" href="../../wavira-core/assets/css/player.css">
+</head>
+<body>
+
+<header class="wavira-header">
+	<div class="wavira-header__inner">
+		<a class="wavira-site-title" href="#main">Wavira</a>
+		<nav class="wavira-cluster" aria-label="Demo navigation">
+			<a href="#albums">Albums</a>
+			<a href="#tracks">Tracks</a>
+			<a href="#video">Videos</a>
+			<a href="#genres">Genres</a>
+		</nav>
+		<button class="wavira-theme-toggle" type="button" data-wavira-theme-toggle>
+			<span class="wavira-theme-label" data-wavira-theme-label>Colour theme</span>
+		</button>
+	</div>
+</header>
+
+<main class="wavira-layout" id="main">
+
+	<section class="wavira-hero" aria-labelledby="hero-title">
+		<div class="wavira-hero__body">
+			<p class="wavira-hero__meta"><span class="wavira-chip">Featured release</span> <span class="wavira-chip wavira-chip--accent">Demo data</span></p>
+			<h1 id="hero-title">Music publishing, on your own site</h1>
+			<p>This page renders the shipped theme layers and the shipped player engine. Layout, colour modes, RTL and the breakpoint matrix are real; only the WordPress data source is stubbed.</p>
+			<p class="wavira-hero__actions">
+				<a class="wavira-signature" href="#tracks">Listen to the demos</a>
+				<a href="#albums">Browse albums</a>
+			</p>
+		</div>
+		<div class="wavira-hero__media">
+			<img src="/tools/preview/cover-1.svg" alt="Demo cover art" width="400" height="400">
+		</div>
+	</section>
+
+	<section class="wavira-section" id="albums" aria-labelledby="albums-title">
+		<div class="wavira-section__head">
+			<h2 id="albums-title">Albums</h2>
+			<p class="wavira-text-center">Three demo cards, fluid grid, logical spacing.</p>
+		</div>
+		<div class="wavira-grid-auto">
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-1.svg" alt="Demo cover art" width="400" height="400">
+				<h3><a href="#albums">Demo album one</a></h3>
+				<p><span class="wavira-chip">Dream pop</span> <span class="wavira-chip">2026</span></p>
+			</article>
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-2.svg" alt="Demo cover art" width="400" height="400">
+				<h3><a href="#albums">Demo album two</a></h3>
+				<p><span class="wavira-chip">Post-rock</span> <span class="wavira-chip">2025</span></p>
+			</article>
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-3.svg" alt="Demo cover art" width="400" height="400">
+				<h3><a href="#albums">Demo album three</a></h3>
+				<p><span class="wavira-chip">Ambient</span> <span class="wavira-chip">2025</span></p>
+			</article>
+		</div>
+	</section>
+
+	<section class="wavira-section" id="tracks" aria-labelledby="tracks-title">
+		<div class="wavira-section__head">
+			<h2 id="tracks-title">Tracks</h2>
+			<p>The same markup <code>[wavira_tracklist]</code> prints, so the no-JavaScript path is visible.</p>
+		</div>
+		<ol class="wavira-tracklist">
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">1</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">Demo track one</a></span>
+				<span class="wavira-tracklist__duration">0:03</span>
+			</li>
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">2</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">Demo track two</a></span>
+				<span class="wavira-tracklist__duration">0:03</span>
+			</li>
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">3</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">Demo track three</a></span>
+				<span class="wavira-tracklist__duration">0:03</span>
+			</li>
+		</ol>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="video-title">
+		<div class="wavira-section__head">
+			<h2 id="video-title">Music video</h2>
+			<p><code>[wavira_video]</code> renders a hosted file or an oEmbed in this frame.</p>
+		</div>
+		<figure class="wavira-video-frame">
+			<img src="/tools/preview/cover-4.svg" alt="Demo video poster" width="400" height="225">
+			<figcaption>Demo poster — the real template prints a <code>&lt;video&gt;</code> element or an embed.</figcaption>
+		</figure>
+	</section>
+
+	<section class="wavira-section" id="genres" aria-labelledby="genres-title">
+		<div class="wavira-section__head">
+			<h2 id="genres-title">Genres</h2>
+			<p>Taxonomy chips, wrapped with a logical gap.</p>
+		</div>
+		<p class="wavira-cluster">
+			<a class="wavira-chip" href="#genres">Dream pop</a>
+			<a class="wavira-chip" href="#genres">Post-rock</a>
+			<a class="wavira-chip" href="#genres">Ambient</a>
+			<a class="wavira-chip" href="#genres">Electronic</a>
+			<a class="wavira-chip wavira-chip--accent" href="#genres">Featured</a>
+		</p>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="lyrics-title">
+		<div class="wavira-section__head">
+			<h2 id="lyrics-title">Lyrics</h2>
+			<p>Long-form content uses the measure-limited prose layer.</p>
+		</div>
+		<div class="wavira-lyrics wavira-prose">
+			<p>Demo lyric line one, set in the reading measure.</p>
+			<p>Demo lyric line two — the wrapper never exceeds <code>--wavira-measure</code>.</p>
+		</div>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="fallback-title">
+		<div class="wavira-section__head">
+			<h2 id="fallback-title">No-JavaScript fallback</h2>
+			<p>Exactly the markup <code>wavira_player_fallback()</code> prints inside a mount point — the engine removes it when it takes over, so this copy stays visible on purpose.</p>
+		</div>
+		<div class="wavira-surface wavira-stack">
+			<audio class="wavira-player__fallback" controls preload="none" src="/tools/preview/tone-330.wav">Demo track one</audio>
+			<p class="wavira-player__fallback-link"><a href="#tracks">Open Demo track one</a></p>
+		</div>
+	</section>
+
+</main>
+
+<footer class="wavira-footer">
+	<div class="wavira-footer__legal">
+		<p>Dev harness for <strong>Wavira Music</strong> · designer and author Etehad WP — اتحاد وردپرس · <a href="https://etehadwp.com/">etehadwp.com</a></p>
+	</div>
+</footer>
+
+<div class="wavira-site-player">
+	<div class="wavira-player wavira-player--sticky"
+		data-wavira-player="1"
+		data-context="tracks"
+		data-id="0"
+		data-slug=""
+		data-limit="4"
+		data-orderby="date"
+		data-order="desc"
+		data-has-track="1"
+		data-track="101">
+		<audio class="wavira-player__fallback" controls preload="none" src="/tools/preview/tone-294.wav">Demo track one</audio>
+		<p class="wavira-player__fallback-link"><a href="#tracks">Open Demo track one</a></p>
+	</div>
+</div>
+
+<script src="embed.js" defer></script>
+<script src="../../wavira/assets/js/index.js" defer></script>
+<script src="../../wavira-core/assets/js/index.js" defer></script>
+</body>
+</html>

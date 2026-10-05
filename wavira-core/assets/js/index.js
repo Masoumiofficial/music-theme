@@ -38,6 +38,9 @@
 		'error'
 	];
 	var REPEAT_MODES = [ 'off', 'all', 'one' ];
+	// Monotonic counter: `aria-controls` needs an ID that is unique per instance,
+	// and a fixed ID is exactly what ADR 0005 §1 forbids.
+	var VIEW_SEQ = 0;
 
 	/** Strings used when PHP provided none (English product copy, no brand strings). */
 	var BASE_STRINGS = {
@@ -1467,6 +1470,7 @@
 	 */
 	function createView( mount, engine, settings ) {
 		var strings = settings.strings;
+		var uid = ++VIEW_SEQ;
 		var unsubscribe = [];
 		var root = doc.createElement( 'div' );
 		var audio = doc.createElement( 'audio' );
@@ -1559,6 +1563,12 @@
 		var mute = button( 'wavira-player__mute', strings.mute );
 		var openLink = el( 'a', 'wavira-player__open', { href: '#' }, strings.openTrack );
 		var queueList = el( 'ol', 'wavira-player__queue', { 'aria-label': strings.queue } );
+		var queueToggle = button( 'wavira-player__queue-toggle', strings.queue );
+		var controls = el( 'div', 'wavira-player__controls' );
+
+		queueList.id = 'wavira-player-queue-' + uid;
+		queueToggle.setAttribute( 'aria-controls', queueList.id );
+		queueToggle.setAttribute( 'aria-expanded', 'false' );
 
 		var progress = doc.createElement( 'input' );
 		var volume = doc.createElement( 'input' );
@@ -1585,22 +1595,27 @@
 
 		meta.appendChild( titleLink );
 		meta.appendChild( artist );
+
+		controls.appendChild( previous );
+		controls.appendChild( playButton );
+		controls.appendChild( next );
+		controls.appendChild( shuffle );
+		controls.appendChild( repeat );
+		controls.appendChild( queueToggle );
+		controls.appendChild( mute );
+
 		root.appendChild( audio );
 		root.appendChild( cover );
 		root.appendChild( meta );
-		root.appendChild( previous );
-		root.appendChild( playButton );
-		root.appendChild( next );
-		root.appendChild( shuffle );
-		root.appendChild( repeat );
+		root.appendChild( controls );
 		root.appendChild( progress );
 		root.appendChild( time );
 		root.appendChild( durationLabel );
-		root.appendChild( mute );
 		root.appendChild( volume );
 		root.appendChild( openLink );
 		root.appendChild( status );
 		root.appendChild( alert );
+		root.appendChild( queueList );
 
 		// Taking over the mount point also removes the no-JavaScript fallback.
 		empty( mount );
@@ -1608,6 +1623,7 @@
 		mount.setAttribute( 'tabindex', mount.getAttribute( 'tabindex' ) || '0' );
 		mount.setAttribute( 'role', 'group' );
 		mount.setAttribute( 'aria-label', strings.player );
+		mount.setAttribute( 'data-queue-open', 'false' );
 
 		/* ---- rendering ---------------------------------------------------- */
 
@@ -1712,6 +1728,14 @@
 			} );
 
 			queueList.hidden = 0 === state.queue.length;
+			queueToggle.hidden = 0 === state.queue.length;
+
+			// An empty queue closes the panel, so the toggle never shows or hides
+			// nothing at all.
+			if ( 0 === state.queue.length ) {
+				mount.setAttribute( 'data-queue-open', 'false' );
+				queueToggle.setAttribute( 'aria-expanded', 'false' );
+			}
 		}
 
 		/**
@@ -1780,6 +1804,12 @@
 		} );
 		repeat.addEventListener( 'click', function () {
 			engine.cycleRepeat();
+		} );
+		queueToggle.addEventListener( 'click', function () {
+			var open = 'true' !== mount.getAttribute( 'data-queue-open' );
+
+			mount.setAttribute( 'data-queue-open', open ? 'true' : 'false' );
+			queueToggle.setAttribute( 'aria-expanded', open ? 'true' : 'false' );
 		} );
 		mute.addEventListener( 'click', function () {
 			engine.toggleMute();

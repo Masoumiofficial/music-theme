@@ -56,7 +56,7 @@ function wavira_player_mount( $args = array() ) {
 
 	$context  = (string) $args['context'];
 	$track_id = (int) $args['track'];
-	$playback = $track_id > 0 ? wavira_core_track_playback( $track_id ) : array();
+	$playback = $track_id > 0 && function_exists( 'wavira_core_track_playback' ) ? wavira_core_track_playback( $track_id ) : array();
 
 	// A single-track mount without playback data has nothing to offer.
 	if ( $track_id > 0 && empty( $playback['sources'] ) ) {
@@ -88,7 +88,11 @@ function wavira_player_mount( $args = array() ) {
 		$attributes['data-track'] = (string) $track_id;
 	}
 
-	wavira_core_enqueue_player();
+	// The plugin may be inactive: the mount point and its <audio> fallback are
+	// theme markup, so the page still renders (theme-switch safety, ADR 0002).
+	if ( function_exists( 'wavira_core_enqueue_player' ) ) {
+		wavira_core_enqueue_player();
+	}
 
 	echo '<div class="' . esc_attr( $classes ) . '"';
 
@@ -160,3 +164,71 @@ function wavira_player_preferred_source( $sources ) {
 
 	return '';
 }
+
+/**
+ * Print a player mount point from a template.
+ *
+ * Block templates are HTML, so the mount point is exposed as `[wavira_player]`.
+ * The attribute value `current` resolves to the queried object, which is what a
+ * template means by "this album" or "this genre".
+ *
+ * @param array<string, mixed>|string $atts Shortcode attributes.
+ * @return string Markup, empty string when there is nothing to render.
+ */
+function wavira_player_shortcode( $atts = array() ) {
+	$atts    = shortcode_atts(
+		array(
+			'context'  => 'tracks',
+			'id'       => '0',
+			'slug'     => '',
+			'limit'    => '0',
+			'track'    => '0',
+			'orderby'  => 'date',
+			'order'    => 'desc',
+			'autoplay' => '0',
+			'sticky'   => '0',
+			'fallback' => '1',
+			'class'    => '',
+		),
+		$atts,
+		'wavira_player'
+	);
+	$context = sanitize_key( (string) $atts['context'] );
+	$id      = wavira_shortcode_post_id( $atts['id'] );
+	$track   = wavira_shortcode_post_id( $atts['track'] );
+
+	// A template says "this album", not its post ID.
+	if ( $id < 1 && in_array( $context, array( 'album', 'artist', 'related' ), true ) ) {
+		$id = (int) get_queried_object_id();
+	}
+
+	if ( 'genre' === $context && '' === (string) $atts['slug'] ) {
+		$atts['slug'] = 'current';
+	}
+
+	// On a track page the mount point should be about that track.
+	if ( $track < 1 && in_array( $context, array( 'tracks', 'related' ), true ) && is_singular( 'wavira_track' ) ) {
+		$track = (int) get_queried_object_id();
+	}
+
+	ob_start();
+
+	wavira_player_mount(
+		array(
+			'context'  => $context,
+			'id'       => $id,
+			'slug'     => wavira_shortcode_term_slug( $atts['slug'] ),
+			'limit'    => absint( $atts['limit'] ),
+			'track'    => $track,
+			'orderby'  => sanitize_key( (string) $atts['orderby'] ),
+			'order'    => 'asc' === strtolower( (string) $atts['order'] ) ? 'asc' : 'desc',
+			'autoplay' => (bool) filter_var( $atts['autoplay'], FILTER_VALIDATE_BOOLEAN ),
+			'sticky'   => (bool) filter_var( $atts['sticky'], FILTER_VALIDATE_BOOLEAN ),
+			'fallback' => (bool) filter_var( $atts['fallback'], FILTER_VALIDATE_BOOLEAN ),
+			'class'    => implode( ' ', array_filter( array_map( 'sanitize_html_class', explode( ' ', (string) $atts['class'] ) ) ) ),
+		)
+	);
+
+	return (string) ob_get_clean();
+}
+add_shortcode( 'wavira_player', 'wavira_player_shortcode' );

@@ -5,6 +5,32 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.6.0 (theme UI, player component skin)
+- **Player stylesheet** (`assets/css/player.css`, new): the component's own neutral skin and token
+  contract (`--wavira-player-bg/surface/fg/muted/accent/accent-fg/border/danger/focus/radius/gap/
+  shadow/bar-height/cover`), logical properties throughout, a sticky bar variant, and a fixed-bar
+  space reservation. 2.7 KB gzipped (budget 6 KB).
+- **Style registration** (`src/Player/Assets.php`): handle `wavira-player-style`, registered next to
+  the engine and enqueued by `wavira_core_enqueue_player()`, so a page without a player loads neither
+  file; version falls back to the product version when the build artefact is absent.
+- **Two public theme helpers** (`public-api.php`): `wavira_core_album_tracklist()` (album rows with
+  permalink, duration and label) and `wavira_core_video_source()` (hosted file, poster, or oEmbed
+  URL), so the theme renders album and video content without naming a plugin class.
+- **Player view contract**: the controls are now a `div.wavira-player__controls` group and every
+  instance owns an `ol.wavira-player__queue` with `aria-controls` wiring; `data-queue-open` on the
+  mount exposes the disclosure state to CSS. Each view gets a unique id from the instance sequence.
+- Version 0.6.0.
+
+### Fixed — 0.6.0
+- **The queue list is appended to the player root.** It was built and populated but never mounted, so
+  the queue panel could not appear; a source-lock test now asserts the append.
+- **`--wp--custom--player--barHeight` never resolved.** WordPress kebab-cases `settings.custom` keys
+  when it compiles them, so the camelCase reference fell back to the literal and the bar-height
+  setting had no effect on the rendered page. Reference corrected to `--player--bar-height`; a new
+  `tools/check-css.mjs` rule fails the build for any unresolvable `--wp--preset--*`, `--wp--custom--*`
+  or `--wp--style--*` reference (ADR 0014).
+- Product URIs in metadata no longer point at the unregistered `wavira.com` (see `docs/BRAND-DECISION.md`).
+
 ### Added — 0.5.0 (player engine)
 - **Player engine** (`assets/js/index.js`): framework-free, one instance per mount point, its own
   `<audio>` element (no global element ID), a DOM-independent state machine

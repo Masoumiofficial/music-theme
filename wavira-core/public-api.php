@@ -110,8 +110,134 @@ if ( ! function_exists( 'wavira_core_enqueue_player' ) ) {
 			return false;
 		}
 
+		// The component's stylesheet is registered with the same handle and is
+		// enqueued here too: a theme asks once for the player, not for its parts.
+		if ( wp_style_is( 'wavira-player', 'registered' ) ) {
+			wp_enqueue_style( 'wavira-player' );
+		}
+
 		wp_enqueue_script( 'wavira-player' );
 
 		return true;
+	}
+}
+
+if ( ! function_exists( 'wavira_core_album_tracklist' ) ) {
+	/**
+	 * Ordered, published tracks of an album.
+	 *
+	 * The album's own tracklist is authoritative (ADR 0012): entries that were
+	 * deleted, unpublished or moved to another post type are skipped without
+	 * reordering the rest, so the editor's playing order survives. A theme renders
+	 * a tracklist from this data and never learns how the relation is stored.
+	 *
+	 * Post types are compared as the documented slugs (ADR 0011) on purpose: this
+	 * file must keep working while the plugin boots and after a service filter.
+	 *
+	 * @param int $album_id Album post ID.
+	 * @return array<int, array<string, mixed>> Rows of `id`, `title`, `permalink`,
+	 *                                          `duration`, `duration_label`.
+	 */
+	function wavira_core_album_tracklist( $album_id ) {
+		$rows = array();
+
+		if ( ! class_exists( 'Wavira\\Core\\Content\\MetaValues' ) ) {
+			return $rows;
+		}
+
+		$album = get_post( absint( $album_id ) );
+
+		if ( ! $album instanceof WP_Post || 'wavira_album' !== $album->post_type ) {
+			return $rows;
+		}
+
+		foreach ( \Wavira\Core\Content\MetaValues::tracklist( $album->ID ) as $track_id ) {
+			$track = get_post( $track_id );
+
+			if ( ! $track instanceof WP_Post || 'wavira_track' !== $track->post_type || 'publish' !== $track->post_status ) {
+				continue;
+			}
+
+			$rows[] = array(
+				'id'             => (int) $track->ID,
+				'title'          => get_the_title( $track ),
+				'permalink'      => (string) get_permalink( $track ),
+				'duration'       => \Wavira\Core\Content\MetaValues::int( $track->ID, \Wavira\Core\Content\MetaSchema::DURATION ),
+				'duration_label' => \Wavira\Core\Content\MetaValues::duration_label( $track->ID ),
+			);
+		}
+
+		return $rows;
+	}
+}
+
+if ( ! function_exists( 'wavira_core_video_source' ) ) {
+	/**
+	 * Where a video post plays from.
+	 *
+	 * One function answers "file or embed?" so a template prints a `<video>`, an
+	 * oEmbed or nothing at all without touching meta keys. Hosted videos prefer the
+	 * highest quality, exactly like the audio player prefers 320 kbps.
+	 *
+	 * @param int $post_id Video post ID.
+	 * @return array<string, mixed> {
+	 *     @type string $kind   `file` (hosted), `embed` (provider URL) or `` (nothing).
+	 *     @type string $url    Media URL or provider URL.
+	 *     @type string $poster Poster image URL, empty string when there is none.
+	 * }
+	 */
+	function wavira_core_video_source( $post_id ) {
+		$empty = array(
+			'kind'   => '',
+			'url'    => '',
+			'poster' => '',
+		);
+
+		if ( ! class_exists( 'Wavira\\Core\\Content\\MetaValues' ) ) {
+			return $empty;
+		}
+
+		$post = get_post( absint( $post_id ) );
+
+		if ( ! $post instanceof WP_Post || 'wavira_video' !== $post->post_type ) {
+			return $empty;
+		}
+
+		$poster_id = \Wavira\Core\Content\MetaValues::int( $post->ID, \Wavira\Core\Content\MetaSchema::VIDEO_POSTER );
+
+		if ( $poster_id < 1 ) {
+			$poster_id = (int) get_post_thumbnail_id( $post );
+		}
+
+		$poster = $poster_id > 0 ? (string) wp_get_attachment_image_url( $poster_id, 'wavira-cover-lg' ) : '';
+		$hosted = array(
+			1080 => \Wavira\Core\Content\MetaSchema::VIDEO_1080,
+			720  => \Wavira\Core\Content\MetaSchema::VIDEO_720,
+			480  => \Wavira\Core\Content\MetaSchema::VIDEO_480,
+		);
+
+		foreach ( $hosted as $key ) {
+			$url = \Wavira\Core\Content\MetaValues::url( $post->ID, $key );
+
+			if ( '' !== $url ) {
+				return array(
+					'kind'   => 'file',
+					'url'    => $url,
+					'poster' => $poster,
+				);
+			}
+		}
+
+		$external = \Wavira\Core\Content\MetaValues::url( $post->ID, \Wavira\Core\Content\MetaSchema::VIDEO_URL );
+
+		if ( '' !== $external ) {
+			return array(
+				'kind'   => 'embed',
+				'url'    => $external,
+				'poster' => $poster,
+			);
+		}
+
+		return $empty;
 	}
 }

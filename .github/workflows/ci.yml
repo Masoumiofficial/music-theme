@@ -213,7 +213,9 @@ jobs:
           node tools/junit-annotate.mjs /tmp/junit.xml
 
   # ---------------------------------------------------------------------------
-  # Assets & gates: JS syntax, JSON validity, legacy-echo gate, build dry-run.
+  # Assets & gates: JS syntax, JSON validity, CSS and contrast gates, PHP class
+  # references, legacy-echo gate, module boundaries, the real build and both
+  # DOM-free unit suites.
   # ---------------------------------------------------------------------------
   assets-and-gates:
     name: JS, JSON, gates, build
@@ -234,8 +236,8 @@ jobs:
       - name: Full lint gate
         run: bash tools/lint.sh
 
-      - name: Player engine unit tests (DOM-free)
-        run: node --test tests/js/player.test.mjs
+      - name: Front-end unit tests (DOM-free)
+        run: node --test tests/js/player.test.mjs tests/js/theme.test.mjs
 
       - name: Bundle size report (gzipped)
         run: |

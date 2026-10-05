@@ -1,0 +1,113 @@
+/*!
+ * Wavira — design tokens (layer 1 of 4).
+ *
+ * theme.json owns the block-editor palette, type scale, spacing scale, radii,
+ * shadows and motion. This layer adds the product tokens a Music site needs and
+ * — more importantly — implements dark mode in exactly one place.
+ *
+ * Dark mode strategy (ADR 0014): every colour in the product is consumed through
+ * the `--wp--preset--color--*` variables. Remapping those variables for the dark
+ * theme therefore restyles the theme CSS *and* every block that uses a preset,
+ * with no second stylesheet and no duplicated rules.
+ *
+ * The mode attribute lives on <html>: `light`, `dark`, or `auto` (follow the
+ * system). `auto` resolves in CSS through prefers-color-scheme, so the first
+ * paint is correct before any script runs.
+ *
+ * Colours must keep their WCAG 2.2 AA contrast in both modes; the pairs are
+ * machine-checked by tools/check-contrast.mjs (tools/lint.sh gate 7).
+ */
+
+:root {
+	/* Product tokens theme.json does not express. */
+	--wavira-header-height: 4.5rem;
+	--wavira-measure: 62ch;
+	--wavira-cover-ratio: 1 / 1;
+	--wavira-cover-radius: var(--wp--custom--radius--md, 12px);
+	--wavira-cover-shadow: var(--wp--preset--shadow--md, 0 4px 12px -2px rgb(0 0 0 / 12%));
+	--wavira-hairline: 1px solid var(--wp--preset--color--border, #d6d9e2);
+	--wavira-ring: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--primary, #5636d6) 35%, transparent);
+	--wavira-body-min: 360px;
+
+	/* Text on an accent-filled badge: both accents are bright, so both modes use
+	   near-black. In the dark palette that is `base`, in the light one `contrast`
+	   — expressed as a token so no component has to know the mode. */
+	--wavira-on-accent: var(--wp--preset--color--contrast);
+
+	/* Room reserved under the last template block for the fixed player bar. */
+	--wavira-player-space: var(--wp--custom--player--bar-space, 6rem);
+
+	color-scheme: light;
+}
+
+/* ---- dark mode --------------------------------------------------------- */
+
+[data-theme="dark"] {
+	--wp--preset--color--base: #0b0c10;
+	--wp--preset--color--surface: #16181f;
+	--wp--preset--color--contrast: #f5f6fa;
+	--wp--preset--color--muted: #b6bcca;
+	--wp--preset--color--border: #2c303b;
+	--wp--preset--color--primary: #b8a7ff;
+	--wp--preset--color--primary-dark: #cfc4ff;
+	--wp--preset--color--accent: #2fe3bd;
+	--wp--preset--color--danger: #ff9a90;
+
+	--wavira-cover-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+	--wavira-hairline: 1px solid var(--wp--preset--color--border, #2c303b);
+	--wavira-on-accent: var(--wp--preset--color--base);
+
+	color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+	/* `auto` is the default and the only value that follows the system. */
+	[data-theme="auto"] {
+		--wp--preset--color--base: #0b0c10;
+		--wp--preset--color--surface: #16181f;
+		--wp--preset--color--contrast: #f5f6fa;
+		--wp--preset--color--muted: #b6bcca;
+		--wp--preset--color--border: #2c303b;
+		--wp--preset--color--primary: #b8a7ff;
+		--wp--preset--color--primary-dark: #cfc4ff;
+		--wp--preset--color--accent: #2fe3bd;
+		--wp--preset--color--danger: #ff9a90;
+
+		--wavira-cover-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+		--wavira-hairline: 1px solid var(--wp--preset--color--border, #2c303b);
+	--wavira-on-accent: var(--wp--preset--color--base);
+
+		color-scheme: dark;
+	}
+}
+
+/* ---- the component's token contract ------------------------------------ */
+
+/* The player ships neutral defaults (plugin CSS). The theme only points those
+   tokens at the palette, which is why the component follows dark mode without a
+   single duplicated selector (ADR 0002, ADR 0014). */
+.wavira-site-player,
+.wavira-player {
+	--wavira-player-bg: var(--wp--preset--color--base);
+	--wavira-player-surface: var(--wp--preset--color--surface);
+	--wavira-player-fg: var(--wp--preset--color--contrast);
+	--wavira-player-muted: var(--wp--preset--color--muted);
+	--wavira-player-accent: var(--wp--preset--color--primary);
+	--wavira-player-accent-fg: var(--wp--preset--color--base);
+	--wavira-player-border: var(--wp--preset--color--border);
+	--wavira-player-danger: var(--wp--preset--color--danger);
+	--wavira-player-focus: var(--wp--preset--color--primary-dark);
+	--wavira-player-radius: var(--wp--custom--radius--md, 12px);
+	--wavira-player-gap: var(--wp--preset--spacing--40, 1rem);
+	--wavira-player-shadow: var(--wp--preset--shadow--lg);
+}
+
+/* ---- motion ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--wp--custom--motion--fast: 0.01ms;
+		--wp--custom--motion--base: 0.01ms;
+		--wp--custom--motion--slow: 0.01ms;
+	}
+}

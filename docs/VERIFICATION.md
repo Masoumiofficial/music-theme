@@ -78,10 +78,10 @@ open until they run on WordPress.
 | A track page works without JavaScript | **IMPLEMENTED** | `wavira_player_mount()` renders a native `<audio>` fallback with the preferred source; the engine removes it when it takes over. Browser verification is an 0.6.0 template task (`WP-RUNTIME`) |
 | Media Session metadata and action handlers | **IMPLEMENTED** | feature-detected adapter; devices/browsers cannot be verified in this environment — scheduled for manual verification with the 0.6.0 UI |
 | The documented keyboard map works | **IMPLEMENTED** | handler code + map in ADR 0005 §4; browser verification pending with the 0.6.0 UI |
-| Architecture boundaries still hold with the new layers | **VERIFIED** | `tools/lint.sh` gate 7 (`check-boundaries.mjs`): 37 plugin files, 6 theme files → `RESULT: PASS` (`LOCAL-AUTHORING`, 2026-10-05) |
+| Architecture boundaries still hold with the new layers | **VERIFIED** | `tools/lint.sh` gate `[BOUNDARIES]` (`check-boundaries.mjs`): 37 plugin files, 11 theme files → `RESULT: PASS` (`LOCAL-AUTHORING`, 2026-10-05) |
 | No legacy string, jQuery or forbidden pattern entered the player code | **VERIFIED** | `tools/lint.sh` gate 6 (legacy-echo gate) → PASS; the JS lock test additionally forbids `innerHTML=`, `eval(`, `document.cookie` and a global audio ID |
 | Every gate the product ships through is green on the player code | **VERIFIED** | `WP-CI` run `37304843180` (commit `88b6b67`): all 8 jobs success — WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, `WordPress integration` (PHP 7.4 and 8.2), `JS, JSON, gates, build`, legacy artifact integrity |
-| A class member that does not exist fails locally instead of costing a CI round | **VERIFIED** | `tools/lint.sh` gate 5 (`tools/check-class-refs.py`) → `checked 53 file(s); 0 problem(s)`; the gate resolves every `Class::member()` / `new Class()` against the repository and would have caught the missing `MetaSchema::audio_key()` and the missing `Terms` import |
+| A class member that does not exist fails locally instead of costing a CI round | **VERIFIED** | `tools/lint.sh` gate `[REFS]` (`tools/check-class-refs.py`) → `checked 58 file(s); 0 problem(s)`; the gate resolves every `Class::member()` / `new Class()` against the repository and would have caught the missing `MetaSchema::audio_key()` and the missing `Terms` import |
 
 The first two 0.5.0 CI runs were red, and the defects they found are fixed and re-verified by run
 `37304843180`: `MetaSchema::audio_key()` was called before it existed (every player request fatal),
@@ -98,12 +98,34 @@ Those rows stay `IMPLEMENTED` rather than being reported as verified.
 
 ---
 
+---
+
+## 0.6.0 — Theme UI
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| The stylesheets obey the product's CSS rules: no `!important`, logical properties only | **VERIFIED** | `LOCAL-AUTHORING`: `node tools/check-css.mjs` → 6 stylesheets pass rules 1–2 |
+| Every `theme.json` palette colour is remapped for dark mode | **VERIFIED** | same run → `dark-mode parity: 9 palette colour(s) remapped`, so a palette entry cannot silently stay light |
+| Every `--wp--preset--*`, `--wp--custom--*` and `--wp--style--*` reference resolves to something WordPress generates from `theme.json` | **VERIFIED** | `[CSS]` rule 6 → `design tokens: 11 custom properties resolvable`; **negative test performed**: reverting `--wp--custom--player--bar-space` to camelCase makes the gate fail with that exact reference |
+| Contrast meets WCAG 2.2 AA in both colour modes | **VERIFIED** | `LOCAL-AUTHORING`: `node tools/check-contrast.mjs` → `OK 21 contrast pair(s)` (light focus ring 9.80:1, dark 12.09:1); the gate found and fixed a real dark-mode defect — light-mode chip text on the dark accent measured **1.51:1**, now the `--wavira-on-accent` token |
+| The theme script's colour modes, labels, storage and player bootstrapping are covered by unit tests | **TESTED** | `node --test tests/js/theme.test.mjs` → 11/11 on Node v22.22.3 (modes + `nextMode` cycle, defensive storage, junk-mode rejection, toggle labelling, click cycling, `initPlayers` present/absent/throwing, source locks, and a PHP↔JS storage-key parity assertion against `inc/assets.php`) |
+| The player view actually mounts the queue list it builds | **TESTED** | source-lock test in `tests/js/player.test.mjs` — the omission (built, populated, never appended) survived a whole phase because no DOM-free suite can see it |
+| Built bundles stay inside the ADR 0009 budgets | **VERIFIED** | `[CSS]`/`[SIZE]`: theme CSS 5.9 KB gzip (≤ 25), theme script 2.5 KB (≤ 10), player CSS 2.7 KB (≤ 6), engine 13.9 KB (≤ 15) |
+| Templates, parts, patterns and shortcodes render real music content | **NOT_STARTED** | needs a rendered WordPress page — `WP-RUNTIME`. Templates are complete on disk but no template has produced an HTML response yet |
+| RTL/LTR parity, dark/light and the 360→1920 breakpoint matrix are verified in a browser | **NOT_STARTED** | the authoring sandbox has no browser; `tools/preview/` renders the shipped CSS/JS with stubbed REST data so a human can perform the pass — the rows stay `NOT_STARTED` until someone records the result |
+| Editor styles match the front end | **IMPLEMENTED** | `assets/css/editor.css` via `add_editor_style()`; visual comparison needs a real editor session (`WP-RUNTIME`) |
+
+**Defects found and closed in 0.6.0** (all with the evidence above): the queue `<ol>` was never
+appended; `--wp--custom--player--barSpace` and `--wp--custom--player--barHeight` never resolved
+(camelCase vs. WordPress' kebab-casing), so two settings silently did nothing; dark-mode chip text
+failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered `wavira.com`.
+
 ## 0.2.0 — Architecture
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
-| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (8 gates incl. `check-boundaries.mjs`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
-| No legacy code, legacy echoes or jQuery in the new product | **VERIFIED** | `tools/lint.sh` gate 6 (grep) — passes |
+| CI enforces the gates above (plus module boundaries and the integration suite) | **VERIFIED** | `.github/workflows/ci.yml`: 8 jobs — `tools/lint.sh` (named gates: `[PHP] [PHPCS] [JS] [JSON] [REFS] [CSS] [CONTRAST] [LEGACY] [BOUNDARIES] [SIZE]`), WPCS + PHP compatibility, PHP 7.4/8.2/8.3 syntax, legacy artifact hash, and `WordPress integration` on 7.4/8.2 |
+| No legacy code, legacy echoes or jQuery in the new product | **VERIFIED** | `tools/lint.sh` gate `[LEGACY]` (grep) — passes |
 | Coding standard rules marked 🔒 are machine-checked | **IMPLEMENTED** | partially: grep gates + WPCS in CI; the JS/CSS/CSP halves arrive with the assets |
 
 ## 0.1.0 — Forensic audit
@@ -119,12 +141,16 @@ Those rows stay `IMPLEMENTED` rather than being reported as verified.
 ## How to re-run everything
 
 ```bash
-# full local gate (PHP and PHPCS parts skip when they are absent)
-bash tools/lint.sh            # 8 gates, incl. PHP class references (tools/check-class-refs.py)
-node tools/build.mjs --check
+# full local gate (the PHP and PHPCS gates skip when they are absent; CI runs them)
+bash tools/lint.sh            # named gates incl. [CSS] tools/check-css.mjs, [CONTRAST] tools/check-contrast.mjs,
+                              # [REFS] tools/check-class-refs.py, [BOUNDARIES] tools/check-boundaries.mjs
+node tools/build.mjs --check  # sources exist; node tools/build.mjs builds wavira/assets/dist + wavira-core/assets/dist
 
-# the player engine unit tests (no DOM, no browser)
-node --test tests/js/player.test.mjs     # or: npm run test:js
+# both DOM-free unit suites (no browser)
+node --test tests/js/player.test.mjs tests/js/theme.test.mjs   # or: npm run test:js
+
+# the component harness (dev only): real browser, real shipped CSS/JS, stubbed REST
+node tools/preview/serve.mjs  # → http://localhost:4173/tools/preview/ (colour modes, RTL/LTR, 360→1920)
 
 # the authoritative static gate (needs PHP + Composer)
 composer install

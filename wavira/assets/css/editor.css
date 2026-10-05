@@ -1,0 +1,64 @@
+/*!
+ * Wavira — block editor styles.
+ *
+ * Loaded with add_editor_style() so the editor shows what the front end shows:
+ * the same presets, the same cover ratio, the same chips. The editor is an iframe
+ * with the theme's presets, so every rule consumes the same custom properties as
+ * the front-end CSS (ADR 0014).
+ *
+ * This file is not part of the layered build: the editor loads it directly, and it
+ * must stay small because it is re-parsed on every editor load.
+ */
+
+.editor-styles-wrapper {
+	background-color: var(--wp--preset--color--base);
+	color: var(--wp--preset--color--contrast);
+	font-family: var(--wp--preset--font-family--body, system-ui, sans-serif);
+	line-height: 1.7;
+}
+
+.editor-styles-wrapper .wp-block-post-featured-image img,
+.editor-styles-wrapper .wp-block-image img {
+	border-radius: var(--wp--custom--radius--md, 12px);
+}
+
+.editor-styles-wrapper .wp-block-post-terms a,
+.editor-styles-wrapper .wavira-chip {
+	display: inline-block;
+	padding: 0.125rem 0.625rem;
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--pill, 999px);
+	background: var(--wp--preset--color--surface);
+	color: var(--wp--preset--color--contrast);
+	text-decoration: none;
+}
+
+.editor-styles-wrapper .wavira-hero {
+	display: grid;
+	gap: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+@media (min-width: 768px) {
+	.editor-styles-wrapper .wavira-hero {
+		grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr);
+		align-items: end;
+	}
+}
+
+.editor-styles-wrapper .wavira-surface {
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--lg, 20px);
+	background: var(--wp--preset--color--surface);
+	padding: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+/* Shortcodes render as their output on the front end and as a placeholder here;
+   make the placeholder legible instead of invisible. */
+.editor-styles-wrapper .wp-block-shortcode {
+	border: 1px dashed var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--sm, 6px);
+	padding: 0.5rem 0.75rem;
+	color: var(--wp--preset--color--muted);
+	font-family: var(--wp--preset--font-family--mono, monospace);
+	font-size: 0.875rem;
+}

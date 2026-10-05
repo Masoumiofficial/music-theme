@@ -1,0 +1,40 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"wavira-layout wavira-main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group wavira-layout wavira-main">
+<!-- wp:heading {"level":1} -->
+<h1>Page not found</h1>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>The page you were looking for does not exist. Try a search, or browse the latest releases.</p>
+<!-- /wp:paragraph -->
+<!-- wp:search {"buttonText":"Search","label":"Search music"} /-->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"constrained"}} -->
+<div class="wp-block-group wavira-section">
+<!-- wp:heading {"level":2} -->
+<h2>Latest albums</h2>
+<!-- /wp:heading -->
+<!-- wp:query {"queryId":1,"query":{"perPage":3,"pages":0,"offset":0,"postType":"wavira_album","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":3}} -->
+<div class="wp-block-query">
+<!-- wp:post-template {"layout":{"type":"grid","columnCount":3}} -->
+<!-- wp:post-featured-image {"aspectRatio":"1"} /-->
+<!-- wp:post-title {"level":3,"isLink":true} /-->
+<!-- wp:post-terms {"term":"wavira_genre","separator":"","prefix":""} /-->
+<!-- /wp:post-template -->
+<!-- wp:query-no-results -->
+<!-- wp:paragraph -->
+<p>Nothing published here yet.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:query-no-results -->
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination -->
+</div>
+<!-- /wp:query -->
+</div>
+<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
+<!-- wp:template-part {"slug":"player-bar"} /-->
