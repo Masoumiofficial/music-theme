@@ -106,14 +106,14 @@ jobs:
       matrix:
         php: ['7.4', '8.2']
     services:
-      mysql:
-        image: mysql:8.0
+      # MariaDB keeps the server and the runner's default client in the same
+      # protocol family; MySQL 8's caching_sha2_password cannot be negotiated by
+      # the client the Ubuntu images ship (verified by a failing CI run).
+      database:
+        image: mariadb:10.11
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wordpress_test
-          # The official image only creates root@localhost unless a host is given;
-          # the test library connects from the runner, i.e. from another host.
-          MYSQL_ROOT_HOST: '%'
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: wordpress_test
         ports:
           - 3306:3306
         options: >-
@@ -148,7 +148,7 @@ jobs:
         run: composer install --no-interaction --no-progress --prefer-dist
 
       - name: Install database and subversion clients
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client rsync
 
       - name: Install the WordPress test library
         run: |

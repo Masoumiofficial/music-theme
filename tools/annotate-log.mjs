@@ -46,7 +46,9 @@ const limit = Number.parseInt(lineCount, 10);
 const interesting = /error|fail|denied|refused|cannot|can't|unable|not found|no such|fatal|exception/i;
 const flagged = lines.filter((line) => interesting.test(line)).slice(-20);
 const tail = lines.slice(-limit);
-const chosen = [...new Set([...flagged, ...tail])];
+// Tail first: the last lines point at the actual failure, and annotation counts
+// are capped per step, so the most useful lines must come first.
+const chosen = [...new Set([...tail, ...flagged])];
 
 for (const line of chosen) {
 	console.log(`::${level} file=ci/${label}::${escape(line)}`);
