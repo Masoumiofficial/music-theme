@@ -137,6 +137,13 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | Jalali (Shamsi) dates | **NOT_STARTED** | decided in ADR 0015 §8 / `docs/DECISIONS.md`: a calendar conversion ships only with verified anchor dates; until then `wp_date()` with `fa_IR` locale data is used |
 | A bundled Persian font | **NOT_STARTED** | the token set already prefers Vazirmatn (OFL-1.1) with system fallbacks; bundling a subset font is a packaging decision (ADR 0010 licence handling, ADR 0009 size budget) |
 
+**CI evidence.** Commit `42aedc6` shipped the pipeline, both catalogues, the tests, ADR 0015 and the
+docs; `d99260f` added the WPCS fix (an alignment warning in the editor string map) and the regenerated
+POT. Runs `37317400311`/`37317406843` (7/8, only the coding-standard job red) and
+`37317660301`/`37317669115` (8/8) both ran the updated suites: `OK (83 tests, 716 assertions)` on PHP
+7.4 and 8.2 — including `tests/test-i18n.php` (the shipped `.mo` files actually return Persian) and the
+editor-catalogue cross-check in `tests/test-blocks.php`.
+
 **Notes from writing the 0.8.0 catalogue:** the theme's translatable surface is small (58 strings) because
 template text already lives in patterns (0.7.0); the plugin's 116 strings are almost entirely admin and
 player surfaces, which is exactly where an Iranian site owner spends their time. The catalogue was

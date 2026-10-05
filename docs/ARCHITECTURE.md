@@ -186,10 +186,10 @@ implementations — see the brief's YAGNI rule.
 | 0.4.0 | MUSIC ENGINE | `src/Search/*`, `src/Related/*`, `src/Downloads/Counter.php`, REST `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`, public function API (`public-api.php`), boundary gate, ADR 0013, PHPUnit harness (`tests/`, 49 tests) | ✅ implemented · **VERIFIED**: static gates + 49 integration tests green against a real WordPress on PHP 7.4 and 8.2 (CI run `37301909854`) |
 | 0.5.0 | PLAYER | `src/Player/*` + `assets/js/index.js` (state machine, queue, views, Media Session, keyboard, a11y), `wavira/v1/player/*` routes, `wavira_player_mount()`, `tests/js/player.test.mjs` (15 DOM-free tests) | ✅ implemented · **VERIFIED** locally: `node --test tests/js/player.test.mjs` 15/15, `tools/lint.sh` PASS, boundary gate PASS · runtime verification in `docs/VERIFICATION.md` |
 | 0.6.0 | UI | tokens → components → templates/patterns, dark/light, RTL/LTR | ✅ implemented · **VERIFIED**: CSS/contrast/token gates, 11 theme JS tests, CI run `37309252018` 8/8 |
-| 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings; artist profile and music-news surfaces | 🔄 localisation implemented and gated; artist/news surfaces still to land |
-| 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | 🔄 blocks implemented, templates carry no untranslatable text · runtime verification in `docs/VERIFICATION.md` |
-| 0.8.0 | SEO + PERF | SEO cooperation, budgets met |
-| 0.9.0 | RC | migration tool, demo import, docs, packaging |
+| 0.7.0 | BUILDERS | `blocks/*` (four dynamic blocks + editor script), `inc/markup.php`, `inc/blocks.php`, patterns migrated to native blocks, translatable template text (`patterns/hidden-*`), `[BLOCKS]` / `[I18N]` / `[MAPPING]` gates; Elementor widgets still open (see `docs/DECISIONS.md`) | ✅ implemented · **VERIFIED** in CI: runs `37311340378`/`37311334949` and `37314137090`/`37314145602` 8/8, `tests/test-blocks.php` in the integration suite |
+| 0.8.0 | PERSIAN-FIRST | `languages/fa_IR.{po,mo}` in both artifacts, `tools/i18n.mjs` (extract/build/check), `[FA]` gate, PHP-printed editor strings; artist profile and music-news surfaces | 🔄 localisation implemented and gated; **VERIFIED** in CI (runs `37317660301`/`37317669115` 8/8, 83 tests / 716 assertions on PHP 7.4 + 8.2); artist/news surfaces still to land |
+| 0.9.0 | SEO + PERF | SEO cooperation, budgets met |
+| 0.10.0 | RC | migration tool, demo import, docs, packaging |
 | 1.0.0 | PRODUCTION | marketplace packages |
 
 See `docs/DECISIONS.md` for the decision list and `docs/CODING-STANDARD.md` for the enforceable rules.
