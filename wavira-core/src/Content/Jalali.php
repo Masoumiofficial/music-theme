@@ -297,20 +297,43 @@ final class Jalali {
 	}
 
 	/**
-	 * Julian day number → Jalali date.
+	 * Julian day number → Jalali date, clamped to the accurate range.
+	 *
+	 * The clamp is decided on the day number, not on a year read out of the
+	 * algorithm: the algorithm walks back to the previous Jalali year when a
+	 * date precedes that year's Nowruz, so an input before the floor used to
+	 * come back as `MIN_YEAR - 1` — a year outside the table, presented as if it
+	 * were a real conversion (CI found it: 1500-01-01 → 1177/10/11). Input
+	 * outside the range now returns the exact first or last day the table
+	 * describes.
 	 *
 	 * @param int $jdn Julian day number.
 	 * @return array{year: int, month: int, day: int}
 	 */
 	private static function from_julian_day( int $jdn ): array {
+		$first = self::jalali_to_julian_day( self::MIN_YEAR, 1, 1 );
+
+		if ( $jdn < $first ) {
+			return array(
+				'year'  => self::MIN_YEAR,
+				'month' => 1,
+				'day'   => 1,
+			);
+		}
+
+		$last_month = self::days_in_month( self::MAX_YEAR, 12 );
+		$last       = self::jalali_to_julian_day( self::MAX_YEAR, 12, $last_month );
+
+		if ( $jdn > $last ) {
+			return array(
+				'year'  => self::MAX_YEAR,
+				'month' => 12,
+				'day'   => $last_month,
+			);
+		}
+
 		$gregorian = self::julian_day_to_gregorian( $jdn );
 		$jy        = $gregorian['year'] - 621;
-
-		if ( $jy < self::MIN_YEAR ) {
-			$jy = self::MIN_YEAR;
-		} elseif ( $jy > self::MAX_YEAR ) {
-			$jy = self::MAX_YEAR;
-		}
 
 		$calendar = self::calendar( $jy );
 		$new_year = self::gregorian_to_julian_day( $gregorian['year'], 3, $calendar['march'] );
@@ -327,6 +350,7 @@ final class Jalali {
 
 			$offset -= 186;
 		} else {
+			// Inside the range, so the previous year is in it too.
 			--$jy;
 			$offset += 179;
 

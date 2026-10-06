@@ -202,9 +202,10 @@ class Test_Jalali extends Wavira_Test_Case {
 		$this->assertSame( '13 مهر 1405', Jalali::format( 2026, 10, 5, 'j F Y' ) );
 		$this->assertSame( '1405/07/13', Jalali::format( 2026, 10, 5, 'Y/m/d' ) );
 		$this->assertSame( 'دوشنبه 13 مهر', Jalali::format( 2026, 10, 5, 'l j F' ) );
-		$this->assertSame( '05Y', Jalali::format( 2026, 10, 5, 'd\Y' ), 'a backslash escapes a literal' );
+		$this->assertSame( '13Y', Jalali::format( 2026, 10, 5, 'd\Y' ), 'a backslash escapes the next character' );
 		$this->assertSame( '1405', Jalali::format( 2026, 10, 5, 'Y' ) );
-		$this->assertSame( '05\\', Jalali::format( 2026, 10, 5, 'd\\' ), 'a trailing escape is kept as written' );
+		$this->assertSame( '13\\', Jalali::format( 2026, 10, 5, 'd\\' ), 'a trailing escape is kept as written' );
+		$this->assertSame( 'd', Jalali::format( 2026, 10, 5, '\\d' ), 'an escaped token prints literally' );
 	}
 
 	/**
@@ -218,6 +219,22 @@ class Test_Jalali extends Wavira_Test_Case {
 
 		$this->assertSame( Jalali::MIN_YEAR, $before['year'], 'the year floor is honoured' );
 		$this->assertSame( Jalali::MAX_YEAR, $after['year'], 'the year ceiling is honoured' );
+
+		// The clamp lands on the boundary itself, not on the year before it: the
+		// algorithm walks back one year when a date precedes that year's Nowruz,
+		// so clamping the year alone answered MIN_YEAR - 1 (CI: 1500-01-01 →
+		// 1177/10/11).
+		$this->assertSame(
+			array( 'year' => Jalali::MIN_YEAR, 'month' => 1, 'day' => 1 ),
+			$before,
+			'the floor is the first day of the first accurate year'
+		);
+		$this->assertSame( 12, $after['month'], 'the ceiling is in Esfand' );
+		$this->assertSame(
+			Jalali::days_in_month( Jalali::MAX_YEAR, 12 ),
+			$after['day'],
+			'the ceiling is the last day of the last accurate year'
+		);
 
 		$this->assertFalse( Jalali::is_leap_year( 900 ), 'a year outside the table is not a leap year' );
 		$this->assertSame( 29, Jalali::days_in_month( 900, 12 ) );
@@ -337,8 +354,13 @@ class Test_Jalali extends Wavira_Test_Case {
 
 		// Display formats: converted.
 		$this->assertSame( '۱۳ مهر ۱۴۰۵', Dates::filter_wp_date( 'October 5, 2026', 'F j, Y', $stamp ) );
-		$this->assertSame( '۱۳ مهر ۱۴۰۵', Dates::filter_wp_date( 'October 5, 2026', '', $stamp ) );
 		$this->assertSame( '۱۳ مهر ۱۴۰۵', Dates::filter_wp_date( '۱۳ مهر ۱۴۰۵', 'j F Y', $stamp ), 'idempotent' );
+
+		// `wp_date( '' )` prints nothing in core, so there is no date to convert;
+		// a filter must never turn an empty string into one. The `get_the_date()`
+		// family resolves an empty format to its own option and is covered by the
+		// wiring test below.
+		$this->assertSame( '', Dates::filter_wp_date( '', '', $stamp ) );
 
 		// Data formats: untouched, whatever the locale says. The expected value
 		// is read from the same function a template would call, so the assertion
@@ -353,8 +375,10 @@ class Test_Jalali extends Wavira_Test_Case {
 		$this->assertSame( '10:00', Dates::filter_wp_date( '10:00', 'H:i', $stamp ) );
 		$this->assertSame( 'October 5, 2026 10:00 am', Dates::filter_wp_date( 'October 5, 2026 10:00 am', 'F j, Y g:i a', $stamp ) );
 
-		// A format with no date part at all is not a date.
-		$this->assertSame( 'hello', Dates::filter_wp_date( 'hello', 'hello', $stamp ) );
+		// A format that names no date part at all is not a date. It has to be a
+		// format without a single token letter — `l`, `n`, `d`, `F` and friends
+		// are tokens, so a word like "hello" would be treated as a format.
+		$this->assertSame( ' / ', Dates::filter_wp_date( ' / ', ' / ', $stamp ) );
 
 		$this->pretend_english();
 	}
