@@ -37,6 +37,13 @@ The conversion is accurate for Jalali years 1178–1633 (≈1799–2254); outsid
 to the boundary instead of being extrapolated. The anchor set that guards it — Nowruz, the Islamic
 Revolution, a leap Esfand, a forty-year round trip — lives in `tests/test-jalali.php`.
 
+The conversion is also **re-entrancy safe**: formatting a date asks WordPress to format it, and WordPress
+runs these very filters while it does that, so a nested call returns WordPress's own output instead of
+converting a second time. An empty format is resolved to the option of its own hook (`date_format` for
+`get_the_date()`, `time_format` for `get_the_time()`), so a time never becomes a date. Both rules are
+asserted in `Test_Jalali::test_conversion_does_not_recurse()` — the missing guard is what hung the 0.10.1
+integration jobs.
+
 ### What is never converted
 
 | Surface | Why |

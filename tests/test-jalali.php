@@ -452,6 +452,56 @@ class Test_Jalali extends Wavira_Test_Case {
 	}
 
 	/**
+	 * The conversion is re-entrancy safe.
+	 *
+	 * `get_the_date()` reaches this class twice — through `wp_date()` inside
+	 * `get_post_time()`, then through the `get_the_date` filter itself — so an
+	 * unguarded conversion recurses until the process dies. CI caught exactly
+	 * that: both integration jobs hung on the first Persian request. A nested call
+	 * must keep WordPress's own output instead.
+	 *
+	 * @return void
+	 */
+	public function test_conversion_does_not_recurse() {
+		$this->pretend_persian();
+
+		Dates::register();
+
+		$stamp = (int) strtotime( '2026-10-05 10:00:00' );
+
+		// `wavira_core_date_label` is the documented extension point, so a filter
+		// there observes the outermost nested call of a conversion.
+		$nested = 'not called';
+		$probe  = static function ( $label ) use ( &$nested ) {
+			$nested = (string) wp_date( 'F j, Y', (int) strtotime( '2026-10-05 10:00:00' ) );
+
+			return $label;
+		};
+
+		add_filter( 'wavira_core_date_label', $probe, 5 );
+
+		$this->assertSame( '۱۳ مهر ۱۴۰۵', Dates::label( $stamp ), 'a direct call converts exactly once' );
+		$this->assertStringContainsString( '2026', $nested, 'a nested call returns WordPress output' );
+		$this->assertStringNotContainsString( '۱۴۰۵', $nested, 'a nested call is not converted again' );
+
+		remove_filter( 'wavira_core_date_label', $probe, 5 );
+
+		// The end-to-end path that hung the integration job: it returns at all.
+		$post = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+				'post_date'   => '2026-10-05 10:00:00',
+			)
+		);
+
+		$this->assertSame( '۱۳ مهر ۱۴۰۵', get_the_date( 'F j, Y', $post ) );
+		$this->assertSame( '۱۳ مهر ۱۴۰۵', get_the_modified_date( 'F j, Y', $post ) );
+		$this->assertStringNotContainsString( '۰', (string) get_the_time( '', $post ), 'an empty time format stays a time' );
+
+		$this->pretend_english();
+	}
+
+	/**
 	 * The payloads carry the localised label, and the public functions agree.
 	 *
 	 * @return void

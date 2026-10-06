@@ -180,9 +180,17 @@ core feature, not a comfortable margin.
 | The new CSS keeps the product's promises | **VERIFIED** | `[CSS]` gate — no `!important`, no physical direction property (so the artist and news layouts mirror on an RTL site), every token resolvable, and the size budget still met |
 | The template path (blog index and archives) actually paginates | **IMPLEMENTED** | `home.html` and `archive.html` use core's Query Loop with `inherit: true` and `wp:query-pagination`; rendering the paginated archive needs a real install (`WP-RUNTIME`) |
 | The editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all seven blocks with a `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
-| Jalali dates in the new surfaces | **IMPLEMENTED** (0.10.1) | `Content\Dates::label_for_post()` fills `date_label` in the news and artist payloads, so the news cards print «۱۳ مهر ۱۴۰۵» on a Persian site; anchor table and policy tests in `tests/test-jalali.php` (ADR 0017) |
+| Jalali dates in the new surfaces | **IMPLEMENTED** (0.10.1) | `Content\Dates::label_for_post()` fills `date_label` in the news and artist payloads, so the news cards print «۱۳ مهر ۱۴۰۵» on a Persian site; anchor table, policy tests and the re-entrancy guard in `tests/test-jalali.php` (ADR 0017 §5, §10) |
 | A browsable artist directory | **NOT_STARTED** | `templates/archive-wavira_artist.html` renders the archive hero only; a grid of artists is deliberate design work (it needs a per-artist card), recorded in `docs/ARTIST-AND-NEWS.md` §3 rather than shipped as a second temporary query loop |
 | Every gate is green on the 0.9.0 commit | **VERIFIED** | CI runs `37354185539` (push) and `37354194397` (pull request) at head `25ce032`: all 8 jobs success — `WPCS + PHP compatibility` (0 findings), PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build`, `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (100 tests, 871 assertions)` on both legs, legacy artifact integrity. Run `37353466951`/`37353475364` was the first, red one; its three findings are fixed in `510beef`/`25ce032` and the WPCS one in code, not by silencing the sniff |
+
+**What the 0.10.1 run found.** The WPCS job rejected the new files in `5c4abf9` (array-item
+spacing, alignment, a stand-alone post-increment) and both integration jobs then hung: `Dates` converted
+by calling `wp_date()`, which WordPress runs through the very filter `Dates::register()` had added, so the
+first Persian request recursed until the process was killed (exit 143 — see ADR 0017 §10). Both defects
+are fixed in code (`1a8bbca` for the standards, `style`/`fix` commit for the guard), never by silencing a
+sniff or a test; the guard is proven locally by a WP-free harness that aborts after 200 re-entries
+(unguarded file: aborts; guarded file: «۱۳ مهر ۱۴۰۵»).
 
 **What the first CI run found.** The three new test files ran for the first time in `37353466951` and
 found four defects, three of them in the product: `wavira_get_news()` ignored a `category` that arrived
@@ -213,7 +221,7 @@ than erroring (a feed caller must not be able to enumerate private types by gues
 | Admin labels are translated before they are registered | **VERIFIED** | `Plugin::boot()` calls `load_textdomain()` before the modules register post types, taxonomies and settings, so `PostTypes` labels are built from translated strings (code path read in `wavira-core/src/Plugin.php`; the strings themselves are asserted in `Test_I18n::test_admin_strings_come_back_in_persian`) |
 | RTL is a build failure, not a habit | **VERIFIED** | `tools/check-css.mjs` rule 2 rejects physical direction properties (`margin-left`, `padding-right`, `text-align: left`, `left:`/`right:`, `inset-left/right`) across all six stylesheets; the RTL guarantee therefore holds for every future component too |
 | A translation cannot break `sprintf` | **VERIFIED** | the `[FA]` gate compares the placeholders of every translation with its source (`%d kbps` → `%d کیلوبیتبرثانیه`), and `Test_I18n::test_placeholders_survive_translation` asserts the rendered result |
-| Jalali (Shamsi) dates | **IMPLEMENTED** (0.10.1) | `Content\Jalali` (Borkowski port, MIT notice in `THIRD-PARTY-NOTICES.md`) + `Content\Dates` policy; `tests/test-jalali.php` pins Nowruz 1400–1405, 1979-02-11 → 1357/11/22, 2025-03-20 → 1403/12/30, a forty-year round trip, the leap rule, the Saturday-first weekday order, both calendars, and the machine-surface guards; ADR 0017 |
+| Jalali (Shamsi) dates | **IMPLEMENTED** (0.10.1) | `Content\Jalali` (Borkowski port, MIT notice in `THIRD-PARTY-NOTICES.md`) + `Content\Dates` policy; `tests/test-jalali.php` pins Nowruz 1400–1405, 1979-02-11 → 1357/11/22, 2025-03-20 → 1403/12/30, a forty-year round trip, the leap rule, the Saturday-first weekday order, both calendars, the machine-surface guards, and that the filters do not recurse (`test_conversion_does_not_recurse`); ADR 0017 §10 |
 | A bundled Persian font | **NOT_STARTED** | the token set already prefers Vazirmatn (OFL-1.1) with system fallbacks; bundling a subset font is a packaging decision (ADR 0010 licence handling, ADR 0009 size budget) |
 
 **CI evidence.** Commit `42aedc6` shipped the pipeline, both catalogues, the tests, ADR 0015 and the

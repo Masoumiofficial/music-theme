@@ -54,8 +54,12 @@ localises both the product's own markup and the news grid a site builds itself.
    another Jalali plugin sets the `wavira_core_date_style` filter to `gregorian` and the product steps
    aside — two converters must never both touch `wp_date`.
 5. **The seam is `wp_date()` plus the four post-date functions.** `Dates::register()` filters `wp_date`,
-   `get_the_time`, `get_the_modified_time`, `get_the_date` and `get_the_modified_date`. It is wired from
-   `ContentModule::register()`, so the calendar is switched on by the plugin rather than by a template.
+   `get_the_date`, `get_the_modified_date`, `get_the_time` and `get_the_modified_time`. The date hooks and
+   the time hooks have their own callbacks (`filter_get_the_date`, `filter_get_the_time`) because an empty
+   format must resolve to the option its own hook uses — `date_format` for the date hooks, `time_format`
+   for the time hooks; deciding on `date_format` alone turned `get_the_time()` into a date. It is wired
+   from `ContentModule::register()`, so the calendar is switched on by the plugin rather than by a
+   template.
 6. **Never convert a machine surface.** Formats that carry data (`c`, `U`, `r`, `Y-m-d`, `Ymd`,
    `Y-m-d H:i:s`, `Y-m-d\TH:i:sP`, `d/m/Y`), formats that contain a time token (a Jalali day would swallow
    the time), and any request in the admin, REST, AJAX, cron, a feed or `robots.txt` are returned
@@ -72,7 +76,15 @@ localises both the product's own markup and the news grid a site builds itself.
    month and weekday names live in the class as **calendar data** (constants), not as interface strings:
    a Persian date is written the same way in every language, and the `.pot` must not grow twelve msgids
    that no translator would ever change.
-10. **Iranian defaults are applied where a default belongs — the seeder, not the front end.** A Persian
+10. **The conversion is re-entrancy safe.** Converting a date means asking WordPress to format it, and
+    WordPress runs these very filters while it does that (`get_the_date()` → `get_post_time()` →
+    `wp_date()` → the filter this class registers). `Dates::label()` and `Dates::label_for_post()` own a
+    `$converting` flag for the whole conversion, and a nested call therefore returns WordPress's own
+    output — which is what a machine consumer expects anyway. Without the guard the first Persian request
+    recursed until the process died: the 0.10.1 integration jobs hung on it. The guard is asserted by
+    `Test_Jalali::test_conversion_does_not_recurse()` and by a WP-free harness (a fake `wp_date()` that
+    aborts after 200 re-entries — the unguarded file aborts, the guarded file returns «۱۳ مهر ۱۴۰۵»).
+11. **Iranian defaults are applied where a default belongs — the seeder, not the front end.** A Persian
     demo (`wp wavira seed`) sets `fa_IR`, `Asia/Tehran`, `start_of_week = 6` (Saturday), `date_format
     = j F Y`, `time_format = H:i`, a Persian `blogdescription` and a `primary` menu with Persian labels
     (خانه، آهنگها، آلبومها، هنرمندان، ویدیوها، سبکها). `--english` seeds the neutral fixture and leaves

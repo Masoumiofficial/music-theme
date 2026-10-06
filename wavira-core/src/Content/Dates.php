@@ -31,6 +31,12 @@
  * 4. **The conversion is idempotent**: it recomputes from the post's timestamp
  *    rather than parsing the incoming string, so a value that passes through two
  *    core filters still lands on the same label.
+ * 5. **The conversion is re-entrancy safe.** Formatting a date means asking
+ *    WordPress to format it, and WordPress applies these very filters while it
+ *    does that (`get_the_date()` → `get_post_time()` → `wp_date()` → the filter
+ *    below). A nested call therefore returns WordPress's own output instead of
+ *    converting again; without that, the first Persian request would recurse
+ *    until the process died.
  *
  * @package Wavira\Core\Content
  */
@@ -74,6 +80,30 @@ final class Dates {
 	 * @var string
 	 */
 	private const DATE_TOKENS = 'dDjlNSwzWFmMntLoXxYy';
+
+	/**
+	 * A `get_the_date()`-style hook: an empty format means the `date_format` option.
+	 */
+	private const KIND_DATE = 'date';
+
+	/**
+	 * A `get_the_time()`-style hook: an empty format means the `time_format` option.
+	 */
+	private const KIND_TIME = 'time';
+
+	/**
+	 * Whether a conversion is already running.
+	 *
+	 * Converting a date means asking WordPress to format it, and WordPress runs
+	 * these very filters while it does that. `label()` and `label_for_post()` own
+	 * the flag for the whole conversion, so a nested call falls back to
+	 * WordPress's own output — which is what a machine consumer expects anyway —
+	 * and the first Persian request terminates instead of recursing until the
+	 * process dies.
+	 *
+	 * @var bool
+	 */
+	private static $converting = false;
 
 	/**
 	 * Effective style of the front end.
@@ -139,15 +169,22 @@ final class Dates {
 			return '';
 		}
 
-		if ( ! self::uses_jalali() ) {
-			$format = '' !== $format ? $format : (string) get_option( 'date_format' );
+		$previous         = self::$converting;
+		self::$converting = true;
 
-			return (string) wp_date( $format, $timestamp );
+		try {
+			if ( ! self::uses_jalali() ) {
+				$format = '' !== $format ? $format : (string) get_option( 'date_format' );
+
+				return (string) wp_date( $format, $timestamp );
+			}
+
+			$local = (string) wp_date( 'Y-n-j', $timestamp );
+
+			return self::jalali_label( $local );
+		} finally {
+			self::$converting = $previous;
 		}
-
-		$local = (string) wp_date( 'Y-n-j', $timestamp );
-
-		return self::jalali_label( $local );
 	}
 
 	/**
@@ -157,15 +194,22 @@ final class Dates {
 	 * @return string
 	 */
 	public static function label_for_post( \WP_Post $post ): string {
-		if ( ! self::uses_jalali() ) {
-			return (string) get_the_date( '', $post );
+		$previous         = self::$converting;
+		self::$converting = true;
+
+		try {
+			if ( ! self::uses_jalali() ) {
+				return (string) get_the_date( '', $post );
+			}
+
+			// The post's own local date fields, so no timezone arithmetic is needed
+			// here and the label matches what the editor sees.
+			$local = (string) get_post_time( 'Y-n-j', false, $post );
+
+			return self::jalali_label( $local );
+		} finally {
+			self::$converting = $previous;
 		}
-
-		// The post's own local date fields, so no timezone arithmetic is needed
-		// here and the label matches what the editor sees.
-		$local = (string) get_post_time( 'Y-n-j', false, $post );
-
-		return self::jalali_label( $local );
 	}
 
 	/**
@@ -208,10 +252,10 @@ final class Dates {
 	 */
 	public static function register(): void {
 		add_filter( 'wp_date', array( __CLASS__, 'filter_wp_date' ), 10, 3 );
+		add_filter( 'get_the_date', array( __CLASS__, 'filter_get_the_date' ), 10, 3 );
+		add_filter( 'get_the_modified_date', array( __CLASS__, 'filter_get_the_date' ), 10, 3 );
 		add_filter( 'get_the_time', array( __CLASS__, 'filter_get_the_time' ), 10, 3 );
 		add_filter( 'get_the_modified_time', array( __CLASS__, 'filter_get_the_time' ), 10, 3 );
-		add_filter( 'get_the_date', array( __CLASS__, 'filter_get_the_time' ), 10, 3 );
-		add_filter( 'get_the_modified_date', array( __CLASS__, 'filter_get_the_time' ), 10, 3 );
 	}
 
 	/**
@@ -223,7 +267,12 @@ final class Dates {
 	 * @return string
 	 */
 	public static function filter_wp_date( $date, $format = '', $timestamp = 0 ) {
-		if ( ! self::should_convert( (string) $format ) ) {
+		if ( '' === (string) $format ) {
+			// `wp_date()` with no format prints nothing: there is no date to localise.
+			return $date;
+		}
+
+		if ( self::$converting || ! self::should_convert( (string) $format, self::KIND_DATE ) ) {
 			return $date;
 		}
 
@@ -231,7 +280,19 @@ final class Dates {
 	}
 
 	/**
-	 * Filter the `get_the_*` date/time functions.
+	 * Filter `get_the_date()` and `get_the_modified_date()`.
+	 *
+	 * @param string        $value  Formatted value.
+	 * @param string        $format Format string.
+	 * @param \WP_Post|null $post   Post.
+	 * @return string
+	 */
+	public static function filter_get_the_date( $value, $format = '', $post = null ) {
+		return self::filter_post( $value, (string) $format, $post, self::KIND_DATE );
+	}
+
+	/**
+	 * Filter `get_the_time()` and `get_the_modified_time()`.
 	 *
 	 * @param string        $value  Formatted value.
 	 * @param string        $format Format string.
@@ -239,7 +300,20 @@ final class Dates {
 	 * @return string
 	 */
 	public static function filter_get_the_time( $value, $format = '', $post = null ) {
-		if ( ! self::should_convert( (string) $format, $post ) ) {
+		return self::filter_post( $value, (string) $format, $post, self::KIND_TIME );
+	}
+
+	/**
+	 * The shared body of the four post-date filters.
+	 *
+	 * @param mixed         $value  Formatted value.
+	 * @param string        $format Format string.
+	 * @param \WP_Post|null $post   Post.
+	 * @param string        $kind   `date` or `time`.
+	 * @return mixed The value unchanged when the conversion does not apply.
+	 */
+	private static function filter_post( $value, string $format, $post, string $kind ) {
+		if ( self::$converting || ! self::should_convert( $format, $kind ) ) {
 			return $value;
 		}
 
@@ -255,13 +329,11 @@ final class Dates {
 	/**
 	 * Whether a value may be converted at all.
 	 *
-	 * @param string        $format Format string.
-	 * @param \WP_Post|null $post   Post, when the caller has one.
+	 * @param string $format Format string.
+	 * @param string $kind   `date` or `time`: which option resolves an empty format.
 	 * @return bool
 	 */
-	private static function should_convert( string $format, $post = null ): bool {
-		unset( $post );
-
+	private static function should_convert( string $format, string $kind = self::KIND_DATE ): bool {
 		if ( ! self::uses_jalali() ) {
 			return false;
 		}
@@ -274,15 +346,17 @@ final class Dates {
 			return false;
 		}
 
+		if ( '' === $format ) {
+			// The `get_the_*` functions resolve an empty format to one of the
+			// site's two options — the time hooks to `time_format`, the date hooks
+			// to `date_format` — so the decision is made on the resolved format.
+			// Anything else would turn `get_the_time()` into a date.
+			$format = (string) get_option( self::KIND_TIME === $kind ? 'time_format' : 'date_format' );
+		}
+
 		// Machine formats are data.
 		if ( in_array( $format, self::MACHINE_FORMATS, true ) ) {
 			return false;
-		}
-
-		if ( '' === $format ) {
-			// The `get_the_*` functions resolve an empty format to the site's
-			// option; that is a display format by definition.
-			return true;
 		}
 
 		// A format with a time part would lose that part inside a Jalali day, so
