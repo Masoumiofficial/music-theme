@@ -121,3 +121,50 @@ Hard requirements
 | M8 | Broken links | report lists every dead external URL (acceptable) but **no** newly dead internal link |
 | M9 | Rollback | batch rollback restores legacy types/meta exactly (checksum on a sample) |
 | M10 | Idempotency | second run changes nothing (diff = empty) |
+
+---
+
+## 8. Implementation notes (0.11.0, in progress)
+
+The tool ships **inside Wavira Core but outside its boot path**: `Migration\LegacySchema` (the audited
+field map) and `Migration\Migrator` (the engine) are only ever constructed by the WP-CLI command, so a
+normal request pays nothing for them and no migration code can run by accident.
+
+```bash
+wp wavira migrate --detect                 # read-only site profile: legacy kinds, deferred fields, unknown values
+wp wavira migrate --dry-run                # the full plan; nothing is written, no report is stored
+wp wavira migrate [--batch=200] [--kind=mp3] [--offset=0] [--report=/tmp/migration.json]
+wp wavira migrate --rollback [--batch=200] # restore from `_migration_backup`, delete created tracks
+wp wavira migrate --status                 # the stored report of the last run
+```
+
+| Guarantee | How it is structural, not promised |
+| --- | --- |
+| Never deletes legacy data | the post keeps its ID, slug, dates and status; the original type and every legacy value are copied into `_migration_backup` (**never overwritten**) and `_migration_raw` before the first write |
+| Idempotent | a legacy post is `post` with a known `musics_type`, a migrated one is a Wavira post type, so the selection cannot see it twice; `_migration_version` is a second guard |
+| Never publishes or unpublishes | the tool writes `post_type` and meta only — no `post_status` write anywhere |
+| Bounded and resumable | every query is bounded (`--batch`, default 200) and ordered by ID; `--offset` continues; counts page instead of loading everything |
+| Reports instead of guessing | an artist that matches no entity → `wavira_credit_label` + the `needs_review` list; a slider image that is not a local attachment → raw audit meta + review (licence: never download third-party media); an unknown `musics_type` → reported and left alone |
+| Reversible | `--rollback` restores the type and meta from the backup, deletes exactly the child tracks this tool created (recorded in `_migration_created`), and reports anything a human changed afterwards instead of touching it |
+
+**Acceptance coverage** (`tests/test-migration.php`, `tests/test-jalali.php` style — real WordPress, real
+DB, legacy-shaped fixtures, never legacy code):
+
+| # | Test | Where |
+| --- | --- | --- |
+| M1 | dry run writes nothing (post type, meta and stored report all unchanged) | `test_dry_run_writes_nothing` |
+| M2 | counts reconcile per kind | `Migrator::detect()` + `test_report_is_stored_after_a_run` |
+| M3 | slugs survive | `test_track_is_migrated_with_its_sources_lyrics_and_slug` |
+| M4/M6 | 128/320 sources arrive exactly | same test + `test_album_repeater_expands_to_ordered_tracks_once` |
+| M5 | lyrics arrive, KSES allow-listed | same test (`assertStringNotContainsString( '<script' )`) |
+| M7 | artist merge, no duplicate entities | `test_artist_directory_is_built_and_duplicates_merge` |
+| M9 | rollback restores the legacy state | `test_rollback_restores_the_legacy_state` |
+| M10 | second run changes nothing | `test_migration_is_idempotent` |
+| — | every map target is a real schema constant (no promise without a key) | `test_every_target_key_is_a_schema_constant` |
+
+M8 (dead external links) needs a live crawl and stays `WP-RUNTIME`; a 10 000-post fixture (M1 at scale)
+is a staging exercise, not a unit test, and is recorded as such in `docs/VERIFICATION.md`.
+
+**Open in 0.11.0:** the admin page (§6 named one) is not built — the CLI is the shipped surface, because
+it is scriptable, dry-runnable and reviewable, and an admin screen needs its own capability and UI
+decision; the packaging script and the final docs pass are the rest of the phase.

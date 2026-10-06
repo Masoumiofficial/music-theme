@@ -87,7 +87,7 @@ to WordPress-native loops (posts/pages) when music types are missing.
 | `src/Related/` | scored related resolution, `RelatedService` (0.4.0 ✅) |
 | `src/Rest/` | `wavira/v1` controllers, schemas, permissions |
 | `src/Admin/` | editor panels, columns, validation, bulk actions, notices |
-| `src/Import/`, `src/Demo/`, `src/Migration/` | data in / data out / data converted |
+| `src/Import/`, `src/Demo/`, `src/Migration/` | data in / data out / data converted — `Migration\LegacySchema` (the audited legacy field map) + `Migration\Migrator` (detect, dry-run, run, rollback; 0.11.0) |
 | `src/Integrations/` | optional third-party bridges |
 | `src/Support/` | autoloader, requirements, cache, logger, capabilities |
 | `public-api.php` | **The only surface a theme may call** (`wavira_core_is_active`, `wavira_core_get_setting`, `wavira_core_related_posts`, `wavira_core_track_playback`, `wavira_core_enqueue_player`) — thin, guarded wrappers over the services |
@@ -200,7 +200,7 @@ implementations — see the brief's YAGNI rule.
 | 0.9.0 | ARTIST + NEWS | `Content/ArtistProfile.php`, `News/NewsFeed.php`, `wavira_core_artist_profile()`, `wavira_core_news_feed()`, three blocks, two shortcodes, `single-wavira_artist.html`, `home.html`, `archive.html`, `docs/ARTIST-AND-NEWS.md` | ✅ verified: CI `37354185539`/`37354194397` 8/8; evidence in `docs/VERIFICATION.md` |
 | 0.10.0 | SEO + PERF | `Seo\StructuredData`, `Seo\SeoSupport`, `Content\Credit`, `wavira_core_structured_data()`, `wavira_core_seo_plugin_active()`, `wavira_core_credit_names()`, `wavira_core_cover_image()`, `inc/seo.php`, `inc/performance.php`, `[PERF]` gate | ✅ **VERIFIED**: CI `37358851972`/`37358981113` 8/8, 118 tests / 948 assertions; `docs/SEO-AND-PERF.md`, ADR 0016 |
 | 0.10.1 | LOCALISATION | `Content\Jalali`, `Content\Dates`, `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()`, Persian demo seeder, Persian `tools/preview/` | ✅ **VERIFIED**: CI `37438117893`/`37438125487` 8/8, 134 tests / 1090 assertions on PHP 7.4 + 8.2; anchor set + forty-year round trip + policy + re-entrancy guard in `tests/test-jalali.php`; ADR 0017, `docs/PERSIAN-LOCALIZATION.md` |
-| 0.11.0 | RC | migration tool, demo import, docs, packaging |
+| 0.11.0 | RC | migration tool, demo import, docs, packaging | 🚧 in progress: `wp wavira migrate` (`LegacySchema` + `Migrator`, `tests/test-migration.php`) landed; packaging and the docs pass are open |
 | 1.0.0 | PRODUCTION | marketplace packages |
 
 See `docs/DECISIONS.md` for the decision list and `docs/CODING-STANDARD.md` for the enforceable rules.

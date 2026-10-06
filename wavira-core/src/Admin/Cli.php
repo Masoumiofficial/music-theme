@@ -16,6 +16,8 @@ use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\Taxonomies;
 use Wavira\Core\Contracts\Registrable;
+use Wavira\Core\Migration\LegacySchema;
+use Wavira\Core\Migration\Migrator;
 use Wavira\Core\Settings\Settings;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,6 +39,189 @@ final class Cli implements Registrable {
 
 		\WP_CLI::add_command( 'wavira verify', array( $this, 'verify' ) );
 		\WP_CLI::add_command( 'wavira seed', array( $this, 'seed' ) );
+		\WP_CLI::add_command( 'wavira migrate', array( $this, 'migrate' ) );
+	}
+
+	/**
+	 * Migrate a site that ran the legacy theme into the Wavira model.
+	 *
+	 * Read the plan first: `--dry-run` prints exactly what would happen and
+	 * writes nothing. The tool is idempotent and resumable, never publishes or
+	 * unpublishes a post, keeps every legacy value in `_migration_backup` and
+	 * `_migration_raw`, and reports what it refuses to guess (an artist name
+	 * that matches no entity, a slider image that is not a local attachment, a
+	 * field the model does not implement).
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--dry-run]
+	 * : Plan only; write nothing at all.
+	 *
+	 * [--detect]
+	 * : Print the site profile (legacy content, deferred fields, unknown kinds)
+	 * and stop.
+	 *
+	 * [--status]
+	 * : Print the report of the last run.
+	 *
+	 * [--rollback]
+	 * : Restore every migrated post from its backup and remove the tracks this
+	 * tool created.
+	 *
+	 * [--kind=<kind>]
+	 * : Limit the run to one legacy kind: mp3, mp4 or album.
+	 *
+	 * [--batch=<number>]
+	 * : Posts per run. Default 200.
+	 *
+	 * [--offset=<number>]
+	 * : Skip the first N posts of a kind (resume cursor). Default 0.
+	 *
+	 * [--report=<file>]
+	 * : Also write the report as JSON to this path.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp wavira migrate --detect
+	 *     wp wavira migrate --dry-run
+	 *     wp wavira migrate --batch=500 --report=/tmp/migration.json
+	 *     wp wavira migrate --rollback
+	 *
+	 * @param array $args       Positional arguments (unused).
+	 * @param array $assoc_args Associative arguments: see OPTIONS.
+	 * @return void
+	 */
+	public function migrate( $args = array(), $assoc_args = array() ): void {
+		unset( $args );
+
+		$migrator = new Migrator();
+
+		if ( isset( $assoc_args['detect'] ) ) {
+			$this->print_profile( $migrator->detect() );
+
+			return;
+		}
+
+		if ( isset( $assoc_args['status'] ) ) {
+			$stored = $migrator->report();
+
+			if ( array() === $stored ) {
+				\WP_CLI::warning( 'No migration report on this site yet — run `wp wavira migrate --dry-run` first.' );
+
+				return;
+			}
+
+			$this->print_report( $stored );
+
+			return;
+		}
+
+		if ( isset( $assoc_args['rollback'] ) ) {
+			$report = $migrator->rollback( array( 'batch' => (int) ( $assoc_args['batch'] ?? Migrator::BATCH ) ) );
+
+			\WP_CLI::log( sprintf( 'Restored %d post(s); deleted %d created track(s).', (int) $report['restored'], (int) $report['deleted'] ) );
+
+			foreach ( $report['skipped'] as $line ) {
+				\WP_CLI::warning( (string) $line );
+			}
+
+			\WP_CLI::success( 'Rollback finished.' );
+
+			return;
+		}
+
+		$report = $migrator->run(
+			array(
+				'dry_run' => isset( $assoc_args['dry-run'] ),
+				'batch'   => (int) ( $assoc_args['batch'] ?? Migrator::BATCH ),
+				'offset'  => (int) ( $assoc_args['offset'] ?? 0 ),
+				'kind'    => (string) ( $assoc_args['kind'] ?? '' ),
+			)
+		);
+
+		if ( isset( $assoc_args['report'] ) ) {
+			$path = (string) $assoc_args['report'];
+			$json = (string) wp_json_encode( $report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+			$ok   = false !== file_put_contents( $path, $json ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- a CLI report the operator asked for by path.
+
+			if ( ! $ok ) {
+				\WP_CLI::warning( sprintf( 'Could not write the report to %s.', $path ) );
+			}
+		}
+
+		$this->print_report( $report );
+	}
+
+	/**
+	 * Print the detection profile.
+	 *
+	 * @param array<string, mixed> $profile Profile from `Migrator::detect()`.
+	 * @return void
+	 */
+	private function print_profile( array $profile ): void {
+		\WP_CLI::log( 'Legacy content:' );
+		\WP_CLI::log( sprintf( '  mp3 (tracks): %d', (int) ( $profile['legacy']['mp3'] ?? 0 ) ) );
+		\WP_CLI::log( sprintf( '  mp4 (videos): %d', (int) ( $profile['legacy']['mp4'] ?? 0 ) ) );
+		\WP_CLI::log( sprintf( '  album:        %d', (int) ( $profile['legacy']['album'] ?? 0 ) ) );
+		\WP_CLI::log( sprintf( '  artist terms: %d', (int) $profile['artists'] ) );
+
+		foreach ( $profile['deferred'] as $key => $info ) {
+			\WP_CLI::log( sprintf( '  deferred %s: %d post(s) — %s', (string) $key, (int) $info['posts'], (string) $info['reason'] ) );
+		}
+
+		foreach ( $profile['unmapped'] as $value => $count ) {
+			\WP_CLI::warning( sprintf( 'musics_type "%s" is not in the map (%d post(s)) — nothing will be converted for it.', (string) $value, (int) $count ) );
+		}
+
+		\WP_CLI::success( sprintf( '%d legacy post(s) found.', (int) $profile['total'] ) );
+	}
+
+	/**
+	 * Print a run report.
+	 *
+	 * @param array<string, mixed> $report Report from the migrator.
+	 * @return void
+	 */
+	private function print_report( array $report ): void {
+		$dry = ! empty( $report['dry_run'] );
+
+		foreach ( (array) ( $report['log'] ?? array() ) as $line ) {
+			\WP_CLI::log( '  ' . (string) $line );
+		}
+
+		foreach ( (array) ( $report['needs_review'] ?? array() ) as $line ) {
+			\WP_CLI::warning( (string) $line );
+		}
+
+		\WP_CLI::log(
+			sprintf(
+				'%s: scanned %d, %s %d, created %d track(s), linked %d artist(s), %d genre(s); %d post(s) left.',
+				$dry ? 'Dry run' : 'Migrated',
+				(int) $report['scanned'],
+				$dry ? 'would migrate' : 'migrated',
+				(int) $report['migrated'],
+				(int) $report['created'],
+				(int) $report['linked'],
+				(int) $report['genres'],
+				(int) $report['remaining']
+			)
+		);
+
+		if ( ! empty( $report['artists']['created'] ) || ! empty( $report['artists']['merged'] ) ) {
+			\WP_CLI::log(
+				sprintf(
+					'Artist directory: %d created, %d merged onto an existing artist.',
+					(int) $report['artists']['created'],
+					(int) $report['artists']['merged']
+				)
+			);
+		}
+
+		if ( ! empty( $report['remaining'] ) && ! $dry ) {
+			\WP_CLI::log( 'Run the command again to continue (the tool is idempotent), or raise --batch.' );
+		}
+
+		\WP_CLI::success( $dry ? 'Dry run finished — nothing was written.' : 'Migration batch finished.' );
 	}
 
 	/**

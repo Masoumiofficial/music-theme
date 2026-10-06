@@ -15,7 +15,9 @@ decisions behind it are [ADR 0015](adr/0015-persian-first-localisation.md) (cata
 | Surface | Source |
 | --- | --- |
 | Theme interface (front end, patterns, template parts) | `wavira/languages/fa_IR.{po,mo}` |
-| Admin screens, post-type/taxonomy labels, settings, CLI output, REST argument descriptions | `wavira-core/languages/fa_IR.{po,mo}` |
+| Admin screens, post-type/taxonomy labels, settings, REST argument descriptions | `wavira-core/languages/fa_IR.{po,mo}` |
+| The *content* the WP-CLI commands create (demo posts, lyrics, the Persian menu and site defaults) | the same catalogue, plus Persian literals in `Admin\Cli` |
+| Developer diagnostics (WP-CLI progress output, migration reports, JSON) | **English on purpose**, like the machine surfaces: an operator greps them, and a report must be comparable between sites |
 | Block titles/descriptions/keywords in the editor | the same catalogues, via core's i18n schema |
 | Player controls (play, queue, repeat, errors, Media Session labels) | the `wavira-core` catalogue, printed into the page by PHP |
 

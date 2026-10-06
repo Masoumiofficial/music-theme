@@ -88,8 +88,11 @@ existing database makes the vendored installer ask for confirmation — drop it 
 Inside WordPress, two WP-CLI commands verify the install:
 
 ```bash
-wp wavira verify          # post types, taxonomies, 43 meta keys, settings, REST routes, counters
-wp wavira seed [--force]  # Persian demo + Iranian defaults; --english for the neutral fixture
+wp wavira verify           # post types, taxonomies, 43 meta keys, settings, REST routes, counters
+wp wavira seed [--force]   # Persian demo + Iranian defaults; --english for the neutral fixture
+wp wavira migrate --detect # what a legacy site holds (read-only)
+wp wavira migrate --dry-run # the full migration plan, writing nothing
+wp wavira migrate          # run it (idempotent, resumable, rollback available)
 ```
 
 The product **does not require a build to be installable**: when `assets/dist/` is missing the theme
@@ -104,7 +107,7 @@ enqueues nothing and the front end degrades gracefully (see ADR 0006).
 | Downloads | Authorization chain (site setting → per-track opt-out → optional login → filter) and atomic counters. Delivery is a redirect to the file: **authorization and accounting, never DRM** (ADR 0013). |
 | Player | Framework-free engine in `wavira-core/assets/js/index.js`: one state machine per instance, its own `<audio>`, queue + shuffle + repeat (off/all/one), Media Session metadata and action handlers, documented keyboard map, ARIA state and live regions, `localStorage` preferences (`wavira.player.*`). Mounted by `wavira_player_mount()` in the theme, with a native `<audio>` fallback when JavaScript is unavailable. |
 | Player data | `wavira/v1/player/tracks/{id}` and `/player/queue?context=album\|artist\|genre\|tracks\|related`; the engine only substitutes IDs into server-provided route templates. |
-| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]`. |
+| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]`, `wp wavira migrate [--detect\|--dry-run\|--rollback] [--batch=<n>] [--kind=<mp3\|mp4\|album>] [--report=<file>]`. |
 | Function API | Plugin: `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()`, `wavira_core_track_playback()`, `wavira_core_enqueue_player()`, `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()` (`wavira-core/public-api.php`). Theme: `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. A theme never names a Core class — enforced by `tools/check-boundaries.mjs`. |
 | Hooks | Filters `wavira_track_playback_payload`, `wavira_core_date_style`, `wavira_core_date_format`, `wavira_core_date_label`, `wavira_player_queue_items`, `wavira_player_settings`, `wavira_related_ids`, `wavira_related_score`, `wavira_searchable_types`, `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access`, `wavira_setting`, `wavira_settings_sanitized`, `wavira_rest_item`, `wavira_content_width`; actions `wavira_core_booted`, `wavira_download_counted`, `wavira_download_served`. Themes call `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. Player mounts emit DOM events `wavira:player:<event>` for theme JavaScript. |
 
