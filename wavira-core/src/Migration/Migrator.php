@@ -525,8 +525,11 @@ final class Migrator {
 				continue;
 			}
 
-			$title = isset( $row[ $map['song_names'] ] ) && is_scalar( $row[ $map['song_names'] ] )
-				? Meta::sanitize_text( $row[ $map['song_names'] ] )
+			// Rows are indexed by their *legacy* sub-field name: the map's
+			// values are the meaning (`title` or a `MetaSchema` key), never the
+			// key to read.
+			$title = isset( $row[ LegacySchema::ALBUM_TITLE_ROW ] ) && is_scalar( $row[ LegacySchema::ALBUM_TITLE_ROW ] )
+				? Meta::sanitize_text( $row[ LegacySchema::ALBUM_TITLE_ROW ] )
 				: '';
 
 			if ( '' === $title ) {
@@ -558,10 +561,11 @@ final class Migrator {
 
 			$track = (int) $track;
 
-			foreach ( array(
-				'albumlink128' => MetaSchema::AUDIO_128,
-				'albumlink320' => MetaSchema::AUDIO_320,
-			) as $legacy_key => $target_key ) {
+			foreach ( $map as $legacy_key => $target_key ) {
+				if ( LegacySchema::ALBUM_TITLE_ROW === $legacy_key || 'title' === $target_key ) {
+					continue;
+				}
+
 				$value = isset( $row[ $legacy_key ] ) ? Meta::sanitize_url( $row[ $legacy_key ] ) : '';
 
 				if ( '' !== $value ) {
@@ -569,8 +573,28 @@ final class Migrator {
 				}
 			}
 
+			$credit = Meta::sanitize_text( (string) get_post_meta( $album->ID, 'artist', true ) );
+
 			update_post_meta( $track, MetaSchema::ALBUM, $album->ID );
-			update_post_meta( $track, MetaSchema::CREDIT_LABEL, Meta::sanitize_text( (string) get_post_meta( $album->ID, 'artist', true ) ) );
+			update_post_meta( $track, MetaSchema::CREDIT_LABEL, $credit );
+
+			// A child inherits the album's artist link; when the album could not
+			// be resolved either, the child keeps the credit label and joins the
+			// review queue exactly like its parent does.
+			$artist = (int) get_post_meta( $album->ID, MetaSchema::ARTIST, true );
+
+			if ( $artist <= 0 && '' !== $credit ) {
+				$artist = $this->resolve_artist( $credit );
+			}
+
+			if ( $artist > 0 ) {
+				update_post_meta( $track, MetaSchema::ARTIST, $artist );
+				++$this->report['linked'];
+			} elseif ( '' !== $credit ) {
+				update_post_meta( $track, LegacySchema::REVIEW, 'artist' );
+				$this->queue_review( sprintf( '#%d: no artist entity matches "%s" — the credit label was kept, link it by hand', $track, $credit ) );
+			}
+
 			update_post_meta( $track, LegacySchema::SOURCE_ALBUM, $album->ID );
 			update_post_meta( $track, LegacySchema::SOURCE_INDEX, $index );
 			update_post_meta( $track, LegacySchema::MARKER, LegacySchema::VERSION );
@@ -894,23 +918,38 @@ final class Migrator {
 	 * @return array<string, int> Value => count.
 	 */
 	private function unmapped_kinds(): array {
-		$values = get_post_meta_by_key( LegacySchema::TYPE_META );
+		global $wpdb;
 
-		if ( ! is_array( $values ) ) {
+		$kinds = LegacySchema::kinds();
+
+		// The distinct values of one meta key, counted by the database. A
+		// paged scan would have to read every typed row to build the same
+		// list, and `get_post_meta_by_key()` is an admin-side function that is
+		// not loaded on a front-end or test request. The result set is the
+		// number of distinct values, and it is capped anyway.
+		$rows = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- read-only diagnostic, one row per distinct value.
+			$wpdb->prepare(
+				"SELECT meta_value, COUNT(*) AS total FROM {$wpdb->postmeta} WHERE meta_key = %s GROUP BY meta_value ORDER BY total DESC LIMIT %d",
+				LegacySchema::TYPE_META,
+				self::MAX_LOG
+			),
+			ARRAY_A
+		);
+
+		if ( ! is_array( $rows ) ) {
 			return array();
 		}
 
-		$kinds   = LegacySchema::kinds();
 		$unknown = array();
 
-		foreach ( $values as $row ) {
-			$value = is_array( $row ) && isset( $row->meta_value ) ? (string) $row->meta_value : '';
+		foreach ( $rows as $row ) {
+			$value = isset( $row['meta_value'] ) ? (string) $row['meta_value'] : '';
 
 			if ( '' === $value || isset( $kinds[ $value ] ) ) {
 				continue;
 			}
 
-			$unknown[ $value ] = ( $unknown[ $value ] ?? 0 ) + 1;
+			$unknown[ $value ] = isset( $row['total'] ) ? (int) $row['total'] : 0;
 		}
 
 		return $unknown;

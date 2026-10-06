@@ -165,6 +165,18 @@ DB, legacy-shaped fixtures, never legacy code):
 M8 (dead external links) needs a live crawl and stays `WP-RUNTIME`; a 10 000-post fixture (M1 at scale)
 is a staging exercise, not a unit test, and is recorded as such in `docs/VERIFICATION.md`.
 
+**Child tracks.** The repeater is read by its *legacy* sub-field name (`album_row_fields()` maps the
+legacy key to the meaning, never the other way round — reading `$row['title']` found nothing), a child
+inherits the album's artist link, and when the album's credit could not be resolved the child keeps the
+credit label and joins the review queue with its parent.
+
+**Local harness.** Before the CI run, the tool was exercised against a WordPress 6.7.2 install (SQLite
+integration plugin, the only database available in the build sandbox): 43 checks over detect / dry run /
+run / idempotency / rollback and 20 over the WP-CLI surface with a stub of the `WP_CLI` API. It is a
+pre-flight, not a substitute for the CI suite (MySQL, PHP 7.4 + 8.2) — and it earned its keep: it found
+the album-row read defect above and an admin-only function (`get_post_meta_by_key()`) that is not loaded
+during a front-end or test request.
+
 **Open in 0.11.0:** the admin page (§6 named one) is not built — the CLI is the shipped surface, because
 it is scriptable, dry-runnable and reviewable, and an admin screen needs its own capability and UI
 decision; the packaging script and the final docs pass are the rest of the phase.

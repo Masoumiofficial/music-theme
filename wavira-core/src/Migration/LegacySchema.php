@@ -39,6 +39,12 @@ final class LegacySchema {
 	public const ARTIST_TAX = 'singer';
 
 	/**
+	 * The legacy repeater row key that holds a track name — a repeater
+	 * sub-field name from the old theme, so it is not a `wavira_*` key.
+	 */
+	public const ALBUM_TITLE_ROW = 'song_names';
+
+	/**
 	 * Meta the tool writes on the migrated post.
 	 */
 	public const BACKUP       = '_migration_backup';
@@ -144,15 +150,19 @@ final class LegacySchema {
 	}
 
 	/**
-	 * Album tracklist rows: legacy row keys => target meaning.
+	 * Album tracklist rows: legacy row key => what the value means.
+	 *
+	 * The title row maps to the literal `title` because a post title is not
+	 * meta; every other value is a `MetaSchema` key. Callers must index the row
+	 * by the *legacy* key ({@see self::ALBUM_TITLE_ROW}), not by the meaning.
 	 *
 	 * @return array<string, string>
 	 */
 	public static function album_row_fields(): array {
 		return array(
-			'song_names'   => 'title',
-			'albumlink128' => MetaSchema::AUDIO_128,
-			'albumlink320' => MetaSchema::AUDIO_320,
+			self::ALBUM_TITLE_ROW => 'title',
+			'albumlink128'        => MetaSchema::AUDIO_128,
+			'albumlink320'        => MetaSchema::AUDIO_320,
 		);
 	}
 

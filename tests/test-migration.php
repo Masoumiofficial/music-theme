@@ -302,6 +302,11 @@ class Test_Migration extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_album_repeater_expands_to_ordered_tracks_once() {
+		// The album names an artist, and the legacy term exists, so the children
+		// have something to inherit instead of a review flag.
+		$term = wp_insert_term( 'آرمان راد', LegacySchema::ARTIST_TAX, array( 'slug' => 'arman-rad' ) );
+		$this->assertIsArray( $term );
+
 		$album = $this->legacy_post(
 			array(
 				LegacySchema::TYPE_META => 'album',
@@ -338,6 +343,7 @@ class Test_Migration extends Wavira_Test_Case {
 			$this->assertSame( $album, (int) get_post_meta( (int) $track, MetaSchema::ALBUM, true ) );
 			$this->assertSame( $index, (int) get_post_field( 'menu_order', (int) $track ), 'the tracklist keeps its order' );
 			$this->assertSame( 'آرمان راد', (string) get_post_meta( (int) $track, MetaSchema::CREDIT_LABEL, true ), 'a child track carries the album credit' );
+			$this->assertSame( PostTypes::ARTIST, get_post_type( (int) get_post_meta( (int) $track, MetaSchema::ARTIST, true ) ), 'a child inherits the album artist link' );
 		}
 
 		$this->assertSame( 'قطعهٔ یک', get_the_title( (int) $tracklist[0] ) );
@@ -462,7 +468,10 @@ class Test_Migration extends Wavira_Test_Case {
 	public function test_cli_wiring_is_present_in_the_source() {
 		$cli = (string) file_get_contents( dirname( __DIR__ ) . '/wavira-core/src/Admin/Cli.php' );
 
-		$this->assertStringContainsString( "\\WP_CLI::add_command( 'wavira migrate', array( $this, 'migrate' ) )", $cli );
+		// No interpolation here: a double-quoted needle containing `$this` was
+		// the bug this test found in itself (PHP stringifies the test case).
+		$this->assertStringContainsString( "WP_CLI::add_command( 'wavira migrate'", $cli );
+		$this->assertStringContainsString( "'migrate' ) )", $cli );
 		$this->assertStringContainsString( 'new Migrator()', $cli );
 		$this->assertStringContainsString( '--dry-run', $cli );
 	}
