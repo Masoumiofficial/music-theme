@@ -5,6 +5,11 @@ content and the **calendar**. This document is the operator's and integrator's v
 decisions behind it are [ADR 0015](adr/0015-persian-first-localisation.md) (catalogues) and
 [ADR 0017](adr/0017-jalali-dates-and-iranian-defaults.md) (calendar and Iranian defaults).
 
+> **Status (0.10.1, verified).** CI runs `37438117893` (push) and `37438125487` (pull request) are green:
+> all 8 jobs, `OK (134 tests, 1090 assertions)` on PHP 7.4 and 8.2. The calendar's anchors, its policy and
+> its re-entrancy guard are executed by `tests/test-jalali.php`; the claims and their evidence are listed
+> in [VERIFICATION.md](VERIFICATION.md).
+
 ## 1. What ships translated
 
 | Surface | Source |

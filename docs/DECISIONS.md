@@ -21,7 +21,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0014](adr/0014-dark-mode-and-token-mapping.md) | Colour modes: one palette in `theme.json`, dark mode as a `--wp--preset--color--*` remap, `data-theme` on `<html>`, neutral plugin tokens mapped by the theme, and a gate that fails unresolvable token references | Accepted — **implemented in 0.6.0** (two casing defects found and fixed) | 2026-10-05 |
 | [0015](adr/0015-persian-first-localisation.md) | Persian ships in the repository for both artifacts; one catalogue covers the front end, the admin and the editor; Jalali deferred with a named exit condition (§8, amended by 0017) | Accepted — **implemented in 0.8.0**; §6/§8 amended in 0.10.1 | 2026-10-05 |
 | [0016](adr/0016-seo-cooperation-and-performance-gates.md) | The site's SEO plugin owns meta tags; the product always emits its own structured data and enforces the performance budget as a build gate | Accepted — **implemented in 0.10.0** | 2026-10-05 |
-| [0017](adr/0017-jalali-dates-and-iranian-defaults.md) | Jalali (Shamsi) dates on `fa*` locales from a verified, anchored converter; machine surfaces stay Gregorian; Iranian defaults are applied by the seeder, and the demo/harness are Persian | Accepted — **implemented in 0.10.1** | 2026-10-05 |
+| [0017](adr/0017-jalali-dates-and-iranian-defaults.md) | Jalali (Shamsi) dates on `fa*` locales from a verified, anchored converter; machine surfaces stay Gregorian; Iranian defaults are applied by the seeder, and the demo/harness are Persian | Accepted — **implemented and verified in 0.10.1** (CI `37438117893`/`37438125487`, 134 tests / 1090 assertions) | 2026-10-05 |
 
 **Resolved open decisions** (were listed as "scheduled" in 0.2.0)
 

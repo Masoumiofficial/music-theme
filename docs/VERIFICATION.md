@@ -147,6 +147,7 @@ failed contrast at 1.51:1; the shipped product URIs pointed at the unregistered 
 | No unbounded query or disabled `srcset` anywhere | **VERIFIED** | `[PERF]` gate scans 78 product PHP files for `posts_per_page => -1`, `nopaging => true` and `srcset` overriding; the `[LEGACY]` grep gate keeps its own rule |
 | Lighthouse / field Core Web Vitals numbers | **NOT_STARTED** | no browser and no live install in this environment: the budget is enforced statically and no field number is claimed (ADR 0016 §5) |
 | Editor-side SEO panels (per-post overrides, social previews) | **NOT_STARTED** | an admin UX feature, scheduled with the 0.11.0 release-candidate work; a site that wants it today runs Rank Math |
+| Every gate is green on the 0.10.1 commit | **VERIFIED** | CI runs `37438117893` (push) and `37438125487` (pull request) at head `e9362e6`: all 8 jobs success — WPCS 0 findings over 80 files, PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build`, `Legacy artifact integrity`, and `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (134 tests, 1090 assertions)` on both legs (0.10.0: 118 tests / 948 assertions + the 16 new Jalali tests). The three red runs before it (`5c4abf9`, `1a8bbca`, `6c6f410`) each found a real defect and are described below |
 | Every gate is green on the 0.10.0 commit | **VERIFIED** | CI runs `37358851972` (pull request) and `37358981113` (push) at head `982c261`: all 8 jobs success — WPCS 0 findings, PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build` (includes the new `[PERF]` gate), `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (118 tests, 948 assertions)` on both legs, legacy artifact integrity. The two earlier red runs (`79eb882`, `581e506`) found three test defects and one WPCS finding, all fixed in `581e506`/`982c261` |
 
 **What the 0.10.0 suite found.** Two of the new tests were wrong before the product was: the
@@ -180,17 +181,29 @@ core feature, not a comfortable margin.
 | The new CSS keeps the product's promises | **VERIFIED** | `[CSS]` gate — no `!important`, no physical direction property (so the artist and news layouts mirror on an RTL site), every token resolvable, and the size budget still met |
 | The template path (blog index and archives) actually paginates | **IMPLEMENTED** | `home.html` and `archive.html` use core's Query Loop with `inherit: true` and `wp:query-pagination`; rendering the paginated archive needs a real install (`WP-RUNTIME`) |
 | The editor preview matches the front end | **IMPLEMENTED** | `blocks/editor.js` registers all seven blocks with a `ServerSideRender` preview and `save() → null`; the visual comparison needs a real editor session (`WP-RUNTIME`) |
-| Jalali dates in the new surfaces | **IMPLEMENTED** (0.10.1) | `Content\Dates::label_for_post()` fills `date_label` in the news and artist payloads, so the news cards print «۱۳ مهر ۱۴۰۵» on a Persian site; anchor table, policy tests and the re-entrancy guard in `tests/test-jalali.php` (ADR 0017 §5, §10) |
+| Jalali dates in the new surfaces | **VERIFIED** (0.10.1) | `Content\Dates::label_for_post()` fills `date_label` in the news and artist payloads, so the news cards print «۱۳ مهر ۱۴۰۵» on a Persian site; anchor table, policy tests and the re-entrancy guard in `tests/test-jalali.php` (ADR 0017 §5, §10) |
 | A browsable artist directory | **NOT_STARTED** | `templates/archive-wavira_artist.html` renders the archive hero only; a grid of artists is deliberate design work (it needs a per-artist card), recorded in `docs/ARTIST-AND-NEWS.md` §3 rather than shipped as a second temporary query loop |
 | Every gate is green on the 0.9.0 commit | **VERIFIED** | CI runs `37354185539` (push) and `37354194397` (pull request) at head `25ce032`: all 8 jobs success — `WPCS + PHP compatibility` (0 findings), PHP 7.4/8.2/8.3 syntax, `JS, JSON, gates, build`, `WordPress integration` on PHP 7.4 **and** 8.2 → `OK (100 tests, 871 assertions)` on both legs, legacy artifact integrity. Run `37353466951`/`37353475364` was the first, red one; its three findings are fixed in `510beef`/`25ce032` and the WPCS one in code, not by silencing the sniff |
 
-**What the 0.10.1 run found.** The WPCS job rejected the new files in `5c4abf9` (array-item
-spacing, alignment, a stand-alone post-increment) and both integration jobs then hung: `Dates` converted
-by calling `wp_date()`, which WordPress runs through the very filter `Dates::register()` had added, so the
-first Persian request recursed until the process was killed (exit 143 — see ADR 0017 §10). Both defects
-are fixed in code (`1a8bbca` for the standards, `style`/`fix` commit for the guard), never by silencing a
-sniff or a test; the guard is proven locally by a WP-free harness that aborts after 200 re-entries
-(unguarded file: aborts; guarded file: «۱۳ مهر ۱۴۰۵»).
+**What the 0.10.1 runs found.** Three red runs, three real defects — none of them silenced:
+
+1. `5c4abf9` — the **WPCS** job rejected the new files (array-item spacing, alignment, a stand-alone
+   post-increment), which also aborted both integration jobs. Fixed in `1a8bbca`. The local `[PHPCS]` gate
+   skips when `vendor/bin/phpcs` is absent, which is why the finding was CI-only in a sandbox with no PHP:
+   any environment that runs `composer install --dev` executes the identical standard set (the same
+   pinned packages CI installs) before pushing.
+2. `1a8bbca` — WPCS green, and both integration jobs **hung until the runner killed them** (exit 143):
+   `Dates` converted by calling `wp_date()`, which WordPress runs through the very filter
+   `Dates::register()` had added, so the first Persian request recursed (`get_the_date()` reaches the
+   class twice over). Fixed in `6c6f410` with a re-entrancy guard the conversion owns (ADR 0017 §10) and
+   a test for it; proven without WordPress by a harness that aborts a re-entered `wp_date()` after 200
+   calls (unguarded file: aborts; guarded file: «۱۳ مهر ۱۴۰۵»).
+3. `6c6f410` — the suite ran for the first time and found one product defect and two wrong expectations:
+   the clamp answered `1177/10/11` for 1500-01-01 (a year outside the accurate table) and `1632/10/11`
+   for 2500-01-01, and two Jalali assertions expected Gregorian output. Fixed in `e9362e6`: the range is
+   decided on the Julian day number against the exact boundary days, the expectations now assert the
+   documented rules, and every one of them was executed locally first through the WP-free harness
+   (39 checks) instead of being run for the first time in CI.
 
 **What the first CI run found.** The three new test files ran for the first time in `37353466951` and
 found four defects, three of them in the product: `wavira_get_news()` ignored a `category` that arrived
@@ -221,7 +234,7 @@ than erroring (a feed caller must not be able to enumerate private types by gues
 | Admin labels are translated before they are registered | **VERIFIED** | `Plugin::boot()` calls `load_textdomain()` before the modules register post types, taxonomies and settings, so `PostTypes` labels are built from translated strings (code path read in `wavira-core/src/Plugin.php`; the strings themselves are asserted in `Test_I18n::test_admin_strings_come_back_in_persian`) |
 | RTL is a build failure, not a habit | **VERIFIED** | `tools/check-css.mjs` rule 2 rejects physical direction properties (`margin-left`, `padding-right`, `text-align: left`, `left:`/`right:`, `inset-left/right`) across all six stylesheets; the RTL guarantee therefore holds for every future component too |
 | A translation cannot break `sprintf` | **VERIFIED** | the `[FA]` gate compares the placeholders of every translation with its source (`%d kbps` → `%d کیلوبیتبرثانیه`), and `Test_I18n::test_placeholders_survive_translation` asserts the rendered result |
-| Jalali (Shamsi) dates | **IMPLEMENTED** (0.10.1) | `Content\Jalali` (Borkowski port, MIT notice in `THIRD-PARTY-NOTICES.md`) + `Content\Dates` policy; `tests/test-jalali.php` pins Nowruz 1400–1405, 1979-02-11 → 1357/11/22, 2025-03-20 → 1403/12/30, a forty-year round trip, the leap rule, the Saturday-first weekday order, both calendars, the machine-surface guards, and that the filters do not recurse (`test_conversion_does_not_recurse`); ADR 0017 §10 |
+| Jalali (Shamsi) dates | **VERIFIED** (0.10.1) | `Content\Jalali` (Borkowski port, MIT notice in `THIRD-PARTY-NOTICES.md`) + `Content\Dates` policy; `tests/test-jalali.php` pins Nowruz 1400–1405, 1979-02-11 → 1357/11/22, 2025-03-20 → 1403/12/30, a forty-year round trip, the leap rule, the Saturday-first weekday order, both calendars, the machine-surface guards, and that the filters do not recurse (`test_conversion_does_not_recurse`); ADR 0017 §10 |
 | A bundled Persian font | **NOT_STARTED** | the token set already prefers Vazirmatn (OFL-1.1) with system fallbacks; bundling a subset font is a packaging decision (ADR 0010 licence handling, ADR 0009 size budget) |
 
 **CI evidence.** Commit `42aedc6` shipped the pipeline, both catalogues, the tests, ADR 0015 and the
