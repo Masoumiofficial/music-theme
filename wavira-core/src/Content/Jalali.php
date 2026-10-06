@@ -71,8 +71,26 @@ final class Jalali {
 	 * @var int[]
 	 */
 	private const BREAKS = array(
-		-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181,
-		1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178,
+		-61,
+		9,
+		38,
+		199,
+		426,
+		686,
+		756,
+		818,
+		1111,
+		1181,
+		1210,
+		1635,
+		2060,
+		2097,
+		2192,
+		2262,
+		2324,
+		2394,
+		2456,
+		3178,
 	);
 
 	/**
@@ -309,11 +327,11 @@ final class Jalali {
 
 			$offset -= 186;
 		} else {
-			$jy       -= 1;
-			$offset   += 179;
+			--$jy;
+			$offset += 179;
 
 			if ( 1 === $calendar['leap'] ) {
-				$offset += 1;
+				++$offset;
 			}
 		}
 
@@ -356,7 +374,7 @@ final class Jalali {
 		$leap_j += self::div( $n, 33 ) * 8 + self::div( self::mod( $n, 33 ) + 3, 4 );
 
 		if ( 4 === self::mod( $jump, 33 ) && 4 === $jump - $n ) {
-			$leap_j++;
+			++$leap_j;
 		}
 
 		$leap_g = self::div( $gy, 4 ) - self::div( ( self::div( $gy, 100 ) + 1 ) * 3, 4 ) - 150;

@@ -99,23 +99,23 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:499
+#: wavira-core/src/Admin/Cli.php:501
 msgid "Demo Album"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:493
+#: wavira-core/src/Admin/Cli.php:495
 msgid "Demo Artist"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:473
+#: wavira-core/src/Admin/Cli.php:475
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:508
+#: wavira-core/src/Admin/Cli.php:510
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:480
+#: wavira-core/src/Admin/Cli.php:482
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -154,11 +154,11 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:494
+#: wavira-core/src/Admin/Cli.php:496
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:472
+#: wavira-core/src/Admin/Cli.php:474
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 

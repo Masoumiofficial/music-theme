@@ -342,7 +342,9 @@ final class Cli implements Registrable {
 			wp_update_nav_menu_item( (int) $menu_id, 0, $args );
 		}
 
-		$locations           = (array) get_theme_mod( 'nav_menu_locations', array() );
+		// Read-modify-write of the nav menu locations, as its own step.
+		$locations = (array) get_theme_mod( 'nav_menu_locations', array() );
+
 		$locations['primary'] = (int) $menu_id;
 
 		set_theme_mod( 'nav_menu_locations', $locations );
