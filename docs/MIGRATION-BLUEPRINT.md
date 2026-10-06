@@ -175,7 +175,8 @@ integration plugin, the only database available in the build sandbox): 43 checks
 run / idempotency / rollback and 20 over the WP-CLI surface with a stub of the `WP_CLI` API. It is a
 pre-flight, not a substitute for the CI suite (MySQL, PHP 7.4 + 8.2) — and it earned its keep: it found
 the album-row read defect above and an admin-only function (`get_post_meta_by_key()`) that is not loaded
-during a front-end or test request.
+during a front-end or test request. The CI run after those fixes — `37440743623` (push) / `37440749435`
+(PR), 8/8 jobs, `OK (146 tests, 1198 assertions)` on PHP 7.4 and 8.2 — is what makes the tool **VERIFIED**.
 
 **Open in 0.11.0:** the admin page (§6 named one) is not built — the CLI is the shipped surface, because
 it is scriptable, dry-runnable and reviewable, and an admin screen needs its own capability and UI

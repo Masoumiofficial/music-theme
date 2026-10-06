@@ -1,6 +1,6 @@
 # ADR 0018 — Migration tool: copy what is known, report what is not, and never guess
 
-- **Status:** Accepted (0.11.0, implemented)
+- **Status:** Accepted (0.11.0, implemented — **verified**: CI runs `37440743623`/`37440749435`, 8/8 jobs, 146 tests / 1198 assertions on PHP 7.4 and 8.2)
 - **Date:** 2026-10-06
 - **Deciders:** product owner (brief: "a separate tool, never part of the theme's runtime"), engineering
 - **Supersedes:** —
