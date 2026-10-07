@@ -126,6 +126,7 @@ visible on a fresh install instead of being a claim in a document.
 | No role-credit model | `songwriter` / `composer` / `regulator` / `mixmaster` are preserved as data but not exposed as fields: that is a v1 model decision (`docs/DECISIONS.md`), not an integration gap |
 | No podcast *feed* | `musicss_podcast` becomes a track with the kind `podcast`; a real podcast needs an RSS feed with enclosures, which is a separate feature and is **not** claimed for v1 |
 | No reverse export into the plugin | converting Wavira content back into `musicss_*` rows is not implemented; the export path is WXR (`wp wavira export-demo`), which is what the plugin's own importer would need anyway |
+| One export per request | `export_wp()` declares its `wxr_*()` helpers inside itself, so a second export in the same request is a fatal `Cannot redeclare wxr_cdata()` error in Core, not a second document. Wavira refuses the second call with a reason. Every export path is one request anyway: the admin button is one, `wp wavira export-demo` is one |
 
 ## 6. Verification
 

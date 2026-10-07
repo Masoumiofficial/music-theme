@@ -42,7 +42,7 @@ final class Exporter {
 
 	/**
 	 * Build a WXR document for the current site.
-		 *
+	 *
 	 * @param array<string, mixed> $args `content` (post type or `all`) and
 	 *                                   `status` (post status or `all`).
 	 * @return array<string, string> `ok` (`1`/`0`), `xml`, `reason`.

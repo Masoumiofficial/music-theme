@@ -63,6 +63,11 @@
 	     no posts_per_page -1, no srcset disabling, no wp_is_mobile layout sniffing,
 	     no deprecated APIs. Those are checked by tools/lint.sh (grep gate) in CI. -->
 
+	<!-- Docblock asterisks must line up. WPCS enables this sniff in later releases and
+	     the CI gate installs the newest toolchain, so it is named here explicitly: the
+	     local pre-check and CI then agree on the same rule set. -->
+	<rule ref="Squiz.Commenting.DocCommentAlignment"/>
+
 	<rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
 	<rule ref="Generic.CodeAnalysis.EmptyStatement"/>
 </ruleset>
