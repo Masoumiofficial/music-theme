@@ -20,8 +20,9 @@ verified changed, only things that were missing were added:
 The demo now also ships a remix of one of its tracks, so the kind feature is visible on a fresh
 install. The CI verdict for these additions is `37625734821` (push) / `37625726155` (PR) on `taef48bd`:
 **9/9 jobs green**, `OK (167 tests, 1435 assertions)` on WordPress 7.1.3 with PHP 7.4 and 8.2, WPCS
-0 findings, archives built and uploaded — the detail is in `docs/VERIFICATION.md` under "after the RC
-verdict". The RC table below keeps the verdict of the code it was recorded against.
+0 findings, archives built and uploaded (the CI-built archives are byte-identical to the local ones:
+theme `619ebbabcbd5…`, plugin `075704d678af…`, bundle `57e953f2b79d…`) — the detail is in
+`docs/VERIFICATION.md` under "after the RC verdict". The RC table below keeps the verdict of the code it was recorded against.
 
 | | |
 | --- | --- |
