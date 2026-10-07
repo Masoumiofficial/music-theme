@@ -16,6 +16,8 @@ use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\Taxonomies;
 use Wavira\Core\Contracts\Registrable;
+use Wavira\Core\Demo\Exporter;
+use Wavira\Core\Demo\Installer;
 use Wavira\Core\Migration\LegacySchema;
 use Wavira\Core\Migration\Migrator;
 use Wavira\Core\Settings\Settings;
@@ -39,6 +41,7 @@ final class Cli implements Registrable {
 
 		\WP_CLI::add_command( 'wavira verify', array( $this, 'verify' ) );
 		\WP_CLI::add_command( 'wavira seed', array( $this, 'seed' ) );
+		\WP_CLI::add_command( 'wavira export-demo', array( $this, 'export_demo' ) );
 		\WP_CLI::add_command( 'wavira migrate', array( $this, 'migrate' ) );
 	}
 
@@ -68,8 +71,15 @@ final class Cli implements Registrable {
 	 * : Restore every migrated post from its backup and remove the tracks this
 	 * tool created.
 	 *
+	 * [--source=<source>]
+	 * : Which site built this content: `legacy` (the audited theme, default) or
+	 * `music-publisher` (the "Sajad Music Publisher" plugin). Both write
+	 * `post` + `musics_type`, so the value decides which field map runs.
+	 *
 	 * [--kind=<kind>]
-	 * : Limit the run to one legacy kind: mp3, mp4 or album.
+	 * : Limit the run to one kind. Legacy: mp3, mp4, album. Publishing plugin:
+	 * musicss, musicss_remix, musicss_nohe, musicss_podcast, musicss_video,
+	 * musicss_album.
 	 *
 	 * [--batch=<number>]
 	 * : Posts per run. Default 200.
@@ -83,6 +93,7 @@ final class Cli implements Registrable {
 	 * ## EXAMPLES
 	 *
 	 *     wp wavira migrate --detect
+	 *     wp wavira migrate --detect --source=music-publisher
 	 *     wp wavira migrate --dry-run
 	 *     wp wavira migrate --batch=500 --report=/tmp/migration.json
 	 *     wp wavira migrate --rollback
@@ -95,6 +106,19 @@ final class Cli implements Registrable {
 		unset( $args );
 
 		$migrator = new Migrator();
+		$source   = isset( $assoc_args['source'] ) ? (string) $assoc_args['source'] : LegacySchema::SOURCE_LEGACY;
+
+		if ( ! LegacySchema::has_source( $source ) ) {
+			\WP_CLI::error(
+				sprintf(
+					'Unknown --source "%s". Known sources: %s.',
+					$source,
+					implode( ', ', array_keys( LegacySchema::sources() ) )
+				)
+			);
+		}
+
+		$migrator->source( $source );
 
 		if ( isset( $assoc_args['detect'] ) ) {
 			$this->print_profile( $migrator->detect() );
@@ -159,11 +183,24 @@ final class Cli implements Registrable {
 	 * @return void
 	 */
 	private function print_profile( array $profile ): void {
-		\WP_CLI::log( 'Legacy content:' );
-		\WP_CLI::log( sprintf( '  mp3 (tracks): %d', (int) ( $profile['legacy']['mp3'] ?? 0 ) ) );
-		\WP_CLI::log( sprintf( '  mp4 (videos): %d', (int) ( $profile['legacy']['mp4'] ?? 0 ) ) );
-		\WP_CLI::log( sprintf( '  album:        %d', (int) ( $profile['legacy']['album'] ?? 0 ) ) );
-		\WP_CLI::log( sprintf( '  artist terms: %d', (int) $profile['artists'] ) );
+		$source = (string) ( $profile['source'] ?? LegacySchema::SOURCE_LEGACY );
+		$label  = (string) ( LegacySchema::sources()[ $source ]['label'] ?? $source );
+
+		\WP_CLI::log( sprintf( 'Source: %s (%s).', $source, $label ) );
+		\WP_CLI::log( 'Content found:' );
+
+		foreach ( $profile['legacy'] as $kind => $count ) {
+			\WP_CLI::log(
+				sprintf(
+					'  %-16s %4d post(s) → %s',
+					(string) $kind,
+					(int) $count,
+					(string) LegacySchema::target_of( (string) $kind, $source )
+				)
+			);
+		}
+
+		\WP_CLI::log( sprintf( '  %-16s %4d', 'artist terms:', (int) $profile['artists'] ) );
 
 		foreach ( $profile['deferred'] as $key => $info ) {
 			\WP_CLI::log( sprintf( '  deferred %s: %d post(s) — %s', (string) $key, (int) $info['posts'], (string) $info['reason'] ) );
@@ -173,7 +210,7 @@ final class Cli implements Registrable {
 			\WP_CLI::warning( sprintf( 'musics_type "%s" is not in the map (%d post(s)) — nothing will be converted for it.', (string) $value, (int) $count ) );
 		}
 
-		\WP_CLI::success( sprintf( '%d legacy post(s) found.', (int) $profile['total'] ) );
+		\WP_CLI::success( sprintf( '%d convertible post(s) found.', (int) $profile['total'] ) );
 	}
 
 	/**
@@ -184,6 +221,10 @@ final class Cli implements Registrable {
 	 */
 	private function print_report( array $report ): void {
 		$dry = ! empty( $report['dry_run'] );
+
+		if ( ! empty( $report['source'] ) ) {
+			\WP_CLI::log( sprintf( 'Source: %s.', (string) $report['source'] ) );
+		}
 
 		foreach ( (array) ( $report['log'] ?? array() ) as $line ) {
 			\WP_CLI::log( '  ' . (string) $line );
@@ -246,8 +287,9 @@ final class Cli implements Registrable {
 			}
 		}
 
-		foreach ( array( Taxonomies::GENRE, Taxonomies::MOOD, Taxonomies::LANGUAGE, Taxonomies::LABEL, Taxonomies::YEAR ) as $taxonomy ) {
-			$enabled = Taxonomies::GENRE === $taxonomy || Settings::get( 'enable_' . str_replace( 'wavira_', '', $taxonomy ), false );
+		foreach ( array( Taxonomies::GENRE, Taxonomies::KIND, Taxonomies::MOOD, Taxonomies::LANGUAGE, Taxonomies::LABEL, Taxonomies::YEAR ) as $taxonomy ) {
+			$always  = in_array( $taxonomy, array( Taxonomies::GENRE, Taxonomies::KIND ), true );
+			$enabled = $always || Settings::get( 'enable_' . str_replace( 'wavira_', '', $taxonomy ), false );
 
 			if ( $enabled && ! taxonomy_exists( $taxonomy ) ) {
 				$errors[] = sprintf( 'Taxonomy missing: %s', $taxonomy );
@@ -298,23 +340,26 @@ final class Cli implements Registrable {
 	}
 
 	/**
-	 * Create a licence-clean demo set (artist, releases, tracks, video).
+	 * Install the demo content (Persian by default).
 	 *
 	 * Persian by default: the product is sold to Persian-language sites, so the
 	 * demo it ships with is a Persian music site — Persian content, `fa_IR`,
 	 * Asia/Tehran, a week that starts on Saturday, and Jalali dates on the front
-	 * end (ADR 0017). `--english` seeds the neutral English fixture instead and
-	 * leaves the site's locale, timezone and menus alone.
+	 * end (ADR 0017). `--english` installs the neutral English fixture instead
+	 * and leaves the site's locale, timezone and menus alone.
 	 *
 	 * Idempotent: does nothing when the site already has tracks, unless --force.
-	 * Audio files are never seeded: a fabricated media URL that 404s is worse
-	 * than no URL at all, and the player is covered by the harness in
-	 * `tools/preview/` and by the PHP suite.
+	 * The same installer runs behind the admin screen `Tools → Wavira demo
+	 * content`, so a buyer without WP-CLI gets the identical demo. Audio files
+	 * are never seeded: a fabricated media URL that 404s is worse than no URL at
+	 * all, and the player is covered by the harness in `tools/preview/` and by
+	 * the PHP suite.
 	 *
 	 * ## OPTIONS
 	 *
 	 * [--force]
-	 * : Seed even when tracks already exist.
+	 * : Re-import even when tracks already exist. Only posts a previous import
+	 *   created are replaced; anything the owner wrote is left alone.
 	 *
 	 * [--english]
 	 * : Seed the English fixture, and leave the site's locale, timezone and
@@ -336,374 +381,114 @@ final class Cli implements Registrable {
 	public function seed( $args = array(), $assoc_args = array() ): void {
 		unset( $args );
 
-		$force      = isset( $assoc_args['force'] );
-		$english    = isset( $assoc_args['english'] );
-		$with_site  = ! isset( $assoc_args['no-site'] );
-		$count      = wp_count_posts( PostTypes::TRACK );
-		$has_tracks = isset( $count->publish ) && (int) $count->publish > 0;
+		$english = isset( $assoc_args['english'] );
 
-		if ( $has_tracks && ! $force ) {
-			\WP_CLI::warning( 'Tracks already exist — nothing seeded. Use --force to seed anyway.' );
+		try {
+			$report = Installer::install(
+				array(
+					'force'   => isset( $assoc_args['force'] ),
+					'english' => $english,
+					'site'    => ! isset( $assoc_args['no-site'] ),
+				)
+			);
+		} catch ( \RuntimeException $exception ) {
+			\WP_CLI::error( $exception->getMessage() );
 			return;
 		}
 
-		$demo = $english ? self::english_demo() : self::persian_demo();
-
-		$artist_id   = self::insert_demo_post( PostTypes::ARTIST, $demo['artist'] );
-		$release_ids = array();
-		$track_ids   = array();
-
-		foreach ( $demo['releases'] as $release ) {
-			$release_id = self::insert_demo_post( PostTypes::ALBUM, $release );
-
-			update_post_meta( $release_id, MetaSchema::ARTIST, $artist_id );
-			update_post_meta( $release_id, MetaSchema::ALBUM_TYPE, (string) $release['type'] );
-			update_post_meta( $release_id, MetaSchema::RELEASE_DATE, (string) $release['release_date'] );
-
-			self::attach_genre( $release_id, (string) $release['genre'] );
-
-			$release_tracks = array();
-
-			foreach ( $release['tracks'] as $index => $track ) {
-				$track_id = self::insert_demo_post(
-					PostTypes::TRACK,
-					array(
-						'title'      => (string) $track['title'],
-						'date'       => (string) $track['date'],
-						'menu_order' => $index + 1,
-					)
-				);
-
-				update_post_meta( $track_id, MetaSchema::ARTIST, $artist_id );
-				update_post_meta( $track_id, MetaSchema::ALBUM, $release_id );
-				update_post_meta( $track_id, MetaSchema::DURATION, (int) $track['duration'] );
-				update_post_meta( $track_id, MetaSchema::LYRICS, (string) $track['lyrics'] );
-				update_post_meta( $track_id, MetaSchema::RELEASE_DATE, (string) $track['date'] );
-
-				if ( ! empty( $track['featured'] ) ) {
-					update_post_meta( $track_id, MetaSchema::FEATURED, true );
-				}
-
-				self::attach_genre( $track_id, (string) $track['genre'] );
-
-				$release_tracks[] = (int) $track_id;
-				$track_ids[]      = (int) $track_id;
-			}
-
-			update_post_meta( $release_id, MetaSchema::TRACKLIST, $release_tracks );
-
-			$release_ids[] = (int) $release_id;
+		foreach ( (array) $report['notices'] as $notice ) {
+			\WP_CLI::warning( (string) $notice );
 		}
 
-		$video_id = self::insert_demo_post( PostTypes::VIDEO, $demo['video'] );
+		if ( $report['skipped'] ) {
+			return;
+		}
 
-		update_post_meta( $video_id, MetaSchema::ARTIST, $artist_id );
-		update_post_meta( $video_id, MetaSchema::ALBUM, (int) reset( $release_ids ) );
-		update_post_meta( $video_id, MetaSchema::VIDEO_SOURCE, 'other' );
+		if ( ! $english && ! isset( $assoc_args['no-site'] ) ) {
+			\WP_CLI::log( '  site   fa_IR · Asia/Tehran · week starts on Saturday · Jalali dates' );
+		}
 
-		if ( ! $english && $with_site ) {
-			self::apply_site_defaults( $demo );
-			self::create_primary_menu( $demo );
+		if ( (int) $report['menu'] > 0 ) {
+			\WP_CLI::log( '  menu   primary menu created' );
+		}
+
+		if ( (int) $report['replaced'] > 0 ) {
+			\WP_CLI::log( sprintf( '  replaced %d post(s) of the previous import', (int) $report['replaced'] ) );
 		}
 
 		\WP_CLI::success(
 			sprintf(
 				'Seeded artist #%1$d, %2$d releases, %3$d tracks and a video.',
-				(int) $artist_id,
-				count( $release_ids ),
-				count( $track_ids )
+				(int) $report['artist'],
+				count( (array) $report['releases'] ),
+				count( (array) $report['tracks'] )
 			)
 		);
 	}
 
 	/**
-	 * Insert one demo post, failing loudly when WordPress refuses.
+	 * Export the site's music content as a WXR file.
 	 *
-	 * @param string               $post_type Post type.
-	 * @param array<string, mixed> $data      Title, content, date and menu order.
-	 * @return int Post ID.
-	 */
-	private static function insert_demo_post( string $post_type, array $data ): int {
-		$post_id = wp_insert_post(
-			array(
-				'post_type'    => $post_type,
-				'post_title'   => (string) $data['title'],
-				'post_content' => (string) ( $data['content'] ?? '' ),
-				'post_status'  => 'publish',
-				'post_date'    => (string) ( $data['date'] ?? '' ),
-				'menu_order'   => (int) ( $data['menu_order'] ?? 0 ),
-			),
-			true
-		);
-
-		if ( is_wp_error( $post_id ) ) {
-			\WP_CLI::error( $post_id->get_error_message() );
-		}
-
-		return (int) $post_id;
-	}
-
-	/**
-	 * Attach one genre term, creating it on first use.
+	 * WXR is the format every WordPress importer reads, so this is how a demo —
+	 * or a live catalogue — moves to another installation: the file goes in
+	 * through `Tools → Import` on the target site. The same document is
+	 * available as a download from `Tools → Wavira demo content`.
 	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $name    Genre name.
+	 * ## OPTIONS
+	 *
+	 * [--file=<path>]
+	 * : Where to write the document. Default: `wavira-content-<site>-<date>.xml`
+	 *   in the current directory.
+	 *
+	 * [--type=<post-type>]
+	 * : Export one post type only (wavira_track, wavira_album, wavira_artist,
+	 *   wavira_video). Default: every content type.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp wavira export-demo
+	 *     wp wavira export-demo --file=/tmp/demo.xml
+	 *     wp wavira export-demo --type=wavira_track
+	 *
+	 * @param array $args       Positional arguments (unused).
+	 * @param array $assoc_args Associative arguments: see OPTIONS.
 	 * @return void
 	 */
-	private static function attach_genre( int $post_id, string $name ): void {
-		$term = term_exists( $name, Taxonomies::GENRE );
+	public function export_demo( $args = array(), $assoc_args = array() ): void {
+		unset( $args );
 
-		if ( ! $term ) {
-			$term = wp_insert_term( $name, Taxonomies::GENRE );
+		$type = isset( $assoc_args['type'] ) ? (string) $assoc_args['type'] : 'all';
+
+		if ( 'all' !== $type && ! in_array( $type, Exporter::demo_types(), true ) ) {
+			\WP_CLI::error(
+				sprintf(
+					'Unknown --type "%s". Known types: all, %s.',
+					$type,
+					implode( ', ', Exporter::demo_types() )
+				)
+			);
 		}
 
-		if ( is_wp_error( $term ) || ! is_array( $term ) || ! isset( $term['term_id'] ) ) {
+		$path   = isset( $assoc_args['file'] ) ? (string) $assoc_args['file'] : getcwd() . '/' . Exporter::file_name();
+		$result = Exporter::to_file( $path, array( 'content' => $type ) );
+
+		if ( ! $result['ok'] ) {
+			\WP_CLI::error( (string) $result['reason'] );
 			return;
 		}
 
-		wp_set_object_terms( $post_id, array( (int) $term['term_id'] ), Taxonomies::GENRE, true );
-	}
-
-	/**
-	 * The Iranian defaults a Persian music site expects.
-	 *
-	 * @param array<string, mixed> $demo Demo catalogue.
-	 * @return void
-	 */
-	private static function apply_site_defaults( array $demo ): void {
-		update_option( 'WPLANG', (string) $demo['site']['locale'] );
-		update_option( 'timezone_string', (string) $demo['site']['timezone'] );
-		update_option( 'start_of_week', 6 );
-		update_option( 'date_format', 'j F Y' );
-		update_option( 'time_format', 'H:i' );
-
-		$description = (string) get_option( 'blogdescription' );
-
-		// Only replace a description nobody wrote on purpose.
-		if ( '' === trim( $description ) || 'Just another WordPress site' === $description ) {
-			update_option( 'blogdescription', (string) $demo['site']['description'] );
-		}
-
-		\WP_CLI::log( '  site   fa_IR · Asia/Tehran · week starts on Saturday · Jalali dates' );
-	}
-
-	/**
-	 * Build the theme's primary menu from the demo catalogue.
-	 *
-	 * @param array<string, mixed> $demo Demo catalogue.
-	 * @return void
-	 */
-	private static function create_primary_menu( array $demo ): void {
-		$menu_id = wp_create_nav_menu( (string) $demo['menu']['name'] );
-
-		if ( is_wp_error( $menu_id ) ) {
-			$existing = wp_get_nav_menu_object( (string) $demo['menu']['name'] );
-
-			if ( ! $existing ) {
-				\WP_CLI::warning( 'Could not create or find the demo menu.' );
-				return;
-			}
-
-			$menu_id = (int) $existing->term_id;
-		}
-
-		foreach ( $demo['menu']['items'] as $item ) {
-			$args = array(
-				'menu-item-title'  => (string) $item['label'],
-				'menu-item-status' => 'publish',
-			);
-
-			if ( 'archive' === $item['type'] ) {
-				$args['menu-item-type']   = 'post_type_archive';
-				$args['menu-item-object'] = (string) $item['object'];
-			} elseif ( 'taxonomy' === $item['type'] ) {
-				$args['menu-item-type']   = 'taxonomy';
-				$args['menu-item-object'] = (string) $item['object'];
-			} else {
-				$args['menu-item-type'] = 'custom';
-				$args['menu-item-url']  = (string) $item['url'];
-			}
-
-			wp_update_nav_menu_item( (int) $menu_id, 0, $args );
-		}
-
-		// Read-modify-write of the nav menu locations, as its own step.
-		$locations = (array) get_theme_mod( 'nav_menu_locations', array() );
-
-		$locations['primary'] = (int) $menu_id;
-
-		set_theme_mod( 'nav_menu_locations', $locations );
-
-		\WP_CLI::log( sprintf( '  menu   %s → primary', (string) $demo['menu']['name'] ) );
-	}
-
-	/**
-	 * The Persian demo catalogue — the product's default demo.
-	 *
-	 * The text is content, not interface copy: it is written in Persian once and
-	 * is not passed through the translation functions, so it never lands in the
-	 * catalogue of interface strings. Every lyric here is generated for the demo
-	 * (ADR 0010): no real song, no third-party work, no real biography.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function persian_demo(): array {
-		return array(
-			'artist'   => array(
-				'title'   => 'آرمان راد',
-				'content' => "آرمان راد، ترانه‌ساز و خوانندهٔ اهل تهران است. کار را با اجراهای کوچک در سالن‌های محلی آغاز کرد و سپس با انتشار تک‌آهنگ‌ها و همکاری با نوازندگان دیگر به صحنه‌های بزرگ‌تر رسید.\n\nاین متن نمایشی است؛ آن را با زندگی‌نامهٔ واقعی هنرمند جایگزین کنید.",
-				'date'    => '2025-11-01',
-			),
-			'releases' => array(
-				array(
-					'title'        => 'شب‌های تهران',
-					'type'         => 'album',
-					'date'         => '2025-12-20',
-					'release_date' => '2025-12-20',
-					'genre'        => 'پاپ رؤیایی',
-					'tracks'       => array(
-						array(
-							'title'    => 'راه بارانی',
-							'date'     => '2025-11-05',
-							'genre'    => 'پاپ رؤیایی',
-							'duration' => 214,
-							'featured' => true,
-							'lyrics'   => "چترم از باران پر است،\nکوچه را تا خانه می‌دوم.",
-						),
-						array(
-							'title'    => 'سکوت',
-							'date'     => '2025-11-19',
-							'genre'    => 'پاپ رؤیایی',
-							'duration' => 187,
-							'lyrics'   => "سکوت من ترانه نیست،\nنفسِ میان دو واژه است.",
-						),
-						array(
-							'title'    => 'پرواز',
-							'date'     => '2025-12-03',
-							'genre'    => 'راک تجربی',
-							'duration' => 246,
-							'lyrics'   => "اگر بمانم، پَر می‌ریزم،\nپس می‌پرم از لبهٔ شهر.",
-						),
-					),
-				),
-				array(
-					'title'        => 'باران بهاری',
-					'type'         => 'single',
-					'date'         => '2026-01-15',
-					'release_date' => '2026-01-15',
-					'genre'        => 'امبینت',
-					'tracks'       => array(
-						array(
-							'title'    => 'باران بهاری',
-							'date'     => '2026-01-15',
-							'genre'    => 'امبینت',
-							'duration' => 231,
-							'lyrics'   => "باران که آمد، شهر نفس کشید،\nو بوی بهار از پنجره گذشت.",
-						),
-					),
-				),
-			),
-			'video'    => array(
-				'title' => 'اجرای زندهٔ نمایشی',
-				'date'  => '2026-02-01',
-			),
-			'site'     => array(
-				'locale'      => 'fa_IR',
-				'timezone'    => 'Asia/Tehran',
-				'description' => 'انتشار موسیقی روی سایت خودتان',
-			),
-			'menu'     => array(
-				'name'  => 'منوی اصلی',
-				'items' => array(
-					array(
-						'type'  => 'custom',
-						'label' => 'خانه',
-						'url'   => home_url( '/' ),
-					),
-					array(
-						'type'   => 'archive',
-						'label'  => 'آهنگ‌ها',
-						'object' => PostTypes::TRACK,
-					),
-					array(
-						'type'   => 'archive',
-						'label'  => 'آلبوم‌ها',
-						'object' => PostTypes::ALBUM,
-					),
-					array(
-						'type'   => 'archive',
-						'label'  => 'هنرمندان',
-						'object' => PostTypes::ARTIST,
-					),
-					array(
-						'type'   => 'archive',
-						'label'  => 'ویدیوها',
-						'object' => PostTypes::VIDEO,
-					),
-					array(
-						'type'   => 'taxonomy',
-						'label'  => 'سبک‌ها',
-						'object' => Taxonomies::GENRE,
-					),
-				),
-			),
+		\WP_CLI::success(
+			sprintf(
+				'Wrote %1$s (%2$s).',
+				(string) $result['file'],
+				size_format( (int) $result['bytes'] )
+			)
 		);
 	}
 
-	/**
-	 * The neutral English fixture.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function english_demo(): array {
-		$lyrics = __( 'Generated demo lyrics — replace this text.', 'wavira-core' );
-		$genre  = __( 'Demo Genre', 'wavira-core' );
-		$tracks = array();
 
-		for ( $index = 1; $index <= 3; $index++ ) {
-			$tracks[] = array(
-				'title'    => sprintf(
-					/* translators: %d: demo track number. */
-					__( 'Demo Track %d', 'wavira-core' ),
-					$index
-				),
-				'date'     => '2026-01-0' . $index,
-				'genre'    => $genre,
-				'duration' => 180 + ( $index * 7 ),
-				'featured' => 1 === $index,
-				'lyrics'   => $lyrics,
-			);
-		}
 
-		return array(
-			'artist'   => array(
-				'title'   => __( 'Demo Artist', 'wavira-core' ),
-				'content' => __( 'Generated demo biography. Replace with real content.', 'wavira-core' ),
-				'date'    => '2026-01-01',
-			),
-			'releases' => array(
-				array(
-					'title'        => __( 'Demo Album', 'wavira-core' ),
-					'type'         => 'album',
-					'date'         => '2026-01-08',
-					'release_date' => '2026-01-08',
-					'genre'        => $genre,
-					'tracks'       => $tracks,
-				),
-			),
-			'video'    => array(
-				'title' => __( 'Demo Music Video', 'wavira-core' ),
-				'date'  => '2026-01-15',
-			),
-			'site'     => array(
-				'locale'      => 'en_US',
-				'timezone'    => 'UTC',
-				'description' => '',
-			),
-			'menu'     => array(
-				'name'  => 'Demo menu',
-				'items' => array(),
-			),
-		);
-	}
+
+
+
 }

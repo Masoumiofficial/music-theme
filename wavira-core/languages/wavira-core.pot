@@ -25,6 +25,10 @@ msgstr ""
 msgid "A %s queue needs the ID of its source item."
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:108
+msgid "A demo pointing at files that do not exist would break the player on the first click; add your own media and the player picks it up."
+msgstr ""
+
 #: wavira-core/src/Rest/PlayerController.php:192
 msgid "A genre queue needs a genre slug."
 msgstr ""
@@ -34,7 +38,7 @@ msgid "Ad slot HTML (above the player)"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:155
-#: wavira-core/src/Content/Taxonomies.php:183
+#: wavira-core/src/Content/Taxonomies.php:289
 #. translators: %s: content type singular name (e.g. "Track").
 msgid "Add new %s"
 msgstr ""
@@ -48,7 +52,7 @@ msgstr ""
 msgid "Albums"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:168
+#: wavira-core/src/Content/Taxonomies.php:274
 #. translators: %s: taxonomy plural name.
 msgid "All %s"
 msgstr ""
@@ -99,25 +103,40 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:686
+#: wavira-core/src/Demo/Fixtures.php:184
 msgid "Demo Album"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:680
+#: wavira-core/src/Demo/Fixtures.php:178
 msgid "Demo Artist"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:660
+#: wavira-core/src/Admin/DemoPage.php:266
+#. translators: 1: number of releases, 2: number of tracks.
+msgid "Demo content imported: %1$d release and %2$d track. Open the front page to see it."
+msgid_plural "Demo content imported: %1$d releases and %2$d tracks. Open the front page to see it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: wavira-core/src/Demo/Fixtures.php:157
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:695
+#: wavira-core/src/Demo/Fixtures.php:193
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:667
+#: wavira-core/src/Demo/Fixtures.php:164
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:148
+msgid "Download everything Wavira manages — artists, albums, tracks, videos, their terms and metadata — as a WXR file, the format any WordPress importer reads."
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:154
+msgid "Download WXR file"
 msgstr ""
 
 #: wavira-core/src/Rest/DownloadController.php:85
@@ -125,7 +144,7 @@ msgid "Downloads are not available for this track."
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:160
-#: wavira-core/src/Content/Taxonomies.php:173
+#: wavira-core/src/Content/Taxonomies.php:279
 #. translators: %s: content type singular name.
 msgid "Edit %s"
 msgstr ""
@@ -146,6 +165,10 @@ msgstr ""
 msgid "Enable the Release-year taxonomy"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:145
+msgid "Export the music content"
+msgstr ""
+
 #: wavira-core/src/Content/ArtistProfile.php:199
 msgid "Facebook"
 msgstr ""
@@ -154,15 +177,15 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:681
+#: wavira-core/src/Demo/Fixtures.php:179
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Admin/Cli.php:659
+#: wavira-core/src/Demo/Fixtures.php:156
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:105
+#: wavira-core/src/Content/Taxonomies.php:202
 msgid "Genre"
 msgstr ""
 
@@ -170,7 +193,7 @@ msgstr ""
 msgid "Genre slug for a genre queue."
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:104
+#: wavira-core/src/Content/Taxonomies.php:201
 msgid "Genres"
 msgstr ""
 
@@ -178,23 +201,39 @@ msgstr ""
 msgid "Global social profile URLs"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:140
+msgid "Import demo content"
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:116
+msgid "Import options"
+msgstr ""
+
 #: wavira-core/src/Content/ArtistProfile.php:195
 msgid "Instagram"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:132
+#: wavira-core/src/Content/Taxonomies.php:211
+msgid "Kind"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:210
+msgid "Kinds"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:238
 msgid "Label"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:131
+#: wavira-core/src/Content/Taxonomies.php:237
 msgid "Labels"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:123
+#: wavira-core/src/Content/Taxonomies.php:229
 msgid "Language"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:122
+#: wavira-core/src/Content/Taxonomies.php:228
 msgid "Languages"
 msgstr ""
 
@@ -243,11 +282,11 @@ msgstr ""
 msgid "Maximum suggestions per entity."
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:114
+#: wavira-core/src/Content/Taxonomies.php:220
 msgid "Mood"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:113
+#: wavira-core/src/Content/Taxonomies.php:219
 msgid "Moods"
 msgstr ""
 
@@ -268,12 +307,16 @@ msgstr ""
 msgid "Mute"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:128
+msgid "Neutral English fixture: content only, nothing about the site is changed."
+msgstr ""
+
 #: wavira-core/src/Content/PostTypes.php:165
 #. translators: %s: content type singular name.
 msgid "New %s"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:188
+#: wavira-core/src/Content/Taxonomies.php:294
 #. translators: %s: taxonomy singular name.
 msgid "New %s name"
 msgstr ""
@@ -287,9 +330,17 @@ msgstr ""
 msgid "No %s found for the requested ID."
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:107
+msgid "No audio or video files are imported."
+msgstr ""
+
 #: wavira-core/src/Rest/DownloadController.php:106
 #: wavira-core/src/Rest/DownloadController.php:116
 msgid "No downloadable audio file is available for this track."
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:102
+msgid "Noha"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:179
@@ -325,6 +376,10 @@ msgstr ""
 msgid "Pause"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:121
+msgid "Persian demo (recommended): also sets the site language, the Tehran timezone, a Saturday week and Jalali dates."
+msgstr ""
+
 #: wavira-core/src/Player/Assets.php:177
 msgid "Play"
 msgstr ""
@@ -342,6 +397,10 @@ msgstr ""
 msgid "Plugin activation failed"
 msgstr ""
 
+#: wavira-core/src/Content/Taxonomies.php:103
+msgid "Podcast"
+msgstr ""
+
 #: wavira-core/src/Player/Assets.php:180
 msgid "Previous track"
 msgstr ""
@@ -354,12 +413,16 @@ msgstr ""
 msgid "Related items per block"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:141
+#: wavira-core/src/Content/Taxonomies.php:247
 msgid "Release year"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:140
+#: wavira-core/src/Content/Taxonomies.php:246
 msgid "Release years"
+msgstr ""
+
+#: wavira-core/src/Content/Taxonomies.php:101
+msgid "Remix"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:187
@@ -393,12 +456,16 @@ msgstr ""
 msgid "Repeat one"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:135
+msgid "Replace a demo that was imported before (only posts this importer created are removed)."
+msgstr ""
+
 #: wavira-core/src/Settings/SettingsSchema.php:109
 msgid "Require a logged-in user to download"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:175
-#: wavira-core/src/Content/Taxonomies.php:163
+#: wavira-core/src/Content/Taxonomies.php:269
 #. translators: %s: content type plural name.
 msgid "Search %s"
 msgstr ""
@@ -429,8 +496,16 @@ msgstr ""
 msgid "Shuffle"
 msgstr ""
 
+#: wavira-core/src/Content/Taxonomies.php:100
+msgid "Single"
+msgstr ""
+
 #: wavira-core/src/Content/ArtistProfile.php:266
 msgid "Singles"
+msgstr ""
+
+#: wavira-core/src/Demo/Installer.php:321
+msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 
 #: wavira-core/src/Rest/AbstractController.php:111
@@ -450,8 +525,26 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:285
+#. translators: %s: error message.
+msgid "The demo content could not be imported: %s"
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:288
+#. translators: %s: error message.
+msgid "The demo content could not be imported."
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:103
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
+msgstr ""
+
 #: wavira-core/src/Player/Assets.php:196
 msgid "There is nothing to play here."
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:278
+msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
 msgstr ""
 
 #: wavira-core/src/Player/Assets.php:195
@@ -483,6 +576,10 @@ msgstr ""
 msgid "Tracks"
 msgstr ""
 
+#: wavira-core/src/Demo/Installer.php:74
+msgid "Tracks already exist — nothing was imported. Use force to import anyway."
+msgstr ""
+
 #: wavira-core/src/Settings/SettingsSchema.php:51
 msgid "Tracks per archive page"
 msgstr ""
@@ -496,7 +593,7 @@ msgstr ""
 msgid "Unmute"
 msgstr ""
 
-#: wavira-core/src/Content/Taxonomies.php:178
+#: wavira-core/src/Content/Taxonomies.php:284
 #. translators: %s: taxonomy singular name.
 msgid "Update %s"
 msgstr ""
@@ -528,6 +625,12 @@ msgstr ""
 msgid "Wavira Core was deactivated: your server does not meet the minimum PHP or WordPress version."
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:76
+#: wavira-core/src/Admin/DemoPage.php:77
+#: wavira-core/src/Admin/DemoPage.php:98
+msgid "Wavira demo content"
+msgstr ""
+
 #: wavira-core/src/Settings/Settings.php:41
 msgid "Wavira settings"
 msgstr ""
@@ -542,6 +645,14 @@ msgstr ""
 
 #: wavira-core/src/Content/ArtistProfile.php:200
 msgid "X (Twitter)"
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:207
+msgid "You are not allowed to export this site."
+msgstr ""
+
+#: wavira-core/src/Admin/DemoPage.php:167
+msgid "You are not allowed to import demo content on this site."
 msgstr ""
 
 #: wavira-core/src/Content/ArtistProfile.php:197

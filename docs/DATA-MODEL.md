@@ -30,6 +30,7 @@ with `map_meta_cap`, and support title, editor, thumbnail, excerpt, revisions, a
 | Taxonomy | Slug | Optional? | Attached to |
 | --- | --- | --- | --- |
 | `wavira_genre` | `/genres/` | always on | track, album, video, artist |
+| `wavira_kind` | `/kinds/` | always on | track (single · remix · noha · podcast — the kind of audio, kept from imported publishing-plugin content; `docs/INTEGRATIONS.md` §4) |
 | `wavira_mood` | `/moods/` | setting `enable_mood` (default on) | track, album |
 | `wavira_language` | `/languages/` | setting `enable_language` (default on) | track, album, video |
 | `wavira_label` | `/labels/` | setting `enable_label` (default on) | album |

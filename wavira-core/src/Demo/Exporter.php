@@ -1,0 +1,147 @@
+<?php
+/**
+ * Export the site's music content as a WordPress eXtended RSS (WXR) document.
+ *
+ * WXR is the interchange format every WordPress importer reads, and the one a
+ * site owner already knows: this is the path for moving a demo or a live
+ * catalogue to another installation without touching a database dump.
+ *
+ * The exporter is a thin, honest wrapper around WordPress' own `export_wp()`
+ * rather than a second implementation of it. Re-implementing WXR would mean
+ * maintaining the format: the term/meta/attachment rules, the escaping, and the
+ * `wp_import` quirks that make an export round-trip. None of that is a Wavira
+ * decision, and Core already does it.
+ *
+ * @package Wavira\Core
+ */
+
+namespace Wavira\Core\Demo;
+
+use Wavira\Core\Content\PostTypes;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class Exporter
+ */
+final class Exporter {
+
+	/**
+	 * Build a WXR document for the current site.
+	 *
+	 * @param array<string, mixed> $args `content` (post type or `all`) and
+	 *                                   `status` (post status or `all`).
+	 * @return array<string, string> `ok` (`1`/`0`), `xml`, `reason`.
+	 */
+	public static function xml( array $args = array() ): array {
+		$content = (string) ( $args['content'] ?? 'all' );
+		$status  = (string) ( $args['status'] ?? 'all' );
+
+		if ( ! function_exists( 'export_wp' ) ) {
+			$path = ABSPATH . 'wp-admin/includes/export.php';
+
+			if ( ! is_readable( $path ) ) {
+				return array(
+					'ok'     => '0',
+					'xml'    => '',
+					'reason' => 'wp-admin/includes/export.php is not readable on this installation',
+				);
+			}
+
+			require_once $path;
+		}
+
+		if ( ! function_exists( 'export_wp' ) ) {
+			return array(
+				'ok'     => '0',
+				'xml'    => '',
+				'reason' => 'export_wp() is not available on this installation',
+			);
+		}
+
+		// `export_wp()` prints the document; capturing it keeps the caller free
+		// to stream it to a download or write it to a file.
+		ob_start();
+		export_wp(
+			array(
+				'content' => $content,
+				'status'  => $status,
+			)
+		);
+		$xml = (string) ob_get_clean();
+
+		if ( '' === trim( $xml ) ) {
+			return array(
+				'ok'     => '0',
+				'xml'    => '',
+				'reason' => 'the export produced no content',
+			);
+		}
+
+		return array(
+			'ok'     => '1',
+			'xml'    => $xml,
+			'reason' => '',
+		);
+	}
+
+	/**
+	 * Write the WXR document to a file.
+	 *
+	 * @param string               $path Absolute path to write to.
+	 * @param array<string, mixed> $args Arguments for `xml()`.
+	 * @return array<string, mixed> `ok` (bool), `file`, `bytes`, `reason`.
+	 */
+	public static function to_file( string $path, array $args = array() ): array {
+		$document = self::xml( $args );
+
+		if ( '1' !== $document['ok'] ) {
+			return array(
+				'ok'     => false,
+				'file'   => '',
+				'bytes'  => 0,
+				'reason' => $document['reason'],
+			);
+		}
+
+		$written = file_put_contents( $path, $document['xml'] ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- a path the operator chose, never a front-end request.
+
+		if ( false === $written ) {
+			return array(
+				'ok'     => false,
+				'file'   => '',
+				'bytes'  => 0,
+				'reason' => sprintf( 'could not write %s', $path ),
+			);
+		}
+
+		return array(
+			'ok'     => true,
+			'file'   => $path,
+			'bytes'  => (int) $written,
+			'reason' => '',
+		);
+	}
+
+	/**
+	 * A file name for a downloaded export.
+	 *
+	 * @return string File name without a path.
+	 */
+	public static function file_name(): string {
+		return sprintf(
+			'wavira-content-%1$s-%2$s.xml',
+			sanitize_title( (string) get_bloginfo( 'name' ) ),
+			gmdate( 'Ymd-His' )
+		);
+	}
+
+	/**
+	 * The post types the demo ships, in the order a reviewer reads them.
+	 *
+	 * @return string[]
+	 */
+	public static function demo_types(): array {
+		return array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO );
+	}
+}

@@ -162,6 +162,21 @@ hardcoded; nothing stored in serialized ACF blobs.
 
 ---
 
+## 6b. A second source outside the audited theme
+
+The same ecosystem ships a **publishing plugin** (`Masoumiofficial/Music-Publisher`, v1.0.0) that
+Persian music sites use when they do not use this theme. It is not part of the audit (it is GPL code
+that is still maintained), but it writes the same `musics_type` discriminator with its own vocabulary,
+so the migration tool converts it too — from the audited **shape**, with its own field map and its own
+review rules. Findings that carry over unchanged: D2 (file URLs in a repeater instead of entities),
+D4 (`art_name` free text next to the `singer` taxonomy), D7 (string booleans `online_ply` /
+`slider_song`) and D8 (no duration or file-size metadata). One finding is new: the plugin stores role
+credits (songwriter, composer, arranger, mix engineer) as **taxonomies**, and v1 has no field for
+them, so they are preserved as migratable data and reported rather than modelled late in the release.
+Full contract: `docs/INTEGRATIONS.md`.
+
+---
+
 ## 7. Data-integrity findings
 
 | # | Finding | Evidence | Severity |

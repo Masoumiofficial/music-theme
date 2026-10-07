@@ -195,6 +195,7 @@ const BUNDLE_EXTRAS = [
 	{ from: 'THIRD-PARTY-NOTICES.md', to: 'README-FIRST/THIRD-PARTY-NOTICES.md' },
 	{ from: 'docs/PERSIAN-LOCALIZATION.md', to: 'README-FIRST/PERSIAN-LOCALIZATION.md' },
 	{ from: 'docs/MIGRATION-BLUEPRINT.md', to: 'README-FIRST/MIGRATION.md' },
+	{ from: 'docs/INTEGRATIONS.md', to: 'README-FIRST/INTEGRATIONS.md' },
 	{ from: 'docs/fa/README.md', to: 'README-FIRST/fa/README.md' },
 	{ from: 'docs/fa/USER-GUIDE.md', to: 'README-FIRST/fa/USER-GUIDE.md' },
 ];

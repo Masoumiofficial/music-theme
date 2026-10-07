@@ -132,8 +132,10 @@ normal request pays nothing for them and no migration code can run by accident.
 
 ```bash
 wp wavira migrate --detect                 # read-only site profile: legacy kinds, deferred fields, unknown values
+wp wavira migrate --detect --source=music-publisher  # the same, for a publishing-plugin site
 wp wavira migrate --dry-run                # the full plan; nothing is written, no report is stored
 wp wavira migrate [--batch=200] [--kind=mp3] [--offset=0] [--report=/tmp/migration.json]
+wp wavira migrate --source=music-publisher [--kind=musicss_remix]
 wp wavira migrate --rollback [--batch=200] # restore from `_migration_backup`, delete created tracks
 wp wavira migrate --status                 # the stored report of the last run
 ```
@@ -178,6 +180,37 @@ the album-row read defect above and an admin-only function (`get_post_meta_by_ke
 during a front-end or test request. The CI run after those fixes — `37440743623` (push) / `37440749435`
 (PR), 8/8 jobs, `OK (146 tests, 1198 assertions)` on PHP 7.4 and 8.2 — is what makes the tool **VERIFIED**.
 
-**Open in 0.11.0:** the admin page (§6 named one) is not built — the CLI is the shipped surface, because
-it is scriptable, dry-runnable and reviewable, and an admin screen needs its own capability and UI
-decision; the packaging script and the final docs pass are the rest of the phase.
+**Open in 0.11.0:** the *migration* admin page (§6 named one) is not built — the migration tool's
+shipped surface is the CLI, because it is scriptable, dry-runnable and reviewable, and running a
+conversion of a live site from a button is a decision that deserves its own phase. (The **demo**
+importer does have an admin screen, `Tools → Wavira demo content` — it installs fixtures, never a
+customer's data.) The packaging script and the final docs pass were the rest of the phase.
+
+---
+
+## 9. The second source: the publishing plugin (0.11.0)
+
+A Persian music site is often built with **“Sajad Music Publisher”** rather than the audited theme, and
+that plugin writes the same meta key with a different vocabulary. Wavira converts both, from one
+engine with two profiles (`docs/INTEGRATIONS.md` is the full contract).
+
+| | Legacy theme | Publishing plugin |
+| --- | --- | --- |
+| Discriminator | `musics_type` = `mp3` · `mp4` · `album` | `musics_type` = `musicss` · `musicss_remix` · `musicss_nohe` · `musicss_podcast` · `musicss_video` · `musicss_album` |
+| Audio | `music128` · `music320` | `music128` · `music320` |
+| Lyrics | `music_text` | `music_txt` |
+| Artist | `artist` (+ `singer` terms, tags) | `art_name` (+ `artist_en`, `singer` terms) |
+| Cover | `vip_img` | `fifu_image_url` |
+| Featured / index player | `vip_song` / `plym` | `slider_song` / `online_ply` |
+| Album tracks | ACF repeater `album` (`song_names`, `albumlink128/320`) | array meta `album_dl` (`title`, `al_url128/320`) |
+| Role credits | — | taxonomies `songwriter` · `composer` · `regulator` · `mixmaster` |
+| Extra kinds | — | remix · noha · podcast, kept in `wavira_kind` |
+
+| # | Test | Where |
+| --- | --- | --- |
+| M11 | a publishing-plugin track converts with kind, sources, lyrics, credit and booleans | `test_publisher_track_arrives_with_its_kind_and_credits` |
+| M12 | the album repeater of that source expands, ordered, once | `test_publisher_album_rows_expand_to_ordered_tracks_once` |
+| M13 | `--source` converts only its own vocabulary | `test_a_source_only_converts_its_own_vocabulary` |
+| M14 | kinds normalise (and a video/album carries none) | `test_publisher_kinds_normalise_to_kind_terms` |
+| M15 | role credits are data, not invented artists | `tests/test-migration.php` (I2 in `docs/INTEGRATIONS.md`) |
+| M16 | the two source maps cannot collide | `test_the_two_sources_do_not_share_a_kind_vocabulary` |

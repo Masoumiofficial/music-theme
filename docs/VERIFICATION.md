@@ -194,6 +194,22 @@ core feature, not a comfortable margin.
 | The migration tool's behaviour on a real install (pre-flight) | **TESTED locally** (superseded by the CI row above) | WordPress 6.7.2 + the SQLite integration plugin in the build sandbox: 43 behavioural checks (detect, dry run, run, slug/sources/lyrics/flags, artist merge, album expansion, idempotency, rollback) and 20 WP-CLI checks against a stub of the `WP_CLI` API. Two defects were found and fixed here (the album repeater was read with the target key; `unmapped_kinds()` called an admin-only function). Not a substitute for the CI suite — see the next row |
 | A 10 000-post dry run | **NOT_STARTED** | blueprint §7 M1 at scale is a staging exercise with a real catalogue; the unit-level dry run is covered and the tool is bounded/resumable by construction |
 
+### 0.11.0 — additions after the release-candidate verdict
+
+The verdict runs (`37618881223`/`37618887341`) are the ones recorded in
+`docs/RELEASE-CANDIDATE.md`. The three additions below landed afterwards, inside the same version;
+the rows state what was executed for them, and the CI verdict is recorded once the run for this
+commit completes.
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| A site built with the publishing plugin converts, with its own field map | **TESTED** (suite) | `Migration\LegacySchema` carries two source profiles (`sources()`, `kinds()`, `fields()`, `credit_meta()`, `title_meta()`, `album_rows()`, `deferred()`); `Migrator::source()` + `wp wavira migrate --source=music-publisher`. Suite: `test_publisher_track_arrives_with_its_kind_and_credits`, `test_publisher_album_rows_expand_to_ordered_tracks_once`, `test_a_source_only_converts_its_own_vocabulary`, `test_the_two_sources_do_not_share_a_kind_vocabulary`, `test_an_unknown_source_is_refused_and_keeps_the_default`, `test_cli_accepts_the_source_option`. The reader facts and the full field map are in `docs/INTEGRATIONS.md`; they were read from the plugin's source, and no plugin file ships with the product |
+| The kind of audio content survives the migration | **TESTED** (suite) | `Content\Taxonomies::KIND` (`wavira_kind`, `/kinds/`, flat, track-only, vocabulary `music` · `remix` · `noha` · `podcast`) with an explicit alias map (`musicss_remix` → `remix`, `musicss_nohe` → `noha`) instead of substring matching, which would file every remix as a single. Suite: `test_kind_taxonomy_is_registered_for_tracks`, `test_kind_vocabulary_matches_the_importable_types`, `test_kind_terms_are_created_once`, `test_publisher_kinds_normalise_to_kind_terms`. Theme surface: `templates/taxonomy-wavira_kind.html` |
+| A buyer without WP-CLI can install the demo | **TESTED** (suite) | `Demo\Fixtures` (the Persian catalogue + the neutral English fixture), `Demo\Installer::install()` (idempotent; `force` replaces only posts carrying `_wavira_demo`), `Admin\DemoPage` on `Tools → Wavira demo content` behind `manage_options` + `admin_post_*` + `check_admin_referer`. Suite: `tests/test-demo.php` — full catalogue, no fabricated media URLs, idempotency, forced replace that leaves the owner's post alone, English fixture leaving the site alone, Iranian defaults, fixture shape, WXR export, and the two source-level guard assertions (the admin screen and the CLI both call `Installer::install()`) |
+| The demo can leave the site it was installed on | **TESTED** (suite) | `Demo\Exporter` wraps WordPress' own `export_wp()`: `wp wavira export-demo [--file=…] [--type=…]` and the *Download WXR file* button on the same screen. Suite: `test_export_produces_a_wxr_document`, `test_export_file_name_is_a_safe_xml_name` |
+| The new admin screen is registered as a plugin module, and adds no admin surface to the front end | **TESTED** (suite) | `Plugin::default_modules()` includes `Admin\DemoPage`; `DemoPage::register()` returns early when `! is_admin()`. Suite: `test_demo_screen_is_a_plugin_module` |
+| The Persian catalogue covers every new string | **VERIFIED** (static gate) | `node tools/i18n.mjs check` → `241/241 string(s) translated, POT/PO/MO in sync` (was 215); `tools/lint.sh` → `RESULT: PASS` twice, including `[PACKAGE]` |
+
 **What the 0.10.1 runs found.** Three red runs, three real defects — none of them silenced:
 
 1. `5c4abf9` — the **WPCS** job rejected the new files (array-item spacing, alignment, a stand-alone

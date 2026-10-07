@@ -11,6 +11,7 @@
 namespace Wavira\Core;
 
 use Wavira\Core\Admin\Cli;
+use Wavira\Core\Admin\DemoPage;
 use Wavira\Core\Content\ContentModule;
 use Wavira\Core\Contracts\Registrable;
 use Wavira\Core\Player\Assets;
@@ -146,6 +147,7 @@ final class Plugin {
 			new ContentRoutes(),
 			new Assets(),
 			new CacheInvalidator(),
+			new DemoPage(),
 			new Cli(),
 		);
 	}

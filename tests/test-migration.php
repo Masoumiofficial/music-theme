@@ -127,9 +127,15 @@ class Test_Migration extends Wavira_Test_Case {
 		$schema   = MetaSchema::all();
 		$promised = array( MetaSchema::CREDIT_LABEL, MetaSchema::SUBTITLE, MetaSchema::ARTIST, MetaSchema::TRACKLIST );
 
-		foreach ( array_keys( LegacySchema::kinds() ) as $kind ) {
-			foreach ( LegacySchema::fields( $kind ) as $map ) {
-				$promised[] = $map[0];
+		foreach ( array_keys( LegacySchema::sources() ) as $source ) {
+			foreach ( array_keys( LegacySchema::kinds( $source ) ) as $kind ) {
+				foreach ( LegacySchema::fields( $kind, $source ) as $map ) {
+					$promised[] = $map[0];
+				}
+			}
+
+			foreach ( LegacySchema::album_rows( $source )['map'] as $target ) {
+				$promised[] = $target;
 			}
 		}
 
@@ -458,6 +464,236 @@ class Test_Migration extends Wavira_Test_Case {
 		$this->assertSame( 'post', get_post_type( $id ), 'an unknown kind is not converted' );
 		$this->assertArrayHasKey( 'playlist', (array) $report['unmapped'] );
 		$this->assertGreaterThanOrEqual( 1, (int) $report['unmapped']['playlist'] );
+	}
+
+	/**
+	 * The two source maps never claim the same `musics_type` value.
+	 *
+	 * They share the meta key (`musics_type`) but not its vocabulary: the legacy
+	 * theme writes `mp3`/`mp4`/`album`, the publishing plugin `musicss*`. A
+	 * collision would make `--source` meaningless and silently convert a site
+	 * with the wrong field map — the one failure mode a shared engine has.
+	 *
+	 * @return void
+	 */
+	public function test_the_two_sources_do_not_share_a_kind_vocabulary() {
+		$legacy    = LegacySchema::kinds( LegacySchema::SOURCE_LEGACY );
+		$publisher = LegacySchema::kinds( LegacySchema::SOURCE_MUSIC_PUBLISHER );
+
+		$this->assertSame( array(), array_intersect_key( $legacy, $publisher ) );
+		$this->assertArrayHasKey( 'mp3', $legacy );
+		$this->assertArrayHasKey( 'musicss_remix', $publisher );
+	}
+
+	/**
+	 * A publishing-plugin track arrives with its kind, its sources and its credit.
+	 *
+	 * Fixture: the shape `class-smp-post-handler.php` writes — `post` +
+	 * `musics_type`, `music128`/`music320`, `music_txt`, `art_name`,
+	 * `track_name`, `fifu_image_url`, `online_ply` — plus the role taxonomies.
+	 *
+	 * @return void
+	 */
+	public function test_publisher_track_arrives_with_its_kind_and_credits() {
+		foreach ( LegacySchema::contributor_taxonomies( LegacySchema::SOURCE_MUSIC_PUBLISHER ) as $taxonomy ) {
+			if ( ! taxonomy_exists( $taxonomy ) ) {
+				register_taxonomy( $taxonomy, array( 'post' ), array( 'public' => false ) );
+			}
+		}
+
+		$term = wp_insert_term( 'آرمان راد', LegacySchema::ARTIST_TAX, array( 'slug' => 'arman-rad' ) );
+		$this->assertIsArray( $term );
+
+		$id = $this->legacy_post(
+			array(
+				LegacySchema::TYPE_META => 'musicss_remix',
+				'art_name'              => 'آرمان راد',
+				'artist_en'             => 'Arman Rad',
+				'track_name'            => 'نسخهٔ ریمیکس',
+				'music128'              => 'https://cdn.example.test/remix-128.mp3',
+				'music320'              => 'https://cdn.example.test/remix-320.mp3',
+				'music_txt'             => '<p>متن</p>',
+				'online_ply'            => 'on',
+				'slider_song'           => '1',
+				'music320_video'        => 'https://cdn.example.test/odd.mp3',
+				'talbume320'            => 'https://cdn.example.test/albums/320/',
+			),
+			'راه بارانی (ریمیکس)'
+		);
+
+		foreach ( array( 'songwriter', 'mixmaster' ) as $taxonomy ) {
+			wp_set_object_terms( $id, array( 'مهسا کیان' ), $taxonomy );
+		}
+
+		( new Migrator() )->source( LegacySchema::SOURCE_MUSIC_PUBLISHER )->run();
+
+		$this->assertSame( PostTypes::TRACK, get_post_type( $id ) );
+		$this->assertSame( 'https://cdn.example.test/remix-320.mp3', get_post_meta( $id, MetaSchema::AUDIO_320, true ) );
+		$this->assertSame( 'https://cdn.example.test/remix-128.mp3', get_post_meta( $id, MetaSchema::AUDIO_128, true ) );
+		$this->assertSame( 'آرمان راد', get_post_meta( $id, MetaSchema::CREDIT_LABEL, true ) );
+		$this->assertSame( 'نسخهٔ ریمیکس', get_post_meta( $id, MetaSchema::SUBTITLE, true ) );
+		$this->assertTrue( (bool) get_post_meta( $id, MetaSchema::FEATURED, true ) );
+		$this->assertTrue( (bool) get_post_meta( $id, MetaSchema::IN_INDEX_PLAYER, true ), '"on" is a real boolean, not a truthy string' );
+
+		$this->assertSame(
+			array( 'remix' ),
+			wp_get_post_terms( $id, Taxonomies::KIND, array( 'fields' => 'slugs' ) ),
+			'musicss_remix lands in the remix kind, not in a generic track bucket'
+		);
+
+		$this->assertSame( LegacySchema::SOURCE_MUSIC_PUBLISHER, get_post_meta( $id, LegacySchema::SOURCE_META, true ) );
+
+		$raw = get_post_meta( $id, LegacySchema::RAW, true );
+
+		$this->assertIsArray( $raw );
+		$this->assertSame( 'Arman Rad', $raw['artist_en'], 'a second-language field is audited, never dropped' );
+		$this->assertSame( 'https://cdn.example.test/odd.mp3', $raw['music320_video'], 'the video MP3 has no v1 field but stays recoverable' );
+		$this->assertSame( 'مهسا کیان', $raw['contributors']['songwriter'][0], 'a role credit is kept as data' );
+
+		$report = ( new Migrator() )->source( LegacySchema::SOURCE_MUSIC_PUBLISHER )->report();
+
+		$this->assertStringContainsString( 'credits name', implode( "\n", (array) $report['needs_review'] ), 'and the operator is told to place it by hand' );
+	}
+
+	/**
+	 * A publishing-plugin album expands from `album_dl` rows, keyed by the row.
+	 *
+	 * @return void
+	 */
+	public function test_publisher_album_rows_expand_to_ordered_tracks() {
+		$id = $this->legacy_post(
+			array(
+				LegacySchema::TYPE_META => 'musicss_album',
+				'art_name'              => 'آرمان راد',
+				'album320'              => 'https://cdn.example.test/album-320.zip',
+				'album_dl'              => array(
+					array(
+						'title'     => 'قطعهٔ یک',
+						'al_url128' => 'https://cdn.example.test/one-128.mp3',
+						'al_url320' => 'https://cdn.example.test/one-320.mp3',
+					),
+					array(
+						'title'     => 'قطعهٔ دو',
+						'al_url128' => 'https://cdn.example.test/two-128.mp3',
+					),
+				),
+			),
+			'شب‌های تهران'
+		);
+
+		( new Migrator() )->source( LegacySchema::SOURCE_MUSIC_PUBLISHER )->run();
+
+		$this->assertSame( PostTypes::ALBUM, get_post_type( $id ) );
+		$this->assertSame( 'https://cdn.example.test/album-320.zip', get_post_meta( $id, MetaSchema::ALBUM_AUDIO_320, true ) );
+
+		$tracklist = get_post_meta( $id, MetaSchema::TRACKLIST, true );
+
+		$this->assertIsArray( $tracklist );
+		$this->assertCount( 2, $tracklist, 'both rows become tracks' );
+		$this->assertSame( 'قطعهٔ یک', get_the_title( (int) $tracklist[0] ) );
+		$this->assertSame( 'قطعهٔ دو', get_the_title( (int) $tracklist[1] ) );
+		$this->assertSame( 'https://cdn.example.test/one-320.mp3', get_post_meta( (int) $tracklist[0], MetaSchema::AUDIO_320, true ) );
+
+		foreach ( $tracklist as $track ) {
+			$this->posts[] = (int) $track;
+		}
+	}
+
+	/**
+	 * `--source` decides which map runs, and never converts the other one.
+	 *
+	 * @return void
+	 */
+	public function test_a_source_only_converts_its_own_vocabulary() {
+		$legacy = $this->legacy_track();
+
+		$this->legacy_post(
+			array(
+				LegacySchema::TYPE_META => 'musicss_nohe',
+				'art_name'              => 'کربلایی',
+				'music320'              => 'https://cdn.example.test/noha-320.mp3',
+			),
+			'نوحه'
+		);
+
+		$report = ( new Migrator() )->source( LegacySchema::SOURCE_MUSIC_PUBLISHER )->run();
+
+		$this->assertSame( 'post', get_post_type( $legacy ), 'a legacy mp3 is not touched by the publishing-plugin map' );
+		$this->assertGreaterThanOrEqual( 1, (int) $report['migrated'], 'and the plugin content is converted' );
+	}
+
+	/**
+	 * The kinds of the publishing plugin normalise to the product's vocabulary.
+	 *
+	 * @return void
+	 */
+	public function test_publisher_kinds_normalise_to_kind_terms() {
+		$expected = array(
+			'musicss'         => 'music',
+			'musicss_remix'   => 'remix',
+			'musicss_nohe'    => 'noha',
+			'musicss_podcast' => 'podcast',
+		);
+
+		foreach ( $expected as $kind => $term ) {
+			$this->assertSame( $term, LegacySchema::kind_term( $kind, LegacySchema::SOURCE_MUSIC_PUBLISHER ), $kind );
+		}
+
+		$this->assertSame( '', LegacySchema::kind_term( 'musicss_video', LegacySchema::SOURCE_MUSIC_PUBLISHER ), 'a video is its own post type' );
+		$this->assertSame( '', LegacySchema::kind_term( 'musicss_album', LegacySchema::SOURCE_MUSIC_PUBLISHER ) );
+		$this->assertSame( 'music', LegacySchema::kind_term( 'mp3', LegacySchema::SOURCE_LEGACY ) );
+		$this->assertSame(
+			'',
+			\Wavira\Core\Content\Taxonomies::normalize_kind( 'musicss_unknown_thing' ),
+			'a value the alias map does not know stays unmapped'
+		);
+	}
+
+	/**
+	 * The detection profile names the source it profiled.
+	 *
+	 * @return void
+	 */
+	public function test_detection_reports_the_selected_source() {
+		$this->legacy_post(
+			array(
+				LegacySchema::TYPE_META => 'musicss_podcast',
+				'music320'              => 'https://cdn.example.test/ep-1.mp3',
+			),
+			'قسمت یک'
+		);
+
+		$profile = ( new Migrator() )->source( LegacySchema::SOURCE_MUSIC_PUBLISHER )->detect();
+
+		$this->assertSame( LegacySchema::SOURCE_MUSIC_PUBLISHER, $profile['source'] );
+		$this->assertSame( 1, (int) $profile['legacy']['musicss_podcast'] );
+		$this->assertArrayHasKey( 'artist_en', $profile['deferred'], 'the deferred profile of the source is what is counted' );
+	}
+
+	/**
+	 * An unknown `--source` value is refused, not quietly ignored.
+	 *
+	 * @return void
+	 */
+	public function test_an_unknown_source_is_refused_and_keeps_the_default() {
+		$migrator = new Migrator();
+
+		$this->assertSame( LegacySchema::SOURCE_LEGACY, $migrator->current_source(), 'the default source is the audited theme' );
+		$this->assertFalse( LegacySchema::has_source( 'musicpress' ) );
+		$this->assertSame( LegacySchema::SOURCE_LEGACY, $migrator->source( 'musicpress' )->current_source(), 'an unknown slug cannot repoint the engine' );
+	}
+
+	/**
+	 * The CLI exposes the source, and refuses an unknown one.
+	 *
+	 * @return void
+	 */
+	public function test_cli_accepts_the_source_option() {
+		$cli = (string) file_get_contents( dirname( __DIR__ ) . '/wavira-core/src/Admin/Cli.php' );
+
+		$this->assertStringContainsString( '--source=<source>', $cli );
+		$this->assertStringContainsString( 'LegacySchema::has_source', $cli );
+		$this->assertStringContainsString( '$migrator->source( $source )', $cli );
 	}
 
 	/**

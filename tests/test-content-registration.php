@@ -61,6 +61,68 @@ class Test_Content_Registration extends Wavira_Test_Case {
 	}
 
 	/**
+	 * The kind taxonomy is always available, flat, and attached to tracks only.
+	 *
+	 * It exists so imported content keeps its nature: a remix, a noha and a
+	 * podcast episode are all audio, and without this taxonomy every one of them
+	 * would be indistinguishable from a song in the archive.
+	 *
+	 * @return void
+	 */
+	public function test_kind_taxonomy_is_registered_for_tracks() {
+		$this->assertTrue( taxonomy_exists( 'wavira_kind' ) );
+
+		$taxonomy = get_taxonomy( 'wavira_kind' );
+
+		$this->assertSame( array( 'wavira_track' ), $taxonomy->object_type, 'a video and an album already are their own type' );
+		$this->assertSame( 'kinds', $taxonomy->rewrite['slug'] );
+		$this->assertSame( 'kinds', $taxonomy->rest_base );
+		$this->assertTrue( $taxonomy->show_in_rest );
+		$this->assertFalse( $taxonomy->hierarchical, 'a kind is a label, not a tree' );
+		$this->assertTrue( $taxonomy->publicly_queryable, 'a kind archive is a real surface: /kinds/noha/ for a Persian site' );
+	}
+
+	/**
+	 * The kind vocabulary is the product's own, and normalises source values.
+	 *
+	 * @return void
+	 */
+	public function test_kind_vocabulary_matches_the_importable_types() {
+		$kinds = \Wavira\Core\Content\Taxonomies::kinds();
+
+		foreach ( array( 'music', 'remix', 'noha', 'podcast' ) as $slug ) {
+			$this->assertArrayHasKey( $slug, $kinds );
+		}
+
+		$this->assertSame( 'remix', \Wavira\Core\Content\Taxonomies::normalize_kind( 'musicss_remix' ) );
+		$this->assertSame( 'noha', \Wavira\Core\Content\Taxonomies::normalize_kind( 'musicss_nohe' ) );
+		$this->assertSame( 'music', \Wavira\Core\Content\Taxonomies::normalize_kind( 'musicss' ) );
+		$this->assertSame( '', \Wavira\Core\Content\Taxonomies::normalize_kind( 'something_else' ), 'an unknown value invents no term' );
+	}
+
+	/**
+	 * Every kind term exists after the seeder ran.
+	 *
+	 * @return void
+	 */
+	public function test_kind_terms_are_created_once() {
+		\Wavira\Core\Content\Taxonomies::ensure_kind_terms();
+		\Wavira\Core\Content\Taxonomies::ensure_kind_terms();
+
+		$terms = get_terms(
+			array(
+				'taxonomy'   => \Wavira\Core\Content\Taxonomies::KIND,
+				'hide_empty' => false,
+				'fields'     => 'slugs',
+			)
+		);
+
+		$this->assertIsArray( $terms );
+		$this->assertSame( array(), array_diff( array_keys( \Wavira\Core\Content\Taxonomies::kinds() ), $terms ) );
+		$this->assertSame( count( array_unique( $terms ) ), count( $terms ), 'a second call creates no duplicate' );
+	}
+
+	/**
 	 * Optional taxonomies follow their settings switch.
 	 *
 	 * @return void

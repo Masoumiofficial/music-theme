@@ -74,6 +74,39 @@ final class Migrator {
 	private $report = array();
 
 	/**
+	 * Source being converted: `legacy` (the audited theme) or
+	 * `music-publisher` (the publishing plugin). Both write `post` +
+	 * `musics_type`, so one engine with two field maps beats two importers that
+	 * drift apart (see `LegacySchema::sources()`).
+	 *
+	 * @var string
+	 */
+	private $source = LegacySchema::SOURCE_LEGACY;
+
+	/**
+	 * Select the source and return the engine, so a caller can chain.
+	 *
+	 * @param string $source Source slug (`legacy`, `music-publisher`).
+	 * @return self
+	 */
+	public function source( string $source ): self {
+		if ( LegacySchema::has_source( $source ) ) {
+			$this->source = $source;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * The source this engine is reading.
+	 *
+	 * @return string
+	 */
+	public function current_source(): string {
+		return $this->source;
+	}
+
+	/**
 	 * Detect what the site holds: legacy content, and what will need a decision.
 	 *
 	 * Read-only; it is what `wp wavira migrate --dry-run` prints first.
@@ -82,6 +115,7 @@ final class Migrator {
 	 */
 	public function detect(): array {
 		$profile = array(
+			'source'   => $this->source,
 			'legacy'   => array(),
 			'total'    => 0,
 			'artists'  => 0,
@@ -89,7 +123,7 @@ final class Migrator {
 			'unmapped' => array(),
 		);
 
-		foreach ( array_keys( LegacySchema::kinds() ) as $kind ) {
+		foreach ( array_keys( LegacySchema::kinds( $this->source ) ) as $kind ) {
 			$count = $this->count_legacy( $kind );
 
 			$profile['legacy'][ $kind ] = $count;
@@ -98,7 +132,7 @@ final class Migrator {
 
 		$profile['artists'] = count( $this->artist_terms() );
 
-		foreach ( LegacySchema::deferred() as $key => $reason ) {
+		foreach ( LegacySchema::deferred( $this->source ) as $key => $reason ) {
 			$found = $this->count_meta( $key );
 
 			if ( $found > 0 ) {
@@ -162,6 +196,7 @@ final class Migrator {
 		);
 
 		$profile                  = $this->detect();
+		$this->report['source']   = $this->source;
 		$this->report['detected'] = $profile['legacy'];
 		$this->report['deferred'] = $profile['deferred'];
 		$this->report['unmapped'] = $profile['unmapped'];
@@ -174,7 +209,7 @@ final class Migrator {
 			$this->log( sprintf( 'dry run: %d artist term(s) would be built into the artist directory', $profile['artists'] ) );
 		}
 
-		$kinds = '' !== $kind ? array( $kind ) : array_keys( LegacySchema::kinds() );
+		$kinds = '' !== $kind ? array( $kind ) : array_keys( LegacySchema::kinds( $this->source ) );
 
 		foreach ( $kinds as $one ) {
 			$ids = $this->legacy_ids( $one, $batch, $offset );
@@ -184,7 +219,7 @@ final class Migrator {
 
 				if ( $dry ) {
 					++$this->report['migrated'];
-					$this->log( sprintf( 'dry run: #%d (post "%s") → %s', $id, (string) get_the_title( $id ), LegacySchema::target_of( $one ) ) );
+					$this->log( sprintf( 'dry run: #%d (post "%s") → %s', $id, (string) get_the_title( $id ), LegacySchema::target_of( $one, $this->source ) ) );
 					continue;
 				}
 
@@ -236,7 +271,7 @@ final class Migrator {
 
 		$ids = get_posts(
 			array(
-				'post_type'        => array_values( LegacySchema::kinds() ),
+				'post_type'        => array( PostTypes::TRACK, PostTypes::ALBUM, PostTypes::VIDEO ),
 				'post_status'      => self::STATUSES,
 				'posts_per_page'   => $batch,
 				'fields'           => 'ids',
@@ -272,11 +307,12 @@ final class Migrator {
 			// The keys to remove are the ones the *kind* wrote, and the kind is
 			// part of the backup: a post's original type (`post`) says nothing
 			// about which field map ran over it.
-			$kind = is_array( $backup['meta'] ?? null ) && isset( $backup['meta'][ LegacySchema::TYPE_META ] )
+			$kind   = is_array( $backup['meta'] ?? null ) && isset( $backup['meta'][ LegacySchema::TYPE_META ] )
 				? (string) $backup['meta'][ LegacySchema::TYPE_META ]
 				: '';
+			$source = isset( $backup[ LegacySchema::SOURCE_META ] ) ? (string) $backup[ LegacySchema::SOURCE_META ] : LegacySchema::SOURCE_LEGACY;
 
-			foreach ( $this->written_keys( $kind ) as $key ) {
+			foreach ( $this->written_keys( $kind, $source ) as $key ) {
 				delete_post_meta( (int) $id, $key );
 			}
 
@@ -305,7 +341,7 @@ final class Migrator {
 	 * @return void
 	 */
 	private function migrate_post( int $id, string $kind ): void {
-		$target = LegacySchema::target_of( $kind );
+		$target = LegacySchema::target_of( $kind, $this->source );
 
 		if ( '' === $target ) {
 			return;
@@ -327,7 +363,7 @@ final class Migrator {
 		$legacy = array();
 		$raw    = array();
 
-		foreach ( LegacySchema::all_post_keys() as $key ) {
+		foreach ( LegacySchema::all_post_keys( $this->source ) as $key ) {
 			$value = get_post_meta( $id, $key, true );
 
 			if ( '' !== $value && array() !== $value && null !== $value && false !== $value ) {
@@ -343,19 +379,22 @@ final class Migrator {
 				'post_type' => $post->post_type,
 				'meta'      => $legacy,
 				'version'   => LegacySchema::VERSION,
+				'source'    => $this->source,
+				'kind'      => $kind,
 			)
 		);
 		update_post_meta( $id, LegacySchema::RAW, $raw );
+		update_post_meta( $id, LegacySchema::SOURCE_META, $this->source );
 
 		set_post_type( $id, $target );
 
-		foreach ( LegacySchema::fields( $kind ) as $legacy_key => $map ) {
+		foreach ( LegacySchema::fields( $kind, $this->source ) as $legacy_key => $map ) {
 			$this->move( $id, $legacy_key, $map[0], $map[1] );
 		}
 
 		// A free-text artist becomes the credit label, and the entity when the
 		// name matches one. `wavira_credit_label` is what the templates print.
-		$credit = (string) get_post_meta( $id, 'artist', true );
+		$credit = (string) get_post_meta( $id, LegacySchema::credit_meta( $this->source ), true );
 
 		if ( '' !== $credit ) {
 			update_post_meta( $id, MetaSchema::CREDIT_LABEL, Meta::sanitize_text( $credit ) );
@@ -372,15 +411,17 @@ final class Migrator {
 			}
 		}
 
-		// `song` is only useful when it is not already the title; otherwise it
-		// would print the title twice on every card.
-		$song = (string) get_post_meta( $id, 'song', true );
+		// The work's title is only useful when it is not already the post title;
+		// otherwise it would print the title twice on every card.
+		$song = (string) get_post_meta( $id, LegacySchema::title_meta( $this->source ), true );
 
 		if ( '' !== $song && $song !== $post->post_title ) {
 			update_post_meta( $id, MetaSchema::SUBTITLE, Meta::sanitize_text( $song ) );
 		}
 
 		$this->copy_genres( $id );
+		$this->apply_kind( $id, $kind );
+		$this->collect_contributors( $id );
 
 		if ( PostTypes::ALBUM === $target ) {
 			$this->expand_album( $post );
@@ -389,6 +430,84 @@ final class Migrator {
 		update_post_meta( $id, LegacySchema::MARKER, LegacySchema::VERSION );
 		++$this->report['migrated'];
 		$this->log( sprintf( '#%d "%s" → %s', $id, $post->post_title, $target ) );
+	}
+
+	/**
+	 * Put the item in the kind taxonomy (`wavira_kind`).
+	 *
+	 * A publishing plugin writes `musicss_remix` / `musicss_nohe` /
+	 * `musicss_podcast`; without this step every one of them would arrive as an
+	 * indistinguishable track and a Persian site could not show «ریمیکس‌ها».
+	 * A source kind with no kind term (a video, an album) writes nothing.
+	 *
+	 * @param int    $id   Post ID.
+	 * @param string $kind Source `musics_type` value.
+	 * @return void
+	 */
+	private function apply_kind( int $id, string $kind ): void {
+		$term = LegacySchema::kind_term( $kind, $this->source );
+
+		if ( '' === $term || ! taxonomy_exists( Taxonomies::KIND ) ) {
+			return;
+		}
+
+		Taxonomies::ensure_kind_terms();
+		wp_set_object_terms( $id, $term, Taxonomies::KIND, false );
+	}
+
+	/**
+	 * Record credits the v1 model has no field for.
+	 *
+	 * The publishing plugin stores the songwriter, composer, arranger and
+	 * mix/master engineer as terms. v1 has no role-credit field, so the names are
+	 * copied to the raw audit meta and reported once — creating artist entities
+	 * for people who may only be credited on one line would be a guess about the
+	 * data, and guessing is what this tool does not do.
+	 *
+	 * @param int $id Post ID.
+	 * @return void
+	 */
+	private function collect_contributors( int $id ): void {
+		$taxonomies = LegacySchema::contributor_taxonomies( $this->source );
+
+		if ( array() === $taxonomies ) {
+			return;
+		}
+
+		$found = array();
+
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( ! taxonomy_exists( $taxonomy ) ) {
+				continue;
+			}
+
+			$names = wp_get_post_terms( $id, $taxonomy, array( 'fields' => 'names' ) );
+
+			if ( is_wp_error( $names ) || array() === $names ) {
+				continue;
+			}
+
+			$found[ $taxonomy ] = array_values( array_map( 'strval', $names ) );
+		}
+
+		if ( array() === $found ) {
+			return;
+		}
+
+		$raw = get_post_meta( $id, LegacySchema::RAW, true );
+		$raw = is_array( $raw ) ? $raw : array();
+
+		$raw['contributors'] = $found;
+
+		update_post_meta( $id, LegacySchema::RAW, $raw );
+		$this->queue_review(
+			sprintf(
+				'#%d: credits name %d contributor(s) the v1 model has no field for — they are kept in %s',
+				$id,
+				count( $found ),
+				LegacySchema::RAW
+			)
+		);
 	}
 
 	/**
@@ -510,13 +629,14 @@ final class Migrator {
 	 * @return void
 	 */
 	private function expand_album( \WP_Post $album ): void {
-		$rows = get_post_meta( $album->ID, 'album', true );
+		$shape = LegacySchema::album_rows( $this->source );
+		$rows  = get_post_meta( $album->ID, $shape['meta'], true );
 
 		if ( ! is_array( $rows ) || array() === $rows ) {
 			return;
 		}
 
-		$map  = LegacySchema::album_row_fields();
+		$map  = $shape['map'];
 		$list = array();
 		$made = array();
 
@@ -528,8 +648,9 @@ final class Migrator {
 			// Rows are indexed by their *legacy* sub-field name: the map's
 			// values are the meaning (`title` or a `MetaSchema` key), never the
 			// key to read.
-			$title = isset( $row[ LegacySchema::ALBUM_TITLE_ROW ] ) && is_scalar( $row[ LegacySchema::ALBUM_TITLE_ROW ] )
-				? Meta::sanitize_text( $row[ LegacySchema::ALBUM_TITLE_ROW ] )
+			$title_key = $shape['title'];
+			$title     = isset( $row[ $title_key ] ) && is_scalar( $row[ $title_key ] )
+				? Meta::sanitize_text( $row[ $title_key ] )
 				: '';
 
 			if ( '' === $title ) {
@@ -562,7 +683,7 @@ final class Migrator {
 			$track = (int) $track;
 
 			foreach ( $map as $legacy_key => $target_key ) {
-				if ( LegacySchema::ALBUM_TITLE_ROW === $legacy_key || 'title' === $target_key ) {
+				if ( $title_key === $legacy_key || 'title' === $target_key ) {
 					continue;
 				}
 
@@ -573,7 +694,7 @@ final class Migrator {
 				}
 			}
 
-			$credit = Meta::sanitize_text( (string) get_post_meta( $album->ID, 'artist', true ) );
+			$credit = Meta::sanitize_text( (string) get_post_meta( $album->ID, LegacySchema::credit_meta( $this->source ), true ) );
 
 			update_post_meta( $track, MetaSchema::ALBUM, $album->ID );
 			update_post_meta( $track, MetaSchema::CREDIT_LABEL, $credit );
@@ -765,9 +886,10 @@ final class Migrator {
 	 * @return \WP_Term[]
 	 */
 	private function artist_terms(): array {
-		$terms = array();
+		$terms  = array();
+		$artist = LegacySchema::artist_taxonomies( $this->source );
 
-		foreach ( array( LegacySchema::ARTIST_TAX, 'post_tag' ) as $taxonomy ) {
+		foreach ( $artist as $taxonomy ) {
 			if ( ! taxonomy_exists( $taxonomy ) ) {
 				continue;
 			}
@@ -790,7 +912,7 @@ final class Migrator {
 		$merged = array();
 
 		foreach ( $terms as $term ) {
-			if ( isset( $merged[ $term->slug ] ) && LegacySchema::ARTIST_TAX !== $term->taxonomy ) {
+			if ( isset( $merged[ $term->slug ] ) && ! in_array( $term->taxonomy, $artist, true ) ) {
 				continue;
 			}
 
@@ -920,7 +1042,12 @@ final class Migrator {
 	private function unmapped_kinds(): array {
 		global $wpdb;
 
-		$kinds = LegacySchema::kinds();
+		// A site can hold either source, or both at once after a plugin change,
+		// so a value is "unknown" only when neither map claims it.
+		$known = array_merge(
+			LegacySchema::kinds( LegacySchema::SOURCE_LEGACY ),
+			LegacySchema::kinds( LegacySchema::SOURCE_MUSIC_PUBLISHER )
+		);
 
 		// The distinct values of one meta key, counted by the database. A
 		// paged scan would have to read every typed row to build the same
@@ -945,7 +1072,7 @@ final class Migrator {
 		foreach ( $rows as $row ) {
 			$value = isset( $row['meta_value'] ) ? (string) $row['meta_value'] : '';
 
-			if ( '' === $value || isset( $kinds[ $value ] ) ) {
+			if ( '' === $value || isset( $known[ $value ] ) ) {
 				continue;
 			}
 
@@ -960,12 +1087,13 @@ final class Migrator {
 	 * exactly what the migration added.
 	 *
 	 * @param string $legacy_kind Legacy kind the post came from.
+	 * @param string $source      Source that produced the post.
 	 * @return string[]
 	 */
-	private function written_keys( string $legacy_kind ): array {
+	private function written_keys( string $legacy_kind, string $source ): array {
 		$keys = array( MetaSchema::CREDIT_LABEL, MetaSchema::SUBTITLE, MetaSchema::TRACKLIST, MetaSchema::ARTIST );
 
-		foreach ( LegacySchema::fields( $legacy_kind ) as $map ) {
+		foreach ( LegacySchema::fields( $legacy_kind, $source ) as $map ) {
 			$keys[] = $map[0];
 		}
 

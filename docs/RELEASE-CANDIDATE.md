@@ -5,6 +5,22 @@
 > §6 are the difference between "the code is ready" and "an upload is ready", and each one is either done,
 > or written down with the reason it is not.
 
+## 0. Added after the release-candidate verdict
+
+The RC was verified green (`37618881223`/`37618887341`) and then three gaps that a Persian buyer would
+have hit on the first day were closed, still inside 0.11.0 — no version bump, because nothing that was
+verified changed, only things that were missing were added:
+
+| Addition | Why it was not optional | Where | Tests |
+| --- | --- | --- | --- |
+| **Publishing-plugin interop** (`--source=music-publisher`) | the ecosystem's other publishing tool writes `post` + `musics_type` with its own vocabulary; a site built with it could not convert its catalogue | `Migration\LegacySchema` source profiles, `Migrator::source()`, `CLI --source`; `docs/INTEGRATIONS.md` | `tests/test-migration.php` (I1–I8) |
+| **`wavira_kind` taxonomy** | a remix, a noha and a podcast episode are all audio; without a kind they arrive indistinguishable from a song | `Content\Taxonomies::KIND`, `/kinds/`, `taxonomy-wavira_kind.html` | `tests/test-content-registration.php`, `test_publisher_kinds_normalise_to_kind_terms` |
+| **Demo import without WP-CLI** | most buyers never open a terminal; a demo only a developer can install is a demo most customers never see | `Demo\Fixtures`, `Demo\Installer`, `Admin\DemoPage` (`Tools → Wavira demo content`), `wp wavira export-demo` | `tests/test-demo.php` |
+
+The demo now also ships a remix of one of its tracks, so the kind feature is visible on a fresh
+install. The CI verdict for these additions is the run recorded in `docs/VERIFICATION.md` under
+"after the RC verdict"; the RC table below keeps the verdict of the code it was recorded against.
+
 | | |
 | --- | --- |
 | Product | **Wavira** — music-publishing ecosystem for WordPress (theme + core plugin) |
@@ -69,8 +85,11 @@ Because the product is sold to Persian-language markets, the claim is worth stat
 1. Plugins → Add New → Upload → wavira-core-0.11.0.zip → Activate
 2. Appearance → Themes → Add New → Upload → wavira-theme-0.11.0.zip → Activate
 3. Settings → Permalinks → save a pretty structure      (the archives need /artists/…, /albums/…)
-4. wp wavira seed --force                               (optional Persian demo content)
-5. wp wavira migrate --detect / --dry-run / …            (optional, for an existing legacy site)
+4. Tools → Wavira demo content → Import demo content    (optional Persian demo, no terminal needed)
+   or: wp wavira seed                                   (the same installer, from WP-CLI)
+5. wp wavira migrate --detect / --dry-run / …            (optional, for an existing site)
+   add --source=music-publisher for a site built with that plugin (docs/INTEGRATIONS.md)
+6. Tools → Wavira demo content → Download WXR file       (move the content to another install)
 ```
 
 ## 5. Support surface at release
@@ -81,6 +100,8 @@ Because the product is sold to Persian-language markets, the claim is worth stat
 | Install note (Persian) | generated into the bundle at `README-FIRST/fa/INSTALL-AND-START.md` |
 | Technical documentation | `README.md`, `docs/ARCHITECTURE.md`, `docs/DATA-MODEL.md`, `docs/MIGRATION-BLUEPRINT.md` |
 | In-product verification | `wp wavira verify` (post types, taxonomies, 46 meta keys, settings, REST routes, counters) |
+| Demo import (no terminal) | `Tools → Wavira demo content` — import the Persian demo, or download the content as WXR |
+| Interop contract | `docs/INTEGRATIONS.md` — what the publishing plugin writes, what converts, what is preserved instead |
 
 ## 6. Pre-upload checklist (the blocking items)
 
@@ -96,7 +117,8 @@ Because the product is sold to Persian-language markets, the claim is worth stat
 ## 7. Known limitations (stated rather than hidden)
 
 * No DRM, no streaming service, no marketplace: the product publishes music on the customer's own site.
-* The migration tool is CLI-only by design (ADR 0018 §7): no admin page in v1.
+* The **migration** tool is CLI-only by design (ADR 0018 §7): no admin page in v1. (The **demo**
+  importer has one, because it installs fixtures rather than converting a customer's live content.)
 * Elementor integration is deferred (`docs/REBUILD-PLAN.md`); Gutenberg blocks are the supported editor
   path in v1.
 * Multisite and theme-switch behaviour are **NOT_STARTED** as tests, though the theme/plugin split is

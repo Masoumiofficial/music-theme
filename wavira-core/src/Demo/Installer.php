@@ -1,0 +1,373 @@
+<?php
+/**
+ * Install the demo content — the one code path behind every door.
+ *
+ * `wp wavira seed` and the admin screen `Tools → Wavira demo content` both call
+ * `Installer::install()`; keeping the two in sync by hand is how a demo drifts
+ * from the product it demonstrates. The routine is idempotent by default: a site
+ * that already has tracks is left alone unless the caller forces a second run.
+ *
+ * Two rules, both inherited from the CLI command this replaced:
+ *
+ * - **No fabricated media.** Audio and video files are never seeded. A demo URL
+ *   that 404s is worse than no URL: the player would look broken on the first
+ *   click a buyer makes. The catalogue carries the metadata a music site needs
+ *   (artists, releases, tracklists, durations, lyrics, genres, kinds) and lets
+ *   the buyer add their own files.
+ * - **Fictional content only.** Every lyric, biography and title is written for
+ *   the demo (ADR 0010); nothing is copied from a real artist or song.
+ *
+ * @package Wavira\Core
+ */
+
+namespace Wavira\Core\Demo;
+
+use RuntimeException;
+use Wavira\Core\Content\MetaSchema;
+use Wavira\Core\Content\PostTypes;
+use Wavira\Core\Content\Taxonomies;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class Installer
+ */
+final class Installer {
+
+	/**
+	 * Post meta that marks a post as demo content this tool created.
+	 *
+	 * It is what makes a second import safe: a forced run removes exactly the
+	 * posts carrying this marker (and their attachments are never deleted),
+	 * while anything the site owner wrote is left untouched.
+	 */
+	public const MARKER = '_wavira_demo';
+
+	/**
+	 * Install the demo catalogue.
+	 *
+	 * @param array<string, mixed> $args `force` (bool), `english` (bool),
+	 *                                   `site` (bool: touch site options and the
+	 *                                   menu, default true).
+	 * @return array<string, mixed> Report: `skipped`, `artist`, `releases`,
+	 *                              `tracks`, `video`, `menu`, `notices`.
+	 * @throws RuntimeException When WordPress refuses to create a post.
+	 */
+	public static function install( array $args = array() ): array {
+		$force   = ! empty( $args['force'] );
+		$english = ! empty( $args['english'] );
+		$site    = ! array_key_exists( 'site', $args ) || ! empty( $args['site'] );
+
+		$report = array(
+			'skipped'  => false,
+			'artist'   => 0,
+			'releases' => array(),
+			'tracks'   => array(),
+			'video'    => 0,
+			'menu'     => 0,
+			'replaced' => 0,
+			'notices'  => array(),
+		);
+
+		if ( self::has_tracks() && ! $force ) {
+			$report['skipped']   = true;
+			$report['notices'][] = __( 'Tracks already exist — nothing was imported. Use force to import anyway.', 'wavira-core' );
+
+			return $report;
+		}
+
+		$demo = $english ? Fixtures::english() : Fixtures::persian();
+
+		if ( $force ) {
+			$report['replaced'] = self::remove_previous( $english ? 'english' : 'persian' );
+		}
+
+		Taxonomies::ensure_kind_terms();
+
+		$report['artist'] = self::insert_demo_post( PostTypes::ARTIST, $demo['artist'] );
+
+		foreach ( $demo['releases'] as $release ) {
+			$release_id = self::insert_demo_post( PostTypes::ALBUM, $release );
+
+			update_post_meta( $release_id, MetaSchema::ARTIST, $report['artist'] );
+			update_post_meta( $release_id, MetaSchema::ALBUM_TYPE, (string) $release['type'] );
+			update_post_meta( $release_id, MetaSchema::RELEASE_DATE, (string) $release['release_date'] );
+
+			self::attach_term( $release_id, Taxonomies::GENRE, (string) $release['genre'] );
+
+			$release_tracks = array();
+
+			foreach ( $release['tracks'] as $index => $track ) {
+				$track_id = self::insert_demo_post(
+					PostTypes::TRACK,
+					array(
+						'title'      => (string) $track['title'],
+						'date'       => (string) $track['date'],
+						'menu_order' => $index + 1,
+					)
+				);
+
+				update_post_meta( $track_id, MetaSchema::ARTIST, $report['artist'] );
+				update_post_meta( $track_id, MetaSchema::ALBUM, $release_id );
+				update_post_meta( $track_id, MetaSchema::DURATION, (int) $track['duration'] );
+				update_post_meta( $track_id, MetaSchema::LYRICS, (string) $track['lyrics'] );
+				update_post_meta( $track_id, MetaSchema::RELEASE_DATE, (string) $track['date'] );
+
+				if ( ! empty( $track['featured'] ) ) {
+					update_post_meta( $track_id, MetaSchema::FEATURED, true );
+				}
+
+				self::attach_term( $track_id, Taxonomies::GENRE, (string) $track['genre'] );
+				self::attach_kind( $track_id, (string) ( $track['kind'] ?? 'music' ) );
+
+				$release_tracks[] = $track_id;
+				$report['tracks'][] = $track_id;
+			}
+
+			update_post_meta( $release_id, MetaSchema::TRACKLIST, $release_tracks );
+
+			$report['releases'][] = $release_id;
+		}
+
+		$report['video'] = self::insert_demo_post( PostTypes::VIDEO, $demo['video'] );
+
+		update_post_meta( $report['video'], MetaSchema::ARTIST, $report['artist'] );
+		update_post_meta( $report['video'], MetaSchema::ALBUM, (int) reset( $report['releases'] ) );
+		update_post_meta( $report['video'], MetaSchema::VIDEO_SOURCE, 'other' );
+
+		if ( ! $english && $site ) {
+			$report['notices'] = array_merge( $report['notices'], self::apply_site_defaults( $demo ) );
+			$report['menu']    = self::create_primary_menu( $demo );
+		}
+
+		/**
+		 * Fires after the demo content was installed.
+		 *
+		 * @since 0.11.0
+		 * @param array<string, mixed> $report Install report.
+		 * @param array<string, mixed> $demo   Fixture that was installed.
+		 */
+		do_action( 'wavira_core_demo_installed', $report, $demo );
+
+		return $report;
+	}
+
+	/**
+	 * Whether the site already holds tracks.
+	 *
+	 * @return bool
+	 */
+	public static function has_tracks(): bool {
+		$count = wp_count_posts( PostTypes::TRACK );
+
+		return isset( $count->publish ) && (int) $count->publish > 0;
+	}
+
+	/**
+	 * Insert one demo post, failing loudly when WordPress refuses.
+	 *
+	 * The caller gets an exception rather than a half-installed catalogue: a
+	 * partial demo is harder to diagnose than a failed import.
+	 *
+	 * @param string               $post_type Post type.
+	 * @param array<string, mixed> $data      Title, content, date and menu order.
+	 * @return int Post ID.
+	 * @throws RuntimeException When the post cannot be created.
+	 */
+	private static function insert_demo_post( string $post_type, array $data ): int {
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => $post_type,
+				'post_title'   => (string) ( $data['title'] ?? '' ),
+				'post_content' => (string) ( $data['content'] ?? '' ),
+				'post_status'  => 'publish',
+				'post_date'    => (string) ( $data['date'] ?? '' ),
+				'menu_order'   => (int) ( $data['menu_order'] ?? 0 ),
+			),
+			true
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			throw new RuntimeException( $post_id->get_error_message() ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- the caller escapes it for the surface it prints on.
+		}
+
+		if ( (int) $post_id <= 0 ) {
+			throw new RuntimeException( 'WordPress did not create the demo post.' ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- a fixed string, never user input.
+		}
+
+		update_post_meta( (int) $post_id, self::MARKER, '1' );
+
+		return (int) $post_id;
+	}
+
+	/**
+	 * Remove the demo content a previous run created.
+	 *
+	 * Only posts carrying the marker are deleted, and they are deleted in pages
+	 * so a large catalogue cannot exhaust memory on a shared host. Nothing here
+	 * touches media: an attachment the owner uploaded under a demo title stays.
+	 *
+	 * @param string $fixture Fixture name, for the log.
+	 * @return int Number of posts deleted.
+	 */
+	private static function remove_previous( string $fixture ): int {
+		$deleted = 0;
+		$types   = array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO );
+
+		do {
+			$ids = get_posts(
+				array(
+					'post_type'        => $types,
+					'post_status'      => 'any',
+					'posts_per_page'   => 100,
+					'fields'           => 'ids',
+					'orderby'          => 'ID',
+					'order'            => 'ASC',
+					'no_found_rows'    => true,
+					'suppress_filters' => false,
+					'meta_key'         => self::MARKER, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- an administrative one-off, not a front-end query.
+					'meta_value'       => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- same.
+				)
+			);
+
+			foreach ( $ids as $id ) {
+				if ( wp_delete_post( (int) $id, true ) ) {
+					++$deleted;
+				}
+			}
+		} while ( array() !== $ids );
+
+		/**
+		 * Fires after a forced import removed the demo content of a previous run.
+		 *
+		 * @since 0.11.0
+		 * @param int    $deleted Number of posts removed.
+		 * @param string $fixture Fixture that is about to be installed.
+		 */
+		do_action( 'wavira_core_demo_replaced', $deleted, $fixture );
+
+		return $deleted;
+	}
+
+	/**
+	 * Attach one term of a taxonomy, creating it on first use.
+	 *
+	 * @param int    $post_id  Post ID.
+	 * @param string $taxonomy Taxonomy name.
+	 * @param string $name     Term name.
+	 * @return void
+	 */
+	private static function attach_term( int $post_id, string $taxonomy, string $name ): void {
+		if ( '' === $name || ! taxonomy_exists( $taxonomy ) ) {
+			return;
+		}
+
+		$term = term_exists( $name, $taxonomy );
+
+		if ( ! $term ) {
+			$term = wp_insert_term( $name, $taxonomy );
+		}
+
+		if ( is_wp_error( $term ) || ! is_array( $term ) || ! isset( $term['term_id'] ) ) {
+			return;
+		}
+
+		wp_set_object_terms( $post_id, array( (int) $term['term_id'] ), $taxonomy, true );
+	}
+
+	/**
+	 * Attach the kind term of a demo track.
+	 *
+	 * The kind is what the archive filter and — for imported content — the
+	 * migration tool use, so the demo declares one per track: the default demo
+	 * ships songs and a remix of one of them, which is enough to show that a
+	 * remix is not just another song on the shelf.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $kind    Kind slug or a source value.
+	 * @return void
+	 */
+	private static function attach_kind( int $post_id, string $kind ): void {
+		$slug = Taxonomies::normalize_kind( $kind );
+
+		if ( '' === $slug ) {
+			return;
+		}
+
+		self::attach_term( $post_id, Taxonomies::KIND, $slug );
+	}
+
+	/**
+	 * The Iranian defaults a Persian music site expects.
+	 *
+	 * @param array<string, mixed> $demo Demo catalogue.
+	 * @return string[] Notices for the report.
+	 */
+	private static function apply_site_defaults( array $demo ): array {
+		update_option( 'WPLANG', (string) $demo['site']['locale'] );
+		update_option( 'timezone_string', (string) $demo['site']['timezone'] );
+		update_option( 'start_of_week', 6 );
+		update_option( 'date_format', 'j F Y' );
+		update_option( 'time_format', 'H:i' );
+
+		$description = (string) get_option( 'blogdescription' );
+
+		// Only replace a description nobody wrote on purpose.
+		if ( '' === trim( $description ) || 'Just another WordPress site' === $description ) {
+			update_option( 'blogdescription', (string) $demo['site']['description'] );
+		}
+
+		return array(
+			__( 'Site locale, timezone, first day of the week and date format were set to the Iranian defaults.', 'wavira-core' ),
+		);
+	}
+
+	/**
+	 * Build the theme's primary menu from the demo catalogue.
+	 *
+	 * @param array<string, mixed> $demo Demo catalogue.
+	 * @return int Menu ID, 0 when the menu could not be created.
+	 */
+	private static function create_primary_menu( array $demo ): int {
+		$menu_id = wp_create_nav_menu( (string) $demo['menu']['name'] );
+
+		if ( is_wp_error( $menu_id ) ) {
+			$existing = wp_get_nav_menu_object( (string) $demo['menu']['name'] );
+
+			if ( ! $existing ) {
+				return 0;
+			}
+
+			$menu_id = (int) $existing->term_id;
+		}
+
+		foreach ( (array) $demo['menu']['items'] as $item ) {
+			$args = array(
+				'menu-item-title'  => (string) $item['label'],
+				'menu-item-status' => 'publish',
+			);
+
+			if ( 'archive' === $item['type'] ) {
+				$args['menu-item-type']   = 'post_type_archive';
+				$args['menu-item-object'] = (string) $item['object'];
+			} elseif ( 'taxonomy' === $item['type'] ) {
+				$args['menu-item-type']   = 'taxonomy';
+				$args['menu-item-object'] = (string) $item['object'];
+			} else {
+				$args['menu-item-type'] = 'custom';
+				$args['menu-item-url']  = (string) $item['url'];
+			}
+
+			wp_update_nav_menu_item( (int) $menu_id, 0, $args );
+		}
+
+		// Read-modify-write of the nav menu locations, as its own step.
+		$locations = (array) get_theme_mod( 'nav_menu_locations', array() );
+
+		$locations['primary'] = (int) $menu_id;
+
+		set_theme_mod( 'nav_menu_locations', $locations );
+
+		return (int) $menu_id;
+	}
+}

@@ -1,9 +1,14 @@
 <?php
 /**
- * Classification taxonomies: genre (required) plus optional mood, language,
- * label and year (ADR 0003, ADR 0012).
+ * Classification taxonomies: genre and kind (always on) plus optional mood,
+ * language, label and year (ADR 0003, ADR 0012).
  *
- * Genres are never hardcoded — they are ordinary, editable terms.
+ * Genres are never hardcoded — they are ordinary, editable terms. `kind` is the
+ * one taxonomy with a fixed vocabulary (music, remix, noha, podcast), because it
+ * answers "what *is* this audio item", it is what a Persian music site browses
+ * by («ریمیکس‌ها»، «نوحه‌ها»، «پادکست‌ها»), and it is the field a publishing
+ * plugin has to fill so the item lands somewhere meaningful instead of being
+ * flattened into a generic track (see `src/Integrations/MusicPublisher.php`).
  *
  * @package Wavira\Core\Content
  */
@@ -26,6 +31,13 @@ final class Taxonomies implements Registrable {
 	 * @var string
 	 */
 	public const GENRE = 'wavira_genre';
+
+	/**
+	 * Kind taxonomy: what the audio item is (single, remix, noha, podcast).
+	 *
+	 * @var string
+	 */
+	public const KIND = 'wavira_kind';
 
 	/**
 	 * Mood taxonomy (optional).
@@ -71,7 +83,92 @@ final class Taxonomies implements Registrable {
 	 * @return bool
 	 */
 	public static function is_music_taxonomy( string $taxonomy ): bool {
-		return in_array( $taxonomy, array( self::GENRE, self::MOOD, self::LANGUAGE, self::LABEL, self::YEAR ), true );
+		return in_array( $taxonomy, array( self::GENRE, self::KIND, self::MOOD, self::LANGUAGE, self::LABEL, self::YEAR ), true );
+	}
+
+	/**
+	 * The fixed vocabulary of the kind taxonomy.
+	 *
+	 * Term slug => label. Slugs are stable (they are in URLs and in the import
+	 * map); labels are translated. `music` is the default every item falls back
+	 * to, so an item is never kind-less.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function kinds(): array {
+		return array(
+			'music'   => __( 'Single', 'wavira-core' ),
+			'remix'   => __( 'Remix', 'wavira-core' ),
+			'noha'    => __( 'Noha', 'wavira-core' ),
+			'podcast' => __( 'Podcast', 'wavira-core' ),
+		);
+	}
+
+	/**
+	 * The kind slug a source value means.
+	 *
+	 * @param string $value Raw value (a `musics_type`, a free label, a slug).
+	 * @return string Kind slug, or an empty string when nothing matches — an
+	 *                unknown value is reported, never filed under a kind it may
+	 *                not be.
+	 */
+	public static function normalize_kind( string $value ): string {
+		$value = strtolower( trim( $value ) );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		if ( isset( self::kinds()[ $value ] ) ) {
+			return $value;
+		}
+
+		$aliases = self::kind_aliases();
+
+		return $aliases[ $value ] ?? '';
+	}
+
+	/**
+	 * Source spellings that mean one of the kinds.
+	 *
+	 * The audited publishing plugin names its values after its own panel:
+	 * `musicss`, `musicss_remix`, `musicss_nohe`, `musicss_podcast`. The map is
+	 * explicit on purpose — `music` is a substring of `musicss_remix`, so a
+	 * loose match would file every remix under "Single", and `nohe`/`noha` are
+	 * two transliterations of the same Persian word (نوحه).
+	 *
+	 * @return array<string, string> Source value => kind slug.
+	 */
+	public static function kind_aliases(): array {
+		return array(
+			'musicss'         => 'music',
+			'musicss_remix'   => 'remix',
+			'musicss_nohe'    => 'noha',
+			'musicss_podcast' => 'podcast',
+			'single'          => 'music',
+			'song'            => 'music',
+			'nohe'            => 'noha',
+		);
+	}
+
+	/**
+	 * Make sure every kind term exists.
+	 *
+	 * Called by the seeder and by the importer: a term that does not exist
+	 * cannot be assigned, and `wp_set_object_terms()` would fail silently.
+	 *
+	 * @return void
+	 */
+	public static function ensure_kind_terms(): void {
+		if ( ! taxonomy_exists( self::KIND ) ) {
+			return;
+		}
+
+		foreach ( self::kinds() as $slug => $label ) {
+			if ( ! term_exists( $slug, self::KIND ) ) {
+				wp_insert_term( $label, self::KIND, array( 'slug' => $slug ) );
+			}
+		}
 	}
 
 	/**
@@ -108,6 +205,15 @@ final class Taxonomies implements Registrable {
 				'hierarchy'   => true,
 				'setting'     => '',
 				'object_type' => array( PostTypes::TRACK, PostTypes::ALBUM, PostTypes::VIDEO, PostTypes::ARTIST ),
+			),
+			self::KIND     => array(
+				'name'        => __( 'Kinds', 'wavira-core' ),
+				'singular'    => __( 'Kind', 'wavira-core' ),
+				'slug'        => 'kinds',
+				'rest_base'   => 'kinds',
+				'hierarchy'   => false,
+				'setting'     => '',
+				'object_type' => array( PostTypes::TRACK ),
 			),
 			self::MOOD     => array(
 				'name'        => __( 'Moods', 'wavira-core' ),

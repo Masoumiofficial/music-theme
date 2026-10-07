@@ -54,7 +54,8 @@ and survive. Deactivate the plugin and the theme still renders a clean post/page
 | `docs/SEO-AND-PERF.md` | Music structured data, SEO cooperation and the performance budget (0.10.0) |
 | `docs/PERSIAN-LOCALIZATION.md` | What a Persian site gets: catalogues, the Jalali calendar, Iranian defaults, Persian numerals, the bundled typeface (0.10.1, 0.11.0) |
 | `docs/RELEASE-CANDIDATE.md` | **Release view**: what ships, what is verified, the pre-upload checklist, the known limitations (0.11.0) |
-| `docs/MIGRATION-BLUEPRINT.md` | Legacy → Wavira data migration plan |
+| `docs/MIGRATION-BLUEPRINT.md` | Legacy → Wavira data migration plan (both sources) |
+| `docs/INTEGRATIONS.md` | **Interop contract**: what the publishing plugin writes, the field map, the kind taxonomy, the limits |
 | `docs/REBUILD-PLAN.md` | Phases 0.1.0 → 1.0.0 with exit criteria |
 | `docs/TECH-DEBT.md` | 35 legacy debt items and their disposition |
 | `docs/BRAND-RESEARCH.md`, `docs/BRAND-DECISION.md` | Brand evidence + Brand Lock (Wavira) |
@@ -120,12 +121,14 @@ licence text must be inside the package (ADR 0019). CI builds and uploads the pa
 
 | Surface | Detail |
 | --- | --- |
-| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` (always) plus optional mood/language/label/year; 46 registered meta keys; one typed settings option with 17 keys. |
+| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` and `wavira_kind` (single · remix · noha · podcast, always on) plus optional mood/language/label/year; 46 registered meta keys; one typed settings option with 17 keys. |
 | REST | `wavira/v1`: typed collections for each entity with pagination headers, `/genres`, `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`. |
 | Downloads | Authorization chain (site setting → per-track opt-out → optional login → filter) and atomic counters. Delivery is a redirect to the file: **authorization and accounting, never DRM** (ADR 0013). |
 | Player | Framework-free engine in `wavira-core/assets/js/index.js`: one state machine per instance, its own `<audio>`, queue + shuffle + repeat (off/all/one), Media Session metadata and action handlers, documented keyboard map, ARIA state and live regions, `localStorage` preferences (`wavira.player.*`). Mounted by `wavira_player_mount()` in the theme, with a native `<audio>` fallback when JavaScript is unavailable. |
 | Player data | `wavira/v1/player/tracks/{id}` and `/player/queue?context=album\|artist\|genre\|tracks\|related`; the engine only substitutes IDs into server-provided route templates. |
-| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]`, `wp wavira migrate [--detect\|--dry-run\|--status\|--rollback] [--batch=<n>] [--offset=<n>] [--kind=<mp3\|mp4\|album>] [--report=<file>]`. |
+| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]` (the same installer as the admin screen), `wp wavira export-demo [--file=<path>] [--type=<post-type>]`, `wp wavira migrate [--detect\|--dry-run\|--status\|--rollback] [--batch=<n>] [--offset=<n>] [--kind=<kind>] [--source=legacy\|music-publisher] [--report=<file>]`. |
+| Admin | `Tools → Wavira demo content`: import the Persian demo (or the English fixture) and download the content as WXR — no terminal required. |
+| Interop | A site built with the “Sajad Music Publisher” plugin converts through the same migration tool (`--source=music-publisher`), keeping remix/noha/podcast kinds, album track rows and role credits as data (`docs/INTEGRATIONS.md`). |
 | Packaging | `node tools/package.mjs [--check] [--strict] [--out=DIR]` — the archives, the manifest and the `[PACKAGE]` gate (ADR 0019). |
 | Function API | Plugin: `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()`, `wavira_core_track_playback()`, `wavira_core_enqueue_player()`, `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()` (`wavira-core/public-api.php`). Theme: `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. A theme never names a Core class — enforced by `tools/check-boundaries.mjs`. |
 | Hooks | Filters `wavira_track_playback_payload`, `wavira_core_date_style`, `wavira_core_date_format`, `wavira_core_date_label`, `wavira_player_queue_items`, `wavira_player_settings`, `wavira_related_ids`, `wavira_related_score`, `wavira_searchable_types`, `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access`, `wavira_setting`, `wavira_settings_sanitized`, `wavira_rest_item`, `wavira_content_width`; actions `wavira_core_booted`, `wavira_download_counted`, `wavira_download_served`. Themes call `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. Player mounts emit DOM events `wavira:player:<event>` for theme JavaScript. |
