@@ -65,7 +65,22 @@ function wavira_apply_persian_defaults(): array {
 		$notes[] = __( 'Site language, timezone, week start and date format were set to the Iranian defaults.', 'wavira' );
 	}
 
-	if ( ! wavira_has_core_language_pack() ) {
+	$pack_missing = ! wavira_has_core_language_pack();
+
+	/**
+	 * Filters whether the theme may download the core language pack.
+	 *
+	 * A download is the right default — it is what makes WordPress itself
+	 * Persian — but a host that ships language packs with the deployment, or a
+	 * site whose updater manages translations, has to be able to say no. With
+	 * the filter off, the situation is still reported to the site owner.
+	 *
+	 * @since 0.12.0
+	 * @param bool $download Whether to attempt the download.
+	 */
+	$download = $pack_missing && (bool) apply_filters( 'wavira_download_core_language_pack', true );
+
+	if ( $download ) {
 		if ( ! function_exists( 'wp_download_language_pack' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
@@ -75,6 +90,8 @@ function wavira_apply_persian_defaults(): array {
 		$notes[] = $downloaded
 			? __( 'The Persian translation of WordPress itself was installed.', 'wavira' )
 			: __( 'The Persian translation of WordPress itself could not be downloaded: the server has to reach api.wordpress.org. The theme and the plugin are Persian either way.', 'wavira' );
+	} elseif ( $pack_missing ) {
+		$notes[] = __( 'The Persian translation of WordPress itself is not installed. Install it from Dashboard → Updates, and the WordPress screens will be Persian too.', 'wavira' );
 	}
 
 	return $notes;

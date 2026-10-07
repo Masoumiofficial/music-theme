@@ -84,7 +84,10 @@ when that component changes, or hides standard WordPress behaviour a customer ex
 The site *language* is a WordPress option, not a theme option, so it is not a `theme_mod`. The theme
 offers it as one nonced, capability-checked action (`wavira_persian_setup`): site language, timezone,
 week start and date format in one step, plus the core language pack when the host can reach
-wordpress.org. When the core plugin is active the theme calls
+wordpress.org — and the pack download itself is filterable
+(`wavira_download_core_language_pack`), because a host that ships translations with the deployment
+should not have the theme reaching out on its own. A site owner who never gets the pack is told that,
+rather than left wondering why the dashboard is still English. When the core plugin is active the theme calls
 `wavira_core_apply_persian_defaults()` — the same code the demo installer uses — so the list does not
 drift; without the plugin the theme applies the same four options itself.
 

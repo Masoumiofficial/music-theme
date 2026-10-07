@@ -527,7 +527,7 @@ msgid "Logo width (px)"
 msgstr ""
 
 #: wavira/inc/customizer.php:160
-#: wavira/inc/site-defaults.php:194
+#: wavira/inc/site-defaults.php:211
 msgid "Make the site Persian"
 msgstr ""
 
@@ -554,7 +554,7 @@ msgstr ""
 msgid "No published tracks in this album yet."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:195
+#: wavira/inc/site-defaults.php:212
 msgid "Not now"
 msgstr ""
 
@@ -731,19 +731,23 @@ msgstr ""
 msgid "The newest news posts as cards."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:187
+#: wavira/inc/site-defaults.php:204
 msgid "The Persian setup ran."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:77
+#: wavira/inc/site-defaults.php:92
 msgid "The Persian translation of WordPress itself could not be downloaded: the server has to reach api.wordpress.org. The theme and the plugin are Persian either way."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:76
+#: wavira/inc/site-defaults.php:94
+msgid "The Persian translation of WordPress itself is not installed. Install it from Dashboard → Updates, and the WordPress screens will be Persian too."
+msgstr ""
+
+#: wavira/inc/site-defaults.php:91
 msgid "The Persian translation of WordPress itself was installed."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:193
+#: wavira/inc/site-defaults.php:210
 msgid "The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian."
 msgstr ""
 
@@ -815,7 +819,7 @@ msgstr ""
 msgid "Watch the video"
 msgstr ""
 
-#: wavira/inc/site-defaults.php:184
+#: wavira/inc/site-defaults.php:201
 msgid "Wavira"
 msgstr ""
 
@@ -836,11 +840,11 @@ msgstr ""
 msgid "X (Twitter)"
 msgstr ""
 
-#: wavira/inc/site-defaults.php:109
+#: wavira/inc/site-defaults.php:126
 msgid "You are not allowed to change the site language."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:132
+#: wavira/inc/site-defaults.php:149
 msgid "You are not allowed to change this."
 msgstr ""
 

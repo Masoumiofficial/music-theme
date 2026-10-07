@@ -42,7 +42,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the four documented options.
 - **`tools/po-merge.py`**: fills a `.po` from its `.pot` in template order, carrying translations and
   `keep-latin` flags over and refusing to write a catalogue with an untranslated string — the tool that
-  added the 99 Persian strings this phase needed (catalogue now 190/190 for the theme, 150/150 for the
+  added the 100 Persian strings this phase needed (catalogue now 191/191 for the theme, 150/150 for the
   plugin).
 
 ### Added — 0.11.0 (release candidate: packaging, bundled typeface, release docs)

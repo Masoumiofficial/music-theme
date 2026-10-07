@@ -44,6 +44,27 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	}
 
 	/**
+	 * Re-register the theme's hooks before each test.
+	 *
+	 * The core test library restores `$wp_filter` after every test to a snapshot
+	 * taken before this file included the theme, so a hook the theme registered
+	 * at include time is gone by the second test — the functions stay, the
+	 * registrations do not. These are the theme's own callbacks and priorities,
+	 * re-added rather than re-included (including the files again would
+	 * redeclare their functions).
+	 *
+	 * @return void
+	 */
+	public function set_up() {
+		parent::set_up();
+
+		add_filter( 'body_class', 'wavira_option_body_classes' );
+		add_filter( 'render_block', 'wavira_filter_player_bar', 10, 2 );
+		add_filter( 'get_custom_logo', 'wavira_custom_logo' );
+		add_action( 'customize_register', 'wavira_customize_register' );
+	}
+
+	/**
 	 * Leave no theme mod behind for the next test.
 	 *
 	 * @return void
@@ -260,19 +281,35 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	}
 
 	/**
-	 * A social field is a link, or it is nothing.
+	 * A social field is a link, or it renders as nothing.
+	 *
+	 * Two guarantees, in the two places they exist. The Customizer refuses a
+	 * scheme the site did not ask for (that is `wavira_sanitize_value()`), and
+	 * whatever else ends up in the option — another plugin, an import, a
+	 * database edit — is escaped where it is printed. `set_theme_mod()` writes
+	 * the raw value on purpose: a test that sanitized first would prove nothing
+	 * about the second guarantee.
 	 *
 	 * @return void
 	 */
 	public function test_social_links_are_safe_and_optional() {
+		$schema = wavira_options_schema();
+
+		$this->assertSame( '', wavira_sanitize_value( $schema['social_telegram'], 'javascript:alert(1)' ), 'the Customizer refuses a foreign scheme' );
+
 		set_theme_mod( 'wavira_social_instagram', 'https://instagram.com/wavira' );
 		set_theme_mod( 'wavira_social_telegram', 'javascript:alert(1)' );
 
 		$links = wavira_social_links();
 
-		$this->assertCount( 1, $links, 'a rejected URL is not a link' );
+		$this->assertCount( 2, $links, 'the option holds what was stored' );
 		$this->assertSame( 'https://instagram.com/wavira', $links[0]['url'] );
 		$this->assertSame( 'instagram', $links[0]['icon'] );
+
+		$row = $this->pattern_output( 'hidden-social-links' );
+
+		$this->assertStringContainsString( 'https://instagram.com/wavira', $row );
+		$this->assertStringNotContainsString( 'javascript:', $row, 'the link is escaped where it is printed' );
 	}
 
 	/**
@@ -342,18 +379,32 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_the_player_bar_can_be_removed_from_the_output() {
-		$block = array(
+		// The wiring first: core's `render_block` filter, priority 10, two
+		// arguments. Dispatching through `apply_filters()` here would run every
+		// other `render_block` callback in core — which is core's business, and
+		// which changes between releases (as it did between 6.7 and 7.1).
+		$this->assertSame( 10, has_filter( 'render_block', 'wavira_filter_player_bar' ) );
+
+		$part = array(
 			'blockName' => 'core/template-part',
 			'attrs'     => array( 'slug' => 'player-bar' ),
 		);
 
-		$this->assertSame( 'rendered', apply_filters( 'render_block', 'rendered', $block ) );
+		$this->assertSame( 'rendered', wavira_filter_player_bar( 'rendered', $part ) );
 
 		set_theme_mod( 'wavira_player_bar', false );
 
-		$this->assertSame( '', apply_filters( 'render_block', 'rendered', $block ) );
-		$this->assertSame( 'rendered', apply_filters( 'render_block', 'rendered', array( 'blockName' => 'core/template-part', 'attrs' => array( 'slug' => 'header' ) ) ), 'other parts are untouched' );
-		$this->assertSame( 'rendered', apply_filters( 'render_block', 'rendered', array( 'blockName' => 'core/paragraph', 'attrs' => array( 'slug' => 'player-bar' ) ) ) );
+		$this->assertSame( '', wavira_filter_player_bar( 'rendered', $part ) );
+		$this->assertSame(
+			'rendered',
+			wavira_filter_player_bar( 'rendered', array( 'blockName' => 'core/template-part', 'attrs' => array( 'slug' => 'header' ) ) ),
+			'other template parts are untouched'
+		);
+		$this->assertSame(
+			'rendered',
+			wavira_filter_player_bar( 'rendered', array( 'blockName' => 'core/paragraph', 'attrs' => array( 'slug' => 'player-bar' ) ) ),
+			'a block that is not a template part is untouched'
+		);
 	}
 
 	/**
@@ -363,6 +414,13 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	 */
 	public function test_the_customizer_panel_matches_the_schema() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		// WordPress loads the Customizer in the admin, not on a front-end
+		// request — and the suite boots a front-end request. The manager's own
+		// constructor pulls in the panels, sections and controls it needs.
+		if ( ! class_exists( 'WP_Customize_Manager' ) ) {
+			require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
+		}
 
 		$wp_customize = new WP_Customize_Manager();
 		do_action( 'customize_register', $wp_customize );
@@ -423,23 +481,23 @@ class Test_Theme_Options extends Wavira_Test_Case {
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
-		// The language-pack download is answered here instead of over the network:
-		// a build must not depend on wordpress.org being reachable, and the point
-		// of this assertion is what the site gets when it is not.
-		$offline = static function () {
-			return new WP_Error( 'http_request_failed', 'no network in tests' );
-		};
+		// No network in a build: the documented filter is the way a host (and this
+		// test) says "do not download the language pack". The four options below
+		// are the half of the action that has to work everywhere.
+		add_filter( 'wavira_download_core_language_pack', '__return_false' );
 
-		add_filter( 'pre_http_request', $offline );
-
-		// The real action: locale, timezone, week start and date format, applied
-		// through the plugin's public function when the plugin is loaded.
 		$notes = wavira_apply_persian_defaults();
 
-		remove_filter( 'pre_http_request', $offline );
+		remove_filter( 'wavira_download_core_language_pack', '__return_false' );
 
 		$this->assertIsArray( $notes );
-		$this->assertNotEmpty( $notes, 'the site owner is told what happened, including what failed' );
+		$this->assertNotEmpty( $notes, 'the site owner is told what happened, including what is missing' );
+
+		$this->assertStringContainsString(
+			'The Persian translation of WordPress itself is not installed',
+			implode( ' ', $notes ),
+			'a skipped download is reported, not silent'
+		);
 
 		$this->assertSame( 'fa_IR', (string) get_option( 'WPLANG' ) );
 		$this->assertSame( 'Asia/Tehran', (string) get_option( 'timezone_string' ) );
@@ -514,21 +572,22 @@ class Test_Theme_Options extends Wavira_Test_Case {
 			array( 'post_mime_type' => 'image/png' )
 		);
 
-		// A real file is not needed to check the markup, and `wp_get_attachment_image()`
-		// has to be answered with something: the filter is core's own way in.
-		$size = static function ( $image, $attachment_id ) use ( $attachment ) {
+		// A real image file is not needed to check the markup: core filters the
+		// `<img>` element it builds, at the end of the function, whether or not
+		// the attachment can be resized.
+		$image = static function ( $html, $attachment_id ) use ( $attachment ) {
 			return $attachment === (int) $attachment_id
-				? array( 'https://example.test/dark.png', 200, 100, false )
-				: $image;
+				? '<img class="custom-logo wavira-logo--dark" src="https://example.test/dark.png" alt="Wavira" />'
+				: $html;
 		};
 
-		add_filter( 'wp_get_attachment_image_src', $size, 10, 2 );
+		add_filter( 'wp_get_attachment_image', $image, 10, 2 );
 
 		set_theme_mod( 'wavira_dark_logo', $attachment );
 
 		$html = (string) apply_filters( 'get_custom_logo', $light );
 
-		remove_filter( 'wp_get_attachment_image_src', $size );
+		remove_filter( 'wp_get_attachment_image', $image );
 
 		$this->assertStringContainsString( 'wavira-logo--dark', $html, 'the second image is marked for the dark palette' );
 		$this->assertStringContainsString( 'wavira-logo--light', $html, 'and core\'s own image keeps its place' );

@@ -15,19 +15,19 @@
 | **One-click Persian setup** | the theme's own screens are Persian already, but WordPress is not until the *site* language changes: one nonced action sets the language, the timezone, the week start and the date format, and fetches the core language pack when the host can | `inc/site-defaults.php`, `wavira_core_apply_persian_defaults()` in the plugin, an admin notice on Appearance → Themes | `test_persian_setup_is_a_guarded_admin_action`, `test_the_language_pack_check_is_a_file_question` |
 | **Demo import, one click away** | a buyer who never opens a terminal still needs the demo content; the panel links straight to `Tools → Wavira demo content` | `wavira_customize_site_description()` | the link target is asserted in the panel-description code path |
 | **Five social glyphs, a back-to-top button, an announcement bar, a dark-mode logo** | the surfaces a music site actually fills in on day one | `assets/icons/`, `patterns/hidden-*.php`, `wavira_custom_logo()` | `test_optional_surfaces_render_only_when_they_are_on`, `test_the_dark_logo_is_added_beside_core_markup` |
-| **The catalogue stayed complete** | 99 new strings arrived with the panel; a half-Persian panel is worse than none | `wavira/languages/*`, `tools/po-merge.py` | `node tools/i18n.mjs check` → **340/340, POT/PO/MO in sync** |
+| **The catalogue stayed complete** | 100 new strings arrived with the panel and the Persian setup; a half-Persian panel is worse than none | `wavira/languages/*`, `tools/po-merge.py` | `node tools/i18n.mjs check` → **341/341, POT/PO/MO in sync** (theme 191, plugin 150) |
 
 **Local verification of this increment** (the CI verdict for the pushed commit is recorded below once the
 run is green): `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned standards, CSS/contrast/
-perf/boundaries/legacy gates), `npm run test:js` → **45/45**, `node tools/i18n.mjs check` → **340/340**,
+perf/boundaries/legacy gates), `npm run test:js` → **45/45**, `node tools/i18n.mjs check` → **341/341**,
 `node tools/package.mjs` → three archives, rebuild byte-identical. Digests of the archives this tree
 produces with CI's own fixed timestamp (see §8):
 
 | Archive | Bytes | SHA-256 |
 | --- | --- | --- |
-| `wavira-theme-0.12.0.zip` | 266 004 | `6b4209d4315ab819f2a5af99e8b55be6aaef1d931db033a95682f61b3fa99a82` |
+| `wavira-theme-0.12.0.zip` | 266 495 | `9642cf09e79dc5b046f0811fbfe3abf72ddc7c5ca3d944032b2c699f929c15b7` |
 | `wavira-core-0.12.0.zip` | 179 841 | `d8602a7f9643a76282175a797eca4229105938c3707ac257e317ed6c7dde7035` |
-| `wavira-0.12.0-bundle.zip` | 478 885 | `71d0bbd2d91687c6dd97948925e5111ee265bcde44c6aa695d005bdf91c3e76b` |
+| `wavira-0.12.0-bundle.zip` | 479 376 | `6cfdf5d4b1edcbb256aec0b1ba7d68c7740ba577b6ab758dde42e44db5c88a7d` |
 
 The remaining pre-upload item is the same one 0.11.0 recorded (§6): `screenshot.png`. It needs a rendered
 page and a browser, and the authoring environment has neither — the file is `optional` in
