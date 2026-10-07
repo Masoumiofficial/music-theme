@@ -9,6 +9,20 @@
 > [`docs/RELEASE-CANDIDATE.md`](docs/RELEASE-CANDIDATE.md) §6; every claim in this repository is tracked
 > in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
 
+## Download
+
+| File | Install it as | Direct link |
+| --- | --- | --- |
+| `wavira-core-0.11.0.zip` | the core plugin — **first**, via *Plugins → Add New → Upload Plugin* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-core-0.11.0.zip) |
+| `wavira-theme-0.11.0.zip` | the theme, via *Appearance → Themes → Add New → Upload Theme* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-theme-0.11.0.zip) |
+| `wavira-0.11.0-bundle.zip` | both, plus a `README-FIRST/` folder | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-0.11.0-bundle.zip) |
+
+All releases and the notes for each: <https://github.com/Masoumiofficial/music-theme/releases>. The
+archives attached to a release are built by CI from the tagged commit with a fixed `SOURCE_DATE_EPOCH`,
+so their SHA-256 is the one the verification jobs saw (0.11.0: theme `619ebbabcbd5…`, core
+`075704d678af…`, bundle `57e953f2b79d…` — also in `SHA256SUMS`). Persian install guide:
+[`docs/fa/USER-GUIDE.md`](docs/fa/USER-GUIDE.md).
+
 **Wavira** is a premium WordPress product for publishing and discovering music: artists, albums,
 tracks, music videos, genres, lyrics, multi-quality downloads and a first-class player — RTL-first with
 full LTR support, dark/light, Gutenberg and Elementor ready, built for performance and WCAG 2.2 AA.
