@@ -11,7 +11,8 @@
 | Version | `0.11.0` (release candidate; `1.0.0` is the production release) |
 | Author | Etehad WP (اتحاد وردپرس) — https://etehadwp.com/ |
 | Licence | GPL-2.0-or-later (bundled third-party: Vazirmatn, SIL OFL 1.1; Jalali algorithm, MIT) |
-| Requires | WordPress 6.6+, PHP 7.4+ (tested 7.4 / 8.2 / 8.3) |
+| Requires | WordPress 6.6+ (policy floor), PHP 7.4+ |
+| Tested on | WordPress **7.1.3** (CI run `37618528282`, annotated from the installed core) and 6.7.2 (local lab); PHP **7.4 / 8.2 / 8.3** (CI syntax + integration) |
 | Packages | `dist/wavira-theme-0.11.0.zip`, `dist/wavira-core-0.11.0.zip`, `dist/wavira-0.11.0-bundle.zip` |
 | Build | `node tools/build.mjs && node tools/package.mjs` (no dependencies, no bundler, deterministic) |
 
@@ -38,9 +39,10 @@ Full evidence lives in `docs/VERIFICATION.md`; this is the release view.
 | Area | Verdict | Evidence |
 | --- | --- | --- |
 | Data model, REST, player, downloads, search, SEO, Persian/Jalali, artist & news pages | **VERIFIED** | CI runs `37438117893` (0.10.1) and earlier — 8/8 jobs, `OK (134 tests, 1090 assertions)` on PHP 7.4 + 8.2 |
-| Legacy migration tool | **VERIFIED** | CI `37440743623` / `37440749435` — `OK (146 tests, 1198 assertions)` on PHP 7.4 + 8.2, after the tool was exercised against a real WordPress in a local lab (43 + 20 checks) |
-| The shipped archives install and run | **TESTED** (local WordPress 6.7.2 + SQLite lab) | unzip → activate → switch on the real archives: 13 checks (WordPress recognises theme and plugin, versions match the headers, built assets, `.mo` catalogue, font licence and test suite placement) + 17 checks on the next request (post types, taxonomy, 46 meta keys, `@font-face` resolved to the packaged file and present in the rendered head, `font-display: swap`, preload, no `s.w.org` hint, player bundle present) |
+| Legacy migration tool | **VERIFIED** | CI `37440743623` / `37440749435`, and the whole suite re-ran green on WordPress 7.1.3 in `37618528282` (`OK (146 tests, 1198 assertions)`) — `OK (146 tests, 1198 assertions)` on PHP 7.4 + 8.2, after the tool was exercised against a real WordPress in a local lab (43 + 20 checks) |
+| The shipped archives install and run | **TESTED** (local WordPress 6.7.2 + SQLite lab); CI builds the same archives on every push and uploads them, and their SHA-256 matched the local build byte for byte (`0e9419e2e524…` theme, `f87b0c14c2a4…` plugin, `071f653e9ab6…` bundle) | unzip → activate → switch on the real archives: 13 checks (WordPress recognises theme and plugin, versions match the headers, built assets, `.mo` catalogue, font licence and test suite placement) + 17 checks on the next request (post types, taxonomy, 46 meta keys, `@font-face` resolved to the packaged file and present in the rendered head, `font-display: swap`, preload, no `s.w.org` hint, player bundle present) |
 | Static gates | **PASS** | `tools/lint.sh`: PHP syntax, WPCS + PHPCompatibilityWP 0 errors/0 warnings over 82 files, JS/JSON, blocks, i18n 215/215, migration mapping, CSS rules, WCAG contrast pairs, performance budgets, legacy-echo gate, module boundaries, `[PACKAGE]` |
+| Deterministic packaging across machines | **VERIFIED** | CI `37618528282`, job *Release packages*: 8/9 jobs green with the CI-built digests identical to the local ones above; the tool also rebuilds one archive in-process and compares bytes |
 | Real-browser audit (Lighthouse, axe, RTL/LTR screenshots) | **NOT_STARTED** | needs a browser: the build environment has none (`WP-RUNTIME` and the pre-upload checklist, §6) |
 | 10 000-post dry run and dead-link crawl (blueprint M1 at scale, M8) | **NOT_STARTED** | staging exercises with a real catalogue, not unit tests |
 
@@ -87,7 +89,7 @@ Because the product is sold to Persian-language markets, the claim is worth stat
 | 2 | Marketplace listing copy (title, description, feature bullets, FAQ) | **PARTIAL** | `wavira/readme.txt` is written for a WordPress-style listing; the marketplace-specific fields (price, category, demo URL, support terms) need the account |
 | 3 | Demo site for reviewers | **NOT_STARTED** | one command (`wp wavira seed --force`) produces it; it needs a host |
 | 4 | Real-browser audit (Lighthouse ≥ 90, axe clean, RTL/LTR and dark/light screenshots) | **NOT_STARTED** | a browser and a live install; the static gates already enforce the budgets the audit measures |
-| 5 | `Tested up to` in the headers | **NEEDS_REVIEW** | CI installs `latest`; a run after 0.11.0 annotates the exact WordPress version, and the header should be set from that annotation |
+| 5 | `Tested up to` in the headers | **DONE** (upper bound) | CI now annotates the version it installed: **WordPress 7.1.3** (run `37618528282`), so the headers say `Tested up to: 7.1`. The **floor** is still a policy floor, not a tested one: 6.6 is what the code requires by decision (ADR 0007) and 6.7.2 is the oldest version this phase actually ran the product on (`docs/VERIFICATION.md`) |
 | 6 | Trademark clearance | **LEGAL_REVIEW_REQUIRED** | preliminary screening only (`docs/BRAND-DECISION.md`) — professional clearance is still recommended |
 
 ## 7. Known limitations (stated rather than hidden)
