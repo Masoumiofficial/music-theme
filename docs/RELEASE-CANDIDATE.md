@@ -152,3 +152,21 @@ sha256sum -c dist/SHA256SUMS                  # from inside dist/
 CI runs steps 1–3 on every push and uploads the archives as the run artefact
 `wavira-0.11.0-packages`, so a package can always be traced to the commit it was built from
 (`manifest.json` → `built_from`).
+
+## 8. Where a customer downloads it from
+
+The stable, public URL for a version is its GitHub release, not the build machine:
+
+| Artifact | URL |
+| --- | --- |
+| Theme | `https://github.com/Masoumiofficial/music-theme/releases/latest/download/wavira-theme-0.11.0.zip` |
+| Core plugin | `https://github.com/Masoumiofficial/music-theme/releases/latest/download/wavira-core-0.11.0.zip` |
+| Both, with `README-FIRST/` | `https://github.com/Masoumiofficial/music-theme/releases/latest/download/wavira-0.11.0-bundle.zip` |
+| All releases | `https://github.com/Masoumiofficial/music-theme/releases` |
+
+The `release-assets` job (`.github/workflows/ci.yml`) attaches the archives whenever a `v*` tag is
+pushed: it runs the same `build` → `package` pair with the same `SOURCE_DATE_EPOCH`, so the attached
+bytes are the ones the other jobs verified. An upload is a `POST` to `uploads.github.com`, which is
+why it happens on a runner rather than from a sandbox that cannot reach that host. `--prerelease`
+releases are excluded from `releases/latest`, so those links only resolve once `1.0.0` is published
+without the flag.

@@ -3,6 +3,9 @@ name: CI
 on:
   push:
     branches: ['**']
+    # A version tag is a release: the same archives this workflow verifies are
+    # attached to the GitHub release, so a version has one stable download URL.
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
@@ -337,6 +340,55 @@ jobs:
             dist/SHA256SUMS
           if-no-files-found: error
           retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # Tagged releases: attach the built archives to the GitHub release.
+  #
+  # The asset upload has to happen on a runner: an upload is a POST to
+  # uploads.github.com, which a sandbox without that host cannot reach, and the
+  # release URL people download from is worth having automated anyway — it is
+  # the same build, byte for byte, that the jobs above verify.
+  # ---------------------------------------------------------------------------
+  release-assets:
+    name: Release assets
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        run: node tools/build.mjs
+
+      - name: Assemble the packages
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs | tee /tmp/package.log
+          node tools/annotate-log.mjs /tmp/package.log package 20 notice
+
+      - name: Attach the archives to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # The release itself is created separately; if the tag arrived first,
+          # give the release a moment to appear rather than failing on a race.
+          for attempt in $(seq 1 30); do
+            if gh release view "$TAG" >/dev/null 2>&1; then break; fi
+            echo "release ${TAG} is not there yet (attempt ${attempt}/30)…"
+            sleep 10
+          done
+          gh release view "$TAG" >/dev/null
+          gh release upload "$TAG" dist/*.zip dist/SHA256SUMS dist/manifest.json --clobber
+          gh release view "$TAG" --json assets -q '.assets[] | "attached: " + .name + " (" + (.size | tostring) + " bytes)"'
+          gh release view "$TAG" --json url -q .url
 
   # ---------------------------------------------------------------------------
   # Repository hygiene: the legacy artifact must never be modified.
