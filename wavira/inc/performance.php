@@ -18,6 +18,13 @@
  *   now leave `loading` and `decoding` to core.
  * - **Nothing is enqueued twice.** The player bundle is asked for once, by the
  *   component that needs it (ADR 0005), and the theme script is deferred.
+ * - **The primary typeface is not a round trip away.** `theme.json` declares
+ *   Vazirmatn as a `fontFace`, and WordPress prints the `@font-face` rule on
+ *   `wp_head` priority 50 (`wp_print_font_faces()`); the browser only discovers
+ *   the file when it has parsed that CSS, which is one full round trip after
+ *   the first paint. The preload here starts the download with the document.
+ *   It is same-origin and the file ships in the theme, so this costs nothing
+ *   when the theme is used without the font.
  *
  * @package Wavira\Theme
  * @since   0.10.0
@@ -58,6 +65,36 @@ if ( ! function_exists( 'wavira_resource_hints' ) ) {
 	}
 }
 add_filter( 'wp_resource_hints', 'wavira_resource_hints', 10, 2 );
+
+if ( ! function_exists( 'wavira_preload_primary_font' ) ) {
+	/**
+	 * Preload the primary typeface declared in `theme.json`.
+	 *
+	 * `@font-face` is printed by core on `wp_head` priority 50, so without a
+	 * hint the font request cannot start until that CSS has been parsed and the
+	 * browser has matched a rule — the text is already on screen by then, in a
+	 * fallback face, and re-lays out when the font arrives. A preload starts the
+	 * same (same-origin) request with the document instead.
+	 *
+	 * The URL comes from the theme, never from input; the hint is skipped when
+	 * the file is absent, so a checkout that never had the font still renders.
+	 *
+	 * @return void
+	 */
+	function wavira_preload_primary_font() {
+		$relative = 'assets/fonts/vazirmatn/vazirmatn-variable.woff2';
+
+		if ( ! file_exists( WAVIRA_THEME_DIR . $relative ) ) {
+			return;
+		}
+
+		printf(
+			'<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>' . "\n",
+			esc_url( WAVIRA_THEME_URI . $relative )
+		);
+	}
+}
+add_action( 'wp_head', 'wavira_preload_primary_font', 2 );
 
 if ( ! function_exists( 'wavira_disable_emojis_everywhere' ) ) {
 	/**

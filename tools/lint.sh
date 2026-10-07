@@ -19,6 +19,8 @@
 #   [PERF]      Performance budgets + query discipline (tools/check-perf.mjs)
 #   [LEGACY]    Legacy-echo / forbidden-pattern / jQuery gate
 #   [BOUNDARIES] Module boundaries (ARCHITECTURE §2, tools/check-boundaries.mjs)
+#   [PACKAGE]   Release package assembly: required files, no dev-only leaks,
+#               licence register, version agreement (tools/package.mjs --check)
 #   [SIZE]      Asset-size report (informational)
 #
 # Exit code 0 = all gates passed. Any failure prints the offending lines.
@@ -272,7 +274,15 @@ else
   FAIL=1
 fi
 
-# ------------------------------------------------------------ 7. Asset-size report
+# ---------------------------------------------------------------- 8. Packaging
+say "[PACKAGE] Release package assembly (tools/package.mjs --check)"
+if node tools/package.mjs --check; then
+  :
+else
+  FAIL=1
+fi
+
+# ------------------------------------------------------------ 9. Asset-size report
 say "[SIZE] Asset-size report (informational)"
 for dist in wavira/assets/dist wavira-core/assets/dist; do
   if [ -d "$dist" ]; then

@@ -79,7 +79,7 @@
 
 	// The settings the plugin prints through wp_add_inline_script().
 	window.waviraPlayerSettings = {
-		version: '0.10.1',
+		version: '0.11.0',
 		routes: {
 			track: STUB + '/tracks/%d',
 			queue: STUB + '/queue'

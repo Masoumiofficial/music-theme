@@ -5,6 +5,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.11.0 (release candidate: the legacy migration tool and the release package)
+- **The legacy migration tool** (`src/Migration/LegacySchema.php`, `src/Migration/Migrator.php`) behind
+  `wp wavira migrate`: `--detect`, `--dry-run`, `--status`, `--rollback`, `--kind`, `--batch`, `--offset`,
+  `--report=<file>`. It copies the original post type and every legacy value into `_migration_backup` (once)
+  and `_migration_raw` before the first write, never publishes/unpublishes or deletes, is structurally
+  idempotent, bounded and resumable, expands the legacy album repeater into real child tracks once, and
+  reports what it refuses to guess (an unmatched artist, a non-local image, an unknown `musics_type`) in a
+  review queue instead of inventing data. `--rollback` restores the legacy state and deletes exactly the
+  children the tool created (ADR 0018).
+- **`tests/test-migration.php`** — the blueprint's acceptance list (M1, M3–M7, M9, M10) plus the schema
+  contract, on legacy-shaped fixtures: real WordPress, real database, no legacy code.
+- **The packages** are built by `tools/package.mjs`, which also validates that the plugin archive contains
+  what it promises (headers, compiled `.mo`, built bundles) and nothing dev-only.
+
+### Changed — 0.11.0
+- The plugin header and `WAVIRA_CORE_VERSION` read `0.11.0`; `Migrator::unmapped_kinds()` no longer calls
+  an admin-only function (it was fatal on a front-end or test request), and `expand_album()` reads the
+  legacy repeater by its own sub-field name.
+
+### Added — 0.10.1 (Persian localisation)
+- **`Content\Jalali`** — a PHP port of the Borkowski algorithm as published in `jalaali/jalaali-js` (MIT;
+  notice in `THIRD-PARTY-NOTICES.md`), accurate for Jalali 1178–1633, clamping input outside the table
+  instead of inventing a date.
+- **`Content\Dates`** — one date policy: Jalali on `fa*` locales, Gregorian elsewhere, with
+  `wavira_core_date_style` / `_date_format` / `_date_label` filters and one filter to step aside for another
+  Jalali plugin. Machine surfaces (machine formats, time-carrying formats, REST, AJAX, cron, feeds, robots,
+  admin) are never converted, and conversion is idempotent because it recomputes from the timestamp.
+- **`wavira_core_digits()`** — Persian numerals for user-visible numbers, exposed in `public-api.php`.
+- **The Persian demo** — `wp wavira seed` now creates a Persian music site: Iranian defaults (`fa_IR`,
+  `Asia/Tehran`, week starting Saturday, `j F Y`), a Persian menu on the `primary` location, and generated
+  Persian demo content (artist, album, tracks with lyrics, single, video, genres). `--english` still
+  produces the neutral fixture for development.
+
 ### Added — 0.10.0 (music structured data and the SEO seams)
 - **`src/Seo/StructuredData.php`** — the schema.org graph of a music post: `MusicGroup`,
   `MusicAlbum` (with its bounded tracklist, `ALBUM_TRACK_LIMIT` = 50), `MusicRecording` (ISO 8601

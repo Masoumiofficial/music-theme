@@ -23,6 +23,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0016](adr/0016-seo-cooperation-and-performance-gates.md) | The site's SEO plugin owns meta tags; the product always emits its own structured data and enforces the performance budget as a build gate | Accepted — **implemented in 0.10.0** | 2026-10-05 |
 | [0017](adr/0017-jalali-dates-and-iranian-defaults.md) | Jalali (Shamsi) dates on `fa*` locales from a verified, anchored converter; machine surfaces stay Gregorian; Iranian defaults are applied by the seeder, and the demo/harness are Persian | Accepted — **implemented and verified in 0.10.1** (CI `37438117893`/`37438125487`, 134 tests / 1090 assertions) | 2026-10-05 |
 | [0018](adr/0018-migration-tool-scope-and-safety.md) | The legacy migration tool is a service behind `wp wavira migrate`: copy-and-back-up before writing, report instead of guessing, structurally idempotent, bounded/resumable, reversible; the admin page is deferred and the CLI is the shipped surface | Accepted — **implemented in 0.11.0**, runtime verdict in `docs/VERIFICATION.md` | 2026-10-06 |
+| [0019](adr/0019-release-packaging.md) | Release packaging: explicit includes plus a leak scan of the result, deterministic ZIPs written by our own dependency-free writer, the licence register checked against the archive, marketplace extras behind `--strict` | Accepted — built and install-tested in 0.11.0 | 2026-10-07 |
 
 **Resolved open decisions** (were listed as "scheduled" in 0.2.0)
 
@@ -43,7 +44,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | Block metadata | Extracted from `block.json` with the exact contexts core uses (`block title`, `block description`, `block keyword`, from `wp-includes/block-i18n.json`) | core translates those fields itself (`translate_settings_using_i18n_schema()`), so the catalogue must use the same contexts or the inserter stays English |
 | Non-Persian translations | Allowed only with an explicit `#, keep-latin` flag on the entry, reviewed in the diff (`%1$s (%2$d)`, `%1$s:%2$s`) | the gate must stay strict enough to catch an untranslated sentence, and explicit enough that a format string does not need a fake translation |
 | Jalali (Shamsi) dates | **Deferred in 0.8.0**, delivered in 0.10.1: date output shipped with `wp_date()` and `fa_IR` locale data until the converter had a verified anchor set (`docs/REBUILD-PLAN.md`, ADR 0017) | an unverified calendar conversion would put wrong dates on every page; WordPress locale data is Gregorian, so this is a product decision, not a bug |
-| Persian fonts | The token set prefers **Vazirmatn** (OFL-1.1, Iranian) with `Segoe UI`/system fallbacks; no font file bundled yet | bundling a subset font is a packaging and size-budget decision (ADR 0010 licence file must travel with it), not a code change |
+| Persian fonts | **Resolved in 0.11.0**: the unmodified Vazirmatn variable WOFF2 (OFL-1.1) ships with the theme, declared in `theme.json`, preloaded, with the licence text beside it and a gate that fails if any of the three goes missing | `docs/PERSIAN-LOCALIZATION.md` §Fonts, `THIRD-PARTY-NOTICES.md` |
 
 ### 0.10.1 — Persian localisation: Jalali dates and Iranian defaults (2026-10-05)
 

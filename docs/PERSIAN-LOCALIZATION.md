@@ -125,7 +125,14 @@ Latin digits stay in code, slugs, IDs, admin form fields, JSON and machine outpu
   catalogue — so a layout or contrast change is judged against the interface the customer buys.
 - **Contrast is measured on the dark and light palettes** in RTL and LTR (`tools/check-contrast.mjs`),
   and Persian text is taller: the token set's line-heights are set for it.
-- **Fonts.** The token stack prefers Vazirmatn (OFL-1.1) with system fallbacks; no font file is bundled
+- **Fonts.** Vazirmatn (OFL-1.1) **ships with the theme** as one unmodified variable WOFF2
+  (`wavira/assets/fonts/vazirmatn/vazirmatn-variable.woff2`, 109 KB, weights 100–900) and is declared as a
+  `fontFace` in `wavira/theme.json`, so WordPress prints the `@font-face` rule for the front end and the
+  editor; `wavira/inc/performance.php` preloads it, because core prints that rule on `wp_head` priority 50
+  and a font discovered after the CSS has been parsed re-lays out text the visitor can already see. The
+  licence text travels beside the font (`OFL.txt`) and `tools/check-css.mjs` fails the build if the file,
+  the licence or `font-display: swap` goes missing. System fallbacks (`Segoe UI`, `system-ui`) stay in the
+  stack for the seconds before the font arrives and for visitors who block it.
   yet (see `THIRD-PARTY-NOTICES.md`).
 
 ## 6. Adding another locale

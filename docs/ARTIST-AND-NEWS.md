@@ -141,7 +141,7 @@ cannot fix one and miss the other. Category chips above the feed come from
 | Not shipped | Reason |
 | --- | --- |
 | A Jalali (Shamsi) calendar | an unverified conversion would put a wrong date on every news card; WordPress's locale data is Gregorian. Decision recorded in ADR 0015 §8 and `docs/DECISIONS.md` |
-| A bundled Persian font | Vazirmatn is already preferred in the token set with system fallbacks; shipping a subset font is a packaging/licence decision (ADR 0010, ADR 0009) |
+| A bundled Persian font | **Done in 0.11.0**: Vazirmatn ships unmodified with the theme (variable WOFF2, OFL text beside it, preloaded); see `docs/PERSIAN-LOCALIZATION.md` §Fonts |
 | Artist *events* / concert calendars | an events feature needs dates, venues, tickets and structured data — its own phase, not a by-product of the profile |
 | Artist registration / user profiles | the product is a publishing ecosystem, not a community platform (ADR 0001 non-goals) |
 | Music charts | needs verified play counts across sites, which the product deliberately does not phone home for |

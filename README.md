@@ -1,11 +1,13 @@
 # Wavira — WordPress music-publishing ecosystem
 
-> **Status: 0.10.1 (Persian localisation).** The data model, REST API, player engine, templates and
-> blocks, artist profiles, the news section, SEO cooperation and the performance budget are
-> implemented, and the product is **Persian by default**: Persian catalogues for both artifacts,
-> Jalali (Shamsi) dates with Persian numerals on `fa_IR` sites, an Iranian demo seeder and a Persian
-> developer harness. Development proceeds phase by phase per `docs/REBUILD-PLAN.md`; every claim is
-> tracked in `docs/VERIFICATION.md`.
+> **Status: 0.11.0 (release candidate).** Every v1 feature has landed and is verified by CI: the data
+> model, REST API, player engine, templates and blocks, artist profiles, the news section, SEO
+> cooperation, the performance budget, Persian/Jalali localisation, the legacy migration tool and the
+> release packages. The product is **Persian by default**: Persian catalogues for both artifacts, Jalali
+> (Shamsi) dates with Persian numerals on `fa_IR` sites, an Iranian demo seeder, a bundled Vazirmatn
+> typeface and a Persian developer harness. What is left is release mechanics, listed item by item in
+> [`docs/RELEASE-CANDIDATE.md`](docs/RELEASE-CANDIDATE.md) §6; every claim in this repository is tracked
+> in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
 
 **Wavira** is a premium WordPress product for publishing and discovering music: artists, albums,
 tracks, music videos, genres, lyrics, multi-quality downloads and a first-class player — RTL-first with
@@ -22,7 +24,7 @@ It ships Persian: the interface, the admin and the editor are translated, dates 
 | `wavira/` | **Wavira Music** theme (presentation layer) — templates, patterns and blocks (0.6.0–0.9.0). |
 | `wavira-core/` | **Wavira Core** plugin (all music data + business logic) — content model, services, player engine, REST API, SEO layer and the Jalali/date policy. |
 | `tests/` | PHPUnit integration suite for a real WordPress test library (`tests/test-*.php`) plus DOM-free player-engine unit tests (`tests/js/`, `node --test`). |
-| `tools/` | Development tooling: `lint.sh`, asset build scripts, CI log/JUnit annotators. |
+| `tools/` | Development tooling: `lint.sh` (all gates), `build.mjs` (assets), `package.mjs` (release archives + `[PACKAGE]` gate), checkers (`check-*.mjs`, `check-class-refs.py`), CI log/JUnit annotators, `preview/`. |
 | `dist/` | Release packages (generated; never committed with binaries). |
 
 ## The two-artifact model
@@ -50,7 +52,8 @@ and survive. Deactivate the plugin and the theme still renders a clean post/page
 | `docs/VERIFICATION.md` | **Per-claim evidence log** (what is VERIFIED vs. still open) |
 | `docs/ARTIST-AND-NEWS.md` | Artist profiles and the music-news section (the 0.9.0 surfaces) |
 | `docs/SEO-AND-PERF.md` | Music structured data, SEO cooperation and the performance budget (0.10.0) |
-| `docs/PERSIAN-LOCALIZATION.md` | What a Persian site gets: catalogues, the Jalali calendar, Iranian defaults, Persian numerals (0.10.1) |
+| `docs/PERSIAN-LOCALIZATION.md` | What a Persian site gets: catalogues, the Jalali calendar, Iranian defaults, Persian numerals, the bundled typeface (0.10.1, 0.11.0) |
+| `docs/RELEASE-CANDIDATE.md` | **Release view**: what ships, what is verified, the pre-upload checklist, the known limitations (0.11.0) |
 | `docs/MIGRATION-BLUEPRINT.md` | Legacy → Wavira data migration plan |
 | `docs/REBUILD-PLAN.md` | Phases 0.1.0 → 1.0.0 with exit criteria |
 | `docs/TECH-DEBT.md` | 35 legacy debt items and their disposition |
@@ -81,6 +84,11 @@ composer test             # integration suite: data model, REST, downloads, sear
 ```bash
 # 6. Player engine unit tests (no WordPress, no browser, no dependencies)
 npm run test:js           # node --test tests/js/player.test.mjs
+
+# 7. Release packages (deterministic; writes dist/, which is never committed)
+node tools/build.mjs && node tools/package.mjs
+node tools/package.mjs --check        # the [PACKAGE] gate lint.sh runs
+node tools/package.mjs --check --strict   # the extra files a marketplace needs
 ```
 
 `composer test:install` mirrors what CI does: it creates the `wordpress_test` database itself, so an
@@ -88,7 +96,7 @@ existing database makes the vendored installer ask for confirmation — drop it 
 Inside WordPress, two WP-CLI commands verify the install:
 
 ```bash
-wp wavira verify           # post types, taxonomies, 43 meta keys, settings, REST routes, counters
+wp wavira verify           # post types, taxonomies, 46 meta keys, settings, REST routes, counters
 wp wavira seed [--force]   # Persian demo + Iranian defaults; --english for the neutral fixture
 wp wavira migrate --detect # what a legacy site holds (read-only)
 wp wavira migrate --dry-run # the full migration plan, writing nothing
@@ -98,16 +106,27 @@ wp wavira migrate          # run it (idempotent, resumable, rollback available)
 The product **does not require a build to be installable**: when `assets/dist/` is missing the theme
 enqueues nothing and the front end degrades gracefully (see ADR 0006).
 
+## Release packages
+
+`node tools/package.mjs` writes three archives into `dist/` — `wavira-theme-<version>.zip`,
+`wavira-core-<version>.zip` and `wavira-<version>-bundle.zip` (both plus the buyer-facing
+`README-FIRST/`) — with a `manifest.json` (every file, size and SHA-256) and `SHA256SUMS`. The archives
+are deterministic: two builds of one commit are byte-identical, and the tool proves it before reporting
+success. What may ship is decided by explicit include lists plus a scan of the *result*, so a dev-only
+directory cannot leak; third-party files must be named in `THIRD-PARTY-NOTICES.md`, and the font's
+licence text must be inside the package (ADR 0019). CI builds and uploads the packages on every push.
+
 ## What the product exposes today (0.5.0)
 
 | Surface | Detail |
 | --- | --- |
-| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` (always) plus optional mood/language/label/year; 43 registered meta keys; one typed settings option with 17 keys. |
+| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` (always) plus optional mood/language/label/year; 46 registered meta keys; one typed settings option with 17 keys. |
 | REST | `wavira/v1`: typed collections for each entity with pagination headers, `/genres`, `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`. |
 | Downloads | Authorization chain (site setting → per-track opt-out → optional login → filter) and atomic counters. Delivery is a redirect to the file: **authorization and accounting, never DRM** (ADR 0013). |
 | Player | Framework-free engine in `wavira-core/assets/js/index.js`: one state machine per instance, its own `<audio>`, queue + shuffle + repeat (off/all/one), Media Session metadata and action handlers, documented keyboard map, ARIA state and live regions, `localStorage` preferences (`wavira.player.*`). Mounted by `wavira_player_mount()` in the theme, with a native `<audio>` fallback when JavaScript is unavailable. |
 | Player data | `wavira/v1/player/tracks/{id}` and `/player/queue?context=album\|artist\|genre\|tracks\|related`; the engine only substitutes IDs into server-provided route templates. |
-| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]`, `wp wavira migrate [--detect\|--dry-run\|--rollback] [--batch=<n>] [--kind=<mp3\|mp4\|album>] [--report=<file>]`. |
+| WP-CLI | `wp wavira verify`, `wp wavira seed [--force] [--english] [--no-site]`, `wp wavira migrate [--detect\|--dry-run\|--status\|--rollback] [--batch=<n>] [--offset=<n>] [--kind=<mp3\|mp4\|album>] [--report=<file>]`. |
+| Packaging | `node tools/package.mjs [--check] [--strict] [--out=DIR]` — the archives, the manifest and the `[PACKAGE]` gate (ADR 0019). |
 | Function API | Plugin: `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()`, `wavira_core_track_playback()`, `wavira_core_enqueue_player()`, `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()` (`wavira-core/public-api.php`). Theme: `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. A theme never names a Core class — enforced by `tools/check-boundaries.mjs`. |
 | Hooks | Filters `wavira_track_playback_payload`, `wavira_core_date_style`, `wavira_core_date_format`, `wavira_core_date_label`, `wavira_player_queue_items`, `wavira_player_settings`, `wavira_related_ids`, `wavira_related_score`, `wavira_searchable_types`, `wavira_download_quality_matrix`, `wavira_download_quality_sources`, `wavira_download_access`, `wavira_setting`, `wavira_settings_sanitized`, `wavira_rest_item`, `wavira_content_width`; actions `wavira_core_booted`, `wavira_download_counted`, `wavira_download_served`. Themes call `wavira_has_core()`, `wavira_get_setting()`, `wavira_icon()`, `wavira_related_posts()`. Player mounts emit DOM events `wavira:player:<event>` for theme JavaScript. |
 

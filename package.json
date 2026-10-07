@@ -1,6 +1,6 @@
 {
 	"name": "wavira-music",
-	"version": "0.10.1",
+	"version": "0.11.0",
 	"private": true,
 	"description": "Development tooling for Wavira — WordPress music-publishing ecosystem. Not required to run the product.",
 	"license": "GPL-2.0-or-later",
@@ -17,6 +17,9 @@
 		"i18n:extract": "node tools/i18n.mjs extract",
 		"i18n:build": "node tools/i18n.mjs build",
 		"i18n:check": "node tools/i18n.mjs check",
+		"package": "node tools/package.mjs",
+		"package:check": "node tools/package.mjs --check",
+		"package:strict": "node tools/package.mjs --check --strict",
 		"check": "npm run lint && npm run build && npm run test:js"
 	}
 }

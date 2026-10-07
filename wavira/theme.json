@@ -74,7 +74,18 @@
 				{
 					"slug": "body",
 					"name": "Body",
-					"fontFamily": "\"Vazirmatn\", \"Segoe UI\", system-ui, -apple-system, sans-serif"
+					"fontFamily": "\"Vazirmatn\", \"Segoe UI\", system-ui, -apple-system, sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Vazirmatn",
+							"fontStyle": "normal",
+							"fontWeight": "100 900",
+							"fontDisplay": "swap",
+							"src": [
+								"file:./assets/fonts/vazirmatn/vazirmatn-variable.woff2"
+							]
+						}
+					]
 				},
 				{
 					"slug": "mono",

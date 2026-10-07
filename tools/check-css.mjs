@@ -17,12 +17,15 @@
  *      (`WP_Theme_JSON::flatten_tree()`), so `--wp--custom--player--barSpace`
  *      silently resolves to nothing: the fallback hides the typo and the setting
  *      stops working (both instances of this shipped in 0.6.0 and are fixed).
+ *   7. the declared font — every `fontFace` in theme.json points at a file that
+ *      ships with the theme, asks for `font-display: swap`, keeps Vazirmatn as
+ *      the primary family, and travels with its OFL text (ADR 0010).
  *
  * Usage:
  *   node tools/check-css.mjs          # check, exit 1 on a violation
  */
 
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -234,6 +237,60 @@ for ( const { label, file, kb } of BUDGETS ) {
 // The theme script must exist (it is a product file, not a build artefact).
 if ( ! existsSync( THEME_JS ) ) {
 	problems.push( 'wavira/assets/js/index.js is missing' );
+}
+
+// --------------------------------------------------- 7. the declared fontface
+// WordPress turns `fontFace` in theme.json into the `@font-face` rule, so the
+// rule itself is never in these files: a wrong path or a missing file would be
+// invisible here and on the site (the browser just falls back), which is exactly
+// the class of defect a gate exists for.
+{
+	const themeJson = JSON.parse( readFileSync( THEME_JSON, 'utf8' ) );
+	const families = themeJson?.settings?.typography?.fontFamilies ?? [];
+	const faces = families.flatMap( ( family ) => ( family.fontFace ?? [] ).map( ( face ) => ( { family, face } ) ) );
+	let fontFiles = 0;
+
+	for ( const { family, face } of faces ) {
+		if ( face.fontDisplay !== 'swap' ) {
+			problems.push( `theme.json: the ${ family.slug } face has no font-display: swap` );
+		}
+
+		for ( const source of [ face.src ?? [] ].flat() ) {
+			if ( ! String( source ).startsWith( 'file:./' ) ) {
+				problems.push( `theme.json: ${ source } is not a theme-relative font file` );
+				continue;
+			}
+
+			const relative = String( source ).replace( 'file:./', '' );
+			const path = join( THEME_DIR, relative );
+
+			if ( ! existsSync( path ) ) {
+				problems.push( `theme.json names ${ relative } but the file is not there` );
+				continue;
+			}
+
+			fontFiles++;
+			notes.push( `${ relative }: ${ ( statSync( path ).size / 1024 ).toFixed( 0 ) } KB, shipped here, no remote URL` );
+		}
+	}
+
+	// The primary family must be the one the stylesheet actually asks for, and a
+	// bundled font must ship its licence text next to it (ADR 0010).
+	const primary = families.find( ( family ) => family.slug === 'body' )?.fontFamily ?? '';
+
+	if ( ! primary.startsWith( '\"Vazirmatn\"' ) ) {
+		problems.push( `theme.json: the body family no longer starts with Vazirmatn (${ primary })` );
+	}
+
+	if ( faces.length > 0 && ! existsSync( join( THEME_DIR, 'assets/fonts/vazirmatn/OFL.txt' ) ) ) {
+		problems.push( 'a font face is declared but assets/fonts/vazirmatn/OFL.txt (the SIL OFL text) is missing' );
+	}
+
+	if ( faces.length === 0 ) {
+		notes.push( 'theme.json declares no bundled font (system stack only)' );
+	}
+
+	notes.push( `font faces: ${ faces.length } declared, ${ fontFiles } file(s) present` );
 }
 
 for ( const line of notes ) {

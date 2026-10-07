@@ -17,6 +17,13 @@
  * model deliberately does not implement yet, together with the decision that
  * holds it back.
  *
+ * It also checks the *numbers* `README.md` claims about the schema. "46 meta
+ * keys" is a promise a reader can verify in one line of code, and it went stale
+ * once already (the README still said 43 after keys were added later — found by
+ * installing the shipped package and asking `MetaSchema::all()`). Only the
+ * README is checked: phase tables elsewhere in `docs/` record what the count was
+ * *at the time*, which is history and must stay readable as such.
+ *
  * Usage:
  *   node tools/check-mapping.mjs        # check, exit 1 on an unknown name
  */
@@ -32,9 +39,11 @@ const POST_TYPES = join( ROOT, 'wavira-core/src/Content/PostTypes.php' );
 const TAXONOMIES = join( ROOT, 'wavira-core/src/Content/Taxonomies.php' );
 const SETTINGS = join( ROOT, 'wavira-core/src/Settings/SettingsSchema.php' );
 
+const README = join( ROOT, 'README.md' );
+
 const problems = [];
 
-for ( const path of [ DOC, SCHEMA, POST_TYPES, TAXONOMIES, SETTINGS ] ) {
+for ( const path of [ DOC, SCHEMA, POST_TYPES, TAXONOMIES, SETTINGS, README ] ) {
 	if ( ! existsSync( path ) ) {
 		console.log( `      FAIL  missing file: ${ path.replace( ROOT + '/', '' ) }` );
 		process.exit( 1 );
@@ -98,6 +107,32 @@ lines.forEach( ( line, index ) => {
 		}
 	}
 } );
+
+// -------------------------------------------- counted claims in the front door
+{
+	const metaConstants = new Set(
+		[ ...read( SCHEMA ).matchAll( /const\s+[A-Z0-9_]+\s*=\s*'(wavira_[a-z0-9_]+)'/g ) ].map( ( m ) => m[ 1 ] )
+	);
+	const settingKeys = new Set(
+		[ ...read( SETTINGS ).matchAll( /^\t\t\t'([a-z0-9_]+)'\s*=>\s*array\(/gm ) ].map( ( m ) => m[ 1 ] )
+	);
+
+	for ( const [ pattern, actual, label ] of [
+		[ /(\d+)\s+registered meta keys/g, metaConstants.size, 'registered meta keys' ],
+		[ /(\d+)\s+meta keys/g, metaConstants.size, 'meta keys' ],
+		[ /with\s+(\d+)\s+keys/g, settingKeys.size, 'settings keys' ],
+	] ) {
+		for ( const match of read( README ).matchAll( pattern ) ) {
+			if ( Number( match[ 1 ] ) !== actual ) {
+				problems.push( `README.md claims ${ match[ 1 ] } ${ label }, the code has ${ actual }` );
+			}
+		}
+	}
+
+	if ( problems.length === 0 ) {
+		console.log( `      OK    README's counts match the code (${ metaConstants.size } meta keys, ${ settingKeys.size } settings)` );
+	}
+}
 
 if ( problems.length > 0 ) {
 	for ( const line of problems ) {

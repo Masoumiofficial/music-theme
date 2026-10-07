@@ -5,6 +5,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.11.0 (release candidate: packaging, bundled typeface, release docs)
+- **Vazirmatn ships with the theme.** One unmodified variable WOFF2 (weights 100–900, 109 KB) declared as a
+  `fontFace` in `theme.json`, so WordPress prints the `@font-face` rule for the front end *and* the block
+  editor; the SIL OFL 1.1 text travels beside it in `assets/fonts/vazirmatn/OFL.txt` (ADR 0010), and
+  `tools/check-css.mjs` fails the build when the file, the licence or `font-display: swap` goes missing.
+  Until now the stack only *preferred* Vazirmatn and fell back to whatever the visitor's system had.
+- **`inc/performance.php` — the typeface is preloaded.** Core prints font-face rules on `wp_head` priority
+  50; without a hint the browser cannot start the request until that CSS has been parsed and a rule has
+  matched, so the text paints in a fallback face and re-lays out. The hint is same-origin, comes from the
+  theme's own URL and is skipped when the file is absent.
+- **`readme.txt`** — a WordPress-style listing document beside `README.md` (description, install steps,
+  FAQ, screenshots, copyright and the third-party notices).
+- **Release packaging.** The theme archive is now assembled by `tools/package.mjs` (deterministic, leak
+  scanned, licence-checked, install-tested) and uploaded by CI, instead of being zipped by hand.
+
+### Changed — 0.11.0
+- The header, `WAVIRA_THEME_VERSION` and `package.json` all read `0.11.0`; the release gate fails when they
+  disagree, so "which version is this" has one answer.
+
+### Added — 0.10.1 (Persian localisation)
+- **Jalali dates on Persian sites.** Templates, cards, archives and the artist profile print Jalali
+  (Shamsi) dates with Persian numerals through the plugin's date API — «۱۳ مهر ۱۴۰۵» — while `<time>`,
+  schema.org and feeds stay Gregorian on purpose.
+- **Persian numerals** wherever a number is user-visible (durations, quality labels, counts, tracklist
+  indices).
+- **`style.css`** declares the Persian-facing theme metadata (`Tags: rtl-language-support,
+  translation-ready` unchanged, version aligned with the phase) and the catalogue was completed.
+
 ### Added — 0.10.0 (SEO cooperation and the performance budget)
 - **`inc/seo.php`** — music structured data printed as one JSON-LD tag from the graph the plugin
   builds, encoded with `JSON_HEX_TAG` so a title containing `</script>` cannot close the tag; plus

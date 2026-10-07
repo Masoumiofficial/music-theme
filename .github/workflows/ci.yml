@@ -187,6 +187,16 @@ jobs:
           # instead of hanging on a missing TTY.
           bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest < /dev/null 2>&1 | tee /tmp/install.log
 
+      - name: Record the WordPress version under test
+        # `install-wp-tests.sh … latest` resolves to whatever is released that
+        # day, so "Tested up to" in the headers and the docs has no evidence
+        # unless the version is written down where it can be quoted.
+        run: |
+          set -uo pipefail
+          VERSION="$(php -r 'require "/tmp/wordpress/wp-includes/version.php"; echo $wp_version;' 2>/dev/null || true)"
+          echo "::notice title=WordPress under test::PHP ${{ matrix.php }} — WordPress ${VERSION:-unknown}"
+          echo "WordPress under test: ${VERSION:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Run the integration suite
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
@@ -246,6 +256,51 @@ jobs:
             [ -f "$file" ] || continue
             printf '%s — %s raw, %s gzipped\n' "$file" "$(du -h "$file" | cut -f1)" "$(gzip -9 -c "$file" | wc -c | awk '{printf "%.1f KB", $1/1024}')"
           done
+
+  # ---------------------------------------------------------------------------
+  # Release packages: the two uploadable artefacts and the bundle, plus the
+  # manifest that says what is inside them. Built on every push so a broken
+  # release tree is found on the commit that broke it, and uploaded so the
+  # package can be downloaded from the run instead of being rebuilt by hand.
+  # ---------------------------------------------------------------------------
+  release-package:
+    name: Release packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        run: node tools/build.mjs
+
+      - name: Assemble the packages
+        # A fixed SOURCE_DATE_EPOCH makes the archives byte-identical between
+        # runs and machines; the tool rebuilds one archive on the spot and fails
+        # if the bytes differ.
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs | tee /tmp/package.log
+          node tools/annotate-log.mjs /tmp/package.log package 20 notice
+
+      - name: Name the artifact from the built version
+        id: meta
+        run: |
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: wavira-${{ steps.meta.outputs.version }}-packages
+          path: |
+            dist/*.zip
+            dist/manifest.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
 
   # ---------------------------------------------------------------------------
   # Repository hygiene: the legacy artifact must never be modified.

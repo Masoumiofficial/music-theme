@@ -468,7 +468,7 @@ function renderPot( artifact, entries ) {
 		'# This file is distributed under the GPL-2.0-or-later licence.',
 		`msgid ""`,
 		`msgstr ""`,
-		`"Project-Id-Version: ${ artifact.domain } 0.10.1\\n"`,
+		`"Project-Id-Version: ${ artifact.domain } 0.11.0\\n"`,
 		`"Report-Msgid-Bugs-To: https://etehadwp.com/\\n"`,
 		`"POT-Creation-Date: ${ stamp }\\n"`,
 		`"MIME-Version: 1.0\\n"`,
