@@ -10,6 +10,8 @@ composer.lock
 # --- Build output ---
 dist/*
 !dist/.gitkeep
+# A copy of dist/ for handing the archives over (same reason: generated, never committed).
+/delivery/
 wavira/assets/dist/
 wavira-core/assets/dist/
 

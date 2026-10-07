@@ -201,7 +201,17 @@ jobs:
         env:
           WP_TESTS_DIR: /tmp/wordpress-tests-lib
         run: |
-          vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox 2>&1 | tee /tmp/phpunit.log || true
+          # The exit status is recorded, not thrown, so the annotation steps below
+          # always run and the failure is readable from the checks API. The last
+          # step of the job turns a non-zero status into a failed job: a fatal
+          # error inside a test must not pass as green because the pipeline ended
+          # in `tee`.
+          set -o pipefail
+          if vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox 2>&1 | tee /tmp/phpunit.log; then
+            echo 0 > /tmp/phpunit.exit
+          else
+            echo "${PIPESTATUS[0]:-1}" > /tmp/phpunit.exit
+          fi
 
       - name: Report install log
         if: always()
@@ -221,6 +231,19 @@ jobs:
         run: |
           test -f /tmp/junit.xml || { echo "::error::PHPUnit produced no JUnit report — see the annotated log above."; exit 1; }
           node tools/junit-annotate.mjs /tmp/junit.xml
+
+      - name: Fail the job if the suite did not pass
+        # Runs last so the annotations above are published first. A non-zero
+        # PHPUnit status means a failing test, a fatal error, or a suite that
+        # never finished — none of which is a green build.
+        if: always()
+        run: |
+          CODE="$(cat /tmp/phpunit.exit 2>/dev/null || echo missing)"
+          if [ "$CODE" != "0" ]; then
+            echo "::error::PHPUnit did not exit cleanly (exit ${CODE}) — see the annotated log above."
+            exit 1
+          fi
+          echo "PHPUnit exited 0."
 
   # ---------------------------------------------------------------------------
   # Assets & gates: JS syntax, JSON validity, CSS and contrast gates, PHP class

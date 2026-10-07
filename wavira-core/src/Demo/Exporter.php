@@ -27,8 +27,22 @@ defined( 'ABSPATH' ) || exit;
 final class Exporter {
 
 	/**
-	 * Build a WXR document for the current site.
+	 * Whether `export_wp()` has already run in this request.
 	 *
+	 * WordPress declares its `wxr_*()` helpers *inside* `export_wp()`, so calling
+	 * it a second time in the same request is a fatal "Cannot redeclare
+	 * wxr_cdata()" error rather than a second document. This flag — together with
+	 * the `wxr_cdata()` probe in `xml()`, which also catches an export run by a
+	 * third party earlier in the request — turns that fatal into a refusal the
+	 * caller can report.
+	 *
+	 * @var bool
+	 */
+	private static $exported = false;
+
+	/**
+	 * Build a WXR document for the current site.
+		 *
 	 * @param array<string, mixed> $args `content` (post type or `all`) and
 	 *                                   `status` (post status or `all`).
 	 * @return array<string, string> `ok` (`1`/`0`), `xml`, `reason`.
@@ -58,6 +72,18 @@ final class Exporter {
 				'reason' => 'export_wp() is not available on this installation',
 			);
 		}
+
+		if ( self::$exported || function_exists( 'wxr_cdata' ) ) {
+			return array(
+				'ok'     => '0',
+				'xml'    => '',
+				'reason' => 'WordPress can only run its exporter once per request: Core declares the wxr_*() helpers inside export_wp(), so a second call in the same request is fatal. Run the export again in a new request.',
+			);
+		}
+
+		// Set before the call: whatever Core leaves behind, a second call must not
+		// reach `export_wp()`.
+		self::$exported = true;
 
 		$xml = self::capture( $content, $status );
 

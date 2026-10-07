@@ -37,7 +37,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the same installer, so the demo cannot drift between them.
 - **`wp wavira export-demo`** (`src/Demo/Exporter.php`) — the site's music content as WXR, for moving it to
   another installation; the same document is a download button on the screen. It wraps WordPress' own
-  `export_wp()` rather than reimplementing the format.
+  `export_wp()` rather than reimplementing the format, and it knows the one thing Core does not say out
+  loud: `export_wp()` declares its `wxr_*()` helpers *inside* itself, so a second call in the same request
+  is a fatal "Cannot redeclare wxr_cdata()" error. A second export — Wavira's own, or one a third-party
+  plugin already ran in this request — is refused with a reason instead of being allowed to take the
+  request down.
 - **`tests/test-demo.php`** — the demo path on a real WordPress: the catalogue, the absence of fabricated
   media URLs, idempotency, a forced import that leaves the owner's post alone, the English fixture leaving
   site options alone, the Iranian defaults, the fixture shape, and the export.

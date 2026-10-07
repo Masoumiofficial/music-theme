@@ -252,7 +252,11 @@ class Test_Demo extends Wavira_Test_Case {
 	}
 
 	/**
-	 * The export produces a WXR document, and writes it to a file.
+	 * The export writes a WXR document to a file, and a second run in the same
+	 * request is refused instead of fatally redeclaring Core's `wxr_cdata()`.
+	 *
+	 * One export per request is all WordPress allows — the suite runs in a single
+	 * process, so this method is the only place that may start one.
 	 *
 	 * @return void
 	 */
@@ -261,20 +265,25 @@ class Test_Demo extends Wavira_Test_Case {
 
 		$this->posts = array_merge( $this->posts, $this->demo_ids() );
 
-		$document = Exporter::xml();
-
-		$this->assertSame( '1', $document['ok'], $document['reason'] );
-		$this->assertStringContainsString( '<rss version="2.0"', $document['xml'] );
-		$this->assertStringContainsString( 'wxr_version', $document['xml'] );
-		$this->assertStringContainsString( 'Demo Artist', $document['xml'], 'the content is in the document' );
-
 		$path   = wp_tempnam( 'wavira-export' );
 		$result = Exporter::to_file( (string) $path );
 
 		$this->assertTrue( $result['ok'], (string) $result['reason'] );
 		$this->assertGreaterThan( 0, (int) $result['bytes'] );
 
+		$document = (string) file_get_contents( (string) $path );
+
+		$this->assertStringContainsString( '<rss version="2.0"', $document );
+		$this->assertStringContainsString( 'wxr_version', $document );
+		$this->assertStringContainsString( 'Demo Artist', $document, 'the content is in the document' );
+
 		wp_delete_file( (string) $path );
+
+		$again = Exporter::xml();
+
+		$this->assertSame( '0', $again['ok'], 'a second export in one request is refused, never fatal' );
+		$this->assertSame( '', $again['xml'] );
+		$this->assertStringContainsString( 'once per request', $again['reason'] );
 	}
 
 	/**
