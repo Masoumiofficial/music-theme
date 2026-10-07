@@ -432,14 +432,14 @@ final class LegacySchema {
 	public static function deferred( string $source = self::SOURCE_LEGACY ): array {
 		if ( self::SOURCE_MUSIC_PUBLISHER === $source ) {
 			return array(
-				'artist_en'         => 'the English artist name is the site\'s second-language field, not a v1 model field',
-				'song_en'           => 'the English work title is the site\'s second-language field, not a v1 model field',
-				'talbume128'        => 'a folder URL for the download host; the model stores file URLs, not folders',
-				'talbume320'        => 'a folder URL for the download host; the model stores file URLs, not folders',
-				'select_effect'     => 'a hover-effect class of the old site templates, not content',
-				'pplayer_in'        => 'the publishing panel\'s own player switch; the player is the product\'s (ADR 0005)',
-				'fifu_image_alt'    => 'stored with the attachment on import; the cover resolves to the media library entry',
-				'music320_video'    => 'the MP3 of a music video: the video post type stores video sources, so a second audio track would have no home',
+				'artist_en'      => 'the English artist name is the site\'s second-language field, not a v1 model field',
+				'song_en'        => 'the English work title is the site\'s second-language field, not a v1 model field',
+				'talbume128'     => 'a folder URL for the download host; the model stores file URLs, not folders',
+				'talbume320'     => 'a folder URL for the download host; the model stores file URLs, not folders',
+				'select_effect'  => 'a hover-effect class of the old site templates, not content',
+				'pplayer_in'     => 'the publishing panel\'s own player switch; the player is the product\'s (ADR 0005)',
+				'fifu_image_alt' => 'stored with the attachment on import; the cover resolves to the media library entry',
+				'music320_video' => 'the MP3 of a music video: the video post type stores video sources, so a second audio track would have no home',
 			);
 		}
 

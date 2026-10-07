@@ -485,10 +485,4 @@ final class Cli implements Registrable {
 			)
 		);
 	}
-
-
-
-
-
-
 }

@@ -307,7 +307,8 @@ class Test_Demo extends Wavira_Test_Case {
 		$this->assertStringContainsString( 'Installer::install(', $page );
 		$this->assertStringContainsString( 'admin_post_', $page );
 		$this->assertStringContainsString( 'check_admin_referer', $page );
-		$this->assertStringContainsString( "self::CAPABILITY = 'manage_options'", $page );
+		$this->assertStringContainsString( "CAPABILITY = 'manage_options'", $page );
+		$this->assertStringContainsString( 'current_user_can( self::CAPABILITY )', $page );
 		$this->assertStringContainsString( 'wp_nonce_field', $page );
 
 		$this->assertStringContainsString( 'Installer::install(', $cli );

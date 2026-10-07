@@ -34,6 +34,16 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Fixtures {
 
+	/**
+	 * The Persian catalogue: the demo the product ships as its example site.
+	 *
+	 * Fictional content, written for the demo (ADR 0010): one artist, an album
+	 * with four tracks (one of them a remix), a single, a music video, Persian
+	 * genres and Jalali-era release dates. No audio or video file is referenced
+	 * — a demo URL that 404s would break the player on the buyer's first click.
+	 *
+	 * @return array<string, mixed>
+	 */
 	public static function persian(): array {
 		return array(
 			'artist'   => array(
@@ -152,6 +162,16 @@ final class Fixtures {
 		);
 	}
 
+	/**
+	 * The neutral English fixture.
+	 *
+	 * Used by the test suite and by `--english`: content only, and the installer
+	 * never touches the site's locale, timezone or menu for it (ADR 0017). The
+	 * strings here *are* translatable, unlike the Persian catalogue, because
+	 * this fixture is a developer fixture rather than a market demo.
+	 *
+	 * @return array<string, mixed>
+	 */
 	public static function english(): array {
 		$lyrics = __( 'Generated demo lyrics — replace this text.', 'wavira-core' );
 		$genre  = __( 'Demo Genre', 'wavira-core' );

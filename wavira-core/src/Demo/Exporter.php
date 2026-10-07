@@ -59,16 +59,7 @@ final class Exporter {
 			);
 		}
 
-		// `export_wp()` prints the document; capturing it keeps the caller free
-		// to stream it to a download or write it to a file.
-		ob_start();
-		export_wp(
-			array(
-				'content' => $content,
-				'status'  => $status,
-			)
-		);
-		$xml = (string) ob_get_clean();
+		$xml = self::capture( $content, $status );
 
 		if ( '' === trim( $xml ) ) {
 			return array(
@@ -83,6 +74,59 @@ final class Exporter {
 			'xml'    => $xml,
 			'reason' => '',
 		);
+	}
+
+	/**
+	 * Run WordPress' exporter and return the document instead of sending it.
+	 *
+	 * `export_wp()` is written for a browser download: it announces the file with
+	 * `header()` and then prints the document. On a request where output has
+	 * already started — WP-CLI, the test suite, a plugin that printed a notice
+	 * before ours — PHP raises a warning for each of those calls even though the
+	 * document itself is produced correctly, and a harness that converts warnings
+	 * into exceptions would fail on something that is not a defect. The guard is
+	 * installed only in that case, only for warnings, and only around this call.
+	 *
+	 * @param string $content Post type, or `all`.
+	 * @param string $status  Post status, or `all`.
+	 * @return string The WXR document.
+	 */
+	private static function capture( string $content, string $status ): string {
+		$guard = headers_sent();
+
+		if ( $guard ) {
+			set_error_handler( array( __CLASS__, 'ignore_header_warning' ), E_WARNING ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- scoped to a single documented call and restored immediately.
+		}
+
+		try {
+			ob_start();
+
+			export_wp(
+				array(
+					'content' => $content,
+					'status'  => $status,
+				)
+			);
+
+			return (string) ob_get_clean();
+		} finally {
+			if ( $guard ) {
+				restore_error_handler();
+			}
+		}
+	}
+
+	/**
+	 * Handle the header warning `export_wp()` raises when output has started.
+	 *
+	 * The document is still generated: the warning is about a download header
+	 * that cannot be set any more, and the caller has already decided what to do
+	 * with the bytes.
+	 *
+	 * @return bool Always true: the warning is handled here.
+	 */
+	public static function ignore_header_warning(): bool {
+		return true;
 	}
 
 	/**

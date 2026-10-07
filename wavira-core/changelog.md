@@ -19,6 +19,29 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **The packages** are built by `tools/package.mjs`, which also validates that the plugin archive contains
   what it promises (headers, compiled `.mo`, built bundles) and nothing dev-only.
 
+- **Interop with the publishing plugin** (`--source=music-publisher`). `src/Migration/LegacySchema.php` now
+  carries two source profiles: the audited theme (`mp3`/`mp4`/`album`) and “Sajad Music Publisher”
+  (`musicss*`), which writes ordinary posts with its own meta (`art_name`, `music_txt`, `fifu_image_url`,
+  `online_ply`, `slider_song`, `album_dl` rows) and its own taxonomies. The migration converts either, from
+  one engine, and the two vocabularies are proven disjoint. Role credits the v1 model has no field for
+  (songwriter, composer, arranger, mix engineer) are preserved as data and reported — never invented as
+  artists. Contract and limits: `docs/INTEGRATIONS.md`.
+- **`Content\Taxonomies::KIND`** (`wavira_kind`, `/kinds/`, always on, tracks only) — single, remix, noha,
+  podcast. This is what keeps an imported remix from arriving as just another song; `normalize_kind()`
+  matches an explicit alias map, so `musicss_remix` cannot land in `music`, and a value nothing claims
+  gets no term at all.
+- **The demo importer without WP-CLI** (`src/Demo/`): `Fixtures` (the Persian catalogue and the neutral
+  English fixture), `Installer::install()` (idempotent; a forced run replaces only posts carrying the
+  `_wavira_demo` marker, never the site owner's content) and `Admin\DemoPage` — the screen
+  `Tools → Wavira demo content`, behind `manage_options` and a nonce. `wp wavira seed` and the screen call
+  the same installer, so the demo cannot drift between them.
+- **`wp wavira export-demo`** (`src/Demo/Exporter.php`) — the site's music content as WXR, for moving it to
+  another installation; the same document is a download button on the screen. It wraps WordPress' own
+  `export_wp()` rather than reimplementing the format.
+- **`tests/test-demo.php`** — the demo path on a real WordPress: the catalogue, the absence of fabricated
+  media URLs, idempotency, a forced import that leaves the owner's post alone, the English fixture leaving
+  site options alone, the Iranian defaults, the fixture shape, and the export.
+
 ### Changed — 0.11.0
 - The plugin header and `WAVIRA_CORE_VERSION` read `0.11.0`; `Migrator::unmapped_kinds()` no longer calls
   an admin-only function (it was fatal on a front-end or test request), and `expand_album()` reads the

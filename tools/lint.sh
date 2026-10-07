@@ -5,7 +5,8 @@
 # not numbered, so inserting one never invalidates a reference in the docs:
 #
 #   [PHP]       PHP syntax          (skipped with a notice when PHP is not installed)
-#   [PHPCS]     WordPress standards (skipped when vendor/bin/phpcs is missing)
+#   [PHPCS]     WordPress standards: vendor/bin/phpcs, or $PHPCS_BIN when a host
+#               has no Composer (the same standard, the same pinned sniffs)
 #   [JS]        JS syntax           (node --check on every .js/.mjs; module syntax for
 #                                    wavira-core/assets/js, because it must be valid without a build)
 #   [JSON]      JSON validity
@@ -63,15 +64,31 @@ fi
 
 # ------------------------------------------------------------------- 2. PHPCS
 say "[PHPCS] WordPress Coding Standards (PHPCS)"
+# `vendor/bin/phpcs` is the normal path (composer install --dev). A host without
+# Composer can point PHPCS_BIN at a phpcs binary that carries the same standard
+# set, so this gate is a real verdict in more environments than one — the
+# alternative is a gate that silently skips and lets CI find the violations.
+PHPCS_RUNNER=""
 if [ -x "vendor/bin/phpcs" ]; then
-  if vendor/bin/phpcs --standard=phpcs.xml.dist -q; then
-    say "      OK    PHPCS clean"
+  PHPCS_RUNNER="vendor/bin/phpcs"
+elif [ -n "${PHPCS_BIN:-}" ] && [ -x "${PHPCS_BIN}" ]; then
+  PHPCS_RUNNER="${PHPCS_BIN}"
+fi
+
+if [ -n "$PHPCS_RUNNER" ]; then
+  case "$PHPCS_RUNNER" in
+    /*) PHPCS_PATH="$PHPCS_RUNNER" ;;
+    *)  PHPCS_PATH="$ROOT/$PHPCS_RUNNER" ;;
+  esac
+
+  if ( cd "$ROOT" && "$PHPCS_PATH" --standard=phpcs.xml.dist -q ); then
+    say "      OK    PHPCS clean ($PHPCS_RUNNER)"
   else
     say "      FAIL  PHPCS reported issues (run vendor/bin/phpcbf to auto-fix what it can)"
     FAIL=1
   fi
 else
-  say "      SKIP  vendor/bin/phpcs not installed (composer install --dev)"
+  say "      SKIP  no phpcs runner: composer install --dev, or set PHPCS_BIN"
 fi
 
 # ------------------------------------------------------------------ 3. JS syntax

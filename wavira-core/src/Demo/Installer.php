@@ -121,8 +121,9 @@ final class Installer {
 				self::attach_kind( $track_id, (string) ( $track['kind'] ?? 'music' ) );
 
 				$release_tracks[] = $track_id;
-				$report['tracks'][] = $track_id;
 			}
+
+			$report['tracks'] = array_merge( $report['tracks'], $release_tracks );
 
 			update_post_meta( $release_id, MetaSchema::TRACKLIST, $release_tracks );
 

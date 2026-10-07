@@ -20,6 +20,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Release packaging.** The theme archive is now assembled by `tools/package.mjs` (deterministic, leak
   scanned, licence-checked, install-tested) and uploaded by CI, instead of being zipped by hand.
 
+- **The kind archive** (`templates/taxonomy-wavira_kind.html`) — `/kinds/remix/`, `/kinds/noha/` and
+  friends render a track listing with the term's description instead of falling back to the blog archive.
+  The taxonomy itself is the plugin's (`Content\Taxonomies::KIND`); the template is the presentation.
+
 ### Changed — 0.11.0
 - The header, `WAVIRA_THEME_VERSION` and `package.json` all read `0.11.0`; the release gate fails when they
   disagree, so "which version is this" has one answer.

@@ -658,6 +658,7 @@ class Test_Migration extends Wavira_Test_Case {
 		$this->legacy_post(
 			array(
 				LegacySchema::TYPE_META => 'musicss_podcast',
+				'artist_en'             => 'Arman Rad',
 				'music320'              => 'https://cdn.example.test/ep-1.mp3',
 			),
 			'قسمت یک'

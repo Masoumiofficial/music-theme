@@ -103,11 +103,11 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:184
+#: wavira-core/src/Demo/Fixtures.php:204
 msgid "Demo Album"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:178
+#: wavira-core/src/Demo/Fixtures.php:198
 msgid "Demo Artist"
 msgstr ""
 
@@ -118,15 +118,15 @@ msgid_plural "Demo content imported: %1$d releases and %2$d tracks. Open the fro
 msgstr[0] ""
 msgstr[1] ""
 
-#: wavira-core/src/Demo/Fixtures.php:157
+#: wavira-core/src/Demo/Fixtures.php:177
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:193
+#: wavira-core/src/Demo/Fixtures.php:213
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:164
+#: wavira-core/src/Demo/Fixtures.php:184
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -177,11 +177,11 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:179
+#: wavira-core/src/Demo/Fixtures.php:199
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:156
+#: wavira-core/src/Demo/Fixtures.php:176
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 
@@ -504,7 +504,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:321
+#: wavira-core/src/Demo/Installer.php:322
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 
