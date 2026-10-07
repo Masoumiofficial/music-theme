@@ -20,6 +20,7 @@ script skips PHP checks and says so).
 | `check-contrast.mjs` | WCAG 2.2 AA gate: 21 mode-specific colour pairs (light and dark) computed from the `theme.json` palette and `tokens.css`; reports the ratio of every pair and fails below the minimum for its size/weight | Node 18+ |
 | `tests/js/player.test.mjs` | Player-engine unit tests (DOM-free, `node:vm`); `npm run test:js` or `node --test tests/js/player.test.mjs` | Node 18+ |
 | `tests/js/theme.test.mjs` | Theme-script unit tests (colour modes, storage, toggle labels, player bootstrapping, PHP↔JS storage-key parity) | Node 18+ |
+| `harness/export.php` | WordPress-free harness for `Demo\Exporter` (`php tools/harness/export.php main\|foreign\|empty`): the header warning a browser-download exporter raises must not reach the caller, a second export in one request must be refused instead of fatally redeclaring Core's `wxr_cdata()`, and an empty export is a reported failure. Exercises the real class file with a stubbed `export_wp()`; development only | PHP 7.4+ |
 | `preview/` | Component harness: `node tools/preview/serve.mjs` → `http://localhost:4173/tools/preview/` renders the shipped CSS/JS with a stubbed player REST API for the colour-mode, RTL/LTR and 360→1920 checks. Development only — see `tools/preview/README.md` | Node 18+ |
 
 ## Legacy-echo gate (part of `lint.sh`)

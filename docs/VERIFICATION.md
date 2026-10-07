@@ -197,9 +197,10 @@ core feature, not a comfortable margin.
 ### 0.11.0 — additions after the release-candidate verdict
 
 The verdict runs (`37618881223`/`37618887341`) are the ones recorded in
-`docs/RELEASE-CANDIDATE.md`. The three additions below landed afterwards, inside the same version;
-the rows state what was executed for them, and the CI verdict is recorded once the run for this
-commit completes.
+`docs/RELEASE-CANDIDATE.md`. The additions below landed afterwards, inside the same version. Their
+verdict is CI `37625734821` (push) / `37625726155` (PR) on `taef48bd`: **9/9 jobs green**,
+`OK (167 tests, 1435 assertions)` on WordPress 7.1.3 with PHP 7.4 and 8.2, WPCS 0 findings, archives
+built and uploaded.
 
 | Claim | Status | Evidence |
 | --- | --- | --- |
@@ -208,6 +209,7 @@ commit completes.
 | A buyer without WP-CLI can install the demo | **TESTED** (suite) | `Demo\Fixtures` (the Persian catalogue + the neutral English fixture), `Demo\Installer::install()` (idempotent; `force` replaces only posts carrying `_wavira_demo`), `Admin\DemoPage` on `Tools → Wavira demo content` behind `manage_options` + `admin_post_*` + `check_admin_referer`. Suite: `tests/test-demo.php` — full catalogue, no fabricated media URLs, idempotency, forced replace that leaves the owner's post alone, English fixture leaving the site alone, Iranian defaults, fixture shape, WXR export, and the two source-level guard assertions (the admin screen and the CLI both call `Installer::install()`) |
 | The demo can leave the site it was installed on | **TESTED** (suite) | `Demo\Exporter` wraps WordPress' own `export_wp()`: `wp wavira export-demo [--file=…] [--type=…]` and the *Download WXR file* button on the same screen. Suite: `test_export_produces_a_wxr_document`, `test_export_file_name_is_a_safe_xml_name` |
 | The new admin screen is registered as a plugin module, and adds no admin surface to the front end | **TESTED** (suite) | `Plugin::default_modules()` includes `Admin\DemoPage`; `DemoPage::register()` returns early when `! is_admin()`. Suite: `test_demo_screen_is_a_plugin_module` |
+| A second export in one request is refused instead of fatal, and a header warning never reaches the caller | **TESTED** | Core declares its `wxr_*()` helpers inside `export_wp()`, so `Exporter` probes for them (and for its own earlier call) and returns `ok=0` with a reason rather than letting WordPress die with "Cannot redeclare wxr_cdata()". Proven in two places: `tests/test-demo.php::test_export_produces_a_wxr_document` reads the WXR back from the file and then asserts the refusal, and `tools/harness/export.php` (run by CI, PHP 8.2) exercises the real class with a stubbed `export_wp()` in three scenarios — `main` (warning captured, second call refused, process alive), `foreign` (a third party already exported: no call at all), `empty` (reported failure) — 11 + 3 + 4 checks. The CI run for `15d4ad6` (`37624192296`/`37624185242`) died at exactly this point (`Fatal error: Cannot redeclare wxr_cdata()`), and the job still reported green because the PHPUnit step swallowed its exit status; the same commit's workflow now fails the job when the suite does not exit 0 |
 | The Persian catalogue covers every new string | **VERIFIED** (static gate) | `node tools/i18n.mjs check` → `241/241 string(s) translated, POT/PO/MO in sync` (was 215); `tools/lint.sh` → `RESULT: PASS` twice, including `[PACKAGE]` |
 
 **What the 0.10.1 runs found.** Three red runs, three real defects — none of them silenced:

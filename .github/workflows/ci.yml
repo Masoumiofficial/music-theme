@@ -37,9 +37,22 @@ jobs:
       - name: Syntax check (theme + core plugin + tools)
         run: |
           set -euo pipefail
-          find wavira wavira-core -type f -name '*.php' -not -path '*/vendor/*' -not -path '*/assets/dist/*' -print0 \
+          find wavira wavira-core tools -type f -name '*.php' -not -path '*/vendor/*' -not -path '*/assets/dist/*' -print0 \
             | xargs -0 -r -n1 php -l
           echo "PHP syntax OK on ${{ matrix.php }}"
+
+      - name: Exporter harness (WordPress-free)
+        # The three exporter behaviours WordPress cannot be asked about inside one
+        # process: a header warning that must not reach the caller, a second export
+        # in one request (Core fatals on it), and an empty export reported as a
+        # failure. Development-only file; see tools/README.md.
+        if: matrix.php == '8.2'
+        run: |
+          set -euo pipefail
+          for scenario in main foreign empty; do
+            echo "--- scenario: ${scenario}"
+            php tools/harness/export.php "${scenario}"
+          done
 
   # ---------------------------------------------------------------------------
   # WordPress Coding Standards + PHPCompatibilityWP (declared floor 7.4).

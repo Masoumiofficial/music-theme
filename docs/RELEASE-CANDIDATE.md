@@ -18,8 +18,10 @@ verified changed, only things that were missing were added:
 | **Demo import without WP-CLI** | most buyers never open a terminal; a demo only a developer can install is a demo most customers never see | `Demo\Fixtures`, `Demo\Installer`, `Admin\DemoPage` (`Tools → Wavira demo content`), `wp wavira export-demo` | `tests/test-demo.php` |
 
 The demo now also ships a remix of one of its tracks, so the kind feature is visible on a fresh
-install. The CI verdict for these additions is the run recorded in `docs/VERIFICATION.md` under
-"after the RC verdict"; the RC table below keeps the verdict of the code it was recorded against.
+install. The CI verdict for these additions is `37625734821` (push) / `37625726155` (PR) on `taef48bd`:
+**9/9 jobs green**, `OK (167 tests, 1435 assertions)` on WordPress 7.1.3 with PHP 7.4 and 8.2, WPCS
+0 findings, archives built and uploaded — the detail is in `docs/VERIFICATION.md` under "after the RC
+verdict". The RC table below keeps the verdict of the code it was recorded against.
 
 | | |
 | --- | --- |
