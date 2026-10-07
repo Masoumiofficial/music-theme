@@ -286,7 +286,14 @@ jobs:
         run: bash tools/lint.sh
 
       - name: Front-end unit tests (DOM-free)
-        run: node --test tests/js/player.test.mjs tests/js/theme.test.mjs
+        # The same list `npm run test:js` runs: the player engine, the theme
+        # script, the Customizer preview and the catalogue consistency check.
+        run: >-
+          node --test
+          tests/js/player.test.mjs
+          tests/js/theme.test.mjs
+          tests/js/customizer.test.mjs
+          tests/js/i18n.test.mjs
 
       - name: Bundle size report (gzipped)
         run: |

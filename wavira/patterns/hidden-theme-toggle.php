@@ -14,6 +14,10 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+if ( ! wavira_option( 'show_theme_toggle' ) ) {
+	return;
+}
 ?>
 
 <!-- wp:html -->

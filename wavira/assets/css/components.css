@@ -15,7 +15,7 @@
 
 .wavira-layout {
 	inline-size: 100%;
-	max-inline-size: var(--wp--style--global--wide-size, 1200px);
+	max-inline-size: var(--wavira-container, var(--wp--style--global--wide-size, 1200px));
 	margin-inline: auto;
 	padding-inline: var(--wp--preset--spacing--40, 1rem);
 }
@@ -712,4 +712,165 @@
 .wavira-video-frame > iframe:not([src]),
 .wavira-video-frame > video:not([src]) {
 	background: var(--wp--preset--color--surface);
+}
+
+/* ---- options: what the settings panel switches ------------------------- */
+/* Everything here is a body class rule, never a `!important`: a class-scoped
+   selector beats the single-class rule it is overriding on specificity, in both
+   directions, whatever order the stylesheets end up in (ADR 0009, ADR 0020). */
+
+body.wavira-not-sticky .wavira-header {
+	position: static;
+}
+
+body.wavira-no-title .wavira-site-title,
+body.wavira-no-tagline .wavira-signature,
+body.wavira-no-toggle .wavira-theme-toggle {
+	display: none;
+}
+
+/* The player bar is not rendered when it is switched off; the reserved space
+   under the last template goes with it. */
+body.wavira-no-player {
+	--wavira-player-space: 0px;
+}
+
+/* ---- logo -------------------------------------------------------------- */
+
+.wavira-logo {
+	display: inline-flex;
+	align-items: center;
+}
+
+.wavira-logo .custom-logo {
+	max-inline-size: var(--wavira-logo-width, 150px);
+	block-size: auto;
+	inline-size: auto;
+}
+
+.wavira-logo--dark {
+	display: none;
+}
+
+[data-theme="dark"] .wavira-logo--light {
+	display: none;
+}
+
+[data-theme="dark"] .wavira-logo--dark {
+	display: inline-block;
+}
+
+@media (prefers-color-scheme: dark) {
+	/* `auto` follows the device, exactly like the palette does (ADR 0014). */
+	[data-theme="auto"] .wavira-logo--light {
+		display: none;
+	}
+
+	[data-theme="auto"] .wavira-logo--dark {
+		display: inline-block;
+	}
+}
+
+/* ---- announcement bar -------------------------------------------------- */
+
+.wavira-topbar {
+	background: var(--wp--preset--color--primary);
+	color: var(--wavira-on-accent);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+.wavira-topbar__inner {
+	padding-block: var(--wp--preset--spacing--20, 0.5rem);
+	text-align: center;
+}
+
+.wavira-topbar p {
+	margin: 0;
+}
+
+.wavira-topbar a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+/* ---- header search ----------------------------------------------------- */
+
+.wavira-header__search {
+	margin-inline-start: auto;
+	flex: 0 1 14rem;
+}
+
+.wavira-header__search .wp-block-search__input {
+	min-inline-size: 6rem;
+}
+
+/* ---- social row -------------------------------------------------------- */
+
+.wavira-footer__social {
+	align-items: center;
+	gap: var(--wavira-social-gap, 0.75rem);
+}
+
+.wavira-social {
+	gap: var(--wavira-social-gap, 0.75rem);
+	align-items: center;
+}
+
+.wavira-social__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--wavira-social-size, 22px);
+	block-size: var(--wavira-social-size, 22px);
+	color: var(--wp--preset--color--muted);
+	border-radius: var(--wp--custom--radius--sm, 6px);
+	transition: color var(--wp--custom--motion--fast, 120ms) ease;
+}
+
+.wavira-social__link:hover,
+.wavira-social__link:focus-visible {
+	color: var(--wp--preset--color--primary);
+}
+
+.wavira-social__link svg {
+	inline-size: 100%;
+	block-size: 100%;
+}
+
+/* ---- back to top ------------------------------------------------------- */
+
+.wavira-to-top {
+	position: fixed;
+	inset-block-end: calc(var(--wavira-player-space, 6rem) + var(--wp--preset--spacing--30, 0.75rem));
+	inset-inline-end: var(--wp--preset--spacing--40, 1rem);
+	z-index: 30;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 2.75rem;
+	block-size: 2.75rem;
+	padding: 0.5rem;
+	border: var(--wavira-hairline);
+	border-radius: var(--wp--custom--radius--pill, 999px);
+	background: var(--wp--preset--color--surface);
+	color: var(--wp--preset--color--contrast);
+	box-shadow: var(--wavira-cover-shadow);
+	cursor: pointer;
+}
+
+.wavira-to-top[hidden] {
+	display: none;
+}
+
+.wavira-to-top svg {
+	inline-size: 100%;
+	block-size: 100%;
+}
+
+/* A footer note under the legal line. */
+.wavira-footer__note {
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+	margin-block-start: var(--wp--preset--spacing--20, 0.5rem);
 }

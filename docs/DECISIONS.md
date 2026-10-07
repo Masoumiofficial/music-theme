@@ -24,6 +24,7 @@ update this index. Format: `docs/adr/NNNN-title.md`.
 | [0017](adr/0017-jalali-dates-and-iranian-defaults.md) | Jalali (Shamsi) dates on `fa*` locales from a verified, anchored converter; machine surfaces stay Gregorian; Iranian defaults are applied by the seeder, and the demo/harness are Persian | Accepted — **implemented and verified in 0.10.1** (CI `37438117893`/`37438125487`, 134 tests / 1090 assertions) | 2026-10-05 |
 | [0018](adr/0018-migration-tool-scope-and-safety.md) | The legacy migration tool is a service behind `wp wavira migrate`: copy-and-back-up before writing, report instead of guessing, structurally idempotent, bounded/resumable, reversible; the admin page is deferred and the CLI is the shipped surface | Accepted — **implemented in 0.11.0**, runtime verdict in `docs/VERIFICATION.md` | 2026-10-06 |
 | [0019](adr/0019-release-packaging.md) | Release packaging: explicit includes plus a leak scan of the result, deterministic ZIPs written by our own dependency-free writer, the licence register checked against the archive, marketplace extras behind `--strict` | Accepted — built and install-tested in 0.11.0 | 2026-10-07 |
+| [0020](adr/0020-theme-options-panel.md) | Theme options: the Customizer as the panel, one schema driving the panel and the front end, CSS variables and body classes instead of `!important`, a default site ships no extra CSS, Persian setup as a nonced action rather than a setting | Accepted — implemented and tested in 0.12.0 | 2026-10-07 |
 
 **Resolved open decisions** (were listed as "scheduled" in 0.2.0)
 

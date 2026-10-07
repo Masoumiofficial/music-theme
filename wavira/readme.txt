@@ -2,7 +2,7 @@
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Version: 0.11.0
+Version: 0.12.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: music, rtl-language-support, translation-ready, block-styles, wide-blocks, custom-colors, accessibility-ready
@@ -85,6 +85,25 @@ Vazirmatn, under the SIL Open Font License 1.1. The licence text ships in
 == Changelog ==
 
 See `changelog.md` in the theme folder.
+
+== Settings panel ==
+
+Appearance → Customize → **Wavira settings**:
+
+* Identity and logo — logo, logo width, a separate logo for dark mode, site title and tagline
+* Header — sticky header, search block, announcement bar, player bar
+* Appearance — first-visit colour mode, accent colour, content width, corner radius, card shadow, card
+  width, light/dark toggle
+* Fonts — Vazirmatn (bundled), system fonts, or your own stack; base text size, heading weight, preload
+* Social networks — Instagram, Telegram, YouTube, X (Twitter), Facebook
+* Texts — footer note, back-to-top button
+* Tools — additional CSS, printed after the theme stylesheet
+
+Most settings preview live, without a page reload; the ones that change markup (a logo, a social row)
+refresh the preview instead, because only the server can render them.
+
+Nothing in the panel disables a WordPress feature, bundles a page builder, or fights another plugin.
+A site that changes nothing ships no extra CSS at all.
 
 == Copyright ==
 

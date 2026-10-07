@@ -1,9 +1,42 @@
-# RELEASE-CANDIDATE.md — Wavira 0.11.0 (RC)
+# RELEASE-CANDIDATE.md — Wavira 0.12.0 (RC)
 
-> **Status: release candidate.** The product is feature-complete for v1: every phase from 0.5.0 to 0.11.0
-> has landed and is verified by CI where CI can see it. What is left is *release mechanics* — the items in
-> §6 are the difference between "the code is ready" and "an upload is ready", and each one is either done,
-> or written down with the reason it is not.
+> **Status: release candidate.** 0.12.0 adds the settings panel a commercial theme is expected to have and
+> the Persian setup a Persian buyer needs on day one (ADR 0020). Everything below §0.1 describes the
+> 0.11.0 candidate, which is still the record of what was verified then; the numbers in §1 belong to this
+> release.
+
+## 0.1 Added in 0.12.0 — the settings panel and the Persian setup
+
+| Addition | Why it mattered | Where | Tests |
+| --- | --- | --- | --- |
+| **The Wavira settings panel** — 32 settings in eight sections (language and Persian setup, identity and logo, header, appearance, fonts, social networks, texts and footer, tools) | "a professional theme settings panel": logo, colours, fonts, widths, social links and footer text, editable without touching code, with a live preview | `inc/options.php` (the schema), `inc/customizer.php` (the panel), ADR 0020 | `tests/test-theme-options.php` (the schema, the sanitizers, the Customizer registration) |
+| **Values as CSS variables and body classes** | a setting reaches every block — including blocks added later — without `!important` and without a second source of truth; a site that changes nothing ships no extra CSS at all | `wavira_option_css()`, `wavira_option_body_classes()`, `assets/css/components.css` | `test_settings_reach_the_front_end`, `test_a_default_site_gets_no_extra_css` |
+| **Live preview** (`assets/js/customizer.js`) | the preview shows the change while the control moves; fields that change markup refresh instead of pretending | built to `assets/dist/customizer.js`, loaded only in the Customizer frame | `tests/js/customizer.test.mjs` (12 tests) + `test_the_preview_list_matches_the_schema` |
+| **One-click Persian setup** | the theme's own screens are Persian already, but WordPress is not until the *site* language changes: one nonced action sets the language, the timezone, the week start and the date format, and fetches the core language pack when the host can | `inc/site-defaults.php`, `wavira_core_apply_persian_defaults()` in the plugin, an admin notice on Appearance → Themes | `test_persian_setup_is_a_guarded_admin_action`, `test_the_language_pack_check_is_a_file_question` |
+| **Demo import, one click away** | a buyer who never opens a terminal still needs the demo content; the panel links straight to `Tools → Wavira demo content` | `wavira_customize_site_description()` | the link target is asserted in the panel-description code path |
+| **Five social glyphs, a back-to-top button, an announcement bar, a dark-mode logo** | the surfaces a music site actually fills in on day one | `assets/icons/`, `patterns/hidden-*.php`, `wavira_custom_logo()` | `test_optional_surfaces_render_only_when_they_are_on`, `test_the_dark_logo_is_added_beside_core_markup` |
+| **The catalogue stayed complete** | 99 new strings arrived with the panel; a half-Persian panel is worse than none | `wavira/languages/*`, `tools/po-merge.py` | `node tools/i18n.mjs check` → **340/340, POT/PO/MO in sync** |
+
+**Local verification of this increment** (the CI verdict for the pushed commit is recorded below once the
+run is green): `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned standards, CSS/contrast/
+perf/boundaries/legacy gates), `npm run test:js` → **45/45**, `node tools/i18n.mjs check` → **340/340**,
+`node tools/package.mjs` → three archives, rebuild byte-identical. Digests of the archives this tree
+produces with CI's own fixed timestamp (see §8):
+
+| Archive | Bytes | SHA-256 |
+| --- | --- | --- |
+| `wavira-theme-0.12.0.zip` | 266 004 | `6b4209d4315ab819f2a5af99e8b55be6aaef1d931db033a95682f61b3fa99a82` |
+| `wavira-core-0.12.0.zip` | 179 841 | `d8602a7f9643a76282175a797eca4229105938c3707ac257e317ed6c7dde7035` |
+| `wavira-0.12.0-bundle.zip` | 478 885 | `71d0bbd2d91687c6dd97948925e5111ee265bcde44c6aa695d005bdf91c3e76b` |
+
+The remaining pre-upload item is the same one 0.11.0 recorded (§6): `screenshot.png`. It needs a rendered
+page and a browser, and the authoring environment has neither — the file is `optional` in
+`tools/package.mjs`, so `--check` passes and `--strict` reports it. Everything else in the panel, the
+Persian setup and the catalogue is machine-verified above.
+
+---
+
+> The sections below were written for the 0.11.0 candidate and are kept as that release's record.
 
 ## 0. Added after the release-candidate verdict
 
@@ -27,12 +60,12 @@ theme `619ebbabcbd5…`, plugin `075704d678af…`, bundle `57e953f2b79d…`) —
 | | |
 | --- | --- |
 | Product | **Wavira** — music-publishing ecosystem for WordPress (theme + core plugin) |
-| Version | `0.11.0` (release candidate; `1.0.0` is the production release) |
+| Version | `0.12.0` (release candidate; `1.0.0` is the production release) |
 | Author | Etehad WP (اتحاد وردپرس) — https://etehadwp.com/ |
 | Licence | GPL-2.0-or-later (bundled third-party: Vazirmatn, SIL OFL 1.1; Jalali algorithm, MIT) |
 | Requires | WordPress 6.6+ (policy floor), PHP 7.4+ |
 | Tested on | WordPress **7.1.3** (CI runs `37618881223`/`37618887341`, annotated from the installed core) and 6.7.2 (local lab); PHP **7.4 / 8.2 / 8.3** (CI syntax + integration) |
-| Packages | `dist/wavira-theme-0.11.0.zip`, `dist/wavira-core-0.11.0.zip`, `dist/wavira-0.11.0-bundle.zip` |
+| Packages | `dist/wavira-theme-0.12.0.zip`, `dist/wavira-core-0.12.0.zip`, `dist/wavira-0.12.0-bundle.zip` |
 | Build | `node tools/build.mjs && node tools/package.mjs` (no dependencies, no bundler, deterministic) |
 
 ---
@@ -41,9 +74,9 @@ theme `619ebbabcbd5…`, plugin `075704d678af…`, bundle `57e953f2b79d…`) —
 
 | Package | Size | Contents |
 | --- | --- | --- |
-| `wavira-core-0.11.0.zip` | ~153 KB | The plugin: content model, REST API, player engine, downloads, SEO data, admin surfaces, Persian catalogue, migration tool |
-| `wavira-theme-0.11.0.zip` | ~213 KB | The theme: templates, patterns, blocks, compiled CSS/JS, Vazirmatn with its licence text, Persian catalogue |
-| `wavira-0.11.0-bundle.zip` | ~389 KB | Both packages plus `README-FIRST/` (install note, user guide, licences, localisation and migration notes) |
+| `wavira-core-0.12.0.zip` | 176 KB | The plugin: content model, REST API, player engine, downloads, SEO data, admin surfaces, Persian catalogue, migration tool, `wavira_core_apply_persian_defaults()` |
+| `wavira-theme-0.12.0.zip` | 260 KB | The theme: templates, patterns, blocks, the options panel and its live preview, compiled CSS/JS, Vazirmatn with its licence text, Persian catalogue |
+| `wavira-0.12.0-bundle.zip` | 468 KB | Both packages plus `README-FIRST/` (install note, user guide, licences, localisation and migration notes) |
 | `dist/manifest.json` | — | Every file in every archive with its size and SHA-256, so a reviewer can verify what was delivered |
 | `dist/SHA256SUMS` | — | The three archive digests |
 

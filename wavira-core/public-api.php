@@ -460,3 +460,35 @@ if ( ! function_exists( 'wavira_core_structured_data' ) ) {
 		);
 	}
 }
+
+if ( ! function_exists( 'wavira_core_apply_persian_defaults' ) ) {
+	/**
+	 * Apply the Iranian defaults a Persian music site expects.
+	 *
+	 * Locale, timezone, first day of the week, date and time format — the same
+	 * policy the demo installer applies, exposed so a theme can offer it as a
+	 * one-click action instead of re-implementing the list (and drifting).
+	 *
+	 * Deliberately narrow: it touches those five options and a blog description
+	 * nobody wrote on purpose. It never publishes content, never changes a user
+	 * and never runs on its own — a caller with `manage_options` decides.
+	 *
+	 * @return array<string, mixed> `ok` (bool) and `notices` (human-readable
+	 *                              strings for the caller to display).
+	 */
+	function wavira_core_apply_persian_defaults() {
+		if ( ! class_exists( 'Wavira\\Core\\Demo\\Fixtures' ) ) {
+			return array(
+				'ok'      => false,
+				'notices' => array(),
+			);
+		}
+
+		$notices = \Wavira\Core\Demo\Installer::apply_site_defaults( \Wavira\Core\Demo\Fixtures::persian() );
+
+		return array(
+			'ok'      => true,
+			'notices' => $notices,
+		);
+	}
+}

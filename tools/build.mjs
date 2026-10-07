@@ -35,6 +35,15 @@ const TARGETS = [
 		outFile: join(ROOT, 'wavira/assets/dist/theme.js'),
 		layerOrder: ['index'],
 		pattern: /\.js$/,
+		// The Customizer preview is a second entry point with its own target
+		// below: it must not be concatenated into the front-end bundle, because
+		// the front end never loads it.
+		exclude: /^customizer\.js$/,
+	},
+	{
+		name: 'customizer JS',
+		outFile: join(ROOT, 'wavira/assets/dist/customizer.js'),
+		files: [join(ROOT, 'wavira/assets/js/customizer.js')],
 	},
 	{
 		name: 'core CSS',
@@ -76,29 +85,49 @@ let built = 0;
 let skipped = 0;
 
 for (const target of TARGETS) {
-	if (!existsSync(target.sourceDir)) {
-		console.log(`- ${target.name}: source dir missing, skipped (${relative(ROOT, target.sourceDir)})`);
-		skipped++;
-		continue;
+	let files;
+
+	if (target.files) {
+		// An explicit list: one entry point whose neighbours belong to another
+		// target (the Customizer preview is exactly that case).
+		const missing = target.files.filter((f) => !existsSync(f));
+
+		if (missing.length > 0) {
+			console.log(`- ${target.name}: missing source(s), skipped (${missing.map((f) => relative(ROOT, f)).join(', ')})`);
+			skipped++;
+			continue;
+		}
+
+		files = target.files;
+	} else {
+		if (!existsSync(target.sourceDir)) {
+			console.log(`- ${target.name}: source dir missing, skipped (${relative(ROOT, target.sourceDir)})`);
+			skipped++;
+			continue;
+		}
+
+		const all = readdirSync(target.sourceDir)
+			.filter((f) => target.pattern.test(f) && !(target.exclude && target.exclude.test(f)))
+			.sort();
+		const ordered = [
+			...target.layerOrder.flatMap((layer) => all.filter((f) => f.startsWith(layer))),
+			...all.filter((f) => !target.layerOrder.some((layer) => f.startsWith(layer))),
+		];
+
+		if (ordered.length === 0) {
+			console.log(`- ${target.name}: no sources yet, skipped (expected before phase 0.6.0)`);
+			skipped++;
+			continue;
+		}
+
+		files = ordered.map((f) => join(target.sourceDir, f));
 	}
 
-	const all = readdirSync(target.sourceDir).filter((f) => target.pattern.test(f)).sort();
-	const ordered = [
-		...target.layerOrder.flatMap((layer) => all.filter((f) => f.startsWith(layer))),
-		...all.filter((f) => !target.layerOrder.some((layer) => f.startsWith(layer))),
-	];
-
-	if (ordered.length === 0) {
-		console.log(`- ${target.name}: no sources yet, skipped (expected before phase 0.6.0)`);
-		skipped++;
-		continue;
-	}
-
-	const files = ordered.map((f) => join(target.sourceDir, f));
+	const sources = files.map((f) => relative(target.sourceDir || dirname(f), f));
 	const body = files.map((f) => readFileSync(f, 'utf8')).join('\n');
 
 	if (CHECK_ONLY) {
-		console.log(`- ${target.name}: would build ${ordered.length} source(s) → ${relative(ROOT, target.outFile)}`);
+		console.log(`- ${target.name}: would build ${sources.length} source(s) → ${relative(ROOT, target.outFile)}`);
 		continue;
 	}
 
@@ -106,7 +135,7 @@ for (const target of TARGETS) {
 	writeFileSync(target.outFile, banner(target.name, files) + body, 'utf8');
 
 	const size = statSync(target.outFile).size;
-	console.log(`- ${target.name}: built ${relative(ROOT, target.outFile)} (${ordered.length} source(s), ${(size / 1024).toFixed(1)} KB)`);
+	console.log(`- ${target.name}: built ${relative(ROOT, target.outFile)} (${sources.length} source(s), ${(size / 1024).toFixed(1)} KB)`);
 	built++;
 }
 

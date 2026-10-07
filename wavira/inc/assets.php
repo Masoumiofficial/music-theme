@@ -52,6 +52,10 @@ function wavira_asset_version( $relative ) {
 function wavira_theme_settings() {
 	$settings = array(
 		'storageKey' => 'wavira.theme',
+		// The mode a first visit starts in (ADR 0020). A visitor who uses the
+		// toggle keeps their own choice — this is only the fallback when nothing
+		// is stored yet.
+		'colourMode' => (string) wavira_option( 'colour_mode', 'auto' ),
 		'strings'    => array(
 			'label' => __( 'Colour theme', 'wavira' ),
 			'light' => __( 'Light', 'wavira' ),
@@ -116,15 +120,19 @@ add_action( 'wp_enqueue_scripts', 'wavira_enqueue_assets' );
  * stylesheet, so `auto` follows the system and a stored `dark` never flashes a
  * light page. Everything else (toggle, cycling, persistence) is theme.js.
  *
+ * The fallback mode is the theme option, printed as JSON — never concatenated
+ * from input — and validated again in the browser (ADR 0020).
+ *
  * @return void
  */
 function wavira_print_colour_mode() {
-	$key = 'wavira.theme';
+	$key     = 'wavira.theme';
+	$default = (string) wavira_option( 'colour_mode', 'auto' );
 
 	$script = '(function(){try{var m=window.localStorage.getItem(' . wp_json_encode( $key ) . ');'
-		. 'if(m!=="light"&&m!=="dark"&&m!=="auto"){m="auto";}'
+		. 'if(m!=="light"&&m!=="dark"&&m!=="auto"){m=' . wp_json_encode( $default ) . ';}'
 		. 'document.documentElement.setAttribute("data-theme",m);}catch(e){'
-		. 'document.documentElement.setAttribute("data-theme","auto");}})();';
+		. 'document.documentElement.setAttribute("data-theme",' . wp_json_encode( $default ) . ');}})();';
 
 	wp_print_inline_script_tag( $script );
 }

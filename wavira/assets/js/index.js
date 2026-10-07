@@ -21,7 +21,7 @@
 ( function ( global ) {
 	'use strict';
 
-	var VERSION = '0.8.0';
+	var VERSION = '0.12.0';
 	var STORAGE_KEY = 'wavira.theme';
 	var MODES = [ 'light', 'dark', 'auto' ];
 	var BASE_STRINGS = {
@@ -212,6 +212,55 @@
 	}
 
 	/**
+	 * Wire the back-to-top button, when the theme printed one.
+	 *
+	 * The button ships `hidden` and is revealed only after the page is scrolled:
+	 * with scripting off it stays out of the way instead of sitting there doing
+	 * nothing. Visitors who prefer reduced motion get an instant jump — the
+	 * preference decides *how* it scrolls, never whether the control works.
+	 *
+	 * @param {Object} doc Document.
+	 * @return {number} Number of buttons wired (0 or 1).
+	 */
+	function initBackToTop( doc ) {
+		if ( ! doc || 'function' !== typeof doc.querySelector ) {
+			return 0;
+		}
+
+		var button = doc.querySelector( '[data-wavira-to-top]' );
+
+		if ( ! button ) {
+			return 0;
+		}
+
+		var reduce = false;
+
+		try {
+			reduce = !! ( global.matchMedia && global.matchMedia( '(prefers-reduced-motion: reduce)' ).matches );
+		} catch ( error ) {
+			reduce = false;
+		}
+
+		button.hidden = false;
+
+		button.addEventListener( 'click', function ( event ) {
+			event.preventDefault();
+
+			if ( 'function' === typeof global.scrollTo ) {
+				global.scrollTo( { top: 0, behavior: reduce ? 'auto' : 'smooth' } );
+			}
+
+			var target = doc.querySelector( 'a.skip-link, #wp--skip-link--target, main' );
+
+			if ( target && 'function' === typeof target.focus ) {
+				target.focus( { preventScroll: true } );
+			}
+		} );
+
+		return 1;
+	}
+
+	/**
 	 * Hand every mount point to the player engine.
 	 *
 	 * @param {Object} doc Document.
@@ -247,6 +296,8 @@
 			initPlayers( doc );
 		}
 
+		initBackToTop( doc );
+
 		return controller;
 	}
 
@@ -261,6 +312,7 @@
 		applyMode: applyMode,
 		initThemeMode: initThemeMode,
 		initPlayers: initPlayers,
+		initBackToTop: initBackToTop,
 		init: init,
 		storageKey: STORAGE_KEY
 	};

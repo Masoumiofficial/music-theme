@@ -11,12 +11,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WAVIRA_THEME_VERSION', '0.11.0' );
+define( 'WAVIRA_THEME_VERSION', '0.12.0' );
 define( 'WAVIRA_THEME_DIR', trailingslashit( get_template_directory() ) );
 define( 'WAVIRA_THEME_URI', trailingslashit( get_template_directory_uri() ) );
 
 require_once WAVIRA_THEME_DIR . 'inc/setup.php';
 require_once WAVIRA_THEME_DIR . 'inc/helpers.php';
+require_once WAVIRA_THEME_DIR . 'inc/options.php';
+require_once WAVIRA_THEME_DIR . 'inc/site-defaults.php';
+require_once WAVIRA_THEME_DIR . 'inc/customizer.php';
 require_once WAVIRA_THEME_DIR . 'inc/markup.php';
 require_once WAVIRA_THEME_DIR . 'inc/hooks.php';
 require_once WAVIRA_THEME_DIR . 'inc/performance.php';

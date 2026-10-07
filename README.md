@@ -1,6 +1,6 @@
 # Wavira — WordPress music-publishing ecosystem
 
-> **Status: 0.11.0 (release candidate).** Every v1 feature has landed and is verified by CI: the data
+> **Status: 0.12.0 (release candidate).** Every v1 feature has landed and is verified by CI: the data
 > model, REST API, player engine, templates and blocks, artist profiles, the news section, SEO
 > cooperation, the performance budget, Persian/Jalali localisation, the legacy migration tool and the
 > release packages. The product is **Persian by default**: Persian catalogues for both artifacts, Jalali
@@ -13,19 +13,23 @@
 
 | File | Install it as | Direct link |
 | --- | --- | --- |
-| `wavira-core-0.11.0.zip` | the core plugin — **first**, via *Plugins → Add New → Upload Plugin* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-core-0.11.0.zip) |
-| `wavira-theme-0.11.0.zip` | the theme, via *Appearance → Themes → Add New → Upload Theme* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-theme-0.11.0.zip) |
-| `wavira-0.11.0-bundle.zip` | both, plus a `README-FIRST/` folder | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-0.11.0-bundle.zip) |
+| `wavira-core-0.12.0.zip` | the core plugin — **first**, via *Plugins → Add New → Upload Plugin* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-core-0.12.0.zip) |
+| `wavira-theme-0.12.0.zip` | the theme, via *Appearance → Themes → Add New → Upload Theme* | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-theme-0.12.0.zip) |
+| `wavira-0.12.0-bundle.zip` | both, plus a `README-FIRST/` folder | [download](https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-0.12.0-bundle.zip) |
 
 All releases and the notes for each: <https://github.com/Masoumiofficial/music-theme/releases>. The
 archives attached to a release are built by CI from the tagged commit with a fixed `SOURCE_DATE_EPOCH`,
-so their SHA-256 is the one the verification jobs saw (0.11.0: theme `619ebbabcbd5…`, core
-`075704d678af…`, bundle `57e953f2b79d…` — also in `SHA256SUMS`). Persian install guide:
-[`docs/fa/USER-GUIDE.md`](docs/fa/USER-GUIDE.md).
+so their SHA-256 is the one the verification jobs saw (0.12.0: digests in the release's `SHA256SUMS`,
+and repeated in `docs/RELEASE-CANDIDATE.md`). Persian install guide:
+[`docs/fa/USER-GUIDE.md`](docs/fa/USER-GUIDE.md). Settings: **Appearance → Customize → Wavira
+settings** — identity and logo, header, appearance, fonts, social links, footer text, additional CSS,
+and the one-click Persian setup.
 
 **Wavira** is a premium WordPress product for publishing and discovering music: artists, albums,
 tracks, music videos, genres, lyrics, multi-quality downloads and a first-class player — RTL-first with
-full LTR support, dark/light, Gutenberg and Elementor ready, built for performance and WCAG 2.2 AA.
+full LTR support, dark/light, Gutenberg and Elementor ready, built for performance and WCAG 2.2 AA. The
+theme ships a settings panel (ADR 0020) and a one-click Persian setup; the music model, the player and
+the migration tool live in the core plugin so they survive a theme switch.
 It ships Persian: the interface, the admin and the editor are translated, dates follow the Jalali
 (Shamsi) calendar on Persian sites, and the demo it seeds is a Persian music site.
 

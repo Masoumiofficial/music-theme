@@ -301,10 +301,16 @@ final class Installer {
 	/**
 	 * The Iranian defaults a Persian music site expects.
 	 *
-	 * @param array<string, mixed> $demo Demo catalogue.
+	 * Public because the public API exposes it as
+	 * `wavira_core_apply_persian_defaults()` and the theme's one-click Persian
+	 * setup calls that function: one implementation of "what a Persian site
+	 * needs", shared by the demo installer and the theme.
+	 *
+	 * @param array<string, mixed> $demo Demo catalogue (its `site` block carries
+	 *                                   the locale, timezone and description).
 	 * @return string[] Notices for the report.
 	 */
-	private static function apply_site_defaults( array $demo ): array {
+	public static function apply_site_defaults( array $demo ): array {
 		update_option( 'WPLANG', (string) $demo['site']['locale'] );
 		update_option( 'timezone_string', (string) $demo['site']['timezone'] );
 		update_option( 'start_of_week', 6 );

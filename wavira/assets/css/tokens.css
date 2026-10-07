@@ -21,6 +21,13 @@
 :root {
 	/* Product tokens theme.json does not express. */
 	--wavira-header-height: 4.5rem;
+	/* Layout width, logo size and social icon size: the three settings the
+	   options panel changes most often, exposed as tokens so a site owner's
+	   value reaches every component without a second stylesheet (ADR 0020). */
+	--wavira-container: var(--wp--style--global--wide-size, 1200px);
+	--wavira-logo-width: 150px;
+	--wavira-social-size: 22px;
+	--wavira-social-gap: var(--wp--preset--spacing--30, 0.75rem);
 	--wavira-measure: 62ch;
 	--wavira-cover-ratio: 1 / 1;
 	--wavira-cover-radius: var(--wp--custom--radius--md, 12px);

@@ -5,6 +5,46 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.12.0 (theme options panel and the Persian setup)
+- **The Wavira settings panel** (`inc/options.php`, `inc/customizer.php`): one schema — key, default,
+  type, control, section, label, bounds — drives the Customizer panel *and* the front end, so a setting
+  cannot exist in one and not the other. Sections: identity and logo (logo width, a separate logo for
+  dark mode, site title and tagline switches), header (sticky, WordPress search block, announcement bar,
+  player bar), appearance (first-visit colour mode, accent, content width, corner radius, card shadow,
+  smallest card width, light/dark toggle), fonts (Vazirmatn · system · custom stack, base size, heading
+  weight, preload), social networks, footer text, and additional CSS.
+- **Values reach the page as CSS variables and body classes, never `!important`**: colours, sizes and
+  stacks are printed in one `<style id="wavira-options-css">` element (the ADR 0014 mechanism, so every
+  block follows them); heading weight and the sticky header are body classes, which win on specificity.
+  A default site prints **nothing** — `wavira_option_css()` returns an empty string while every setting
+  is at its declared default.
+- **A dark-mode logo** (`get_custom_logo` filter) that follows the same `prefers-color-scheme` query as
+  the palette, so `auto` mode shows it on a dark device without a second setting.
+- **One-click Persian setup** (`inc/site-defaults.php`): a nonced, `manage_options`-gated action that sets
+  the site language, timezone, week start and date format — through
+  `wavira_core_apply_persian_defaults()` when the plugin is active, and on its own when it is not — plus
+  a dismissible notice on Appearance → Themes and the Customizer while the site language is not Persian.
+- **Five social glyphs and a back-to-top icon** (`assets/icons/`): simple geometric shapes drawn for this
+  theme, stroke-based and `currentColor`, not the networks' official artwork — nothing trademarked is
+  redistributed and the accessible name comes from the translated label.
+- **Live preview** (`assets/js/customizer.js`, built to `assets/dist/customizer.js`): every field that
+  drives a CSS variable or a body class declares `postMessage` transport and updates in the preview
+  without a reload — accent, widths, radius, shadows, base text size, heading weight, the four display
+  switches, and the additional-CSS block. Fields that change markup stay on `refresh`, because only the
+  server can render them. The preview's list is derived from the same `live` entries the option CSS is
+  printed from, so a property name exists in one place; the script is loaded only inside the Customizer
+  frame and is budgeted separately (≤ 10 KB gzipped).
+- **`tests/test-theme-options.php`**: the schema is complete and every declared type has a sanitizer that
+  refuses garbage; a hostile `</style>` value cannot leave its element; a default site prints no CSS;
+  every switch reaches the front end (CSS, body class, or markup); each pattern renders only for its
+  switch; the player bar is removed from the output rather than hidden; the Customizer registers every
+  field in its declared section with the shared sanitizer; and the Persian action is nonced and applies
+  the four documented options.
+- **`tools/po-merge.py`**: fills a `.po` from its `.pot` in template order, carrying translations and
+  `keep-latin` flags over and refusing to write a catalogue with an untranslated string — the tool that
+  added the 99 Persian strings this phase needed (catalogue now 190/190 for the theme, 150/150 for the
+  plugin).
+
 ### Added — 0.11.0 (release candidate: packaging, bundled typeface, release docs)
 - **Vazirmatn ships with the theme.** One unmodified variable WOFF2 (weights 100–900, 109 KB) declared as a
   `fontFace` in `theme.json`, so WordPress prints the `@font-face` rule for the front end *and* the block

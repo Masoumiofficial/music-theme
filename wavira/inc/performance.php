@@ -79,10 +79,18 @@ if ( ! function_exists( 'wavira_preload_primary_font' ) ) {
 	 * The URL comes from the theme, never from input; the hint is skipped when
 	 * the file is absent, so a checkout that never had the font still renders.
 	 *
+	 * A hint for a font nothing uses is a wasted request, so the option decides:
+	 * another stack is in effect, or the site owner switched the preload off, and
+	 * no `<link>` is printed (ADR 0020).
+	 *
 	 * @return void
 	 */
 	function wavira_preload_primary_font() {
 		$relative = 'assets/fonts/vazirmatn/vazirmatn-variable.woff2';
+
+		if ( ! function_exists( 'wavira_preloads_font' ) || ! wavira_preloads_font() ) {
+			return;
+		}
 
 		if ( ! file_exists( WAVIRA_THEME_DIR . $relative ) ) {
 			return;

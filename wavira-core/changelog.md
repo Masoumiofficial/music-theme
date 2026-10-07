@@ -5,6 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.12.0 (the Persian setup, shared)
+- **`wavira_core_apply_persian_defaults()`** (`public-api.php`) — the Iranian defaults (locale, timezone,
+  week start, date and time format, and a blog description nobody wrote on purpose) exposed as a public
+  function, so the theme's one-click Persian setup and the demo installer run the *same* code instead of
+  two lists that drift. Narrow by design: it publishes nothing, changes no user, and only ever runs when a
+  caller with `manage_options` decides to run it.
+- `Demo\Installer::apply_site_defaults()` is now `public` for the same reason, with its docblock saying
+  who calls it.
+
 ### Added — 0.11.0 (release candidate: the legacy migration tool and the release package)
 - **The legacy migration tool** (`src/Migration/LegacySchema.php`, `src/Migration/Migrator.php`) behind
   `wp wavira migrate`: `--detect`, `--dry-run`, `--status`, `--rollback`, `--kind`, `--batch`, `--offset`,

@@ -35,6 +35,11 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve( dirname( fileURLToPath( import.meta.url ) ), '..' );
 
+// The catalogue header names the artifact version. It is read from the package
+// rather than written a second time: a version that has to be edited in two
+// places is a version that will disagree with itself.
+const VERSION = JSON.parse( readFileSync( join( ROOT, 'package.json' ), 'utf8' ) ).version;
+
 /** The two artifacts and the text domain each one owns. */
 const DOMAINS = [
 	{ domain: 'wavira', source: 'wavira', pot: 'wavira/languages/wavira.pot', languages: 'wavira/languages' },
@@ -468,7 +473,7 @@ function renderPot( artifact, entries ) {
 		'# This file is distributed under the GPL-2.0-or-later licence.',
 		`msgid ""`,
 		`msgstr ""`,
-		`"Project-Id-Version: ${ artifact.domain } 0.11.0\\n"`,
+		`"Project-Id-Version: ${ artifact.domain } ${ VERSION }\\n"`,
 		`"Report-Msgid-Bugs-To: https://etehadwp.com/\\n"`,
 		`"POT-Creation-Date: ${ stamp }\\n"`,
 		`"MIME-Version: 1.0\\n"`,

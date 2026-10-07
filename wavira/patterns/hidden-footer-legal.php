@@ -14,8 +14,15 @@
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$wavira_note = (string) wavira_option( 'footer_note' );
 ?>
 
 <!-- wp:paragraph -->
 <p>© <span class="wavira-footer__year"><?php echo esc_html( (string) wp_date( 'Y' ) ); ?></span> <?php echo esc_html_x( '— all rights reserved.', 'footer legal line after the copyright year', 'wavira' ); ?></p>
 <!-- /wp:paragraph -->
+<?php if ( '' !== $wavira_note ) : ?>
+<!-- wp:paragraph {"className":"wavira-footer__note"} -->
+<p class="wavira-footer__note"><?php echo esc_html( $wavira_note ); ?></p>
+<!-- /wp:paragraph -->
+<?php endif; ?>

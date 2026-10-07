@@ -146,6 +146,7 @@ const ARTIFACTS = [
 			'languages/wavira.pot',
 			'assets/dist/theme.css',
 			'assets/dist/theme.js',
+			'assets/dist/customizer.js',
 			'assets/fonts/vazirmatn/vazirmatn-variable.woff2',
 			'assets/fonts/vazirmatn/OFL.txt',
 		],

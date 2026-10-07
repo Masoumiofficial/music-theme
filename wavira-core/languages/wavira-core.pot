@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.11.0\n"
+"Project-Id-Version: wavira-core 0.12.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -504,7 +504,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:322
+#: wavira-core/src/Demo/Installer.php:328
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 

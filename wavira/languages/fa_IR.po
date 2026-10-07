@@ -1,21 +1,7 @@
-# Persian (fa_IR) translation of wavira.
-# Copyright (C) 2026 Etehad WP — اتحاد وردپرس
-# This file is distributed under the GPL-2.0-or-later licence.
-#
+
+
 msgid ""
-msgstr ""
-"Project-Id-Version: wavira 0.10.0\n"
-"Report-Msgid-Bugs-To: https://etehadwp.com/\n"
-"POT-Creation-Date: 2026-10-05 12:00+0000\n"
-"PO-Revision-Date: 2026-10-05 12:00+0000\n"
-"Last-Translator: Etehad WP <https://etehadwp.com/>\n"
-"Language-Team: Persian (Iran) — Etehad WP\n"
-"Language: fa_IR\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.10.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05 12:00+0000\nPO-Revision-Date: 2026-10-05 12:00+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
@@ -33,13 +19,85 @@ msgstr "%1$s (%2$d)"
 msgid "%1$s (%2$s)"
 msgstr "%1$s (%2$s)"
 
+#: wavira/inc/customizer.php:300
+msgid "A CSS font stack, for example: \"IRANSans\", Tahoma, sans-serif. Used only when “Custom stack” is selected."
+msgstr "یک پشتهٔ فونت CSS، مثلاً: «IRANSans»، Tahoma، sans-serif. فقط وقتی «پشتهٔ دلخواه» انتخاب شده باشد به کار می‌رود."
+
+#: wavira/inc/customizer.php:112
+msgid "A filled field prints its icon in the footer. An empty field prints nothing at all — no dead links."
+msgstr "هر فیلد پرشده آیکونش را در فوتر چاپ می‌کند و فیلد خالی هیچ چیز — یعنی هیچ پیوند مرده‌ای."
+
+#: wavira/inc/customizer.php:306
+msgid "A line of your own in the footer, for a licence note or a request. The design credit stays: attribution is part of the licence."
+msgstr "یک خط از خودتان در فوتر، برای یادداشت مجوز یا درخواست. اعتبار طراحی می‌ماند: ذکر نام بخشی از پروانه است."
+
+#: wavira/inc/customizer.php:288
+msgid "A slim bar above the header, for a tour announcement or a release note."
+msgstr "نواری باریک بالای سربرگ، برای اعلام تور یا خبر انتشار."
+
+#: wavira/inc/customizer.php:307
+msgid "A small button that returns to the top of a long page. It is skipped for visitors who prefer reduced motion."
+msgstr "دکمه‌ای کوچک برای بازگشت به بالای صفحه‌های بلند. برای کسانی که کاهش حرکت را ترجیح می‌دهند، بدون انیمیشن کار می‌کند."
+
+#: wavira/inc/options.php:138
+msgid "Accent colour"
+msgstr "رنگ تأکیدی"
+
+#: wavira/inc/options.php:311
+msgid "Additional CSS"
+msgstr "CSS افزودنی"
+
+#: wavira/inc/customizer.php:121
+msgid "Additional CSS is loaded after the theme stylesheet, exactly like the Customizer’s own field, and it is printed without a build step."
+msgstr "CSS افزودنی پس از شیوه‌نامهٔ قالب بارگذاری می‌شود، درست مثل فیلد خودِ سازگارساز، و بدون هیچ مرحلهٔ ساخت چاپ می‌شود."
+
+#: wavira/inc/customizer.php:287
+msgid "Adds the WordPress search block to the header."
+msgstr "بلوک جست‌وجوی وردپرس را به سربرگ اضافه می‌کند."
+
 #: wavira/inc/artists.php:140
 msgid "Album"
 msgstr "آلبوم"
 
-#: wavira/inc/assets.php:59
+#: wavira/inc/options.php:96
+msgid "Announcement bar above the header"
+msgstr "نوار اعلان بالای سربرگ"
+
+#: wavira/inc/options.php:110
+msgid "Announcement link"
+msgstr "پیوند اعلان"
+
+#: wavira/inc/options.php:103
+msgid "Announcement text"
+msgstr "متن اعلان"
+
+#: wavira/inc/customizer.php:102
+msgid "Appearance"
+msgstr "ظاهر"
+
+#: wavira/inc/customizer.php:292
+msgid "Applies to a first visit. A visitor who uses the toggle keeps their own choice."
+msgstr "برای نخستین بازدید اعمال می‌شود. بازدیدکننده‌ای که از دکمهٔ تغییر حالت استفاده کند، انتخاب خودش را نگه می‌دارد."
+
+#: wavira/inc/assets.php:63
 msgid "Auto"
 msgstr "خودکار"
+
+#: wavira/inc/options.php:128
+msgid "Auto (follow the device)"
+msgstr "خودکار (پیروی از دستگاه)"
+
+#: wavira/patterns/hidden-back-to-top.php:27
+msgid "Back to top"
+msgstr "بازگشت به بالا"
+
+#: wavira/inc/options.php:302
+msgid "Back-to-top button"
+msgstr "دکمهٔ بازگشت به بالا"
+
+#: wavira/inc/options.php:213
+msgid "Base text size (px)"
+msgstr "اندازهٔ متن پایه (پیکسل)"
 
 #: wavira/blocks/player/block.json
 msgctxt "block description"
@@ -253,39 +311,113 @@ msgctxt "block title"
 msgid "Music video"
 msgstr "موزیکویدیو"
 
+#: wavira/inc/options.php:223
+msgid "Bold (700)"
+msgstr "ضخیم (۷۰۰)"
+
 #: wavira/patterns/featured-album.php:33
 msgctxt "button label in the featured album pattern"
 msgid "Browse all albums"
 msgstr "مشاهدهٔ همهٔ آلبومها"
 
+#: wavira/inc/customizer.php:297
+msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
+msgstr "کارت‌ها در هر تعداد ستونی که جا شود می‌شکنند. عدد بزرگ‌تر یعنی کارت‌های کمتر و بزرگ‌تر."
+
 #: wavira/blocks/artist-profile/render.php:51
 msgid "Choose an artist for this block, or open it on an artist page."
 msgstr "هنرمندی را برای این بلوک انتخاب کنید یا آن را در صفحهٔ یک هنرمند باز کنید."
 
-#: wavira/inc/assets.php:56
+#: wavira/inc/options.php:126
+msgid "Colour mode for a first visit"
+msgstr "حالت رنگ در نخستین بازدید"
+
+#: wavira/inc/assets.php:60
 msgid "Colour theme"
 msgstr "پوستهٔ رنگ"
 
-#: wavira/patterns/hidden-theme-toggle.php:21
+#: wavira/patterns/hidden-theme-toggle.php:25
 msgctxt "colour-mode label shown until the theme script runs"
 msgid "Auto"
 msgstr "خودکار"
+
+#: wavira/inc/customizer.php:103
+msgid "Colours and sizes are emitted as CSS variables, so every block follows them — including the blocks you add later."
+msgstr "رنگ‌ها و اندازه‌ها به‌صورت متغیرهای CSS تولید می‌شوند، پس همهٔ بلوک‌ها از آن‌ها پیروی می‌کنند — از جمله بلوک‌هایی که بعداً اضافه می‌کنید."
+
+#: wavira/inc/options.php:148
+msgid "Content width (px)"
+msgstr "عرض محتوا (پیکسل)"
+
+#: wavira/inc/options.php:158
+msgid "Corner radius (px)"
+msgstr "گردی گوشه‌ها (پیکسل)"
 
 #: wavira/patterns/hidden-footer-credit.php:19
 msgctxt "credit label before the author link"
 msgid "Design and development:"
 msgstr "طراحی و توسعه:"
 
-#: wavira/inc/assets.php:58
+#: wavira/inc/customizer.php:308
+msgid "CSS of your own, printed after the theme stylesheet. HTML tags and comments are stripped; a closing style tag would end the block."
+msgstr "CSS خودتان، که بعد از شیوه‌نامهٔ قالب چاپ می‌شود. تگ‌های HTML و توضیحات حذف می‌شوند؛ تگ پایانیِ style بلوک را می‌بست."
+
+#: wavira/inc/options.php:203
+msgid "Custom font stack"
+msgstr "پشتهٔ فونت دلخواه"
+
+#: wavira/inc/options.php:195
+msgid "Custom stack"
+msgstr "پشتهٔ دلخواه"
+
+#: wavira/inc/assets.php:62
+#: wavira/inc/options.php:130
 msgid "Dark"
 msgstr "تاریک"
+
+#: wavira/inc/customizer.php:165
+msgid "Demo content (a Persian artist, an album, tracks, a video and a menu):"
+msgstr "محتوای نمایشی (یک خوانندهٔ فارسی، یک آلبوم، قطعه‌ها، یک ویدیو و یک فهرست):"
 
 #: wavira/patterns/latest-tracks.php:21
 msgctxt "description in the catalogue player pattern"
 msgid "Play straight through the catalogue — shuffle, repeat and the queue are in the player."
 msgstr "همهٔ آثار را پشتسرهم پخش کنید — پخش تصادفی، تکرار و صف پخش در پخشکننده در دسترس است."
 
-#: wavira/patterns/hidden-footer-legal.php:20
+#: wavira/inc/customizer.php:305
+msgid "Each new tab gets rel=\"noopener\" — the browser cannot hand the tab to the linked page."
+msgstr "هر زبانهٔ جدید rel=\"noopener\" می‌گیرد — مرورگر نمی‌تواند زبانه را به صفحهٔ مقصد بسپارد."
+
+#: wavira/inc/customizer.php:301
+msgid "Every block size in the theme is relative to this, so the whole page scales together."
+msgstr "همهٔ اندازه‌های بلوک‌ها در قالب نسبی‌اند، پس کل صفحه با هم بزرگ و کوچک می‌شود."
+
+#: wavira/inc/customizer.php:141
+msgid "Everything the theme itself needs: identity, header, colours, fonts, social links and footer text. Music content, the player engine and the migration tool belong to the Wavira Core plugin and keep working if you switch themes."
+msgstr "هر آنچه خودِ قالب لازم دارد: هویت، سربرگ، رنگ‌ها، فونت‌ها، پیوندهای شبکه‌های اجتماعی و متن فوتر. محتوای موسیقی، موتور پخش‌کننده و ابزار مهاجرت به افزونهٔ واویرا هسته تعلق دارند و با تغییر قالب هم کار می‌کنند."
+
+#: wavira/inc/options.php:224
+msgid "Extra bold (800)"
+msgstr "خیلی ضخیم (۸۰۰)"
+
+#: wavira/inc/options.php:269
+#: wavira/inc/options.php:589
+msgid "Facebook"
+msgstr "فیس‌بوک"
+
+#: wavira/inc/customizer.php:169
+msgid "Find the plugin"
+msgstr "یافتن افزونه"
+
+#: wavira/inc/options.php:191
+msgid "Font"
+msgstr "فونت"
+
+#: wavira/inc/customizer.php:107
+msgid "Fonts and typography"
+msgstr "فونت و تایپوگرافی"
+
+#: wavira/patterns/hidden-footer-legal.php:22
 msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr "— همهٔ حقوق محفوظ است."
@@ -294,9 +426,17 @@ msgstr "— همهٔ حقوق محفوظ است."
 msgid "Footer navigation"
 msgstr "ناوبری پاورقی"
 
+#: wavira/inc/options.php:295
+msgid "Footer note"
+msgstr "یادداشت فوتر"
+
 #: wavira/inc/blocks.php:64
 msgid "Genre chips, most used first."
 msgstr "برچسبهای سبک، پرکاربردترین در ابتدا."
+
+#: wavira/inc/customizer.php:97
+msgid "Header"
+msgstr "سربرگ"
 
 #: wavira/patterns/hidden-heading-music-news.php:20
 msgctxt "heading above the news feed"
@@ -323,13 +463,68 @@ msgctxt "heading of the genre chips pattern"
 msgid "Browse by genre"
 msgstr "مرور بر اساس سبک"
 
+#: wavira/inc/options.php:220
+msgid "Heading weight"
+msgstr "ضخامت عنوان‌ها"
+
+#: wavira/inc/customizer.php:284
+msgid "Hide it when the logo already contains the site name; search engines still read the title."
+msgstr "اگر لوگو خودش نام سایت را دارد، پنهانش کنید؛ موتورهای جست‌وجو همچنان عنوان را می‌خوانند."
+
+#: wavira/inc/customizer.php:298
+msgid "Hides the button only; the visitor’s device preference keeps working."
+msgstr "فقط دکمه را پنهان می‌کند؛ ترجیح دستگاه بازدیدکننده همچنان کار می‌کند."
+
+#: wavira/inc/options.php:279
+msgid "Icon size (px)"
+msgstr "اندازهٔ آیکون (پیکسل)"
+
+#: wavira/inc/customizer.php:304
+msgid "Icon size in the footer row."
+msgstr "اندازهٔ آیکون‌ها در ردیف فوتر."
+
+#: wavira/inc/customizer.php:93
+msgid "Identity and logo"
+msgstr "هویت و لوگو"
+
+#: wavira/inc/options.php:241
+#: wavira/inc/options.php:573
+msgid "Instagram"
+msgstr "اینستاگرام"
+
+#: wavira/inc/customizer.php:286
+msgid "Keeps the header at the top while the page scrolls."
+msgstr "سربرگ را هنگام پیمایش صفحه در بالا نگه می‌دارد."
+
+#: wavira/inc/customizer.php:88
+msgid "Language and Persian setup"
+msgstr "زبان و راه‌اندازی فارسی"
+
 #: wavira/inc/setup.php:48
 msgid "Legal links (license, privacy)"
 msgstr "پیوندهای حقوقی (مجوز، حریم خصوصی)"
 
-#: wavira/inc/assets.php:57
+#: wavira/inc/assets.php:61
+#: wavira/inc/options.php:129
 msgid "Light"
 msgstr "روشن"
+
+#: wavira/inc/options.php:182
+msgid "Light/dark toggle button"
+msgstr "دکمهٔ تغییر حالت روشن/تاریک"
+
+#: wavira/inc/options.php:59
+msgid "Logo for dark mode"
+msgstr "لوگوی حالت تاریک"
+
+#: wavira/inc/options.php:52
+msgid "Logo width (px)"
+msgstr "عرض لوگو (پیکسل)"
+
+#: wavira/inc/customizer.php:160
+#: wavira/inc/site-defaults.php:190
+msgid "Make the site Persian"
+msgstr "فارسی‌سازی سایت"
 
 #: wavira/patterns/hidden-404.php:23
 msgctxt "message of the 404 template"
@@ -354,10 +549,34 @@ msgstr "هنوز خبری منتشر نشده است. نخستین خبر را �
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
 
+#: wavira/inc/site-defaults.php:191
+msgid "Not now"
+msgstr "اکنون نه"
+
+#: wavira/inc/customizer.php:296
+msgid "Off gives a flat, editorial look."
+msgstr "خاموشی، ظاهری تخت و تحریری‌محور می‌دهد."
+
+#: wavira/inc/customizer.php:291
+msgid "Off removes the player bar and its reserved space from every template. The per-page players (tracklists, the player block) are not affected."
+msgstr "خاموش‌کردن، نوار پخش‌کننده و فضای رزروشده‌اش را از همهٔ قالب‌ها برمی‌دارد. پخش‌کننده‌های درون‌صفحه (فهرست قطعه‌ها، بلوک پخش‌کننده) تغییری نمی‌کنند."
+
 #: wavira/inc/player.php:138
 #. translators: %s: track title.
 msgid "Open %s"
 msgstr "باز کردن %s"
+
+#: wavira/inc/options.php:286
+msgid "Open social links in a new tab"
+msgstr "بازکردن پیوندهای اجتماعی در زبانهٔ جدید"
+
+#: wavira/inc/customizer.php:283
+msgid "Optional. Shown instead of the logo above when dark mode is active — including on the automatic setting, which follows the device."
+msgstr "اختیاری. وقتی حالت تاریک فعال است، به‌جای لوگوی بالا نمایش داده می‌شود — از جمله در حالت خودکار که از دستگاه پیروی می‌کند."
+
+#: wavira/inc/customizer.php:290
+msgid "Optional. Where the announcement bar links to."
+msgstr "اختیاری. جایی که نوار اعلان به آن پیوند می‌دهد."
 
 #: wavira/inc/artists.php:143
 msgid "Photo"
@@ -371,9 +590,17 @@ msgstr "تصاویر"
 msgid "Photos attached to an artist."
 msgstr "تصاویر پیوست‌شده به یک هنرمند."
 
+#: wavira/inc/options.php:117
+msgid "Player bar on every page"
+msgstr "نوار پخش‌کننده در همهٔ صفحه‌ها"
+
 #: wavira/inc/blocks.php:60
 msgid "Player for an album, artist or genre queue."
 msgstr "پخشکننده برای آلبوم، هنرمند یا صف سبک."
+
+#: wavira/inc/options.php:232
+msgid "Preload the bundled font"
+msgstr "پیش‌بارگذاری فونت همراه قالب"
 
 #: wavira/inc/setup.php:46
 msgid "Primary navigation"
@@ -382,6 +609,19 @@ msgstr "ناوبری اصلی"
 #: wavira/inc/blocks.php:66
 msgid "Profile, works and photos of an artist."
 msgstr "نمای هنرمند: آثار، زندگی‌نامه، شبکه‌های اجتماعی و تصاویر."
+
+#: wavira/patterns/hidden-header-search.php:24
+#: wavira/patterns/hidden-header-search.php:26
+msgid "Search"
+msgstr "جست‌وجو"
+
+#: wavira/inc/options.php:89
+msgid "Search button in the header"
+msgstr "دکمهٔ جست‌وجو در سربرگ"
+
+#: wavira/patterns/hidden-header-search.php:25
+msgid "Search music…"
+msgstr "جست‌وجوی موسیقی…"
 
 #: wavira/patterns/hidden-heading-watch.php:16
 msgctxt "section heading above a music video"
@@ -413,17 +653,110 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr "موزیکویدیوها"
 
+#: wavira/inc/options.php:222
+msgid "Semi bold (600)"
+msgstr "نیمه‌ضخیم (۶۰۰)"
+
+#: wavira/inc/options.php:165
+msgid "Shadow on cards and covers"
+msgstr "سایهٔ کارت‌ها و جلدها"
+
+#: wavira/inc/options.php:66
+msgid "Show the site title"
+msgstr "نمایش نام سایت"
+
+#: wavira/inc/options.php:73
+msgid "Show the tagline"
+msgstr "نمایش شعار سایت"
+
+#: wavira/inc/customizer.php:289
+msgid "Shown in the announcement bar. Leave empty to keep the bar for the link only."
+msgstr "در نوار اعلان نمایش داده می‌شود. خالی بگذارید تا نوار فقط برای پیوند بماند."
+
 #: wavira/inc/artists.php:141
 msgid "Single"
 msgstr "تک‌آهنگ"
+
+#: wavira/inc/site-defaults.php:65
+msgid "Site language, timezone, week start and date format were set to the Iranian defaults."
+msgstr "زبان سایت، منطقهٔ زمانی، آغاز هفته و قالب تاریخ روی پیش‌فرض‌های ایرانی تنظیم شد."
+
+#: wavira/inc/options.php:175
+msgid "Smallest card width (rem)"
+msgstr "کمترین عرض کارت (rem)"
+
+#: wavira/inc/customizer.php:111
+msgid "Social networks"
+msgstr "شبکه‌های اجتماعی"
+
+#: wavira/inc/customizer.php:303
+msgid "Starts the font download with the document, which removes the swap on the first screen. Turn it off if you replace the font and keep this setting."
+msgstr "دانلود فونت را همراه سند آغاز می‌کند تا در نخستین صفحه جابه‌جایی فونت دیده نشود. اگر فونت را عوض می‌کنید و این تنظیم را نگه می‌دارید، خاموشش کنید."
+
+#: wavira/inc/options.php:82
+msgid "Sticky header"
+msgstr "سربرگ چسبان"
+
+#: wavira/inc/options.php:194
+msgid "System fonts (no font file)"
+msgstr "فونت‌های سیستم (بدون فایل فونت)"
+
+#: wavira/inc/options.php:248
+#: wavira/inc/options.php:577
+msgid "Telegram"
+msgstr "تلگرام"
+
+#: wavira/inc/customizer.php:116
+msgid "Texts and footer"
+msgstr "متن‌ها و فوتر"
+
+#: wavira/inc/customizer.php:75
+msgid "The browser tab icon (favicon) and the app icon on phones."
+msgstr "آیکون زبانهٔ مرورگر (فاوآیکون) و آیکون برنامه در گوشی."
+
+#: wavira/inc/customizer.php:98
+msgid "The header is a template part: reorder it and add blocks in the Site Editor. These switches control what the theme prints around your own blocks."
+msgstr "سربرگ یک بخش قالب است: در ویرایشگر سایت بازچینی‌اش کنید و بلوک اضافه کنید. این کلیدها تعیین می‌کنند قالب چه چیزی پیرامون بلوک‌های شما چاپ کند."
+
+#: wavira/inc/customizer.php:282
+msgid "The maximum width of the logo. The logo keeps its own proportions on smaller screens."
+msgstr "بیشترین عرض لوگو. لوگو در صفحه‌های کوچک‌تر نسبت خودش را نگه می‌دارد."
 
 #: wavira/inc/blocks.php:70
 msgid "The newest news posts as cards."
 msgstr "تازه‌ترین خبرها به‌صورت کارت."
 
+#: wavira/inc/site-defaults.php:183
+msgid "The Persian setup ran."
+msgstr "راه‌اندازی فارسی انجام شد."
+
+#: wavira/inc/site-defaults.php:77
+msgid "The Persian translation of WordPress itself could not be downloaded: the server has to reach api.wordpress.org. The theme and the plugin are Persian either way."
+msgstr "ترجمهٔ فارسی خودِ وردپرس دانلود نشد: سرور باید به api.wordpress.org دسترسی داشته باشد. در هر حال قالب و افزونه فارسی‌اند."
+
+#: wavira/inc/site-defaults.php:76
+msgid "The Persian translation of WordPress itself was installed."
+msgstr "ترجمهٔ فارسی خودِ وردپرس نصب شد."
+
+#: wavira/inc/site-defaults.php:189
+msgid "The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian."
+msgstr "زبان سایت فارسی نیست، پس صفحه‌های خودِ وردپرس انگلیسی می‌مانند. قالب و افزونه همین حالا فارسی‌اند."
+
+#: wavira/inc/customizer.php:285
+msgid "The tagline is set in Settings → General."
+msgstr "شعار سایت در تنظیمات → همگانی تعیین می‌شود."
+
+#: wavira/inc/customizer.php:158
+msgid "The theme and the plugin ship their own Persian translations, so the music interface is Persian on any locale. A site whose language is not Persian yet also needs WordPress itself in Persian — this link sets the site language, the timezone and the Persian date format in one step."
+msgstr "قالب و افزونه ترجمهٔ فارسی خودشان را همراه دارند، پس رابط موسیقی در هر زبانی فارسی است. سایتی که زبانش هنوز فارسی نیست، خودِ وردپرس را هم باید فارسی کند — این پیوند در یک گام زبان سایت، منطقهٔ زمانی و قالب تاریخ فارسی را تنظیم می‌کند."
+
 #: wavira/inc/blocks.php:62
 msgid "The video of this post: file, embed or link."
 msgstr "ویدیوی این نوشته: فایل، جایگذاری یا پیوند."
+
+#: wavira/inc/customizer.php:294
+msgid "The width of the site layout on wide screens."
+msgstr "عرض چیدمان سایت در صفحه‌های پهن."
 
 #: wavira/blocks/artist-gallery/render.php:41
 msgid "This artist has no photos yet. Upload them from the artist’s media library."
@@ -433,9 +766,37 @@ msgstr "این هنرمند هنوز تصویری ندارد. آن‌ها را �
 msgid "This post has no video source yet."
 msgstr "این نوشته هنوز منبع ویدیویی ندارد."
 
+#: wavira/inc/customizer.php:120
+msgid "Tools"
+msgstr "ابزارها"
+
+#: wavira/inc/customizer.php:166
+msgid "Tools → Wavira demo content"
+msgstr "ابزارها → محتوای نمایشی واویرا"
+
 #: wavira/inc/blocks.php:58
 msgid "Tracklist of the album chosen in the sidebar."
 msgstr "فهرست قطعههای آلبومی که در نوار کناری انتخاب شده است."
+
+#: wavira/inc/customizer.php:295
+msgid "Used by covers, cards, buttons and inputs."
+msgstr "جلدها، کارت‌ها، دکمه‌ها و ورودی‌ها از آن استفاده می‌کنند."
+
+#: wavira/inc/customizer.php:293
+msgid "Used for buttons, links and highlights. Each mode has one colour field, so dark mode is not forgotten: check the contrast against both backgrounds."
+msgstr "برای دکمه‌ها، پیوندها و برجسته‌سازی‌ها. هر حالت یک فیلد رنگ دارد تا حالت تاریک فراموش نشود: کنتراست را با هر دو پس‌زمینه بسنجید."
+
+#: wavira/inc/options.php:193
+msgid "Vazirmatn (bundled, recommended for Persian)"
+msgstr "وزیرمتن (همراه قالب، پیشنهادی برای فارسی)"
+
+#: wavira/inc/customizer.php:302
+msgid "Vazirmatn is a variable font, so every weight renders without a second file."
+msgstr "وزیرمتن یک فونت متغیر است، پس هر ضخامتی بدون فایل دوم رندر می‌شود."
+
+#: wavira/inc/customizer.php:299
+msgid "Vazirmatn is bundled in the theme: no request leaves the site, and Persian letterforms are complete. A custom stack must not point at a remote font file."
+msgstr "وزیرمتن همراه قالب است: هیچ درخواستی از سایت بیرون نمی‌رود و شکل حروف فارسی کامل است. پشتهٔ دلخواه نباید به فایل فونتی روی سرور دیگر اشاره کند."
 
 #: wavira/inc/artists.php:142
 msgid "Video"
@@ -449,6 +810,36 @@ msgstr "مشاهدهٔ همه"
 msgid "Watch the video"
 msgstr "تماشای ویدیو"
 
+#: wavira/inc/site-defaults.php:180
+msgid "Wavira"
+msgstr "واویرا"
+
+#: wavira/inc/customizer.php:168
+msgid "Wavira Core is not active: install and activate it to get the music content types, the player and the demo content. The theme renders what exists and stays functional either way."
+msgstr "افزونهٔ واویرا هسته فعال نیست: برای داشتن انواع محتوای موسیقی، پخش‌کننده و محتوای نمایشی نصب و فعالش کنید. قالب در هر حالت آنچه هست را نمایش می‌دهد و کار می‌کند."
+
 #: wavira/inc/setup.php:66
 msgid "Wavira music"
 msgstr "موسیقی واویرا"
+
+#: wavira/inc/customizer.php:38
+msgid "Wavira settings"
+msgstr "تنظیمات واویرا"
+
+#: wavira/inc/options.php:262
+#: wavira/inc/options.php:585
+msgid "X (Twitter)"
+msgstr "ایکس (توییتر)"
+
+#: wavira/inc/site-defaults.php:105
+msgid "You are not allowed to change the site language."
+msgstr "شما اجازهٔ تغییر زبان سایت را ندارید."
+
+#: wavira/inc/site-defaults.php:128
+msgid "You are not allowed to change this."
+msgstr "شما اجازهٔ این کار را ندارید."
+
+#: wavira/inc/options.php:255
+#: wavira/inc/options.php:581
+msgid "YouTube"
+msgstr "یوتیوب"
