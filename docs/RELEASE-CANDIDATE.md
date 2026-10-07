@@ -12,7 +12,7 @@
 | **The Wavira settings panel** — 32 settings in eight sections (language and Persian setup, identity and logo, header, appearance, fonts, social networks, texts and footer, tools) | "a professional theme settings panel": logo, colours, fonts, widths, social links and footer text, editable without touching code, with a live preview | `inc/options.php` (the schema), `inc/customizer.php` (the panel), ADR 0020 | `tests/test-theme-options.php` (the schema, the sanitizers, the Customizer registration) |
 | **Values as CSS variables and body classes** | a setting reaches every block — including blocks added later — without `!important` and without a second source of truth; a site that changes nothing ships no extra CSS at all | `wavira_option_css()`, `wavira_option_body_classes()`, `assets/css/components.css` | `test_settings_reach_the_front_end`, `test_a_default_site_gets_no_extra_css` |
 | **Live preview** (`assets/js/customizer.js`) | the preview shows the change while the control moves; fields that change markup refresh instead of pretending | built to `assets/dist/customizer.js`, loaded only in the Customizer frame | `tests/js/customizer.test.mjs` (12 tests) + `test_the_preview_list_matches_the_schema` |
-| **One-click Persian setup** | the theme's own screens are Persian already, but WordPress is not until the *site* language changes: one nonced action sets the language, the timezone, the week start and the date format, and fetches the core language pack when the host can | `inc/site-defaults.php`, `wavira_core_apply_persian_defaults()` in the plugin, an admin notice on Appearance → Themes | `test_persian_setup_is_a_guarded_admin_action`, `test_the_language_pack_check_is_a_file_question` |
+| **One-click Persian setup** | the theme's own screens are Persian already, but WordPress is not until the *site* language changes: one nonced action installs the core language pack first — WordPress refuses to store a locale it has no translation for — then sets the language, the timezone, the week start and the date format, and reports what it could not do | `inc/site-defaults.php`, `wavira_core_apply_persian_defaults()` in the plugin, an admin notice on Appearance → Themes | `test_persian_setup_is_a_guarded_admin_action`, `test_the_language_pack_check_is_a_file_question` |
 | **Demo import, one click away** | a buyer who never opens a terminal still needs the demo content; the panel links straight to `Tools → Wavira demo content` | `wavira_customize_site_description()` | the link target is asserted in the panel-description code path |
 | **Five social glyphs, a back-to-top button, an announcement bar, a dark-mode logo** | the surfaces a music site actually fills in on day one | `assets/icons/`, `patterns/hidden-*.php`, `wavira_custom_logo()` | `test_optional_surfaces_render_only_when_they_are_on`, `test_the_dark_logo_is_added_beside_core_markup` |
 | **The catalogue stayed complete** | 100 new strings arrived with the panel and the Persian setup; a half-Persian panel is worse than none | `wavira/languages/*`, `tools/po-merge.py` | `node tools/i18n.mjs check` → **341/341, POT/PO/MO in sync** (theme 191, plugin 150) |
@@ -25,9 +25,9 @@ produces with CI's own fixed timestamp (see §8):
 
 | Archive | Bytes | SHA-256 |
 | --- | --- | --- |
-| `wavira-theme-0.12.0.zip` | 266 495 | `9642cf09e79dc5b046f0811fbfe3abf72ddc7c5ca3d944032b2c699f929c15b7` |
+| `wavira-theme-0.12.0.zip` | 266 921 | `889fa7c36d649b824ec02f7008594a9452c2bb9ae13302bd59eeea3cd0f5ab19` |
 | `wavira-core-0.12.0.zip` | 179 841 | `d8602a7f9643a76282175a797eca4229105938c3707ac257e317ed6c7dde7035` |
-| `wavira-0.12.0-bundle.zip` | 479 376 | `6cfdf5d4b1edcbb256aec0b1ba7d68c7740ba577b6ab758dde42e44db5c88a7d` |
+| `wavira-0.12.0-bundle.zip` | 479 864 | `11dfd749138777ef009338fd82dd12f255c73c44a0981d2321299f0982c75f82` |
 
 The remaining pre-upload item is the same one 0.11.0 recorded (§6): `screenshot.png`. It needs a rendered
 page and a browser, and the authoring environment has neither — the file is `optional` in

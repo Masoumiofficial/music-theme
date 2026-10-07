@@ -50,21 +50,11 @@ function wavira_persian_dismiss_url(): string {
 function wavira_apply_persian_defaults(): array {
 	$notes = array();
 
-	if ( function_exists( 'wavira_core_apply_persian_defaults' ) ) {
-		$report = wavira_core_apply_persian_defaults();
-
-		if ( is_array( $report ) && isset( $report['notices'] ) ) {
-			$notes = array_map( 'strval', (array) $report['notices'] );
-		}
-	} else {
-		update_option( 'WPLANG', 'fa_IR' );
-		update_option( 'timezone_string', 'Asia/Tehran' );
-		update_option( 'start_of_week', 6 );
-		update_option( 'date_format', 'j F Y' );
-		update_option( 'time_format', 'H:i' );
-		$notes[] = __( 'Site language, timezone, week start and date format were set to the Iranian defaults.', 'wavira' );
-	}
-
+	// The language pack comes first, and not by accident: WordPress refuses to
+	// store a locale the site has no translation for. `sanitize_option()` checks
+	// `get_available_languages()` and silently keeps the previous value, so a
+	// site whose pack arrives after the options would stay English — the exact
+	// failure this action exists to prevent.
 	$pack_missing = ! wavira_has_core_language_pack();
 
 	/**
@@ -91,7 +81,22 @@ function wavira_apply_persian_defaults(): array {
 			? __( 'The Persian translation of WordPress itself was installed.', 'wavira' )
 			: __( 'The Persian translation of WordPress itself could not be downloaded: the server has to reach api.wordpress.org. The theme and the plugin are Persian either way.', 'wavira' );
 	} elseif ( $pack_missing ) {
-		$notes[] = __( 'The Persian translation of WordPress itself is not installed. Install it from Dashboard → Updates, and the WordPress screens will be Persian too.', 'wavira' );
+		$notes[] = __( 'The Persian translation of WordPress itself is not installed, so the site language stays as it is. Install it from Dashboard → Updates, and the WordPress screens will be Persian too.', 'wavira' );
+	}
+
+	if ( function_exists( 'wavira_core_apply_persian_defaults' ) ) {
+		$report = wavira_core_apply_persian_defaults();
+
+		if ( is_array( $report ) && isset( $report['notices'] ) ) {
+			$notes = array_merge( $notes, array_map( 'strval', (array) $report['notices'] ) );
+		}
+	} else {
+		update_option( 'WPLANG', 'fa_IR' );
+		update_option( 'timezone_string', 'Asia/Tehran' );
+		update_option( 'start_of_week', 6 );
+		update_option( 'date_format', 'j F Y' );
+		update_option( 'time_format', 'H:i' );
+		$notes[] = __( 'Site language, timezone, week start and date format were set to the Iranian defaults.', 'wavira' );
 	}
 
 	return $notes;

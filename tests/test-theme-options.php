@@ -21,6 +21,20 @@
 class Test_Theme_Options extends Wavira_Test_Case {
 
 	/**
+	 * Site options the Persian setup changes, restored after every test.
+	 *
+	 * @var string[]
+	 */
+	const SITE_OPTIONS = array( 'WPLANG', 'timezone_string', 'start_of_week', 'date_format', 'time_format' );
+
+	/**
+	 * Values those options had before the test.
+	 *
+	 * @var array<string, mixed>
+	 */
+	private $site_options = array();
+
+	/**
 	 * Load the theme's option layer once for the class.
 	 *
 	 * @return void
@@ -62,6 +76,12 @@ class Test_Theme_Options extends Wavira_Test_Case {
 		add_filter( 'render_block', 'wavira_filter_player_bar', 10, 2 );
 		add_filter( 'get_custom_logo', 'wavira_custom_logo' );
 		add_action( 'customize_register', 'wavira_customize_register' );
+
+		// The Persian setup writes site options, not theme mods. A test that left
+		// the site in Persian would change what every later test measures.
+		foreach ( self::SITE_OPTIONS as $option ) {
+			$this->site_options[ $option ] = get_option( $option );
+		}
 	}
 
 	/**
@@ -73,6 +93,16 @@ class Test_Theme_Options extends Wavira_Test_Case {
 		foreach ( array_keys( wavira_options_schema() ) as $key ) {
 			remove_theme_mod( 'wavira_' . $key );
 		}
+
+		foreach ( $this->site_options as $option => $value ) {
+			if ( false === $value ) {
+				delete_option( $option );
+			} else {
+				update_option( $option, $value );
+			}
+		}
+
+		$this->site_options = array();
 
 		parent::tear_down();
 	}
@@ -481,17 +511,55 @@ class Test_Theme_Options extends Wavira_Test_Case {
 
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
-		// No network in a build: the documented filter is the way a host (and this
-		// test) says "do not download the language pack". The four options below
-		// are the half of the action that has to work everywhere.
+		// WordPress refuses to store a locale it has no translation for
+		// (`sanitize_option()` asks `get_available_languages()`, which reads this
+		// directory), so a site that is about to become Persian needs the pack to
+		// exist first — which is the order the theme itself uses. The file only
+		// has to be there: nothing loads it in this test.
+		$pack = trailingslashit( WP_LANG_DIR ) . 'fa_IR.mo';
+		$had  = file_exists( $pack );
+
+		if ( ! $had ) {
+			wp_mkdir_p( WP_LANG_DIR );
+			file_put_contents( $pack, '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- test fixture.
+		}
+
+		$notes = wavira_apply_persian_defaults();
+
+		if ( ! $had ) {
+			wp_delete_file( $pack );
+		}
+
+		$this->assertIsArray( $notes );
+		$this->assertNotEmpty( $notes, 'the site owner is told what happened' );
+
+		$this->assertSame( 'fa_IR', (string) get_option( 'WPLANG' ) );
+		$this->assertSame( 'Asia/Tehran', (string) get_option( 'timezone_string' ) );
+		$this->assertSame( 6, (int) get_option( 'start_of_week' ) );
+		$this->assertSame( 'j F Y', (string) get_option( 'date_format' ) );
+	}
+
+	/**
+	 * A missing language pack is reported, not faked.
+	 *
+	 * The half of the action that does not need the network still runs — and the
+	 * locale is the half WordPress itself refuses, so the site owner is told why
+	 * rather than being left with a dashboard that is still English. The download
+	 * is switched off through the documented filter: a build has no network, and
+	 * reaching wordpress.org is not what this test is about.
+	 *
+	 * @return void
+	 */
+	public function test_a_missing_language_pack_is_reported_rather_than_faked() {
+		if ( wavira_has_core_language_pack() ) {
+			$this->markTestSkipped( 'this install already ships a Persian translation of WordPress' );
+		}
+
 		add_filter( 'wavira_download_core_language_pack', '__return_false' );
 
 		$notes = wavira_apply_persian_defaults();
 
 		remove_filter( 'wavira_download_core_language_pack', '__return_false' );
-
-		$this->assertIsArray( $notes );
-		$this->assertNotEmpty( $notes, 'the site owner is told what happened, including what is missing' );
 
 		$this->assertStringContainsString(
 			'The Persian translation of WordPress itself is not installed',
@@ -499,7 +567,7 @@ class Test_Theme_Options extends Wavira_Test_Case {
 			'a skipped download is reported, not silent'
 		);
 
-		$this->assertSame( 'fa_IR', (string) get_option( 'WPLANG' ) );
+		$this->assertNotSame( 'fa_IR', (string) get_option( 'WPLANG' ), 'WordPress does not store a locale it has no translation for' );
 		$this->assertSame( 'Asia/Tehran', (string) get_option( 'timezone_string' ) );
 		$this->assertSame( 6, (int) get_option( 'start_of_week' ) );
 		$this->assertSame( 'j F Y', (string) get_option( 'date_format' ) );
@@ -595,10 +663,18 @@ class Test_Theme_Options extends Wavira_Test_Case {
 		$this->assertStringContainsString( '<span class="wavira-logo">', $html );
 		$this->assertStringContainsString( 'alt="Wavira"', $html, 'core\'s alt text is not thrown away' );
 
-		// An attachment with no image data adds nothing rather than an empty tag.
-		set_theme_mod( 'wavira_dark_logo', (int) self::factory()->attachment->create_object( 'broken.png', 0, array( 'post_mime_type' => 'image/png' ) ) );
+		// When core cannot produce an image — a deleted file, a broken upload —
+		// the logo markup is left as it was, rather than wrapped around an empty
+		// string. The filter is core's own end of `wp_get_attachment_image()`.
+		$nothing = static function ( $html, $attachment_id ) use ( $attachment ) {
+			return $attachment === (int) $attachment_id ? '' : $html;
+		};
+
+		add_filter( 'wp_get_attachment_image', $nothing, 10, 2 );
 
 		$this->assertSame( $light, apply_filters( 'get_custom_logo', $light ) );
+
+		remove_filter( 'wp_get_attachment_image', $nothing );
 	}
 
 	/**

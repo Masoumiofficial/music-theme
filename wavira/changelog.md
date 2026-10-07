@@ -20,10 +20,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   is at its declared default.
 - **A dark-mode logo** (`get_custom_logo` filter) that follows the same `prefers-color-scheme` query as
   the palette, so `auto` mode shows it on a dark device without a second setting.
-- **One-click Persian setup** (`inc/site-defaults.php`): a nonced, `manage_options`-gated action that sets
-  the site language, timezone, week start and date format — through
-  `wavira_core_apply_persian_defaults()` when the plugin is active, and on its own when it is not — plus
-  a dismissible notice on Appearance → Themes and the Customizer while the site language is not Persian.
+- **One-click Persian setup** (`inc/site-defaults.php`): a nonced, `manage_options`-gated action that
+  installs the WordPress translation for `fa_IR` *first* — WordPress refuses to store a locale it has no
+  translation for, so the other order would leave a site English — and then sets the site language,
+  timezone, week start and date format, through `wavira_core_apply_persian_defaults()` when the plugin is
+  active and on its own when it is not. The download is filterable
+  (`wavira_download_core_language_pack`) for hosts that manage language packs themselves, or that have no
+  way to reach wordpress.org; whatever is left undone is reported to the site owner instead of being
+  silent, and a dismissible notice on Appearance → Themes and the Customizer explains the situation while
+  the site language is not Persian.
 - **Five social glyphs and a back-to-top icon** (`assets/icons/`): simple geometric shapes drawn for this
   theme, stroke-based and `currentColor`, not the networks' official artwork — nothing trademarked is
   redistributed and the accessible name comes from the translated label.

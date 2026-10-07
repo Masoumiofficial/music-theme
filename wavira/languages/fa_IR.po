@@ -522,7 +522,7 @@ msgid "Logo width (px)"
 msgstr "عرض لوگو (پیکسل)"
 
 #: wavira/inc/customizer.php:160
-#: wavira/inc/site-defaults.php:211
+#: wavira/inc/site-defaults.php:216
 msgid "Make the site Persian"
 msgstr "فارسی‌سازی سایت"
 
@@ -549,7 +549,7 @@ msgstr "هنوز خبری منتشر نشده است. نخستین خبر را �
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
 
-#: wavira/inc/site-defaults.php:212
+#: wavira/inc/site-defaults.php:217
 msgid "Not now"
 msgstr "اکنون نه"
 
@@ -677,7 +677,7 @@ msgstr "در نوار اعلان نمایش داده می‌شود. خالی ب�
 msgid "Single"
 msgstr "تک‌آهنگ"
 
-#: wavira/inc/site-defaults.php:65
+#: wavira/inc/site-defaults.php:99
 msgid "Site language, timezone, week start and date format were set to the Iranian defaults."
 msgstr "زبان سایت، منطقهٔ زمانی، آغاز هفته و قالب تاریخ روی پیش‌فرض‌های ایرانی تنظیم شد."
 
@@ -726,23 +726,23 @@ msgstr "بیشترین عرض لوگو. لوگو در صفحه‌های کوچک
 msgid "The newest news posts as cards."
 msgstr "تازه‌ترین خبرها به‌صورت کارت."
 
-#: wavira/inc/site-defaults.php:204
+#: wavira/inc/site-defaults.php:209
 msgid "The Persian setup ran."
 msgstr "راه‌اندازی فارسی انجام شد."
 
-#: wavira/inc/site-defaults.php:92
+#: wavira/inc/site-defaults.php:82
 msgid "The Persian translation of WordPress itself could not be downloaded: the server has to reach api.wordpress.org. The theme and the plugin are Persian either way."
 msgstr "ترجمهٔ فارسی خودِ وردپرس دانلود نشد: سرور باید به api.wordpress.org دسترسی داشته باشد. در هر حال قالب و افزونه فارسی‌اند."
 
-#: wavira/inc/site-defaults.php:94
-msgid "The Persian translation of WordPress itself is not installed. Install it from Dashboard → Updates, and the WordPress screens will be Persian too."
-msgstr "ترجمهٔ فارسی خودِ وردپرس نصب نیست. آن را از پیشخوان ← به‌روزرسانی‌ها نصب کنید تا صفحه‌های وردپرس هم فارسی شوند."
+#: wavira/inc/site-defaults.php:84
+msgid "The Persian translation of WordPress itself is not installed, so the site language stays as it is. Install it from Dashboard → Updates, and the WordPress screens will be Persian too."
+msgstr "ترجمهٔ فارسی خودِ وردپرس نصب نیست، پس زبان سایت همان‌طور که هست می‌ماند. آن را از پیشخوان ← به‌روزرسانی‌ها نصب کنید تا صفحه‌های وردپرس هم فارسی شوند."
 
-#: wavira/inc/site-defaults.php:91
+#: wavira/inc/site-defaults.php:81
 msgid "The Persian translation of WordPress itself was installed."
 msgstr "ترجمهٔ فارسی خودِ وردپرس نصب شد."
 
-#: wavira/inc/site-defaults.php:210
+#: wavira/inc/site-defaults.php:215
 msgid "The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian."
 msgstr "زبان سایت فارسی نیست، پس صفحه‌های خودِ وردپرس انگلیسی می‌مانند. قالب و افزونه همین حالا فارسی‌اند."
 
@@ -814,7 +814,7 @@ msgstr "مشاهدهٔ همه"
 msgid "Watch the video"
 msgstr "تماشای ویدیو"
 
-#: wavira/inc/site-defaults.php:201
+#: wavira/inc/site-defaults.php:206
 msgid "Wavira"
 msgstr "واویرا"
 
@@ -835,11 +835,11 @@ msgstr "تنظیمات واویرا"
 msgid "X (Twitter)"
 msgstr "ایکس (توییتر)"
 
-#: wavira/inc/site-defaults.php:126
+#: wavira/inc/site-defaults.php:131
 msgid "You are not allowed to change the site language."
 msgstr "شما اجازهٔ تغییر زبان سایت را ندارید."
 
-#: wavira/inc/site-defaults.php:149
+#: wavira/inc/site-defaults.php:154
 msgid "You are not allowed to change this."
 msgstr "شما اجازهٔ این کار را ندارید."
 
