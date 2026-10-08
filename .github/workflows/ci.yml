@@ -458,6 +458,16 @@ jobs:
         run: |
           {
             set -euo pipefail
+            # PHP's built-in server answers one request at a time unless it is
+            # told how many workers to run, and a themed page is dozens of
+            # requests (the stylesheet, the script, the font, plus an image per
+            # card — 0.15.0's demo generates 23 media files, so the front page
+            # went from zero images to a screenful). One worker and a browser
+            # that opens six connections is a stall, and a stalled subresource is
+            # what turned into `Runtime.callFunctionOn timed out` in 0.15.0's
+            # first render. `wp server` passes the environment through to `php -S`.
+            export PHP_CLI_SERVER_WORKERS=8
+            echo "the built-in server runs ${PHP_CLI_SERVER_WORKERS} worker processes"
             nohup php /tmp/wp-cli.phar server --host=127.0.0.1 --port=8080 --docroot=/tmp/site > /tmp/server.log 2>&1 &
             for attempt in $(seq 1 30); do
               if curl -fsS -o /dev/null http://127.0.0.1:8080/; then

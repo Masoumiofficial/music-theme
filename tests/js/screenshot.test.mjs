@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { deflateSync } from 'node:zlib';
 
-import { findChrome, option, options, parsePages, pngSize } from '../../tools/screenshot.mjs';
+import { budgets, findChrome, option, options, parsePages, pngSize } from '../../tools/screenshot.mjs';
 
 /**
  * CRC-32, the checksum every PNG chunk carries.
@@ -160,6 +160,25 @@ test( 'a Chrome that was asked for by name is either there or reported missing',
 
 	// `process.execPath` exists, so the lookup itself is exercised.
 	assert.equal( findChrome( process.execPath ), process.execPath );
+} );
+
+test( 'every wait has a budget, and a bad number falls back to the default', () => {
+	assert.deepEqual( budgets( [] ), { protocol: 120000, settle: 15000, axe: 90000 } );
+
+	assert.deepEqual(
+		budgets( [ '--protocol-timeout=30000', '--settle=5000', '--axe-timeout=1000' ] ),
+		{ protocol: 30000, settle: 5000, axe: 1000 }
+	);
+
+	// A budget of zero, a negative one, a word and a bare flag are all "not a
+	// budget": an unbounded or instantly-expired wait is worse than the default.
+	assert.deepEqual( budgets( [ '--settle=0' ] ).settle, 15000 );
+	assert.deepEqual( budgets( [ '--protocol-timeout=-1' ] ).protocol, 120000 );
+	assert.deepEqual( budgets( [ '--axe-timeout=soon' ] ).axe, 90000 );
+	assert.deepEqual( budgets( [ '--settle' ] ).settle, 15000 );
+
+	// A fractional number of milliseconds is not something a timer can use.
+	assert.equal( budgets( [ '--settle=1500.7' ] ).settle, 1500 );
 } );
 
 test( 'the command line refuses to run without a URL and an output file', () => {

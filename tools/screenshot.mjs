@@ -27,6 +27,15 @@
  *   --axe[=FILE]     run axe-core and write the report (default /tmp/wavira-axe.json)
  *   --chrome=PATH    the browser binary (default: CHROME_PATH, then the usual names)
  *   --timeout=MS     per-page timeout (default 30000)
+ *   --settle=MS      how long a page may take to load its fonts and images (default 15000)
+ *   --axe-timeout=MS how long one axe run may take (default 90000)
+ *   --protocol-timeout=MS the browser's own call timeout (default 120000)
+ *
+ * Every wait is bounded and every phase is announced before it starts, because
+ * the alternative was measured: 0.15.0's first render died with
+ * `Runtime.callFunctionOn timed out` — one unbounded in-page wait, no line in
+ * the log saying which page it was on, and nothing in the image set to read
+ * afterwards (the artifact download is not always possible either).
  *
  * Exit status is 0 only when every image was written, every image has the size
  * it was asked for, and every page answered 200 with text on it. A screenshot
@@ -101,6 +110,37 @@ export function options( args, name ) {
 	return args
 		.filter( ( a ) => a.startsWith( `--${ name }=` ) )
 		.map( ( a ) => a.slice( name.length + 3 ) );
+}
+
+/**
+ * The three budgets this script runs inside.
+ *
+ * A browser call that never returns is the one failure that cannot be read from
+ * the log afterwards — it stops the render mid-flight with a protocol error and
+ * no picture — so each budget is a number here, validated, and covered by a test
+ * instead of being a literal somewhere in the middle of `main()`.
+ *
+ * @param {string[]} args Arguments, without `node script`.
+ * @return {{protocol: number, settle: number, axe: number}} Milliseconds.
+ */
+export function budgets( args ) {
+	const read = ( name, fallback ) => {
+		const raw = option( args, name, null );
+
+		if ( null === raw || true === raw ) {
+			return fallback;
+		}
+
+		const value = Number( raw );
+
+		return Number.isFinite( value ) && value > 0 ? Math.floor( value ) : fallback;
+	};
+
+	return {
+		protocol: read( 'protocol-timeout', 120000 ),
+		settle: read( 'settle', 15000 ),
+		axe: read( 'axe-timeout', 90000 ),
+	};
 }
 
 /**
@@ -207,6 +247,24 @@ export async function main( args ) {
 	const extraDir = option( args, 'extra' );
 	const axeOption = option( args, 'axe', false );
 	const axeFile = axeOption ? String( true === axeOption ? '/tmp/wavira-axe.json' : axeOption ) : null;
+	const budget = budgets( args );
+	const quiet = '1' === process.env.WAVIRA_SCREENSHOT_QUIET;
+
+	/**
+	 * Say what is about to happen, before it happens.
+	 *
+	 * A run that dies inside a browser call leaves no other trace: the notes are
+	 * printed at the end, so the note list of a failed run is empty and the log
+	 * shows only the crash. One line per phase costs nothing and names the page.
+	 *
+	 * @param {string} message What is starting.
+	 * @return {void}
+	 */
+	const say = ( message ) => {
+		if ( ! quiet ) {
+			process.stdout.write( `  → ${ message }\n` );
+		}
+	};
 
 	let pages = [];
 
@@ -255,6 +313,9 @@ export async function main( args ) {
 		browser = await puppeteer.launch( {
 			executablePath: chrome,
 			headless: true,
+			// Every CDP call is bounded. The default is generous, and a call that
+			// has not answered in two minutes has not been answered (0.15.0).
+			protocolTimeout: budget.protocol,
 			args: [
 				'--no-sandbox',
 				'--disable-dev-shm-usage',
@@ -306,6 +367,8 @@ export async function main( args ) {
 	 * @return {Promise<Object>} The open page plus what was written.
 	 */
 	const capture = async ( shot ) => {
+		say( `render ${ shot.file } ← ${ shot.url } (${ shot.scheme })` );
+
 		const page = await browser.newPage();
 
 		await page.setViewport( { ...viewport, deviceScaleFactor: 1 } );
@@ -317,15 +380,37 @@ export async function main( args ) {
 		const response = await page.goto( shot.url, { waitUntil: 'load', timeout } );
 		const status = response ? response.status() : 0;
 
-		await page.evaluate( async () => {
-			await document.fonts.ready;
-			await Promise.all(
-				Array.from( document.images ).map( ( image ) =>
-					image.decode ? image.decode().catch( () => {} ) : Promise.resolve()
+		// Fonts and images are waited for, but not forever: `document.fonts.ready`
+		// and `image.decode()` both wait on a network request that may never
+		// settle (a stalled font, an image behind a saturated server), and waiting
+		// on that is what turns a slow page into a dead render. The budget is the
+		// licence to take the picture anyway; the note says it was taken early.
+		const settled = await page.evaluate( async ( settle ) => {
+			const bounded = ( promise ) =>
+				Promise.race( [
+					Promise.resolve( promise ).catch( () => {} ),
+					new Promise( ( resolve ) => setTimeout( resolve, settle ) ),
+				] );
+
+			await bounded( document.fonts.ready );
+			await bounded(
+				Promise.all(
+					Array.from( document.images ).map( ( image ) =>
+						image.decode ? image.decode().catch( () => {} ) : Promise.resolve()
+					)
 				)
 			);
 			window.scrollTo( 0, 0 );
-		} );
+
+			// Read after the wait: anything still incomplete is what was waited on.
+			return Array.from( document.images ).filter( ( image ) => ! image.complete ).length;
+		}, budget.settle );
+
+		if ( settled > 0 ) {
+			notes.push(
+				`${ shot.file } — ${ settled } image(s) were still loading after ${ budget.settle }ms; the picture is of a page that had not finished`
+			);
+		}
 
 		// The page's own language and direction are reported so a screenshot of
 		// the wrong direction is visible in the log rather than in the file.
@@ -396,19 +481,40 @@ export async function main( args ) {
 			const report = { tool: 'axe-core', generated_for: String( url ), pages: [] };
 
 			for ( const target of targets ) {
+				say( `axe ${ target.name} ← ${ target.url }` );
+
 				const page = await browser.newPage();
 
 				await page.setViewport( { ...viewport, deviceScaleFactor: 1 } );
 				await page.goto( target.url, { waitUntil: 'load', timeout } );
 				await page.addScriptTag( { path: axePath } );
 
-				const violations = await page.evaluate( async () => {
-					const outcome = await window.axe.run( document, { resultTypes: [ 'violations' ] } );
+				// `axe.run()` is the heaviest in-page call this script makes and
+				// the one an unbounded wait has already killed a render with. It
+				// gets a budget of its own, and a run that blows it is recorded as
+				// a finding of a different kind rather than as silence: the report
+				// has to say which page could not be measured.
+				const measured = await page.evaluate( async ( axeBudget ) => {
+					const outcome = await Promise.race( [
+						window.axe.run( document, { resultTypes: [ 'violations' ] } ),
+						new Promise( ( resolve ) => setTimeout( () => resolve( null ), axeBudget ) ),
+					] );
 
-					return outcome.violations.map( ( v ) => ( { id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length } ) );
-				} );
+					if ( ! outcome ) {
+						return { timedOut: true };
+					}
 
-				report.pages.push( { name: target.name, url: target.url, violations } );
+					return {
+						timedOut: false,
+						violations: outcome.violations.map( ( v ) => ( { id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length } ) ),
+					};
+				}, budget.axe );
+
+				if ( measured.timedOut ) {
+					fail( `axe did not finish on ${ target.name } within ${ budget.axe }ms — the page could not be measured` );
+				}
+
+				report.pages.push( { name: target.name, url: target.url, violations: measured.violations } );
 				await page.close();
 			}
 
