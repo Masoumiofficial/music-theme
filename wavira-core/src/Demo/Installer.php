@@ -472,7 +472,7 @@ final class Installer {
 						'slug' => sanitize_title( $name ),
 					)
 				);
-				$changed++;
+				++$changed;
 			}
 		}
 
@@ -519,7 +519,7 @@ final class Installer {
 					'post_name'    => sanitize_title( $title ),
 				)
 			);
-			$changed++;
+			++$changed;
 		}
 
 		return $changed;

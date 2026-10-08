@@ -610,6 +610,15 @@ jobs:
               wp post list --post_type=post --fields=ID,post_title,post_name,post_status
               echo "--- what the importer sees when it looks for the sample content"
               wp eval 'foreach ( array( "hello-world" => "post", "sample-page" => "page" ) as $slug => $type ) { $found = get_posts( array( "post_type" => $type, "name" => $slug, "posts_per_page" => 1, "post_status" => array( "publish", "draft", "pending", "private" ), "suppress_filters" => true ) ); echo $slug . ": " . ( $found ? $found[0]->post_title . " [" . $found[0]->post_name . "]" : "not found" ) . PHP_EOL; } $term = get_term_by( "slug", "uncategorized", "category" ); echo "uncategorized: " . ( $term ? $term->name : "not found by slug" ) . PHP_EOL;'
+              echo "--- did the import's site scope run? (these are what it writes)"
+              wp option get WPLANG
+              wp option get date_format
+              wp option get timezone_string
+              wp option get start_of_week
+              echo "--- and the step itself, called directly"
+              wp eval 'try { $m = new ReflectionMethod( "Wavira\\Core\\Demo\\Installer", "translate_first_content" ); $m->setAccessible( true ); echo "translate_first_content() returned " . (int) $m->invoke( null ) . PHP_EOL; } catch ( Throwable $e ) { echo "threw " . get_class( $e ) . ": " . $e->getMessage() . PHP_EOL; }'
+              wp post list --post_type=post --fields=ID,post_title,post_name
+              wp term list category --fields=term_id,name,slug
             } 2>&1 | tee /tmp/first-content.log
 
             if [ "${persian_failures}" != "0" ]; then
