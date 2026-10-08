@@ -101,7 +101,7 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->assertSame( 'برچسبهای سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
 		$this->assertSame( 'موسیقی', _x( 'music', 'block keyword', 'wavira' ) );
 		$this->assertSame( 'نمای هنرمند', _x( 'Artist profile', 'block title', 'wavira' ) );
-		$this->assertSame( 'گالری تصاویر هنرمند', _x( 'Artist photo gallery', 'block title', 'wavira' ) );
+		$this->assertSame( 'گالری تصاویر', _x( 'Photo gallery', 'block title', 'wavira' ) );
 		$this->assertSame( 'هنرمند', _x( 'artist', 'block keyword', 'wavira' ) );
 	}
 
@@ -174,7 +174,8 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
 
 		$this->assertSame( 'دانلود قطعه', __( 'Download the track', 'wavira' ) );
-		$this->assertSame( 'گالری تصاویر', __( 'Photo gallery', 'wavira' ) );
+		$this->assertSame( 'گالری تصاویر', _x( 'Photo gallery', 'block title', 'wavira' ) );
+		$this->assertSame( 'تصاویر', __( 'Photos', 'wavira' ) );
 		$this->assertSame( '3.2 مگابایت', sprintf( __( '%s MB', 'wavira' ), '3.2' ) );
 
 		$this->load_catalogue( 'wavira-core', 'wavira-core/languages/fa_IR.mo' );

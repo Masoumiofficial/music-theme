@@ -91,18 +91,21 @@ final class Installer {
 			++$report['media'];
 		}
 
-		if ( $site ) {
-			for ( $photo = 1; $photo <= 6; $photo++ ) {
-				$id = Placeholders::photo(
-					$report['artist'],
-					self::palette( 4 + $photo ),
-					(string) $demo['artist']['title'] . $photo,
-					$photo
-				);
+		// The gallery is content, not a site setting: `$site` decides whether the
+		// language, timezone and date formats are touched, and a demo whose
+		// artist page has an empty gallery (or whose album page offers no
+		// download) because somebody chose the narrowly-scoped import is a demo
+		// that does not demonstrate the product (ADR 0024).
+		for ( $photo = 1; $photo <= 6; $photo++ ) {
+			$id = Placeholders::photo(
+				$report['artist'],
+				self::palette( 4 + $photo ),
+				(string) $demo['artist']['title'] . $photo,
+				$photo
+			);
 
-				if ( $id > 0 ) {
-					++$report['media'];
-				}
+			if ( $id > 0 ) {
+				++$report['media'];
 			}
 		}
 
@@ -128,12 +131,10 @@ final class Installer {
 				++$report['media'];
 			}
 
-			if ( $site ) {
-				$album_file = Placeholders::album_audio( $release_id, 8, 262 + ( $release_index * 55 ) );
+			$album_file = Placeholders::album_audio( $release_id, 8, 262 + ( $release_index * 55 ) );
 
-				if ( $album_file > 0 ) {
-					++$report['media'];
-				}
+			if ( $album_file > 0 ) {
+				++$report['media'];
 			}
 
 			$release_tracks = array();
@@ -306,6 +307,13 @@ final class Installer {
 		$deleted = 0;
 		$types   = array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO );
 
+		// The generated attachments go first, and separately: a forced import
+		// that deleted its titles and left twenty-three files in the uploads
+		// folder would fill a site with orphans (ADR 0024). `wp_delete_attachment()`
+		// removes the file with the row, so nothing is unlinked by hand; only
+		// files this importer wrote carry the marker.
+		$deleted += self::remove_previous_media();
+
 		do {
 			$ids = get_posts(
 				array(
@@ -418,6 +426,41 @@ final class Installer {
 		return array(
 			__( 'Site locale, timezone, first day of the week and date format were set to the Iranian defaults.', 'wavira-core' ),
 		);
+	}
+
+	/**
+	 * Delete the attachments a previous import generated.
+	 *
+	 * Bounded and marker-scoped: a real site's uploads never carry
+	 * `Placeholders::MARKER`, so nothing an owner uploaded can be touched.
+	 *
+	 * @return int Number of attachments deleted.
+	 */
+	private static function remove_previous_media(): int {
+		$deleted = 0;
+
+		do {
+			$ids = get_posts(
+				array(
+					'post_type'        => 'attachment',
+					'post_status'      => 'any',
+					'posts_per_page'   => 100,
+					'fields'           => 'ids',
+					'no_found_rows'    => true,
+					'suppress_filters' => false,
+					'meta_key'         => Placeholders::MARKER, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- administrative one-off.
+					'meta_value'       => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- same.
+				)
+			);
+
+			foreach ( $ids as $id ) {
+				if ( wp_delete_attachment( (int) $id, true ) ) {
+					++$deleted;
+				}
+			}
+		} while ( array() !== $ids );
+
+		return $deleted;
 	}
 
 	/**

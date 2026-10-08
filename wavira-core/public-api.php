@@ -344,6 +344,11 @@ if ( ! function_exists( 'wavira_core_download_qualities' ) ) {
 	 * A `320 kbps` audio file and a `1080p` video are both "a quality" to a
 	 * visitor, so both come back in the same shape and the label is translated.
 	 *
+	 * **Empty when the visitor may not download**: a quality a theme cannot link
+	 * to is not a quality, and the labels a theme prints come from here — so the
+	 * access decision is made once, here, and a theme that lists these is not
+	 * listing files the endpoint will refuse (ADR 0023).
+	 *
 	 * @param int $post_id Post ID of any type.
 	 * @return array<int, array<string, mixed>> Each: quality, url, type, label.
 	 */
@@ -352,7 +357,13 @@ if ( ! function_exists( 'wavira_core_download_qualities' ) ) {
 			return array();
 		}
 
-		return \Wavira\Core\Downloads\Sources::available( absint( $post_id ) );
+		$post_id = absint( $post_id );
+
+		if ( ! \Wavira\Core\Downloads\Access::allows( $post_id ) ) {
+			return array();
+		}
+
+		return \Wavira\Core\Downloads\Sources::available( $post_id );
 	}
 }
 

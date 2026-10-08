@@ -32,6 +32,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   what the visitor expects. A browser without `showModal` keeps the working link and loads no polyfill
   (ADR 0006), which is why the theme still works when JavaScript fails.
 
+### Fixed — 0.15.0
+
+- **The Persian catalogue's block titles are read with their context.** The
+  gallery block was renamed to «گالری تصاویر» (*Photo gallery*) and the runtime
+  test still asked for the old «گالری تصاویر هنرمند» — a test that passed on the
+  checked-in English source and failed on a real install, where WordPress reads
+  the block metadata through `_x()` in core's `block title` context (CI caught
+  it, `tests/test-i18n.php` is fixed at the same place the block is named).
+- **The download title and size labels come from the plugin.** The theme's
+  `wavira_download_meta_label()` glued the English word `kbps` onto a number for a
+  track and `p` onto a video height — so a Persian site printed English — and it
+  now prints the label the plugin resolved (`%d kbps` / `%d pixels` through the
+  catalogue) with Persian numerals. The lightbox's accessible name and the close
+  button's name reach the script the same way, from the theme settings.
+
 ### Changed — 0.15.0
 
 - **File sizes and qualities are translated, not concatenated**: `%s KB` / `%s MB` (theme) and `%d kbps` /

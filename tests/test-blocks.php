@@ -459,7 +459,7 @@ class Test_Blocks extends Wavira_Test_Case {
 		$html = do_blocks( '<!-- wp:wavira/download {"postId":' . $track . ',"variant":"button","showSize":true} /-->' );
 
 		$this->assertStringContainsString( 'wavira-download--button', $html );
-		$this->assertStringContainsString( 'wavira/v1/download/' . $track, $html );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track ), $html );
 		$this->assertStringContainsString( 'Download the track', $html );
 		$this->assertStringContainsString( '320 kbps', $html );
 	}

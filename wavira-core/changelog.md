@@ -32,6 +32,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (`report['media']`), which the CLI and the admin notice both print. **23 files on a fresh install**, and
   nothing is fetched from a third party.
 
+### Fixed — 0.15.0
+
+- **`wavira_core_download_qualities()` is an authorization decision too.** It
+  returned every file a post has, and the theme prints a quality list and a
+  download link from exactly that answer — so on a site that turned downloads
+  off, or a track with the per-post opt-out, a theme could offer a link the
+  endpoint would refuse. It asks `Access::allows()` first now and returns an
+  empty list when the visitor may not download, which is the same answer the
+  route gives, decided once (`tests/test-theme-downloads.php` covers both the
+  opt-out and, on a real install, the render job).
+- **A forced import deletes the media it generated.** `--force` removed the demo
+  posts and left twenty-three attachments behind; a repeated import filled the
+  uploads folder with orphans. The importer deletes the attachments carrying
+  `Placeholders::MARKER` first — bounded, marker-scoped, and unable to touch a
+  file the owner uploaded (ADR 0024).
+- **The demo generates its media whatever the scope of the import.** Choosing the
+  narrowly-scoped import (no site-language changes) also meant no cover, no
+  gallery photo and no audio — so the artist page had an empty gallery and the
+  album page offered no download, which is precisely what 0.15.0 exists to fix.
+  `site` now governs the site settings only, and `tests/test-demo.php` asserts the
+  media exists, is local, is marker-tagged and is counted.
+
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».

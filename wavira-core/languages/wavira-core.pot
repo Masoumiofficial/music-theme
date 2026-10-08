@@ -518,7 +518,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:419
+#: wavira-core/src/Demo/Installer.php:427
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 

@@ -106,26 +106,69 @@ class Test_Demo extends Wavira_Test_Case {
 	}
 
 	/**
-	 * The demo ships metadata, never fabricated media URLs.
+	 * The demo's media is its own, local, attached, and counted.
 	 *
-	 * A demo whose player points at a 404 looks broken on the first click a
-	 * buyer makes, so the catalogue deliberately carries no audio (ADR 0010).
+	 * Until 0.15.0 the catalogue carried no audio at all, because a demo whose
+	 * player points at a 404 looks broken on the first click a buyer makes
+	 * (ADR 0010). ADR 0024 answers that by *generating* the files instead of
+	 * borrowing them: what must never appear is a remote URL or a file that
+	 * belongs to somebody else.
 	 *
 	 * @return void
 	 */
-	public function test_demo_never_seeds_media_urls() {
+	public function test_demo_media_is_generated_locally_and_counted() {
 		$report = Installer::install( array( 'site' => false ) );
 
 		$this->posts = array_merge( $this->posts, $this->demo_ids() );
 
+		$upload = wp_upload_dir();
+		$count  = 0;
+
 		foreach ( $report['tracks'] as $track ) {
-			$this->assertSame( '', (string) get_post_meta( (int) $track, MetaSchema::AUDIO_128, true ) );
-			$this->assertSame( '', (string) get_post_meta( (int) $track, MetaSchema::AUDIO_320, true ) );
+			foreach ( array( MetaSchema::AUDIO_128, MetaSchema::AUDIO_320 ) as $key ) {
+				$url = (string) get_post_meta( (int) $track, $key, true );
+
+				$this->assertNotSame( '', $url, 'a demo track has audio to play and to download' );
+				$this->assertStringStartsWith( $upload['baseurl'], $url, 'the file is on this site, not somewhere else' );
+
+				++$count;
+			}
 		}
 
 		foreach ( $report['releases'] as $release ) {
-			$this->assertSame( '', (string) get_post_meta( (int) $release, MetaSchema::ALBUM_AUDIO_320, true ) );
+			$url = (string) get_post_meta( (int) $release, MetaSchema::ALBUM_AUDIO_320, true );
+
+			$this->assertNotSame( '', $url, 'a demo album has a master file to download' );
+			$this->assertStringStartsWith( $upload['baseurl'], $url );
 		}
+
+		// The report counts generated files so the admin notice and the CLI can
+		// say how much they made — and so a run that generated nothing is
+		// visible instead of silent.
+		$this->assertGreaterThan( 0, (int) $report['media'] );
+		$this->assertSame( (int) $report['media'], count( $this->demo_media() ) );
+	}
+
+	/**
+	 * Every generated file is marked as the demo's own.
+	 *
+	 * `remove_previous()` deletes exactly what the importer created, so a second
+	 * import cannot leave orphans and an uninstall cannot take a real site's
+	 * uploads with it (ADR 0024).
+	 *
+	 * @return int[] Attachment IDs.
+	 */
+	private function demo_media() {
+		return get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_key'       => '_wavira_demo_media',
+				'no_found_rows'  => true,
+			)
+		);
 	}
 
 	/**

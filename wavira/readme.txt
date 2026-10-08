@@ -32,6 +32,13 @@ theme never takes your catalogue with it.
   package), dates are Jalali (Shamsi) with Persian numerals, the text direction
   is right-to-left with complete left-to-right parity, and the bundled Vazirmatn
   typeface is served from your own server — no third-party requests.
+* Downloads in every section: a track's audio at 128 and 320 kbps, an album's
+  master file, a hosted video at each height it offers, and any cover or gallery
+  photo — through one authorized route with per-post control, and never a link
+  when there is no file.
+* A photo gallery with a lightbox on any post that has photos attached (an
+  artist, a release or a video), so the pictures open at full size and can be
+  saved.
 * Dark and light colour modes driven by CSS variables, honouring the visitor's
   system preference and remembering their choice.
 * Structured data (MusicGroup, MusicAlbum, MusicRecording, MusicVideoObject)

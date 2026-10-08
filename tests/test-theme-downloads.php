@@ -131,7 +131,7 @@ class Test_Theme_Downloads extends Wavira_Test_Case {
 		$this->assertStringContainsString( '320 kbps', $list );
 		$this->assertStringContainsString( '128 kbps', $list );
 		$this->assertStringContainsString( '3.5 MB', $list );
-		$this->assertStringContainsString( 'wavira/v1/download/' . $track, $list );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track ), $list );
 		$this->assertStringNotContainsString( 'track-320.mp3', $list, 'the file URL is never printed' );
 
 		$button = wavira_get_download( $track );
@@ -175,7 +175,7 @@ class Test_Theme_Downloads extends Wavira_Test_Case {
 		$html = wavira_get_download( $album );
 
 		$this->assertStringContainsString( 'Download the album', $html );
-		$this->assertStringContainsString( 'wavira/v1/download/' . $album, $html );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $album ), $html );
 	}
 
 	/**
