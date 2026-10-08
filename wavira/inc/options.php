@@ -901,6 +901,37 @@ function wavira_custom_logo( $html ) {
 add_filter( 'get_custom_logo', 'wavira_custom_logo' );
 
 /**
+ * The site name is the front page's first heading, and a paragraph anywhere else.
+ *
+ * The header renders the site title as a paragraph (`"level": 0`) on purpose —
+ * a `<p>` in a shared header is right on a single view, where the post title is
+ * the page's `<h1>`. On the front page there is no post title, so the document
+ * had no `<h1>` at all (axe's `page-has-heading-one`, and the reason the front
+ * page's sections hang off nothing). `render_block_data` is the hook for this:
+ * it runs before the block renders, with the parsed attributes, so core builds
+ * the `h1` itself instead of this theme editing core's markup with a regular
+ * expression. The class and the CSS are the same for both tags
+ * (`.wavira-site-title`), so nothing moves.
+ *
+ * @since 0.15.0
+ * @param array $parsed_block Block being rendered.
+ * @return array The block, with the site title promoted on the front page.
+ */
+function wavira_promote_front_page_title( $parsed_block ) {
+	if (
+		isset( $parsed_block['blockName'], $parsed_block['attrs']['level'] )
+		&& 'core/site-title' === $parsed_block['blockName']
+		&& 0 === (int) $parsed_block['attrs']['level']
+		&& is_front_page()
+	) {
+		$parsed_block['attrs']['level'] = 1;
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'wavira_promote_front_page_title' );
+
+/**
  * Leave the player bar out of the page when the site owner turned it off.
  *
  * Filtering the rendered template part removes the markup instead of hiding it:

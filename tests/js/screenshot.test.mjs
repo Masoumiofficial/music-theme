@@ -23,6 +23,7 @@ import {
 	findChrome,
 	option,
 	options,
+	landmarkNote,
 	parsePages,
 	playerVerdict,
 	pngSize,
@@ -274,4 +275,30 @@ test( 'the command line refuses to run without a URL and an output file', () => 
 
 	assert.equal( noBrowser.status, 1 );
 	assert.match( noBrowser.stderr, /no Chrome or Chromium found/ );
+} );
+
+test( 'the landmark note names the counts, the footer elements and the links', () => {
+	const two = landmarkNote(
+		{
+			landmarks: {
+				h1: 0,
+				main: 1,
+				nav: 2,
+				footer: 2,
+				footerTop: 2,
+				footerTags: [ '<footer class="wp-block-template-part">', '<footer class="wavira-footer">' ],
+			},
+			unnamed: [ 'wavira-player__title', 'wavira-gallery__link' ],
+		},
+		'http://127.0.0.1:8080/'
+	);
+
+	assert.match( two, /h1=0 main=1 nav=2 footer=2 \(top-level 2\)/ );
+	assert.match( two, /<footer class="wavira-footer">/, 'the second footer is named' );
+	assert.match( two, /2 link\(s\) with no name: wavira-player__title, wavira-gallery__link/ );
+
+	const clean = landmarkNote( { landmarks: { h1: 1, main: 1, nav: 1, footer: 1, footerTop: 1 }, unnamed: [] } );
+
+	assert.match( clean, /every link has a name/ );
+	assert.doesNotMatch( clean, /footer class/, 'one footer needs no explanation' );
 } );

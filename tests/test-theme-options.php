@@ -625,6 +625,50 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	}
 
 	/**
+	 * The front page promotes the site title to the page's `<h1>`.
+	 *
+	 * The header renders it as a paragraph on purpose — on a single view the post
+	 * title is the `<h1>` — which left the front page with no first-level heading
+	 * at all (`page-has-heading-one`, and the sections hanging off nothing).
+	 * `render_block_data` changes the block's `level` attribute before it renders,
+	 * so core builds the tag itself rather than this theme editing core's markup,
+	 * and the class's CSS pins what the `h1` element rule would otherwise change
+	 * so the header does not move.
+	 *
+	 * @return void
+	 */
+	public function test_the_front_page_promotes_the_site_title() {
+		$block = array(
+			'blockName' => 'core/site-title',
+			'attrs'     => array( 'level' => 0 ),
+		);
+
+		$this->go_to( home_url( '/' ) );
+
+		$this->assertTrue( is_front_page(), 'the query is the front page' );
+		$this->assertSame( 1, wavira_promote_front_page_title( $block )['attrs']['level'], 'the site title is the h1 there' );
+
+		$page = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'A page' ) );
+
+		$this->go_to( get_permalink( $page ) );
+
+		$this->assertFalse( is_front_page(), 'the query is a page now' );
+		$this->assertSame( 0, wavira_promote_front_page_title( $block )['attrs']['level'], 'and a paragraph everywhere else' );
+
+		$this->assertSame(
+			array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ),
+			wavira_promote_front_page_title( array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ) ),
+			'another block is left alone'
+		);
+
+		$this->assertSame(
+			array( 'blockName' => 'core/site-title' ),
+			wavira_promote_front_page_title( array( 'blockName' => 'core/site-title' ) ),
+			'so is a site title without the attribute'
+		);
+	}
+
+	/**
 	 * The dark-mode logo is an addition to core's markup, never a replacement.
 	 *
 	 * @return void

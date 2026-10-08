@@ -1547,7 +1547,11 @@
 		}
 
 		var cover = el( 'img', 'wavira-player__cover', { alt: '' } );
-		var titleLink = el( 'a', 'wavira-player__title' );
+		// The title is a link to the track being played — and until there is one,
+		// it is not a link: an empty `<a href="#">` has no accessible name, which
+		// is exactly what axe's `link-name` rule reports. It arrives hidden and
+		// `renderTrack()` reveals it with the track's own title.
+		var titleLink = el( 'a', 'wavira-player__title', { hidden: 'hidden' } );
 		var artist = el( 'span', 'wavira-player__artist' );
 		var meta = el( 'div', 'wavira-player__meta' );
 		var status = el( 'p', 'wavira-player__status', { role: 'status', 'aria-live': 'polite' }, '' );
@@ -1643,6 +1647,7 @@
 
 			titleLink.textContent = data.title || '';
 			titleLink.href = link || '#';
+			titleLink.hidden = '' === link && '' === ( data.title || '' );
 			artist.textContent = artistName;
 			artist.hidden = '' === artistName;
 

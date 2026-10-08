@@ -251,6 +251,33 @@ export function stylesheetVerdict( meta ) {
 }
 
 /**
+ * The landmark counts and the links without a name, as one line.
+ *
+ * axe reports both as *moderate*, which the gate prints and allows — so a
+ * duplicate landmark or an empty link survives every run while nobody can say
+ * *which* element it is. This names them: the counts per landmark, and the class
+ * of up to three links that have no text, no `aria-label` and no described image
+ * (axe's `link-name`, which is serious and does fail the build — naming the
+ * offender here is the difference between one run and three).
+ *
+ * @param {Object} meta What the page reported.
+ * @param {string} url  Page URL, for the message.
+ * @return {string} One line.
+ */
+export function landmarkNote( meta, url = '' ) {
+	const landmarks = meta?.landmarks || {};
+	const unnamed = Array.isArray( meta?.unnamed ) ? meta.unnamed : [];
+	const counts = `h1=${ landmarks.h1 ?? '?' } main=${ landmarks.main ?? '?' } nav=${ landmarks.nav ?? '?' } ` +
+		`footer=${ landmarks.footer ?? '?' } (top-level ${ landmarks.footerTop ?? '?' })`;
+	const links = 0 === unnamed.length ? 'every link has a name' : `${ unnamed.length } link(s) with no name: ${ unnamed.slice( 0, 3 ).join( ', ' ) }`;
+	const tags = ( landmarks.footer ?? 0 ) > 1 && Array.isArray( landmarks.footerTags )
+		? ` (${ landmarks.footerTags.join( ', ' ) })`
+		: '';
+
+	return `${ url }${ url ? ' — ' : '' }${ counts }${ tags }; ${ links }`;
+}
+
+/**
  * Decide whether the player a page mounts has anything in it to play.
  *
  * The theme prints a mount point and Wavira Core's engine fills it with its own
@@ -515,6 +542,32 @@ export async function main( args ) {
 				controls: mount.querySelectorAll( 'button, audio, input, select' ).length,
 			} ) );
 
+			// Landmarks and links, the two things axe reports as *moderate* —
+			// which means the gate prints them and the run stays green, and a
+			// finding nobody can locate from a violation id alone stays there.
+			// Counted here, with the offending elements named, so the annotation
+			// says which element is which (`landmarkNote()`).
+			const landmarks = {
+				h1: document.querySelectorAll( 'h1' ).length,
+				main: document.querySelectorAll( 'main' ).length,
+				nav: document.querySelectorAll( 'nav' ).length,
+				footer: document.querySelectorAll( 'footer' ).length,
+				footerTop: Array.from( document.querySelectorAll( 'footer' ) ).filter(
+					( node ) => ! node.closest( 'main, article, aside, nav, section' )
+				).length,
+				// Which elements they are, because “two footer landmarks” is not
+				// something a reader can find in a template.
+				footerTags: Array.from( document.querySelectorAll( 'footer' ) )
+					.slice( 0, 3 )
+					.map( ( node ) => `<footer class="${ node.className || '(none)' }">` ),
+			};
+
+			const unnamed = Array.from( document.querySelectorAll( 'a[href]' ) )
+				.filter( ( link ) => '' === ( link.textContent || '' ).trim() )
+				.filter( ( link ) => ! link.getAttribute( 'aria-label' ) )
+				.filter( ( link ) => ! link.querySelector( 'img[alt]:not([alt=\"\"])' ) )
+				.map( ( link ) => ( link.className || '(no class)' ).toString().split( ' ' )[ 0 ] );
+
 			return {
 				lang: document.documentElement.lang,
 				dir: document.documentElement.dir || 'ltr',
@@ -523,6 +576,8 @@ export async function main( args ) {
 				rules: rules,
 				stylesheets: stylesheets,
 				players: players,
+				landmarks: landmarks,
+				unnamed: unnamed,
 			};
 		} );
 
@@ -538,6 +593,12 @@ export async function main( args ) {
 				`HTTP ${ status }, lang=${ meta.lang || '(none)' } dir=${ meta.dir }, ${ meta.height }px tall, ` +
 				`${ meta.rules } CSS rule(s) in effect, ${ meta.players.length } player(s)`
 		);
+
+		// At the end of its own line: a failed step's annotation keeps the tail of
+		// a long message and drops the head, and this is the line that has to
+		// survive — it is the answer to “which element is the duplicate?”.
+		landmarkLines.push( { name: shot.file.split( '/' ).pop(), text: landmarkNote( meta, shot.url ) } );
+		notes.push( `${ shot.file.split( '/' ).pop() }: ${ landmarkLines[ landmarkLines.length - 1 ].text }` );
 
 		if ( ! size ) {
 			fail( `${ shot.file } is not a PNG` );
@@ -580,6 +641,7 @@ export async function main( args ) {
 	};
 
 	const written = [];
+	const landmarkLines = [];
 
 	try {
 		const home = await capture( { file: resolve( ROOT, String( out ) ), url: String( url ), scheme: colour } );
@@ -673,6 +735,13 @@ export async function main( args ) {
 
 	for ( const note of notes ) {
 		process.stdout.write( `  · ${ note }\n` );
+	}
+
+	// And as annotations of their own: a step's failure message is capped, and
+	// the API returns what fits, so the lines that answer “which element?” must
+	// not depend on their position inside that message.
+	for ( const line of landmarkLines ) {
+		process.stdout.write( `::notice title=Landmarks${ line.name ? ` ${ line.name }` : '' }::${ line.text }\n` );
 	}
 
 	process.stdout.write( `screenshot: OK — ${ written.length } image(s)${ axeFile ? `, axe report ${ axeFile }` : '' }\n` );

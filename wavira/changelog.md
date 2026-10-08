@@ -46,6 +46,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed — 0.15.0
 
+- **The player is not an empty box any more.** Two defects, one cause each: the
+  engine's handle was registered on `wp_enqueue_scripts`, which fires inside
+  `<head>`, while a block theme renders its template *before* it — so the mount
+  point asked for a bundle that was not registered yet and every page shipped an
+  empty `<div>`; and the title inside the player was an `<a href="#">` with no
+  text and no `aria-label` until a track loaded, which is an unnamed link (axe's
+  `link-name`, serious). The bundle registers on `init` now, the title link
+  arrives `hidden` and is revealed with the track's own title, and the render job
+  measures both: the player verdict, and the landmark/link counts in an
+  annotation of their own.
+- **The front page has an `<h1>`.** The header renders the site title as a
+  paragraph on purpose — on a single view the post title is the page's `<h1>` —
+  which left the front page with no first-level heading, and its sections hanging
+  off nothing. `render_block_data` promotes the site title's `level` on the front
+  page only, so core builds the tag; `.wavira-site-title` pins the font family
+  and line box the `h1` rule would otherwise change, so the header does not move.
+
+
 - **The album page showed «تصاویر» twice.** The template supplied the section
   heading as a pattern and the gallery block rendered one of its own beneath it.
   Every other section in the theme gets its heading from a pattern, so the

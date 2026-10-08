@@ -50,10 +50,17 @@
 	min-block-size: var(--wavira-header-height);
 }
 
+/* The site title is a `<p>` in the header and an `<h1>` on the front page
+   (`wavira_promote_front_page_title()`), and the two have to measure the same:
+   `h1` would take the display font and a tighter line box from base.css, so the
+   header would change shape on the front page and nowhere else. Every property
+   the element rule sets that the class does not is pinned here. */
 .wavira-site-title {
 	margin: 0;
+	font-family: inherit;
 	font-size: var(--wp--preset--font-size--large, 1.25rem);
 	font-weight: 700;
+	line-height: 1.7;
 }
 
 .wavira-site-title a {
