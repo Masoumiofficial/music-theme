@@ -39,6 +39,10 @@ msgstr ""
 msgid "A genre queue needs a genre slug."
 msgstr ""
 
+#: wavira-core/src/Demo/Installer.php:487
+msgid "About the site"
+msgstr ""
+
 #: wavira-core/src/Settings/SettingsSchema.php:129
 msgid "Ad slot HTML (above the player)"
 msgstr ""
@@ -575,6 +579,14 @@ msgstr ""
 msgid "There is nothing to play here."
 msgstr ""
 
+#: wavira-core/src/Demo/Installer.php:488
+msgid "This is a sample page. Write what your visitors should know about the music, the artists and how to reach you."
+msgstr ""
+
+#: wavira-core/src/Demo/Installer.php:483
+msgid "This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here."
+msgstr ""
+
 #: wavira-core/src/Admin/DemoPage.php:281
 msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
 msgstr ""
@@ -613,6 +625,10 @@ msgstr ""
 
 #: wavira-core/src/Settings/SettingsSchema.php:51
 msgid "Tracks per archive page"
+msgstr ""
+
+#: wavira-core/src/Demo/Installer.php:464
+msgid "Uncategorized"
 msgstr ""
 
 #: wavira-core/src/Rest/ContentController.php:89
@@ -666,8 +682,17 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
+#: wavira-core/src/Demo/Installer.php:482
+msgid "Welcome to the music site"
+msgstr ""
+
 #: wavira-core/src/Rest/PlayerController.php:71
 msgid "What the queue is built from."
+msgstr ""
+
+#: wavira-core/src/Demo/Installer.php:435
+#. translators: %d: number of sample posts and pages.
+msgid "WordPress’s sample content (%d item(s)) now reads in the site’s language."
 msgstr ""
 
 #: wavira-core/src/Content/ArtistProfile.php:272

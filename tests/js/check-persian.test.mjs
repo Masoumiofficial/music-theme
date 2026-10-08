@@ -16,7 +16,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { ALLOWED, checkPersian, latinWords, visible } from '../../tools/check-persian.mjs';
+import { ALLOWED, checkPersian, elements, latinWords, visible, withoutEntities } from '../../tools/check-persian.mjs';
 
 test( 'the reader keeps text and drops markup, scripts and comments', () => {
 	assert.equal(
@@ -68,8 +68,14 @@ test( 'an untranslated alt or label is named with the attribute it is in', () =>
 	} );
 
 	assert.equal( result.attributes.length, 3 );
-	assert.deepEqual( result.attributes[ 0 ], { attribute: 'alt', value: 'Demo cover art', words: [ 'Demo', 'cover', 'art' ] } );
+	assert.deepEqual( result.attributes[ 0 ], {
+		element: 'img',
+		attribute: 'alt',
+		value: 'Demo cover art',
+		words: [ 'Demo', 'cover', 'art' ],
+	} );
 	assert.equal( result.attributes[ 1 ].attribute, 'aria-label' );
+	assert.equal( result.attributes[ 1 ].element, 'button' );
 	assert.deepEqual( result.attributes[ 2 ].words, [ 'Search', 'the', 'catalogue' ] );
 	assert.deepEqual( result.text, [] );
 } );
@@ -81,6 +87,38 @@ test( 'a word hidden in an attribute WordPress prints with single quotes is foun
 
 	assert.equal( result.attributes.length, 1 );
 	assert.deepEqual( result.attributes[ 0 ].words, [ 'Studio', 'session' ] );
+} );
+
+test( 'a directive is not an attribute, and an entity is not a word', () => {
+	// WordPress's Interactivity API writes `data-wp-bind--aria-label`, which
+	// *contains* `aria-label`: a regex over attribute names reported core's own
+	// directives as untranslated labels.
+	const directive = checkPersian( {
+		page: '<button data-wp-bind--aria-label="state.ariaLabel" aria-label="باز کردن جستجو">جستجو</button>',
+	} );
+
+	assert.deepEqual( directive.attributes, [] );
+
+	// `&raquo;` is punctuation from core's feed titles, not the word “raquo”.
+	assert.equal( withoutEntities( 'واویرا موزیک &raquo; خوراک' ), 'واویرا موزیک   خوراک' );
+	assert.equal( checkPersian( { page: '<a title="واویرا موزیک &raquo; خوراک">خوراک</a>' } ).clean, true );
+
+	// A machine reads `<link title>`: feed, oEmbed and RSD titles are WordPress's
+	// own and are not this product's to translate.
+	assert.equal(
+		checkPersian( { page: '<link rel="alternate" type="application/rss+xml" title="oEmbed (XML)" href="/feed">' } ).clean,
+		true
+	);
+
+	// The same words on an element a visitor sees are still a defect.
+	assert.equal( checkPersian( { page: '<a title="Studio session">ضبط</a>' } ).clean, false );
+} );
+
+test( 'the element reader pairs tags with their own attributes', () => {
+	const found = elements( '<img src="/a.png" alt="طرح"><a href="/b" title="صفحه">ب</a>' );
+
+	assert.deepEqual( found[ 0 ], { name: 'img', attributes: { src: '/a.png', alt: 'طرح' } } );
+	assert.deepEqual( found[ 1 ], { name: 'a', attributes: { href: '/b', title: 'صفحه' } } );
 } );
 
 test( 'the allow-list is proper nouns, and a caller can extend it', () => {

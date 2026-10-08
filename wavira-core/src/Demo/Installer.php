@@ -423,9 +423,93 @@ final class Installer {
 			update_option( 'blogdescription', (string) $demo['site']['description'] );
 		}
 
-		return array(
+		$notices = array(
 			__( 'Site locale, timezone, first day of the week and date format were set to the Iranian defaults.', 'wavira-core' ),
 		);
+
+		$first = self::translate_first_content();
+
+		if ( $first > 0 ) {
+			$notices[] = sprintf(
+				/* translators: %d: number of sample posts and pages. */
+					__( 'WordPress’s sample content (%d item(s)) now reads in the site’s language.', 'wavira-core' ),
+				$first
+			);
+		}
+
+		return $notices;
+	}
+
+	/**
+	 * Put WordPress's own sample content into the site's language.
+	 *
+	 * A fresh install is not Persian because the theme and the plugin are: core
+	 * creates “Hello world!”, a sample page and an “Uncategorized” category, and
+	 * the front page's news section shows all three — English content inside a
+	 * Persian site, which is the one thing a visitor notices first (0.15.0's
+	 * render found it: the page read «اخبار موسیقی» above “Hello world!”).
+	 *
+	 * Bounded and polite: only the canonical slugs core itself writes are touched,
+	 * so anything the owner renamed is left alone, and the texts come from the
+	 * catalogue rather than from a string typed here.
+	 *
+	 * @return int Number of items whose text was replaced.
+	 */
+	private static function translate_first_content(): int {
+		$changed = 0;
+
+		$category = get_term_by( 'slug', 'uncategorized', 'category' );
+
+		if ( $category instanceof WP_Term ) {
+			$name = __( 'Uncategorized', 'wavira-core' );
+
+			if ( $name !== (string) $category->name ) {
+				wp_update_term(
+					(int) $category->term_id,
+					'category',
+					array(
+						'name' => $name,
+						'slug' => sanitize_title( $name ),
+					)
+				);
+				$changed++;
+			}
+		}
+
+		$samples = array(
+			'hello-world' => array(
+				'type'    => 'post',
+				'title'   => __( 'Welcome to the music site', 'wavira-core' ),
+				'content' => __( 'This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here.', 'wavira-core' ),
+			),
+			'sample-page' => array(
+				'type'    => 'page',
+				'title'   => __( 'About the site', 'wavira-core' ),
+				'content' => __( 'This is a sample page. Write what your visitors should know about the music, the artists and how to reach you.', 'wavira-core' ),
+			),
+		);
+
+		foreach ( $samples as $slug => $sample ) {
+			$post = get_page_by_path( $slug, OBJECT, $sample['type'] );
+
+			if ( ! $post instanceof WP_Post ) {
+				continue;
+			}
+
+			$title = (string) $sample['title'];
+
+			wp_update_post(
+				array(
+					'ID'           => (int) $post->ID,
+					'post_title'   => $title,
+					'post_content' => (string) $sample['content'],
+					'post_name'    => sanitize_title( $title ),
+				)
+			);
+			$changed++;
+		}
+
+		return $changed;
 	}
 
 	/**

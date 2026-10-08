@@ -64,6 +64,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   shipped catalogue and fails the render job when a served page prints an
   English section heading.
 
+- **WordPress's own sample content is Persian after the import.** A fresh install
+  is not Persian because the theme and the plugin are: core creates “Hello
+  world!”, a sample page and an “Uncategorized” category, and the front page's
+  news section shows them — «اخبار موسیقی» above an English post, which is the
+  first thing a visitor notices and the last thing a check looked at. The import
+  (site scope) replaces both texts and renames the category from the catalogue,
+  by the canonical slugs core itself writes, so anything an owner renamed is left
+  alone. The render job's Persian gate found it.
+
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».

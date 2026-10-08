@@ -43,7 +43,15 @@ export const ALLOWED = [
 ];
 
 /** The attributes a visitor reads or hears, and which therefore must be Persian. */
-export const SPOKEN_ATTRIBUTES = [ 'alt', 'aria-label', 'placeholder', 'title', 'value' ];
+export const SPOKEN_ATTRIBUTES = [ 'alt', 'aria-label', 'placeholder', 'title' ];
+
+/**
+ * Elements whose `title` is machine-facing — core's feed, oEmbed and RSD links
+ * carry titles only a program reads, and they are translated by WordPress itself,
+ * not by this product. Everything else in `SPOKEN_ATTRIBUTES` is checked wherever
+ * it appears.
+ */
+export const MACHINE_ELEMENTS = [ 'link', 'meta' ];
 
 const LATIN_WORD = /[A-Za-z][A-Za-z'’.-]*/g;
 
@@ -56,6 +64,43 @@ export function visible( html ) {
 		.replace( /&(?:nbsp|amp|hellip|mdash|ndash|#8217|#039|#171|#187);/g, ' ' )
 		.replace( /\s+/g, ' ' )
 		.trim();
+}
+
+/**
+ * Entity references are punctuation, not words: `&raquo;` must not read as
+ * “raquo”.
+ *
+ * @param {string} value Text or attribute value.
+ * @return {string} The same text with entities removed.
+ */
+export function withoutEntities( value ) {
+	return value.replace( /&[a-zA-Z][a-zA-Z0-9]*;|&#\d+;/g, ' ' );
+}
+
+/**
+ * Every tag and its attributes.
+ *
+ * A regex over attribute names was not enough: `data-wp-bind--aria-label`
+ * contains `aria-label`, so WordPress's own Interactivity directives were being
+ * reported as untranslated labels. Attributes are read per element instead.
+ *
+ * @param {string} html Rendered HTML.
+ * @return {Array<{name: string, attributes: Object<string, string>}>} Elements, in order.
+ */
+export function elements( html ) {
+	const found = [];
+
+	for ( const tag of html.matchAll( /<([a-z][a-z0-9:-]*)((?:\s+[^<>]*?)?)\/?>/gi ) ) {
+		const attributes = {};
+
+		for ( const attribute of tag[ 2 ].matchAll( /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/g ) ) {
+			attributes[ attribute[ 1 ].toLowerCase() ] = attribute[ 2 ] ?? attribute[ 3 ] ?? '';
+		}
+
+		found.push( { name: tag[ 1 ].toLowerCase(), attributes } );
+	}
+
+	return found;
 }
 
 /**
@@ -84,24 +129,29 @@ export function latinWords( text, allowed = ALLOWED ) {
  * @param {object}   input
  * @param {string}   input.page    Rendered HTML.
  * @param {string[]} [input.allow] Extra allowed words.
- * @return {{ text: string[], attributes: Array<{attribute: string, value: string, words: string[]}>, clean: boolean }}
+ * @return {{ text: string[], attributes: Array<{element: string, attribute: string, value: string, words: string[]}>, clean: boolean }}
  *         The Latin words in the page's text, in its spoken attributes, and whether the page is clean.
  */
 export function checkPersian( { page, allow = [] } ) {
 	const allowed = [ ...ALLOWED, ...allow ];
-	const text = latinWords( visible( page ), allowed );
+	const text = latinWords( withoutEntities( visible( page ) ), allowed );
 	const attributes = [];
 
-	for ( const attribute of SPOKEN_ATTRIBUTES ) {
-		// Attribute values, both quote styles: WordPress prints its own with single
-		// quotes and the theme's markup with double ones.
-		const pattern = new RegExp( `${ attribute }=['"]([^'"]*)['"]`, 'g' );
+	for ( const element of elements( page ) ) {
+		for ( const attribute of SPOKEN_ATTRIBUTES ) {
+			if ( ! ( attribute in element.attributes ) ) {
+				continue;
+			}
 
-		for ( const match of page.matchAll( pattern ) ) {
-			const words = latinWords( match[ 1 ], allowed );
+			if ( 'title' === attribute && MACHINE_ELEMENTS.includes( element.name ) ) {
+				continue;
+			}
+
+			const value = withoutEntities( element.attributes[ attribute ] );
+			const words = latinWords( value, allowed );
 
 			if ( words.length > 0 ) {
-				attributes.push( { attribute, value: match[ 1 ], words } );
+				attributes.push( { element: element.name, attribute, value, words } );
 			}
 		}
 	}
@@ -140,9 +190,9 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 		process.exit( 1 );
 	}
 
-	for ( const { attribute, value, words } of result.attributes ) {
+	for ( const { element, attribute, value, words } of result.attributes ) {
 		console.log(
-			`::error title=Persian page::${ attribute }="${ value.slice( 0, 80 ) }" is not Persian — it contains ${ words
+			`::error title=Persian page::<${ element } ${ attribute }="${ value.slice( 0, 80 ) }"> is not Persian — it contains ${ words
 				.map( ( word ) => `“${ word }”` )
 				.join( ', ' ) }`
 		);
