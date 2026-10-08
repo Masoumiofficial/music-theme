@@ -394,6 +394,27 @@ jobs:
           done
           gh release view "$TAG" >/dev/null
           gh release upload "$TAG" dist/*.zip dist/SHA256SUMS dist/manifest.json --clobber
+
+          # A release that ends up with no files on it looks like a working
+          # download page until someone clicks a link, so check what actually
+          # landed instead of trusting the upload command's silence.
+          (
+            cd dist
+            ls *.zip SHA256SUMS manifest.json | sort
+          ) > /tmp/expected.txt
+          gh release view "$TAG" --json assets -q '.assets[].name' | sort > /tmp/attached.txt
+          missing=0
+          while IFS= read -r file; do
+            if ! grep -qxF "$file" /tmp/attached.txt; then
+              echo "::error::${file} was not attached to the release"
+              missing=1
+            fi
+          done < /tmp/expected.txt
+          if [ "$missing" != "0" ]; then
+            echo "attached: $(tr '\n' ' ' < /tmp/attached.txt)"
+            exit 1
+          fi
+
           gh release view "$TAG" --json assets -q '.assets[] | "attached: " + .name + " (" + (.size | tostring) + " bytes)"'
           gh release view "$TAG" --json url -q .url
 
