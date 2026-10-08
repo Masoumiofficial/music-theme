@@ -464,6 +464,19 @@ jobs:
                 echo "the site answered after ${attempt} attempt(s)"
                 curl -sS -o /tmp/home.html -w 'front page: HTTP %{http_code}, %{size_download} bytes\n' http://127.0.0.1:8080/
                 grep -o '<title>[^<]*</title>' /tmp/home.html | head -1 || true
+                # Whether the theme's own stylesheet reaches the browser is the
+                # difference between the theme and core's defaults, and the answer
+                # is in three places at once: the files on disk, the same files over
+                # HTTP, and what the page links to. Print all three before deciding.
+                echo "--- the theme's built assets on disk"
+                ls -la /tmp/site/wp-content/themes/wavira/assets/dist/ 2>&1 || echo "no assets/dist directory"
+                echo "--- the same assets over HTTP"
+                for asset in assets/dist/theme.css assets/dist/theme.js; do
+                  url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
+                  echo "${asset}: HTTP $(curl -s -o /dev/null -w '%{http_code}' "$url"), $(curl -s "$url" | wc -c) byte(s)"
+                done
+                echo "--- stylesheets and scripts the front page asks for"
+                grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12
                 # The claim that needs a rendered page rather than a catalogue: the
                 # front page carries the theme's *own* Persian headings, not only the
                 # Persian demo content, and it is the front-page template rather than
@@ -482,7 +495,7 @@ jobs:
           } 2>&1 | tee /tmp/serve.log
           status="${PIPESTATUS[0]}"
           if [ "$status" != "0" ]; then
-            node tools/annotate-log.mjs /tmp/serve.log serve 40 error
+            node tools/annotate-log.mjs /tmp/serve.log serve 45 error --one
           fi
           exit "$status"
 

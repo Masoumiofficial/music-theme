@@ -114,7 +114,11 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 	// renders with core's defaults when its stylesheet is not on the page, and a
 	// screenshot of it looks almost right — which is how the first render's layout
 	// survived a review of the HTML alone.
-	const stylesheet = /href="[^"]*assets\/dist\/theme\.css[^"]*"/;
+	// Both quote styles: WordPress prints `<link ... href='...'>` with single
+	// quotes and a theme or a plugin may print double ones, and a gate that only
+	// reads one of them fails a page that is fine (it did, on the first run).
+	const attribute = ( name, path ) => new RegExp( `${ name }=['"][^'"]*${ path }[^'"]*['"]` );
+	const stylesheet = attribute( 'href', 'assets\\/dist\\/theme\\.css' );
 
 	if ( ! stylesheet.test( page ) ) {
 		problems.push(
@@ -123,7 +127,7 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 		);
 	}
 
-	if ( ! /src="[^"]*assets\/dist\/theme\.js[^"]*"/.test( page ) ) {
+	if ( ! attribute( 'src', 'assets\\/dist\\/theme\\.js' ).test( page ) ) {
 		problems.push( 'the page does not load the theme script (assets/dist/theme.js) — the player and the colour toggle are inert' );
 	}
 
