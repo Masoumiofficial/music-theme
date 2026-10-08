@@ -290,7 +290,7 @@ msgstr ""
 msgid "Moods"
 msgstr ""
 
-#: wavira-core/src/Settings/Settings.php:42
+#: wavira-core/src/Settings/Settings.php:48
 msgid "Music product settings: appearance, content, player, downloads and data handling."
 msgstr ""
 
@@ -631,7 +631,7 @@ msgstr ""
 msgid "Wavira demo content"
 msgstr ""
 
-#: wavira-core/src/Settings/Settings.php:41
+#: wavira-core/src/Settings/Settings.php:47
 msgid "Wavira settings"
 msgstr ""
 

@@ -237,6 +237,12 @@ final class SettingsSchema {
 				case 'boolean':
 					$properties[ $key ] = array( 'type' => 'boolean' );
 					break;
+				case 'html':
+				case 'url':
+					// Stored and transported as a string; the sanitizer is what makes
+					// it safe for its context, not the transport type.
+					$properties[ $key ] = array( 'type' => 'string' );
+					break;
 				case 'integer':
 					$properties[ $key ] = array( 'type' => 'integer' );
 					break;

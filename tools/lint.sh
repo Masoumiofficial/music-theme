@@ -271,6 +271,15 @@ PATTERN_HITS=$(grep -rnE \
 # owner says otherwise), so the music sections would only ever be reachable under
 # `/blog/`. The front page is `front-page.html`; the blog index is core's.
 HOME_TEMPLATE="wavira/templates/home.html"
+INDEX_TEMPLATE="wavira/templates/index.html"
+
+if [ ! -f "$INDEX_TEMPLATE" ]; then
+  say "      FAIL  $INDEX_TEMPLATE is missing"
+  say "            WordPress refuses to activate a block theme without it"
+  say "            (\"standalone themes must have a templates/index.html or index.php\")"
+  FAIL=1
+fi
+
 if [ -f "$HOME_TEMPLATE" ]; then
   say "      FAIL  $HOME_TEMPLATE shadows the blog index and the front page"
   say "            the front page belongs in wavira/templates/front-page.html;"
@@ -298,8 +307,8 @@ if [ -n "$JQUERY_HITS" ]; then
   printf '%s\n' "$JQUERY_HITS" | sed 's/^/            /'
   FAIL=1
 fi
-[ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && [ ! -f "$HOME_TEMPLATE" ] \
-  && say "      OK    no legacy echoes, no forbidden patterns, no jQuery, no home.html shadowing the front page"
+[ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && [ -f "$INDEX_TEMPLATE" ] && [ ! -f "$HOME_TEMPLATE" ] \
+  && say "      OK    no legacy echoes, no forbidden patterns, no jQuery, no home.html shadowing the front page, and an index.html that activates"
 
 # -------------------------------------------------------------- 7. Module boundaries
 say "[BOUNDARIES] Module boundaries (ARCHITECTURE §2)"

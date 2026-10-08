@@ -6,10 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Changed — 0.14.0 (shipped with the theme)
-- **No behaviour change**: the front page this release adds is the theme's, and it renders the content the
-  plugin already exposes — the four post types, the genre taxonomy and the player. The plugin is versioned
-  and shipped in lockstep with the theme so `Dashboard → Updates` shows one number for the pair. The only
-  source change in this release is the version header.
+- **A `doing-it-wrong` notice on every request, fixed.** The settings option was registered with
+  `type => 'array'` while its value is a map of setting name to value; core has required an item schema for
+  an `array` type since 5.4 and logged «you must specify the schema for each array item» on every request
+  that registered the setting. It is registered as an `object` now, which is what it is. Found by the
+  `wp-render` job (the theme's render job reads `debug.log` with `WP_DEBUG` on), covered by
+  `tests/test-settings-registration.php`, and the REST schema names its `html` and `url` fields as strings
+  explicitly instead of by falling through to the default.
+- **No theme-facing behaviour change**: the front page this release adds is the theme's, and it renders the
+  content the plugin already exposes — the four post types, the genre taxonomy and the player. The plugin is
+  versioned and shipped in lockstep with the theme so `Dashboard → Updates` shows one number for the pair.
 
 ### Changed — 0.13.0 (shipped with the theme)
 - **No behaviour change**: 0.13.0 is a theme release (the settings screen, ADR 0020's amendment). The

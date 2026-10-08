@@ -26,10 +26,14 @@ see that a page is empty of the thing it exists to show. A screenshot can.
    `core/post-template`) over a post type the plugin registers, under its own heading pattern
    (`wavira/hidden-heading-*`), so a section is translated, editable in the Site Editor and removable
    without touching code.
-2. **`templates/home.html` does not exist.** `index.html` is the blog index, which is what core,
-   feeds, sitemaps and SEO plugins expect at `/` when the owner sets a static front page, and it is
-   also the fallback when they do not. Two names for one template was the defect; the fix is one name
-   for each job. `tools/lint.sh` fails the build if `home.html` comes back.
+2. **`templates/home.html` does not exist, and `templates/index.html` is the blog index.** `index.html`
+   is what core, feeds, sitemaps and SEO plugins expect at `/` when the owner sets a static front page,
+   and it is the fallback when they do not; `home.html` would have shadowed both the blog index and the
+   front page, which is exactly the defect. Two names for one template was the problem; the fix is one
+   name for each job. `tools/lint.sh` fails the build if `home.html` comes back — **and if `index.html` is
+   missing**: the first version of this change deleted it, and the first real run of the render job refused
+   to activate the theme («پوسته‌های مستقل باید یک پروندهٔ `templates/index.html` یا `index.php` داشته باشند»).
+   A block theme without an index template is not installable, which is a thing a static gate can hold.
 3. **Every section uses the plugin's own defaults.** No query in the front page sets a `tax_query`, a
    `meta_query` or an ordering by a field that needs data the demo might not have: each one renders from
    an empty install, and each has a `core/query-no-results` branch. A front page that only works on demo

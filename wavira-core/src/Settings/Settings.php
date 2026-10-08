@@ -37,7 +37,13 @@ final class Settings implements Registrable {
 			'wavira',
 			SettingsSchema::OPTION,
 			array(
-				'type'              => 'array',
+				// `object`, not `array`: the stored value is a map of setting name to
+				// value. Core refuses an `array` type without a schema for its *items*
+				// (`register_setting()` in wp-includes/option.php, since 5.4), which is
+				// the right rule for a list and the wrong description for this option —
+				// and it logged a doing-it-wrong notice on every request that
+				// registered it (caught by the `wp-render` job's debug log, 0.14.0).
+				'type'              => 'object',
 				'label'             => __( 'Wavira settings', 'wavira-core' ),
 				'description'       => __( 'Music product settings: appearance, content, player, downloads and data handling.', 'wavira-core' ),
 				'sanitize_callback' => array( SettingsSchema::class, 'sanitize' ),

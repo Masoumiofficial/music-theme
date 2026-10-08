@@ -27,13 +27,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **`docs/screenshots/`** — the render's own record: the front page, an album, an artist profile and a
   dark-mode home, committed so a review needs no running site and a visual regression shows up in a diff.
 
+- **`tools/check-render.mjs`** — the page has to be the front page: every front-page heading must be
+  translated in the shipped `fa_IR.po` **and** on the page, and the page must carry the front-page
+  template's own sections and Persian text. It reads the expected strings from the catalogue instead of a
+  list typed into CI, so a heading that loses its translation fails the same gate as an English page
+  (17 unit tests, one of which checks the repository's own catalogue).
+
 ### Fixed — 0.14.0
 - **The theme shipped no front page at all** (`wavira/templates/`): `home.html` existed and `index.html`
   was `home.html` under a second name, so a WordPress default install — which uses the blog index as the
   front page — showed a news grid at the root and the music sections were reachable only on `/blog/`.
   A music theme whose front page does not show the music is a defect a screenshot catches and a static
-  gate cannot. `home.html`'s news loop moved into `front-page.html` as a section, and the legacy gate now
-  refuses a `home.html` that shadows the blog index.
+  gate cannot. `home.html` is gone for good (the gate refuses it if it comes back), `index.html` is the
+  blog index it always should have been, and `front-page.html` is the front page. The first version of
+  this fix deleted `index.html` outright, and the first real run of the render job refused to activate the
+  theme — «پوسته‌های مستقل باید یک پروندهٔ `templates/index.html` یا `index.php` داشته باشند» — so the gate
+  now also fails when `index.html` is missing: the theme's one required file is a thing a static check can
+  hold.
+- **A `doing-it-wrong` notice on every request** (`wavira-core`): the settings option was registered as an
+  `array` — core has required an item schema for that type since 5.4, and the value is really a map of
+  setting name to value, so it is registered as an `object` now. A notice in the debug log is a defect, and
+  the render job's debug log is what found it (`tests/test-settings-registration.php` now runs that
+  registration under a `doing_it_wrong_run` collector).
 
 ### Added — 0.13.0 (the settings screen)
 - **Appearance → Wavira settings** (`inc/admin-panel.php`): the same 32-setting schema, now with a screen
