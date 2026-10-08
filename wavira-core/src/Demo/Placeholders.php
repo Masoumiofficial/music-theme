@@ -193,16 +193,19 @@ final class Placeholders {
 	/**
 	 * Store bytes in the uploads directory as an attachment.
 	 *
-	 * @param string $bytes    File contents.
-	 * @param string $name     File name.
-	 * @param string $mime     MIME type.
+	 * @param string $bytes     File contents.
+	 * @param string $name      File name.
+	 * @param string $mime      MIME type.
 	 * @param bool   $is_image  Whether the file is an image (a WAV is not).
+	 * @param int    $parent_id Post to attach the file to, 0 for none.
 	 * @param string $title     Attachment title. The file name has to be ASCII and
 	 *                          is what the demo generates; the *title* is what a
 	 *                          visitor sees when an image does not load and what the
 	 *                          media library lists, so it is a Persian label and not
 	 *                          the file name (0.15.0).
-	private static function store( string $bytes, string $name, string $mime, bool $is_image = true, int $parent_id = 0 ): int {
+	 * @return int Attachment ID, 0 on failure.
+	 */
+	private static function store( string $bytes, string $name, string $mime, bool $is_image = true, int $parent_id = 0, string $title = '' ): int {
 		$upload = wp_upload_bits( $name, null, $bytes );
 
 		if ( ! empty( $upload['error'] ) || empty( $upload['file'] ) ) {

@@ -5,6 +5,10 @@
 # not numbered, so inserting one never invalidates a reference in the docs:
 #
 #   [PHP]       PHP syntax          (skipped with a notice when PHP is not installed)
+#   [STRUCT]    PHP structure       (tools/check-php-structure.mjs: a declaration
+#                                    inside a comment, or a docblock whose @param
+#                                    count disagrees with the signature — the two
+#                                    defects `php -l` cannot see)
 #   [PHPCS]     WordPress standards: vendor/bin/phpcs, or $PHPCS_BIN when a host
 #               has no Composer (the same standard, the same pinned sniffs)
 #   [JS]        JS syntax           (node --check on every .js/.mjs; module syntax for
@@ -60,6 +64,24 @@ if command -v php >/dev/null 2>&1; then
   fi
 else
   say "      SKIP  php not installed in this environment (CI runs this gate)"
+fi
+
+# ------------------------------------------------------------- PHP structure
+# `php -l` answers "does this file parse?", and a docblock that lost its closing
+# delimiter — swallowing the method below it — parses perfectly. That happened:
+# `Placeholders::store()` became part of a comment above it, `self::store()` became
+# a call to a method that did not exist, three CI jobs failed, and the syntax gate
+# had said PASS on the same file.
+say "[STRUCT] PHP structure (declarations in comments, docblock signatures)"
+if command -v node >/dev/null 2>&1; then
+  if node tools/check-php-structure.mjs; then
+    :
+  else
+    say "      FAIL  see the file and line above"
+    FAIL=1
+  fi
+else
+  say "      SKIP  node not installed"
 fi
 
 # ------------------------------------------------------------------- 2. PHPCS
