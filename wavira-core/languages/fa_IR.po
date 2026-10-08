@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: wavira-core 0.15.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
-"PO-Revision-Date: 2026-10-08 15:20+0000\n"
+"PO-Revision-Date: 2026-10-08 15:28+0000\n"
 "Last-Translator: Etehad WP <https://etehadwp.com/>\n"
 "Language-Team: Persian (Iran) — Etehad WP\n"
 "Language: fa_IR\n"
@@ -17,13 +17,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Downloads/Access.php:215
-#: wavira-core/src/Downloads/Sources.php:215
+#: wavira-core/src/Downloads/Access.php:214
+#: wavira-core/src/Downloads/Sources.php:216
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
 msgstr "%d کیلوبیتبرثانیه"
 
-#: wavira-core/src/Downloads/Sources.php:207
+#: wavira-core/src/Downloads/Sources.php:208
 #. translators: %d: video frame height in pixels, e.g. 720.
 msgid "%d pixels"
 msgstr "%d پیکسل"

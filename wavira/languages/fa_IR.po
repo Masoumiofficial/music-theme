@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 15:20+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 15:28+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
