@@ -88,7 +88,7 @@ final class Installer {
 		$report['artist'] = self::insert_demo_post( PostTypes::ARTIST, $demo['artist'] );
 
 		if ( Placeholders::cover( $report['artist'], self::palette( 4 ), (string) $demo['artist']['title'], 800 ) > 0 ) {
-			$report['media']++;
+			++$report['media'];
 		}
 
 		if ( $site ) {
@@ -101,7 +101,7 @@ final class Installer {
 				);
 
 				if ( $id > 0 ) {
-					$report['media']++;
+					++$report['media'];
 				}
 			}
 		}
@@ -125,14 +125,14 @@ final class Installer {
 			$cover   = Placeholders::cover( $release_id, $palette, (string) $release['title'] );
 
 			if ( $cover > 0 ) {
-				$report['media']++;
+				++$report['media'];
 			}
 
 			if ( $site ) {
 				$album_file = Placeholders::album_audio( $release_id, 8, 262 + ( $release_index * 55 ) );
 
 				if ( $album_file > 0 ) {
-					$report['media']++;
+					++$report['media'];
 				}
 			}
 
@@ -164,13 +164,13 @@ final class Installer {
 				$track_cover = Placeholders::cover( $track_id, $palette, (string) $track['title'], 600 );
 
 				if ( $track_cover > 0 ) {
-					$report['media']++;
+					++$report['media'];
 				}
 
 				$audio = Placeholders::audio( $track_id, 6, 330 + ( $index * 42 ) );
 
 				if ( ! empty( $audio['id'] ) ) {
-					$report['media']++;
+					++$report['media'];
 
 					// The demo's own file length is what the player shows while
 					// nothing has loaded yet: six seconds of tone, not the four
@@ -186,7 +186,7 @@ final class Installer {
 			update_post_meta( $release_id, MetaSchema::TRACKLIST, $release_tracks );
 
 			$report['releases'][] = $release_id;
-			$release_index++;
+			++$release_index;
 		}
 
 		$report['video'] = self::insert_demo_post( PostTypes::VIDEO, $demo['video'] );
@@ -199,7 +199,7 @@ final class Installer {
 		// video *file*, and the block says so plainly instead of pointing at a
 		// file that is not there (see docs/DEMO-CONTENT.md).
 		if ( Placeholders::cover( $report['video'], self::palette( 3 ), (string) $demo['video']['title'], 960 ) > 0 ) {
-			$report['media']++;
+			++$report['media'];
 		}
 
 		if ( ! $english && $site ) {

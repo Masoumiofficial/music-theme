@@ -43,6 +43,7 @@ final class Sources {
 	 * Quality means kbps for audio and the frame height for video. Both are
 	 * "the number a visitor recognises", which is why one word covers them.
 	 *
+	 * @param string $type Download type (`track`, `album`, `video` or `image`).
 	 * @return array<int, int> Qualities, best first.
 	 */
 	public static function qualities( string $type ): array {

@@ -185,10 +185,11 @@ final class Placeholders {
 	 * @param string $bytes    File contents.
 	 * @param string $name     File name.
 	 * @param string $mime     MIME type.
-	 * @param bool   $is_image Whether the file is an image (a WAV is not).
+	 * @param bool   $is_image  Whether the file is an image (a WAV is not).
+	 * @param int    $parent_id Post to attach the file to, 0 for none.
 	 * @return int Attachment ID, 0 on failure.
 	 */
-	private static function store( string $bytes, string $name, string $mime, bool $is_image = true, int $parent = 0 ): int {
+	private static function store( string $bytes, string $name, string $mime, bool $is_image = true, int $parent_id = 0 ): int {
 		$upload = wp_upload_bits( $name, null, $bytes );
 
 		if ( ! empty( $upload['error'] ) || empty( $upload['file'] ) ) {
@@ -203,7 +204,7 @@ final class Placeholders {
 				'post_status'    => 'inherit',
 				// Attached to its post: the artist gallery *is* the attachments of
 				// the artist post, so an unattached photo is invisible.
-				'post_parent'    => $parent,
+				'post_parent'    => $parent_id,
 			),
 			$upload['file']
 		);

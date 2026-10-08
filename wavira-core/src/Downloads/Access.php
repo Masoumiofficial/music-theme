@@ -115,7 +115,7 @@ final class Access {
 			return false;
 		}
 
-		$allowed = '' !== self::file_url( $post_id, $type );
+		$allowed = '' !== self::file_url( $post_id );
 
 		if ( Sources::IMAGE === $type ) {
 			$allowed = $allowed && self::image_is_public( $post_id );
@@ -150,11 +150,10 @@ final class Access {
 	/**
 	 * The file a non-track post offers, at its best quality.
 	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $type    Download type.
+	 * @param int $post_id Post ID.
 	 * @return string URL, empty string when there is nothing to hand out.
 	 */
-	private static function file_url( int $post_id, string $type ): string {
+	private static function file_url( int $post_id ): string {
 		$resolved = Sources::resolve( $post_id );
 
 		return (string) ( $resolved['url'] ?? '' );

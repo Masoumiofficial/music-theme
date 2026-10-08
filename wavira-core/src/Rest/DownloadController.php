@@ -171,5 +171,4 @@ final class DownloadController extends AbstractController {
 
 		return $response;
 	}
-
 }
