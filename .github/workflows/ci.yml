@@ -369,53 +369,97 @@ jobs:
           php /tmp/wp-cli.phar --info
 
       - name: Install WordPress
+        # Every command's output is captured and annotated: a job log is not
+        # readable from every environment, an annotation is.
         run: |
-          set -euo pipefail
-          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wavira_render;"
-          php /tmp/wp-cli.phar core download --path=/tmp/site --locale=fa_IR --version=latest
-          php /tmp/wp-cli.phar config create --path=/tmp/site --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --locale=fa_IR --extra-php <<'PHP'
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wavira_render;"
+            echo "--- wp core download"
+            wp core download --locale=fa_IR
+            echo "--- wp config create"
+            wp config create --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --locale=fa_IR --extra-php <<'PHP'
           define( 'WP_DEBUG', true );
           define( 'WP_DEBUG_LOG', '/tmp/site/debug.log' );
           define( 'WP_DEBUG_DISPLAY', false );
           PHP
-          php /tmp/wp-cli.phar core install --path=/tmp/site --url=http://127.0.0.1:8080 --title='واویرا موزیک' --admin_user=admin --admin_password=wavira-render-only --admin_email=render@example.test --skip-email
+            echo "--- wp core install"
+            wp core install --url=http://127.0.0.1:8080 --title='واویرا موزیک' --admin_user=admin --admin_password=wavira-render-only --admin_email=render@example.test --skip-email
+            echo "--- wp core version"
+            wp core version
+          } 2>&1 | tee /tmp/install-site.log
+          status="${PIPESTATUS[0]}"
+          node tools/annotate-log.mjs /tmp/install-site.log install-site 40 error
+          exit "$status"
 
       - name: Install the theme and the plugin from the working tree
         run: |
-          set -euo pipefail
-          rm -rf /tmp/site/wp-content/themes/wavira /tmp/site/wp-content/plugins/wavira-core
-          cp -a wavira /tmp/site/wp-content/themes/wavira
-          cp -a wavira-core /tmp/site/wp-content/plugins/wavira-core
-          php /tmp/wp-cli.phar plugin activate wavira-core --path=/tmp/site
-          php /tmp/wp-cli.phar theme activate wavira --path=/tmp/site
-          php /tmp/wp-cli.phar option update permalink_structure '/%postname%/' --path=/tmp/site
-          php /tmp/wp-cli.phar rewrite flush --hard --path=/tmp/site
-          php /tmp/wp-cli.phar option update blogdescription 'پخش و انتشار موسیقی ایرانی' --path=/tmp/site
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            rm -rf /tmp/site/wp-content/themes/wavira /tmp/site/wp-content/plugins/wavira-core
+            cp -a wavira /tmp/site/wp-content/themes/wavira
+            cp -a wavira-core /tmp/site/wp-content/plugins/wavira-core
+            wp plugin activate wavira-core
+            wp theme activate wavira
+            wp option update permalink_structure '/%postname%/'
+            wp rewrite flush --hard
+            wp option update blogdescription 'پخش و انتشار موسیقی ایرانی'
+            echo "--- active theme and plugin"
+            wp theme list --status=active
+            wp plugin list --status=active
+          } 2>&1 | tee /tmp/install-product.log
+          status="${PIPESTATUS[0]}"
+          node tools/annotate-log.mjs /tmp/install-product.log install-product 40 error
+          exit "$status"
 
       - name: Seed the Persian demo
         run: |
-          set -euo pipefail
-          php /tmp/wp-cli.phar wavira seed --force --path=/tmp/site
-          echo "--- what the demo contains ---"
-          php /tmp/wp-cli.phar post list --post_type=wavira_album --fields=ID,post_title,post_name --path=/tmp/site
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            wp wavira seed --force
+            echo "--- what the demo contains ---"
+            wp post list --post_type=wavira_album --fields=ID,post_title,post_name
+            wp post list --post_type=wavira_artist --fields=ID,post_title,post_name
+          } 2>&1 | tee /tmp/seed.log
+          status="${PIPESTATUS[0]}"
+          node tools/annotate-log.mjs /tmp/seed.log seed 40 error
+          exit "$status"
 
       - name: Serve the site
         run: |
-          set -euo pipefail
-          nohup php /tmp/wp-cli.phar server --host=127.0.0.1 --port=8080 --docroot=/tmp/site > /tmp/server.log 2>&1 &
-          for attempt in $(seq 1 30); do
-            if curl -fsS -o /dev/null http://127.0.0.1:8080/; then
-              echo "the site answered after ${attempt} attempt(s)"
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::the site never answered on 127.0.0.1:8080"
-          tail -40 /tmp/server.log
-          exit 1
+          {
+            set -euo pipefail
+            nohup php /tmp/wp-cli.phar server --host=127.0.0.1 --port=8080 --docroot=/tmp/site > /tmp/server.log 2>&1 &
+            for attempt in $(seq 1 30); do
+              if curl -fsS -o /dev/null http://127.0.0.1:8080/; then
+                echo "the site answered after ${attempt} attempt(s)"
+                curl -sS -o /tmp/home.html -w 'front page: HTTP %{http_code}, %{size_download} bytes\n' http://127.0.0.1:8080/
+                grep -o '<title>[^<]*</title>' /tmp/home.html | head -1 || true
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "the site never answered on 127.0.0.1:8080"
+            cat /tmp/server.log
+            exit 1
+          } 2>&1 | tee /tmp/serve.log
+          status="${PIPESTATUS[0]}"
+          node tools/annotate-log.mjs /tmp/serve.log serve 40 error
+          exit "$status"
 
       - name: Install the renderer
-        run: npm install --no-save --fund=false --audit=false --prefix /tmp/render puppeteer-core axe-core
+        run: |
+          {
+            set -euo pipefail
+            npm install --no-save --fund=false --audit=false --prefix /tmp/render puppeteer-core axe-core
+            ls /tmp/render/node_modules | head -5
+          } 2>&1 | tee /tmp/renderer.log
+          status="${PIPESTATUS[0]}"
+          node tools/annotate-log.mjs /tmp/renderer.log renderer 20 error
+          exit "$status"
 
       - name: Render the screenshots and run axe
         env:
