@@ -23,7 +23,9 @@
 **Verification of this increment** — `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned
 standards, 93 PHP files parsed, CSS/contrast/perf/boundaries/legacy gates), `npm run test:js` → **54/54**,
 `node tools/i18n.mjs check` → **374/374**, `node tools/package.mjs` → three archives, rebuild
-byte-identical. Digests of the archives this tree produces with CI's own fixed timestamp (see §8):
+byte-identical; the WordPress integration job of CI run `37775907971` ran the 14 new PHP cases against
+a real WordPress on both PHP legs → **OK (198 tests, 2382 assertions)**. Digests of the archives this tree
+produces with CI's own fixed timestamp (see §8):
 
 | Archive | Bytes | SHA-256 |
 | --- | --- | --- |
