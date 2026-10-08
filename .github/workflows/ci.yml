@@ -595,16 +595,27 @@ jobs:
             # an alt, an aria-label or a placeholder) is a defect that names
             # itself. Proper nouns are listed in the tool.
             echo "--- the three rendered pages, in full"
+            persian_failures=0
             for page in home album artist; do
-              node tools/check-persian.mjs --page="/tmp/${page}.html" || asset_failures=1
+              node tools/check-persian.mjs --page="/tmp/${page}.html" || persian_failures=1
             done
 
             # What the front page's news section actually shows: WordPress's own
             # sample content is the first thing a visitor reads on a fresh install,
-            # and the import is supposed to put it in the site's language.
-            echo "--- the blog posts the front page can show"
-            wp post list --post_type=post --fields=ID,post_title,post_name,post_status
-            wp term list category --fields=term_id,name,slug
+            # and the import is supposed to put it in the site's language. Its own
+            # annotation, because the interesting lines are at the top of a log
+            # whose annotation only keeps the tail.
+            {
+              echo "--- the posts the front page's news section can show"
+              wp post list --post_type=post --fields=ID,post_title,post_name,post_status
+              echo "--- what the importer sees when it looks for the sample content"
+              wp eval 'foreach ( array( "hello-world" => "post", "sample-page" => "page" ) as $slug => $type ) { $found = get_posts( array( "post_type" => $type, "name" => $slug, "posts_per_page" => 1, "post_status" => array( "publish", "draft", "pending", "private" ), "suppress_filters" => true ) ); echo $slug . ": " . ( $found ? $found[0]->post_title . " [" . $found[0]->post_name . "]" : "not found" ) . PHP_EOL; } $term = get_term_by( "slug", "uncategorized", "category" ); echo "uncategorized: " . ( $term ? $term->name : "not found by slug" ) . PHP_EOL;'
+            } 2>&1 | tee /tmp/first-content.log
+
+            if [ "${persian_failures}" != "0" ]; then
+              node tools/annotate-log.mjs /tmp/first-content.log first-content 20 error
+              asset_failures=1
+            fi
 
             # What answers, not only how big it is. `curl | wc -c` said "38378
             # bytes" for the stylesheet in 0.14.0 and the render was still
