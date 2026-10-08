@@ -558,8 +558,9 @@ jobs:
             done
 
             echo "--- what the front page asks the browser to load"
-            grep -o 'href="[^"]*\.css[^"]*"' /tmp/home.html | head -8
-            grep -o 'src="[^"]*\.js[^"]*"' /tmp/home.html | head -8
+            # `|| true`: no match is a result, not a failure, and with `pipefail`
+            # a bare grep would end the step (it did, 0.14.0).
+            { grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12; } || true
 
             echo "--- the arguments the renderer will get"
             cat /tmp/extra-pages.txt
