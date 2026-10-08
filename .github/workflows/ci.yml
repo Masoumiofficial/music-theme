@@ -547,7 +547,11 @@ jobs:
           } 2>&1 | tee /tmp/render.log
           status="${PIPESTATUS[0]}"
           if [ "$status" != "0" ]; then
-            node tools/annotate-log.mjs /tmp/render.log render 40 error
+            # One per line for the run page, and the whole tail as a single
+            # annotation because a run carries a limited number of them and the
+            # Checks API hands back only some: the crash has to arrive as one.
+            node tools/annotate-log.mjs /tmp/render.log render 24 error
+            node tools/annotate-log.mjs /tmp/render.log render-failure 24 error --one
           fi
           exit "$status"
 

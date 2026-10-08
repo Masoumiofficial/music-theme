@@ -7,16 +7,25 @@
  * request. Any CI step whose output matters pipes through `tee` and, when the job
  * fails, this script turns the interesting lines into annotations.
  *
- * Usage: node tools/annotate-log.mjs <logfile> [label] [lines] [level]
+ * Usage: node tools/annotate-log.mjs <logfile> [label] [lines] [level] [--one]
+ *
+ * `--one` emits the tail as a single annotation instead of one per line. A runner
+ * caps how many annotations a run can carry and the Checks API returns only part
+ * of them, so when a crash dump is the thing that matters it has to arrive as one
+ * message: the tail is kept and the head is dropped, because the last line of a
+ * crash is the least interesting one and the message is at the top of it.
+ *
  * Always exits 0 — the failure itself must come from the step that produced the log.
  */
 
 import { readFileSync } from 'node:fs';
 
-const [, , file, label = 'log', lineCount = '40', level = 'error'] = process.argv;
+const argv = process.argv.slice(2);
+const single = argv.includes('--one');
+const [file, label = 'log', lineCount = '40', level = 'error'] = argv.filter((argument) => '--one' !== argument);
 
 if (!file) {
-	console.error('usage: node tools/annotate-log.mjs <logfile> [label] [lines] [level]');
+	console.error('usage: node tools/annotate-log.mjs <logfile> [label] [lines] [level] [--one]');
 	process.exit(2);
 }
 
@@ -43,6 +52,20 @@ const lines = content
 	.filter((line) => line.trim() !== '');
 
 const limit = Number.parseInt(lineCount, 10);
+
+if (single) {
+	const tail = lines.slice(-limit);
+	let body = tail.join('\n');
+
+	// Keep the end of the message: the failure is the last thing that happened.
+	if (body.length > 1000) {
+		body = `…${body.slice(-999)}`;
+	}
+
+	console.log(`::${level} title=${label}::${escape(body)}`);
+	console.log(`${label}: ${tail.length} line(s) in one annotation of ${lines.length}.`);
+	process.exit(0);
+}
 
 // First annotation is always a log summary: how long the log is and where it
 // ends. Without job logs this is the quickest way to see whether a step was cut
