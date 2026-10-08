@@ -29,7 +29,7 @@ $wavira_line  = '' !== $wavira_url
 	: $wavira_label;
 ?>
 
-<!-- wp:group {"className":"wavira-topbar","layout":{"type":"constrained"}} -->
+<!-- wp:group {"className":"wavira-topbar","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-topbar">
 <!-- wp:group {"className":"wavira-layout wavira-topbar__inner","layout":{"type":"flex","flexWrap":"wrap","justifyContent":"center"}} -->
 <div class="wp-block-group wavira-layout wavira-topbar__inner">

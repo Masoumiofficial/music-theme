@@ -184,6 +184,24 @@ if ( existsSync( EDITOR ) ) {
 
 // ------------------------------------------- 3. no shortcode blocks in our files
 const CONTENT_DIRS = [ 'wavira/templates', 'wavira/parts', 'wavira/patterns' ];
+
+/**
+ * The classes whose width the theme's own CSS decides.
+ *
+ * A `constrained` block layout caps the element at theme.json's `contentSize` and
+ * centres it, which is right for a paragraph and wrong for a page container: the
+ * whole theme rendered as a 720px column on a real site until a screenshot of it
+ * said so (0.14.0, `wp-render`).
+ */
+const CONTAINER_CLASSES = [
+	'wavira-layout',
+	'wavira-section',
+	'wavira-header',
+	'wavira-footer',
+	'wavira-topbar',
+	'wavira-surface',
+	'wavira-site-player',
+];
 let contentFiles = 0;
 
 for ( const directory of CONTENT_DIRS ) {
@@ -206,6 +224,27 @@ for ( const directory of CONTENT_DIRS ) {
 
 		if ( source.includes( 'wp:shortcode' ) ) {
 			problems.push( `${ directory }/${ name }: ships a wp:shortcode block — use the wavira/* block instead` );
+		}
+
+		for ( const [ index, line ] of source.split( '\n' ).entries() ) {
+			if ( ! line.includes( '<!-- wp:group' ) || ! line.includes( '"layout":{"type":"constrained"}' ) ) {
+				continue;
+			}
+
+			const classes = ( line.match( /"className":"([^"]+)"/ ) || [ '', '' ] )[ 1 ].split( /\s+/ );
+
+			for ( const container of CONTAINER_CLASSES ) {
+				if ( ! classes.includes( container ) ) {
+					continue;
+				}
+
+				problems.push(
+					`${ directory }/${ name }:${ index + 1 }: a wp:group with the theme's own container class ` +
+						`“${ container }” is a constrained layout — WordPress then caps it at theme.json's content ` +
+						'size (720px) and the theme\'s container rules never apply. Use "layout":{"type":"default"}; ' +
+						'the width belongs to `.wavira-layout` and the container-width setting (ADR 0008).'
+				);
+			}
 		}
 	}
 }

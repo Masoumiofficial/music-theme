@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<!-- wp:group {"className":"wavira-section","layout":{"type":"constrained"}} -->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-section">
 <!-- wp:group {"className":"wavira-hero","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-hero">

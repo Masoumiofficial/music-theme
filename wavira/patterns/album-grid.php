@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<!-- wp:group {"className":"wavira-section","layout":{"type":"constrained"}} -->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-section">
 <!-- wp:heading {"level":2} -->
 <h2><?php echo esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ); ?></h2>

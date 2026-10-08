@@ -53,6 +53,11 @@ about the sandbox, not about the product.
 
 * §6 item 1 (`screenshot.png`) and item 4 (the real-browser audit) move from **NOT_STARTED** to produced,
   with the images kept in `docs/screenshots/` so a review needs no running site.
+* **The first successful render paid for the job twice over.** It showed the theme's own container being
+  overruled by a constrained block layout — every page rendering as a 720px column with two thirds of it
+  empty — which five releases of static gates had not seen: the templates were registered, the blocks were
+  consistent, the budgets held. It also showed the demo's missing cover art, which is deliberate (no
+  fabricated media, ADR 0010) and now visible in a picture rather than in a paragraph.
 * The job adds a browser download and a WordPress install to every push on a branch. That is a few minutes
   for the only evidence of its kind in the repository, and it is the evidence a marketplace asks for.
 * Lighthouse specifically is *not* run: it needs a Chromium build with a matching Lighthouse version and

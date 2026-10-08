@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 ?>
-<!-- wp:group {"className":"wavira-surface","layout":{"type":"constrained"}} -->
+<!-- wp:group {"className":"wavira-surface","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-surface">
 <!-- wp:heading {"level":2} -->
 <h2><?php echo esc_html_x( 'Browse by genre', 'heading of the genre chips pattern', 'wavira' ); ?></h2>

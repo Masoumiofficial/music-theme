@@ -46,6 +46,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   theme — «پوسته‌های مستقل باید یک پروندهٔ `templates/index.html` یا `index.php` داشته باشند» — so the gate
   now also fails when `index.html` is missing: the theme's one required file is a thing a static check can
   hold.
+- **The whole theme rendered as a 720px column** (`wavira/templates`, `wavira/parts`, `wavira/patterns`):
+  every group wrapper carrying one of the theme's own container classes — `wavira-layout`, `wavira-section`,
+  the header, the footer, the top bar, the surface, the player — was declared with a *constrained* block
+  layout, and WordPress caps a constrained layout at `theme.json`'s `contentSize` (720px here) and centres
+  it. The theme's own container never applied: `.wavira-layout`, the `container-width` setting and the wide
+  grids were all overruled by an inline `max-width`, so a music catalogue rendered as a column of text with
+  two thirds of the page empty. The wrappers are flow layouts now — the width belongs to the theme's CSS —
+  and `tools/check-blocks.mjs` refuses a container class wearing a constrained layout. The first rendered
+  screenshot is what found this, after five releases of green static gates.
 - **A `doing-it-wrong` notice on every request** (`wavira-core`): the settings option was registered as an
   `array` — core has required an item schema for that type since 5.4, and the value is really a map of
   setting name to value, so it is registered as an `object` now. A notice in the debug log is a defect, and
