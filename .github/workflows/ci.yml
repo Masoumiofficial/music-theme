@@ -571,19 +571,6 @@ jobs:
           fi
           exit "$status"
 
-      - name: Say why the render failed
-        # The last word on a failed render, as one annotation: whatever the API
-        # returns, it returns the newest ones, and this step runs last.
-        if: failure()
-        run: |
-          if [ -f /tmp/render.log ]; then
-            node tools/annotate-log.mjs /tmp/render.log render-diagnosis 14 error --one
-          elif [ -f /tmp/preflight.log ]; then
-            node tools/annotate-log.mjs /tmp/preflight.log preflight-diagnosis 14 error --one
-          else
-            echo "::error title=Rendered theme::the render never started — no log was written"
-          fi
-
       - name: Commit the theme screenshot when it changed
         # Only on `main`: a push made with GITHUB_TOKEN does not trigger
         # workflows, so a branch that commits its own screenshot can never go
@@ -650,6 +637,19 @@ jobs:
   # release tree is found on the commit that broke it, and uploaded so the
   # package can be downloaded from the run instead of being rebuilt by hand.
   # ---------------------------------------------------------------------------
+      - name: Say why the render failed
+        # The last word on a failed render, as one annotation: whatever the API
+        # returns, it returns the newest ones, and this step runs last.
+        if: failure()
+        run: |
+          if [ -f /tmp/render.log ]; then
+            node tools/annotate-log.mjs /tmp/render.log render-diagnosis 14 error --one
+          elif [ -f /tmp/preflight.log ]; then
+            node tools/annotate-log.mjs /tmp/preflight.log preflight-diagnosis 14 error --one
+          else
+            echo "::error title=Rendered theme::the render never started — no log was written"
+          fi
+
   release-package:
     name: Release packages
     runs-on: ubuntu-latest
