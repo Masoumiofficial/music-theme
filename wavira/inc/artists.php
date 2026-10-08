@@ -318,8 +318,14 @@ if ( ! function_exists( 'wavira_get_photo_gallery' ) ) {
 
 		$columns = (int) max( 2, min( 4, (int) $args['columns'] ) );
 
-		$html  = '<section class="wavira-section wavira-gallery">';
-		$html .= wavira_get_section_head( (string) $args['heading'] );
+		$html = '<section class="wavira-section wavira-gallery">';
+
+		// An empty heading is not an empty `<h2>`: a template that supplies its
+		// own section heading as a pattern (which is how every other section in
+		// this theme gets one) says “no heading here”.
+		if ( '' !== (string) $args['heading'] ) {
+			$html .= wavira_get_section_head( (string) $args['heading'] );
+		}
 		$html .= '<ul class="wavira-gallery__items wavira-gallery__items--' . esc_attr( (string) $columns ) . '">';
 
 		foreach ( $images as $image ) {
@@ -384,15 +390,28 @@ if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
 	 * are the same component.
 	 *
 	 * @param array<string, mixed> $artist Artist payload.
-	 * @param array<string, mixed> $args   `columns` (2–4).
+	 * @param array<string, mixed> $args   `columns` (2–4), `heading` (string;
+	 *                                     empty for a section that has its own).
 	 * @return string Markup, empty string when the artist has no photos.
 	 */
 	function wavira_get_artist_gallery( $artist, $args = array() ) {
-		$args = wp_parse_args( $args, array( 'columns' => 3 ) );
+		$args = wp_parse_args(
+			$args,
+			array(
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
 
 		$images = isset( $artist['gallery'] ) ? (array) $artist['gallery'] : array();
 
-		return wavira_get_photo_gallery( $images, array( 'columns' => (int) $args['columns'] ) );
+		return wavira_get_photo_gallery(
+			$images,
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
 	}
 }
 
@@ -491,7 +510,7 @@ if ( ! function_exists( 'wavira_get_artist_gallery_only' ) ) {
 	 * Just the gallery, for a page that places the profile and the photos apart.
 	 *
 	 * @param int                  $artist_id Artist post ID.
-	 * @param array<string, mixed> $args      `limit`, `columns`.
+	 * @param array<string, mixed> $args      `limit`, `columns`, `heading`.
 	 * @return string Markup.
 	 */
 	function wavira_get_artist_gallery_only( $artist_id, $args = array() ) {
@@ -500,6 +519,7 @@ if ( ! function_exists( 'wavira_get_artist_gallery_only' ) ) {
 			array(
 				'limit'   => 12,
 				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
 			)
 		);
 
@@ -516,7 +536,13 @@ if ( ! function_exists( 'wavira_get_artist_gallery_only' ) ) {
 			return '';
 		}
 
-		return wavira_get_artist_gallery( $artist, array( 'columns' => (int) $args['columns'] ) );
+		return wavira_get_artist_gallery(
+			$artist,
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
 	}
 }
 

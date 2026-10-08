@@ -25,6 +25,9 @@
 		"columns": {
 			"type": "number",
 			"default": 3
+		},
+		"heading": {
+			"type": "string"
 		}
 	},
 	"supports": {

@@ -477,7 +477,7 @@ msgstr ""
 msgid "Download the album"
 msgstr ""
 
-#: wavira/inc/artists.php:358
+#: wavira/inc/artists.php:364
 #: wavira/inc/downloads.php:48
 msgid "Download the image"
 msgstr ""
@@ -558,11 +558,6 @@ msgstr ""
 
 #: wavira/inc/customizer.php:97
 msgid "Header"
-msgstr ""
-
-#: wavira/patterns/hidden-heading-album-photos.php:16
-msgctxt "heading above the gallery of an album"
-msgid "Photos"
 msgstr ""
 
 #: wavira/patterns/hidden-heading-music-news.php:20
@@ -689,7 +684,7 @@ msgstr ""
 msgid "No news posts yet. Publish one and it appears here."
 msgstr ""
 
-#: wavira/blocks/artist-gallery/render.php:54
+#: wavira/blocks/artist-gallery/render.php:65
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr ""
 
@@ -747,8 +742,11 @@ msgstr ""
 msgid "Photo"
 msgstr ""
 
+#: wavira/blocks/artist-gallery/render.php:27
 #: wavira/inc/artists.php:311
-#: wavira/inc/artists.php:413
+#: wavira/inc/artists.php:402
+#: wavira/inc/artists.php:432
+#: wavira/inc/artists.php:522
 msgid "Photos"
 msgstr ""
 
@@ -800,6 +798,11 @@ msgstr ""
 #: wavira/patterns/hidden-heading-watch.php:16
 msgctxt "section heading above a music video"
 msgid "Watch"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-photos.php:16
+msgctxt "section heading above a photo gallery"
+msgid "Photos"
 msgstr ""
 
 #: wavira/patterns/hidden-heading-tracks.php:16

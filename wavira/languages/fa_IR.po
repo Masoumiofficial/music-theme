@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 17:02+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 17:45+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
@@ -470,7 +470,7 @@ msgstr "دانلود"
 msgid "Download the album"
 msgstr "دانلود آلبوم"
 
-#: wavira/inc/artists.php:358
+#: wavira/inc/artists.php:364
 #: wavira/inc/downloads.php:48
 msgid "Download the image"
 msgstr "دانلود تصویر"
@@ -552,11 +552,6 @@ msgstr "برچسبهای سبک، پرکاربردترین در ابتدا."
 #: wavira/inc/customizer.php:97
 msgid "Header"
 msgstr "سربرگ"
-
-#: wavira/patterns/hidden-heading-album-photos.php:16
-msgctxt "heading above the gallery of an album"
-msgid "Photos"
-msgstr "تصاویر"
 
 #: wavira/patterns/hidden-heading-music-news.php:20
 msgctxt "heading above the news feed"
@@ -682,7 +677,7 @@ msgstr "هنوز سبکی با موسیقی منتشرشده نداریم."
 msgid "No news posts yet. Publish one and it appears here."
 msgstr "هنوز خبری منتشر نشده است. نخستین خبر را منتشر کنید تا اینجا نمایش داده شود."
 
-#: wavira/blocks/artist-gallery/render.php:54
+#: wavira/blocks/artist-gallery/render.php:65
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr "هنوز تصویری نیست. آن‌ها را از کتابخانهٔ رسانهٔ همین نوشته بارگذاری کنید."
 
@@ -740,8 +735,11 @@ msgstr "راه‌اندازی فارسی"
 msgid "Photo"
 msgstr "تصویر"
 
+#: wavira/blocks/artist-gallery/render.php:27
 #: wavira/inc/artists.php:311
-#: wavira/inc/artists.php:413
+#: wavira/inc/artists.php:402
+#: wavira/inc/artists.php:432
+#: wavira/inc/artists.php:522
 msgid "Photos"
 msgstr "تصاویر"
 
@@ -794,6 +792,11 @@ msgstr "جست‌وجوی موسیقی…"
 msgctxt "section heading above a music video"
 msgid "Watch"
 msgstr "تماشا"
+
+#: wavira/patterns/hidden-heading-photos.php:16
+msgctxt "section heading above a photo gallery"
+msgid "Photos"
+msgstr "تصاویر"
 
 #: wavira/patterns/hidden-heading-tracks.php:16
 msgctxt "section heading above an album tracklist"

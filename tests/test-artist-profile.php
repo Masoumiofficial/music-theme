@@ -288,6 +288,29 @@ class Test_Artist_Profile extends Wavira_Test_Case {
 	}
 
 	/**
+	 * The heading is the block's, the template's or nobody's — never two.
+	 *
+	 * The album page showed «تصاویر» twice in 0.15.0: its template supplied the
+	 * section heading as a pattern and the gallery block rendered one of its own
+	 * underneath it. An empty heading is the block's way of saying “this section
+	 * already has one”, and it must not leave an empty `<h2>` behind.
+	 *
+	 * @return void
+	 */
+	public function test_gallery_heading_can_be_turned_off() {
+		$artist = $this->make_artist();
+		$this->make_photo( $artist, 'stage.jpg', 'On stage' );
+
+		$default = wavira_get_artist_gallery_only( $artist, array( 'limit' => 12 ) );
+		$this->assertStringContainsString( 'wavira-section__head', $default, 'the block carries a heading by default' );
+
+		$quiet = wavira_get_artist_gallery_only( $artist, array( 'limit' => 12, 'heading' => '' ) );
+		$this->assertStringContainsString( 'wavira-gallery__items', $quiet, 'the photos are still there' );
+		$this->assertStringNotContainsString( 'wavira-section__head', $quiet, 'and no heading of its own' );
+		$this->assertStringNotContainsString( '<h2', $quiet, 'nor an empty one' );
+	}
+
+	/**
 	 * A profile with nothing to show renders nothing, never an empty shell.
 	 *
 	 * @return void

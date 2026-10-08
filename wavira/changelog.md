@@ -17,7 +17,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (the platform setting) and `@supports not (backdrop-filter: …)`. A new
   Appearance setting, «پانل‌های شیشه‌ای مات», turns the effect off by adding one
   body class — the same override reached a third way, with no rule per component
-  and no `!important` (`wavira/assets/css/tokens.css`, `components.css`). (every section plays, every section downloads)
+  and no `!important` (`wavira/assets/css/tokens.css`, `components.css`).
 
 - **A download in every section** (`wavira/inc/downloads.php`, `wavira/blocks/download/`, the four single
   templates). 0.14.0 showed the music; 0.15.0 lets a visitor *take* it: the track hero lists 128 and
@@ -33,7 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   size, a label override and a quality picker, so a site owner can put a download wherever the Site Editor
   allows one. Eight blocks ship now.
 - **A real photo gallery** (`wavira/blocks/artist-gallery/`, `wavira/inc/artists.php`,
-  `wavira/patterns/hidden-heading-album-photos.php`). The artist gallery became **Photo gallery** and works
+  `wavira/patterns/hidden-heading-photos.php`). The artist gallery became **Photo gallery** and works
   on any post that has photos attached — an artist, a release or a video: `wavira_get_photos()`,
   `wavira_get_photo_gallery()` and `wavira_get_post_gallery()` return published attachments with their
   captions and alt text, the block lays them out in a responsive grid, and the album and artist templates
@@ -46,6 +46,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed — 0.15.0
 
+- **The album page showed «تصاویر» twice.** The template supplied the section
+  heading as a pattern and the gallery block rendered one of its own beneath it.
+  Every other section in the theme gets its heading from a pattern, so the
+  gallery now does too — the block's `heading` attribute defaults to its own
+  «تصاویر» for anyone who drops the block into a page, and an empty string means
+  “this section already has one” and leaves no empty `<h2>` behind. The artist
+  page's photos take the same heading, from the same pattern
+  (`wavira/patterns/hidden-heading-photos.php`, `wavira/inc/artists.php`,
+  `wavira/blocks/artist-gallery/`).
 - **The Persian catalogue's block titles are read with their context.** The
   gallery block was renamed to «گالری تصاویر» (*Photo gallery*) and the runtime
   test still asked for the old «گالری تصاویر هنرمند» — a test that passed on the
