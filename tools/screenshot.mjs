@@ -216,6 +216,41 @@ export function findChrome( explicit = null ) {
 }
 
 /**
+ * Decide whether a page's stylesheet actually reached the browser.
+ *
+ * The two facts are different: a page can link the theme stylesheet and still be
+ * unstyled (the file 404s, or a WordPress router answers with the front page's
+ * HTML), and a page without a single stylesheet can render perfectly legibly —
+ * which is exactly how ten unstyled screenshots shipped in 0.14.0. Both failures
+ * produce a plausible-looking image, so this returns a *reason*, not a boolean,
+ * and the caller refuses the picture.
+ *
+ * @param {{stylesheets: string[], rules: number}} meta What the page reported.
+ * @return {string} An empty string when the theme's CSS is in effect, else why not.
+ */
+export function stylesheetVerdict( meta ) {
+	const sheets = Array.isArray( meta.stylesheets ) ? meta.stylesheets : [];
+	const themeSheet = sheets.find( ( href ) => String( href ).includes( 'assets/dist/theme.css' ) );
+
+	if ( ! themeSheet ) {
+		return (
+			'the page does not link the theme stylesheet (assets/dist/theme.css); it links ' +
+			( sheets.length ? sheets.join( ', ' ) : 'no stylesheet at all' ) +
+			' — an unstyled page is not a screenshot of the theme'
+		);
+	}
+
+	if ( Number( meta.rules ) < 50 ) {
+		return (
+			`the page links ${ themeSheet } but only ${ meta.rules } CSS rule(s) are in effect — ` +
+			'the stylesheet did not load (a WordPress router answers a request for a missing file with the front page as text/html)'
+		);
+	}
+
+	return '';
+}
+
+/**
  * Run the capture with the arguments given.
  *
  * @param {string[]} args Arguments, without `node script`.
@@ -413,13 +448,34 @@ export async function main( args ) {
 		}
 
 		// The page's own language and direction are reported so a screenshot of
-		// the wrong direction is visible in the log rather than in the file.
-		const meta = await page.evaluate( () => ( {
-			lang: document.documentElement.lang,
-			dir: document.documentElement.dir || 'ltr',
-			height: document.documentElement.scrollHeight,
-			text: ( document.body.innerText || '' ).trim().slice( 0, 200 ),
-		} ) );
+		// the wrong direction is visible in the log rather than in the file —
+		// and so is whether the theme's own stylesheet actually applied, which is
+		// the difference between a screenshot of the theme and a screenshot of
+		// unstyled HTML. "The file was requested" and "the rules are in effect"
+		// are two different facts, and only the second one is worth photographing
+		// (0.14.0 shipped ten unstyled images because nothing checked it).
+		const meta = await page.evaluate( () => {
+			const rules = Array.from( document.styleSheets ).reduce( ( total, sheet ) => {
+				try {
+					return total + sheet.cssRules.length;
+				} catch {
+					return total; // A cross-origin sheet cannot be read; not ours.
+				}
+			}, 0 );
+
+			const stylesheets = Array.from( document.querySelectorAll( 'link[rel="stylesheet"]' ) ).map(
+				( link ) => link.getAttribute( 'href' ) || ''
+			);
+
+			return {
+				lang: document.documentElement.lang,
+				dir: document.documentElement.dir || 'ltr',
+				height: document.documentElement.scrollHeight,
+				text: ( document.body.innerText || '' ).trim().slice( 0, 200 ),
+				rules: rules,
+				stylesheets: stylesheets,
+			};
+		} );
 
 		const bytes = await page.screenshot( { type: 'png' } );
 
@@ -430,7 +486,8 @@ export async function main( args ) {
 
 		notes.push(
 			`${ shot.file } — ${ size ? `${ size.width }×${ size.height }` : 'NOT A PNG' }, ${ bytes.length } B, ` +
-				`HTTP ${ status }, lang=${ meta.lang || '(none)' } dir=${ meta.dir }, ${ meta.height }px tall`
+				`HTTP ${ status }, lang=${ meta.lang || '(none)' } dir=${ meta.dir }, ${ meta.height }px tall, ` +
+				`${ meta.rules } CSS rule(s) in effect`
 		);
 
 		if ( ! size ) {
@@ -447,6 +504,17 @@ export async function main( args ) {
 
 		if ( meta.text.length < 40 ) {
 			fail( `${ shot.file } looks blank (${ meta.text.length } characters of visible text) — the page did not render` );
+		}
+
+		// The theme's stylesheet has to be *linked* and *applied*. A page whose
+		// CSS 404s (or comes back as HTML, which is what a WordPress router does
+		// for a file that is not there) still renders, renders legibly, and
+		// photographs as a wall of black text on white — the most expensive kind
+		// of wrong image, because it looks like a finished render.
+		const styling = stylesheetVerdict( meta );
+
+		if ( '' !== styling ) {
+			fail( `${ shot.url }: ${ styling }` );
 		}
 
 		return { page, file: shot.file, bytes: bytes.length };

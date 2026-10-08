@@ -147,9 +147,13 @@ final class Placeholders {
 		$path = (string) get_attached_file( $best );
 
 		return array(
-			'id'   => (int) $best,
-			'url'  => (string) wp_get_attachment_url( $best ),
-			'size' => (int) ( file_exists( $path ) ? filesize( $path ) : 0 ),
+			'id'    => (int) $best,
+			'url'   => (string) wp_get_attachment_url( $best ),
+			'size'  => (int) ( file_exists( $path ) ? filesize( $path ) : 0 ),
+			// Two files, one per quality. The importer counts generated files and
+			// the notice says how many, so this is the number that has to be
+			// honest: a track that shipped two tones is two files (0.15.0).
+			'files' => count( $written ),
 		);
 	}
 

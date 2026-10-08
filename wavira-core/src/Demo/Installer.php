@@ -171,7 +171,7 @@ final class Installer {
 				$audio = Placeholders::audio( $track_id, 6, 330 + ( $index * 42 ) );
 
 				if ( ! empty( $audio['id'] ) ) {
-					++$report['media'];
+					$report['media'] += (int) ( $audio['files'] ?? 1 );
 
 					// The demo's own file length is what the player shows while
 					// nothing has loaded yet: six seconds of tone, not the four

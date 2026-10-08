@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { deflateSync } from 'node:zlib';
 
-import { budgets, findChrome, option, options, parsePages, pngSize } from '../../tools/screenshot.mjs';
+import { budgets, findChrome, option, options, parsePages, pngSize, stylesheetVerdict } from '../../tools/screenshot.mjs';
 
 /**
  * CRC-32, the checksum every PNG chunk carries.
@@ -179,6 +179,43 @@ test( 'every wait has a budget, and a bad number falls back to the default', () 
 
 	// A fractional number of milliseconds is not something a timer can use.
 	assert.equal( budgets( [ '--settle=1500.7' ] ).settle, 1500 );
+} );
+
+test( 'an unstyled page is refused, with the reason, instead of photographed', () => {
+	// The good case: the theme's sheet is linked and its rules are in effect.
+	assert.equal(
+		stylesheetVerdict( {
+			stylesheets: [ 'http://site.test/wp-content/themes/wavira/assets/dist/theme.css?ver=1' ],
+			rules: 812,
+		} ),
+		''
+	);
+
+	// A page with no stylesheet at all renders legibly and is still worthless as
+	// a screenshot of the theme — this is what 0.14.0 shipped.
+	const missing = stylesheetVerdict( { stylesheets: [], rules: 0 } );
+
+	assert.match( missing, /does not link the theme stylesheet/ );
+	assert.match( missing, /no stylesheet at all/ );
+
+	// A page that links core's styles but not the theme's says which ones it has.
+	const core = stylesheetVerdict( {
+		stylesheets: [ 'http://site.test/wp-includes/css/dist/block-library/style.min.css' ],
+		rules: 90,
+	} );
+
+	assert.match( core, /block-library\/style\.min\.css/ );
+
+	// The nastiest case: the link is there, the file is not — a WordPress router
+	// answers a missing file with the front page as `text/html`, so the sheet
+	// parses to nothing and the page is black text on white.
+	const empty = stylesheetVerdict( {
+		stylesheets: [ 'http://site.test/wp-content/themes/wavira/assets/dist/theme.css' ],
+		rules: 0,
+	} );
+
+	assert.match( empty, /only 0 CSS rule\(s\) are in effect/ );
+	assert.match( empty, /text\/html/ );
 } );
 
 test( 'the command line refuses to run without a URL and an output file', () => {
