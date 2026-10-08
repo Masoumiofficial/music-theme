@@ -212,8 +212,7 @@ test( 'the front page has the h1 the other templates get from their titles', () 
 	// the post or page title), so the front page carries its own, visually hidden.
 	const template = readFileSync( fileURLToPath( new URL( '../../wavira/templates/front-page.html', import.meta.url ) ), 'utf8' );
 
-	assert.match( template, /wp:site-title \{"level":1\} \/\-->/ );
-	assert.match( template, /wavira-visually-hidden/ );
+	assert.match( template, /wp:site-title \{"level":1,"className":"wavira-visually-hidden"\} \/\-->/ );
 } );
 
 test( 'the command line refuses to run without a page', () => {

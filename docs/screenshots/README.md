@@ -6,11 +6,10 @@ cannot produce from source.
 
 | File | What it shows |
 | --- | --- |
-| `home.png` | the front page: latest albums, the catalogue player, latest tracks, videos |
+| `../screenshot.png` | the front page in light mode: latest albums, the catalogue player, latest tracks, videos, the news — the same image the marketplace asks for, which is why it is not duplicated here |
 | `album.png` | an album page: cover, tracklist, durations, the play button |
 | `artist.png` | an artist profile: works by type, biography, social links |
 | `home-dark.png` | the same front page with `prefers-color-scheme: dark` |
-| `../screenshot.png` | `wavira/screenshot.png`: the marketplace screenshot, 1200×900, same render |
 
 They exist so a review does not need a running site, and so a visual regression is visible in a diff.
 Re-render with:

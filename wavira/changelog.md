@@ -26,6 +26,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the output instead of disappearing.
 - **`docs/screenshots/`** — the render's own record: the front page, an album, an artist profile and a
   dark-mode home, committed so a review needs no running site and a visual regression shows up in a diff.
+  The dark home is byte-identical to the light one, which is honest: the theme's dark mode is a
+  `prefers-color-scheme` switch a visitor owns, and `emulateMediaFeatures` sets the media query without a
+  site that has dark colours defined yet — the file records that rather than hiding it.
   The render job commits them on a branch (never on a tag, where there is no branch to commit to), because
   an image that only exists as a build artifact is an image the packaged theme cannot carry.
 
