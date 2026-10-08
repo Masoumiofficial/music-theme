@@ -19,7 +19,16 @@
  *      comment it is written in;
  *   2. a docblock immediately above a declaration whose `@param` count does not
  *      match the declaration's parameters — the other half of the same mistake,
- *      and the one that quietly documents an argument that is not there.
+ *      and the one that quietly documents an argument that is not there;
+ *   3. a namespaced file that names a global class without importing it. PHP
+ *      resolves an unqualified class name against the current namespace and does
+ *      **not** fall back to the global one — but only `instanceof` and `catch`
+ *      stay quiet about it: `$post instanceof WP_Post` inside
+ *      `namespace Wavira\Core\Demo` asks for `Wavira\Core\Demo\WP_Post`, gets
+ *      `false`, and the branch is never taken. That is how the demo import
+ *      "translated" WordPress's sample content to a return value of zero with no
+ *      error anywhere: `php -l` parses, the integration suite passes, and the
+ *      front page keeps showing “Hello world!”.
  *
  * The scanner masks comments and strings in place (same offsets, spaces where the
  * content was), so positions in the masked text and the real text agree.
@@ -201,6 +210,41 @@ export function inspect( source ) {
 		}
 	}
 
+	// 3. a global class named without a `use` in a namespaced file.
+	//
+	// Only classes that are WordPress's own (`WP_*`, `wpdb`) and only the places
+	// where a wrong answer is silent — `instanceof`, `catch`, `new`, static calls
+	// and inheritance all resolve the same way, but the first two fail quietly.
+	const namespace = masked.match( /^\s*namespace\s+([A-Za-z_][A-Za-z0-9_\\]*)\s*;/m );
+
+	if ( namespace ) {
+		const imported = new Set();
+
+		for ( const match of masked.matchAll( /^\s*use\s+([A-Za-z_][A-Za-z0-9_\\]*)(?:\s+as\s+([A-Za-z_][A-Za-z0-9_]*))?\s*;/gm ) ) {
+			imported.add( match[ 2 ] || match[ 1 ].split( '\\' ).pop() );
+		}
+
+		const globalClass = /(?:\binstanceof\s+|\bcatch\s*\(\s*|\bnew\s+)((?:WP|wpdb)[A-Za-z0-9_]*)/g;
+
+		for ( const match of masked.matchAll( globalClass ) ) {
+			const name = match[ 1 ];
+
+			if ( imported.has( name ) ) {
+				continue;
+			}
+
+			findings.push( {
+				line: lineAt( source, match.index ),
+				rule: 'core-class-import',
+				message:
+					`“${ name }” is used unqualified in namespace ${ namespace[ 1 ] } and never imported — ` +
+					'PHP does not fall back to the global class, so this branch is never taken (add `use ' +
+					name +
+					';`)',
+			} );
+		}
+	}
+
 	return findings;
 }
 
@@ -247,6 +291,8 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 		process.exit( 1 );
 	}
 
-	console.log( `      OK    ${ targets.length } PHP file(s): no declaration inside a comment, no docblock mismatch` );
+	console.log(
+		`      OK    ${ targets.length } PHP file(s): no declaration inside a comment, no docblock mismatch, no missing core-class import`
+	);
 }
 /* c8 ignore stop */

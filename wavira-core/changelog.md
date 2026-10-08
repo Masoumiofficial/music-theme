@@ -64,6 +64,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   shipped catalogue and fails the render job when a served page prints an
   English section heading.
 
+- **The import's “is this a post?” check asked the wrong class.** `WP_Post` and
+  `WP_Term` were named unqualified inside `namespace Wavira\Core\Demo`, and PHP
+  resolves an unqualified class name against the current namespace *without*
+  falling back to the global one: `$post instanceof WP_Post` asked for
+  `Wavira\Core\Demo\WP_Post`, got `false`, and skipped every item — silently,
+  with a green syntax check and a return value of zero. The two classes are
+  imported now, `tools/check-php-structure.mjs` reports the pattern, and
+  `tests/test-demo.php` asserts the result instead of the intention.
+
 - **WordPress's own sample content is Persian after the import.** A fresh install
   is not Persian because the theme and the plugin are: core creates “Hello
   world!”, a sample page and an “Uncategorized” category, and the front page's

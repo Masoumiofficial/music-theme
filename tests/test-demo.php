@@ -271,6 +271,106 @@ class Test_Demo extends Wavira_Test_Case {
 	}
 
 	/**
+	 * WordPress's own sample content reads in the site's language after an import.
+	 *
+	 * A fresh install is not Persian because the theme and the plugin are: core
+	 * writes “Hello world!”, a sample page and an “Uncategorized” category, and
+	 * the front page's news section shows them. The import (site scope) replaces
+	 * both texts and renames the category from the catalogue, by the canonical
+	 * slugs core itself writes — and this test exists because the first version
+	 * of that code asked `$post instanceof WP_Post` inside a namespace, which PHP
+	 * answers with `false` for every post, silently and with a green syntax
+	 * check (the render job's Persian gate found it on the front page).
+	 *
+	 * @return void
+	 */
+	public function test_wordpresss_sample_content_is_translated() {
+		$post = self::factory()->post->create(
+			array(
+				'post_title'   => 'Hello world!',
+				'post_name'    => 'hello-world',
+				'post_content' => 'This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here.',
+				'post_status'  => 'publish',
+			)
+		);
+
+		$page = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_title'  => 'Sample Page',
+				'post_name'   => 'sample-page',
+				'post_status' => 'publish',
+			)
+		);
+
+		$term = self::factory()->term->create( array( 'taxonomy' => 'category', 'name' => 'Uncategorized', 'slug' => 'uncategorized' ) );
+
+		$this->posts[] = $post;
+		$this->posts[] = $page;
+
+		// The catalogue, loaded the way the plugin loads it on a Persian site.
+		$switched = switch_to_locale( 'fa_IR' );
+		load_textdomain( 'wavira-core', WAVIRA_CORE_DIR . 'languages/fa_IR.mo', 'fa_IR' );
+
+		$report = Installer::install();
+
+		$this->posts = array_merge( $this->posts, $this->demo_ids() );
+
+		$title = get_the_title( $post );
+		$name  = get_post_field( 'post_name', $post );
+
+		$this->assertNotSame( 'Hello world!', $title, 'core\'s English title is gone' );
+		$this->assertStringContainsString( 'سایت موسیقی', $title, 'and the catalogue\'s Persian one is there' );
+		$this->assertNotSame( 'hello-world', $name, 'the slug follows the new title' );
+		$this->assertNotSame( 'This is your first post.', get_post_field( 'post_content', $post ) );
+
+		$this->assertNotSame( 'Sample Page', get_the_title( $page ) );
+		$this->assertSame( 'دسته‌بندی‌نشده', get_term( $term, 'category' )->name );
+
+		// One notice says how much was rewritten — the post, the page and the
+		// category, all three of them. The report is what the CLI and the admin
+		// screen print, so the number has to be in it.
+		$sample_notice = '';
+
+		foreach ( (array) $report['notices'] as $notice ) {
+			if ( false !== strpos( (string) $notice, '(3' ) ) {
+				$sample_notice = (string) $notice;
+			}
+		}
+
+		$this->assertNotSame( '', $sample_notice, 'the report says how many items were rewritten' );
+
+		unload_textdomain( 'wavira-core', true );
+
+		if ( $switched ) {
+			restore_previous_locale();
+		}
+	}
+
+	/**
+	 * And an English demo leaves it exactly as it is.
+	 *
+	 * @return void
+	 */
+	public function test_the_english_demo_leaves_wordpresss_sample_content_alone() {
+		$post = self::factory()->post->create(
+			array(
+				'post_title'  => 'Hello world!',
+				'post_name'   => 'hello-world',
+				'post_status' => 'publish',
+			)
+		);
+
+		$this->posts[] = $post;
+
+		Installer::install( array( 'english' => true ) );
+
+		$this->posts = array_merge( $this->posts, $this->demo_ids() );
+
+		$this->assertSame( 'Hello world!', get_the_title( $post ), 'the English demo is English' );
+	}
+
+	/**
 	 * The fixture itself holds what the installer promises to read.
 	 *
 	 * A fixture with a missing key would fail mid-import on a customer's site;

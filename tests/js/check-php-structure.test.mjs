@@ -110,3 +110,58 @@ test( 'a docblock for a different declaration is not that declaration’s docblo
 	// `unrelated()` — a declaration between them is what separates the two.
 	assert.deepEqual( inspect( source ), [] );
 } );
+
+test( 'a namespaced file that names a global class without importing it is a finding', () => {
+	// The defect of 0.15.0's second render: PHP resolves `WP_Post` inside a
+	// namespace to `Wavira\Core\Demo\WP_Post`, `instanceof` answers false, and
+	// the branch is never taken — silently, with a green syntax check.
+	const source = [
+		'<?php',
+		'namespace Wavira\\Core\\Demo;',
+		'',
+		'$post = get_post( 1 );',
+		'if ( ! $post instanceof WP_Post ) {',
+		'\treturn 0;',
+		'}',
+		'',
+	].join( '\n' );
+
+	const findings = inspect( source );
+
+	assert.equal( findings.length, 1 );
+	assert.equal( findings[ 0 ].rule, 'core-class-import' );
+	assert.match( findings[ 0 ].message, /WP_Post/ );
+	assert.match( findings[ 0 ].message, /never imported/ );
+} );
+
+test( 'and it is not a finding once the class is imported', () => {
+	const source = [
+		'<?php',
+		'namespace Wavira\\Core\\Demo;',
+		'',
+		'use WP_Post;',
+		'use WP_Term as Term;',
+		'',
+		'if ( $post instanceof WP_Post ) {',
+		'\t$term = $term instanceof Term ? $term : null;',
+		'}',
+		'',
+	].join( '\n' );
+
+	assert.deepEqual( inspect( source ), [] );
+} );
+
+test( 'the global namespace is not the business of this rule', () => {
+	// A theme file has no namespace: `WP_Query` there is the global class, which
+	// is what it always was.
+	const source = [
+		'<?php',
+		'$query = new WP_Query( array() );',
+		'if ( $query instanceof WP_Query ) {',
+		'\techo 1;',
+		'}',
+		'',
+	].join( '\n' );
+
+	assert.deepEqual( inspect( source ), [] );
+} );

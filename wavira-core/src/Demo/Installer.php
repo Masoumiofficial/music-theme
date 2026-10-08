@@ -26,6 +26,8 @@ use RuntimeException;
 use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\Taxonomies;
+use WP_Post;
+use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
