@@ -62,7 +62,7 @@ msgstr ""
 msgid "Accent colour"
 msgstr ""
 
-#: wavira/inc/options.php:370
+#: wavira/inc/options.php:385
 msgid "Additional CSS"
 msgstr ""
 
@@ -114,11 +114,11 @@ msgstr ""
 msgid "Back to top"
 msgstr ""
 
-#: wavira/inc/options.php:361
+#: wavira/inc/options.php:376
 msgid "Back-to-top button"
 msgstr ""
 
-#: wavira/inc/options.php:260
+#: wavira/inc/options.php:275
 msgid "Base text size (px)"
 msgstr ""
 
@@ -361,7 +361,7 @@ msgctxt "block title"
 msgid "Photo gallery"
 msgstr ""
 
-#: wavira/inc/options.php:277
+#: wavira/inc/options.php:292
 msgid "Bold (700)"
 msgstr ""
 
@@ -429,11 +429,11 @@ msgstr ""
 msgid "CSS of your own, printed after the theme stylesheet. HTML tags and comments are stripped; a closing style tag would end the block."
 msgstr ""
 
-#: wavira/inc/options.php:250
+#: wavira/inc/options.php:265
 msgid "Custom font stack"
 msgstr ""
 
-#: wavira/inc/options.php:242
+#: wavira/inc/options.php:257
 msgid "Custom stack"
 msgstr ""
 
@@ -514,12 +514,12 @@ msgstr ""
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer."
 msgstr ""
 
-#: wavira/inc/options.php:278
+#: wavira/inc/options.php:293
 msgid "Extra bold (800)"
 msgstr ""
 
-#: wavira/inc/options.php:323
-#: wavira/inc/options.php:652
+#: wavira/inc/options.php:338
+#: wavira/inc/options.php:667
 msgid "Facebook"
 msgstr ""
 
@@ -527,7 +527,7 @@ msgstr ""
 msgid "Find the plugin"
 msgstr ""
 
-#: wavira/inc/options.php:238
+#: wavira/inc/options.php:253
 msgid "Font"
 msgstr ""
 
@@ -544,8 +544,12 @@ msgstr ""
 msgid "Footer navigation"
 msgstr ""
 
-#: wavira/inc/options.php:354
+#: wavira/inc/options.php:369
 msgid "Footer note"
+msgstr ""
+
+#: wavira/inc/options.php:236
+msgid "Frosted-glass panels"
 msgstr ""
 
 #: wavira/inc/blocks.php:64
@@ -586,7 +590,7 @@ msgctxt "heading of the genre chips pattern"
 msgid "Browse by genre"
 msgstr ""
 
-#: wavira/inc/options.php:272
+#: wavira/inc/options.php:287
 msgid "Heading weight"
 msgstr ""
 
@@ -598,7 +602,7 @@ msgstr ""
 msgid "Hides the button only; the visitor’s device preference keeps working."
 msgstr ""
 
-#: wavira/inc/options.php:333
+#: wavira/inc/options.php:348
 msgid "Icon size (px)"
 msgstr ""
 
@@ -610,8 +614,8 @@ msgstr ""
 msgid "Identity and logo"
 msgstr ""
 
-#: wavira/inc/options.php:295
-#: wavira/inc/options.php:636
+#: wavira/inc/options.php:310
+#: wavira/inc/options.php:651
 msgid "Instagram"
 msgstr ""
 
@@ -714,7 +718,7 @@ msgstr ""
 msgid "Open %s"
 msgstr ""
 
-#: wavira/inc/options.php:345
+#: wavira/inc/options.php:360
 msgid "Open social links in a new tab"
 msgstr ""
 
@@ -760,7 +764,7 @@ msgstr ""
 msgid "Player for an album, artist or genre queue."
 msgstr ""
 
-#: wavira/inc/options.php:286
+#: wavira/inc/options.php:301
 msgid "Preload the bundled font"
 msgstr ""
 
@@ -823,7 +827,7 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr ""
 
-#: wavira/inc/options.php:276
+#: wavira/inc/options.php:291
 msgid "Semi bold (600)"
 msgstr ""
 
@@ -875,12 +879,12 @@ msgstr ""
 msgid "Sticky header"
 msgstr ""
 
-#: wavira/inc/options.php:241
+#: wavira/inc/options.php:256
 msgid "System fonts (no font file)"
 msgstr ""
 
-#: wavira/inc/options.php:302
-#: wavira/inc/options.php:640
+#: wavira/inc/options.php:317
+#: wavira/inc/options.php:655
 msgid "Telegram"
 msgstr ""
 
@@ -992,7 +996,7 @@ msgstr ""
 msgid "Used for buttons, links and highlights. Each mode has one colour field, so dark mode is not forgotten: check the contrast against both backgrounds."
 msgstr ""
 
-#: wavira/inc/options.php:240
+#: wavira/inc/options.php:255
 msgid "Vazirmatn (bundled, recommended for Persian)"
 msgstr ""
 
@@ -1044,8 +1048,8 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira/inc/options.php:316
-#: wavira/inc/options.php:648
+#: wavira/inc/options.php:331
+#: wavira/inc/options.php:663
 msgid "X (Twitter)"
 msgstr ""
 
@@ -1062,7 +1066,7 @@ msgstr ""
 msgid "You are not allowed to change this."
 msgstr ""
 
-#: wavira/inc/options.php:309
-#: wavira/inc/options.php:644
+#: wavira/inc/options.php:324
+#: wavira/inc/options.php:659
 msgid "YouTube"
 msgstr ""

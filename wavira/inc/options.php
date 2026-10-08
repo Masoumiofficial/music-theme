@@ -228,6 +228,21 @@ function wavira_options_schema(): array {
 				'class' => 'wavira-no-toggle',
 			),
 		),
+		'glass'             => array(
+			'default'   => true,
+			'type'      => 'bool',
+			'control'   => 'checkbox',
+			'section'   => 'appearance',
+			'label'     => __( 'Frosted-glass panels', 'wavira' ),
+			'transport' => 'postMessage',
+			// The class is the switch: tokens.css redefines the four material
+			// tokens under `body.wavira-no-glass`, so turning the effect off is
+			// one selector in one place rather than a rule per component.
+			'live'      => array(
+				'mode'  => 'bool-class',
+				'class' => 'wavira-no-glass',
+			),
+		),
 
 		// ---------------------------------------------------------------- typography.
 		'font_family'       => array(
@@ -817,6 +832,10 @@ function wavira_option_body_classes( $classes ) {
 
 	if ( ! wavira_option( 'show_tagline' ) ) {
 		$classes[] = 'wavira-no-tagline';
+	}
+
+	if ( ! wavira_option( 'glass' ) ) {
+		$classes[] = 'wavira-no-glass';
 	}
 
 	if ( ! wavira_option( 'show_theme_toggle' ) ) {

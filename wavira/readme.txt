@@ -41,6 +41,11 @@ theme never takes your catalogue with it.
   saved.
 * Dark and light colour modes driven by CSS variables, honouring the visitor's
   system preference and remembering their choice.
+* A frosted-glass interface — the header, the player bar, the cards and the
+  menus are translucent materials over the page, with a switch in Appearance to
+  turn the effect off. A visitor who asks for less transparency (a platform
+  setting) or a browser without backdrop blur gets the solid panels instead, so
+  the look never stands between a visitor and the text.
 * Structured data (MusicGroup, MusicAlbum, MusicRecording, MusicVideoObject)
   printed on music pages, and meta tags emitted only when no SEO plugin is
   active — so Rank Math or Yoast stay in charge.
@@ -106,7 +111,7 @@ with the demo import one tab away:
 * Identity and logo — logo, logo width, a separate logo for dark mode, site title and tagline
 * Header — sticky header, search block, announcement bar, player bar
 * Appearance — first-visit colour mode, accent colour, content width, corner radius, card shadow, card
-  width, light/dark toggle
+  width, light/dark toggle, frosted-glass panels
 * Fonts — Vazirmatn (bundled), system fonts, or your own stack; base text size, heading weight, preload
 * Social networks — Instagram, Telegram, YouTube, X (Twitter), Facebook
 * Texts — footer note, back-to-top button

@@ -18,7 +18,16 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { deflateSync } from 'node:zlib';
 
-import { budgets, findChrome, option, options, parsePages, pngSize, stylesheetVerdict } from '../../tools/screenshot.mjs';
+import {
+	budgets,
+	findChrome,
+	option,
+	options,
+	parsePages,
+	playerVerdict,
+	pngSize,
+	stylesheetVerdict,
+} from '../../tools/screenshot.mjs';
 
 /**
  * CRC-32, the checksum every PNG chunk carries.
@@ -216,6 +225,25 @@ test( 'an unstyled page is refused, with the reason, instead of photographed', (
 
 	assert.match( empty, /only 0 CSS rule\(s\) are in effect/ );
 	assert.match( empty, /text\/html/ );
+} );
+
+test( 'a player mount with nothing inside it is refused', () => {
+	// The good case: the engine filled the mount with its own controls.
+	assert.equal( playerVerdict( { players: [ { controls: 5 } ] } ), '' );
+	assert.equal( playerVerdict( { players: [ { controls: 0 }, { controls: 3 } ] } ), '' );
+
+	// A page with no player at all is not this check's business.
+	assert.equal( playerVerdict( { players: [] } ), '' );
+	assert.equal( playerVerdict( {} ), '' );
+
+	// The theme printed the mount, the section has its height, and the engine
+	// never ran: the page looks finished and has nothing to play — which is what
+	// a music theme may not look like.
+	const empty = playerVerdict( { players: [ { controls: 0 } ] } );
+
+	assert.match( empty, /mounts 1 player\(s\) and none of them contains a control/ );
+	assert.match( empty, /the engine did not run/ );
+	assert.match( playerVerdict( { players: [ { controls: 0 }, { controls: 0 } ] } ), /mounts 2 player\(s\)/ );
 } );
 
 test( 'the command line refuses to run without a URL and an output file', () => {

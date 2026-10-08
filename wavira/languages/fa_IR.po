@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 15:28+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 17:02+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
@@ -55,7 +55,7 @@ msgstr "دکمه‌ای کوچک برای بازگشت به بالای صفحه�
 msgid "Accent colour"
 msgstr "رنگ تأکیدی"
 
-#: wavira/inc/options.php:370
+#: wavira/inc/options.php:385
 msgid "Additional CSS"
 msgstr "CSS افزودنی"
 
@@ -107,11 +107,11 @@ msgstr "خودکار (پیروی از دستگاه)"
 msgid "Back to top"
 msgstr "بازگشت به بالا"
 
-#: wavira/inc/options.php:361
+#: wavira/inc/options.php:376
 msgid "Back-to-top button"
 msgstr "دکمهٔ بازگشت به بالا"
 
-#: wavira/inc/options.php:260
+#: wavira/inc/options.php:275
 msgid "Base text size (px)"
 msgstr "اندازهٔ متن پایه (پیکسل)"
 
@@ -354,7 +354,7 @@ msgctxt "block title"
 msgid "Photo gallery"
 msgstr "گالری تصاویر"
 
-#: wavira/inc/options.php:277
+#: wavira/inc/options.php:292
 msgid "Bold (700)"
 msgstr "ضخیم (۷۰۰)"
 
@@ -422,11 +422,11 @@ msgstr "طراحی و توسعه:"
 msgid "CSS of your own, printed after the theme stylesheet. HTML tags and comments are stripped; a closing style tag would end the block."
 msgstr "CSS خودتان، که بعد از شیوه‌نامهٔ قالب چاپ می‌شود. تگ‌های HTML و توضیحات حذف می‌شوند؛ تگ پایانیِ style بلوک را می‌بست."
 
-#: wavira/inc/options.php:250
+#: wavira/inc/options.php:265
 msgid "Custom font stack"
 msgstr "پشتهٔ فونت دلخواه"
 
-#: wavira/inc/options.php:242
+#: wavira/inc/options.php:257
 msgid "Custom stack"
 msgstr "پشتهٔ دلخواه"
 
@@ -507,12 +507,12 @@ msgstr "هر آنچه خودِ قالب لازم دارد: هویت، سربرگ
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer."
 msgstr "هر آنچه خودِ قالب لازم دارد: هویت، سربرگ، رنگ‌ها، فونت‌ها، پیوندهای شبکه‌های اجتماعی، متن فوتر — و محتوای نمایشی. تغییرها همین‌جا ذخیره می‌شوند؛ پیش‌نمایش زنده در سفارشی‌ساز است."
 
-#: wavira/inc/options.php:278
+#: wavira/inc/options.php:293
 msgid "Extra bold (800)"
 msgstr "خیلی ضخیم (۸۰۰)"
 
-#: wavira/inc/options.php:323
-#: wavira/inc/options.php:652
+#: wavira/inc/options.php:338
+#: wavira/inc/options.php:667
 msgid "Facebook"
 msgstr "فیس‌بوک"
 
@@ -520,7 +520,7 @@ msgstr "فیس‌بوک"
 msgid "Find the plugin"
 msgstr "یافتن افزونه"
 
-#: wavira/inc/options.php:238
+#: wavira/inc/options.php:253
 msgid "Font"
 msgstr "فونت"
 
@@ -537,9 +537,13 @@ msgstr "— همهٔ حقوق محفوظ است."
 msgid "Footer navigation"
 msgstr "ناوبری پاورقی"
 
-#: wavira/inc/options.php:354
+#: wavira/inc/options.php:369
 msgid "Footer note"
 msgstr "یادداشت فوتر"
+
+#: wavira/inc/options.php:236
+msgid "Frosted-glass panels"
+msgstr "پانل‌های شیشه‌ای مات"
 
 #: wavira/inc/blocks.php:64
 msgid "Genre chips, most used first."
@@ -579,7 +583,7 @@ msgctxt "heading of the genre chips pattern"
 msgid "Browse by genre"
 msgstr "مرور بر اساس سبک"
 
-#: wavira/inc/options.php:272
+#: wavira/inc/options.php:287
 msgid "Heading weight"
 msgstr "ضخامت عنوان‌ها"
 
@@ -591,7 +595,7 @@ msgstr "اگر لوگو خودش نام سایت را دارد، پنهانش ک
 msgid "Hides the button only; the visitor’s device preference keeps working."
 msgstr "فقط دکمه را پنهان می‌کند؛ ترجیح دستگاه بازدیدکننده همچنان کار می‌کند."
 
-#: wavira/inc/options.php:333
+#: wavira/inc/options.php:348
 msgid "Icon size (px)"
 msgstr "اندازهٔ آیکون (پیکسل)"
 
@@ -603,8 +607,8 @@ msgstr "اندازهٔ آیکون‌ها در ردیف فوتر."
 msgid "Identity and logo"
 msgstr "هویت و لوگو"
 
-#: wavira/inc/options.php:295
-#: wavira/inc/options.php:636
+#: wavira/inc/options.php:310
+#: wavira/inc/options.php:651
 msgid "Instagram"
 msgstr "اینستاگرام"
 
@@ -707,7 +711,7 @@ msgstr "خاموش‌کردن، نوار پخش‌کننده و فضای رزر�
 msgid "Open %s"
 msgstr "باز کردن %s"
 
-#: wavira/inc/options.php:345
+#: wavira/inc/options.php:360
 msgid "Open social links in a new tab"
 msgstr "بازکردن پیوندهای اجتماعی در زبانهٔ جدید"
 
@@ -753,7 +757,7 @@ msgstr "نوار پخش‌کننده در همهٔ صفحه‌ها"
 msgid "Player for an album, artist or genre queue."
 msgstr "پخشکننده برای آلبوم، هنرمند یا صف سبک."
 
-#: wavira/inc/options.php:286
+#: wavira/inc/options.php:301
 msgid "Preload the bundled font"
 msgstr "پیش‌بارگذاری فونت همراه قالب"
 
@@ -816,7 +820,7 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr "موزیکویدیوها"
 
-#: wavira/inc/options.php:276
+#: wavira/inc/options.php:291
 msgid "Semi bold (600)"
 msgstr "نیمه‌ضخیم (۶۰۰)"
 
@@ -868,12 +872,12 @@ msgstr "دانلود فونت را همراه سند آغاز می‌کند تا
 msgid "Sticky header"
 msgstr "سربرگ چسبان"
 
-#: wavira/inc/options.php:241
+#: wavira/inc/options.php:256
 msgid "System fonts (no font file)"
 msgstr "فونت‌های سیستم (بدون فایل فونت)"
 
-#: wavira/inc/options.php:302
-#: wavira/inc/options.php:640
+#: wavira/inc/options.php:317
+#: wavira/inc/options.php:655
 msgid "Telegram"
 msgstr "تلگرام"
 
@@ -985,7 +989,7 @@ msgstr "جلدها، کارت‌ها، دکمه‌ها و ورودی‌ها از
 msgid "Used for buttons, links and highlights. Each mode has one colour field, so dark mode is not forgotten: check the contrast against both backgrounds."
 msgstr "برای دکمه‌ها، پیوندها و برجسته‌سازی‌ها. هر حالت یک فیلد رنگ دارد تا حالت تاریک فراموش نشود: کنتراست را با هر دو پس‌زمینه بسنجید."
 
-#: wavira/inc/options.php:240
+#: wavira/inc/options.php:255
 msgid "Vazirmatn (bundled, recommended for Persian)"
 msgstr "وزیرمتن (همراه قالب، پیشنهادی برای فارسی)"
 
@@ -1037,8 +1041,8 @@ msgstr "موسیقی واویرا"
 msgid "Wavira settings"
 msgstr "تنظیمات واویرا"
 
-#: wavira/inc/options.php:316
-#: wavira/inc/options.php:648
+#: wavira/inc/options.php:331
+#: wavira/inc/options.php:663
 msgid "X (Twitter)"
 msgstr "ایکس (توییتر)"
 
@@ -1055,7 +1059,7 @@ msgstr "شما اجازهٔ تغییر تنظیمات قالب را ندارید
 msgid "You are not allowed to change this."
 msgstr "شما اجازهٔ این کار را ندارید."
 
-#: wavira/inc/options.php:309
-#: wavira/inc/options.php:644
+#: wavira/inc/options.php:324
+#: wavira/inc/options.php:659
 msgid "YouTube"
 msgstr "یوتیوب"

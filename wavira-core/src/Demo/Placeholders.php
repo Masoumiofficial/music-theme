@@ -53,7 +53,7 @@ final class Placeholders {
 		}
 
 		$name = sprintf( 'wavira-demo-cover-%d.png', $post_id );
-		$id   = self::store( $png, $name, 'image/png', true, $post_id );
+		$id   = self::store( $png, $name, 'image/png', true, $post_id, __( 'Demo cover art', 'wavira-core' ) );
 
 		if ( $id < 1 ) {
 			return 0;
@@ -84,7 +84,7 @@ final class Placeholders {
 		}
 
 		$name = sprintf( 'wavira-demo-photo-%d-%d.png', $post_id, $index );
-		$id   = self::store( $png, $name, 'image/png', true, $post_id );
+		$id   = self::store( $png, $name, 'image/png', true, $post_id, __( 'Demo gallery photo', 'wavira-core' ) );
 
 		if ( $id < 1 ) {
 			return 0;
@@ -125,7 +125,7 @@ final class Placeholders {
 			}
 
 			$name = sprintf( 'wavira-demo-track-%d-%dkbps.wav', $track_id, $kbps );
-			$id   = self::store( $wav, $name, 'audio/wav', false, $track_id );
+			$id   = self::store( $wav, $name, 'audio/wav', false, $track_id, __( 'Demo audio file', 'wavira-core' ) );
 
 			if ( $id < 1 ) {
 				continue;
@@ -172,7 +172,14 @@ final class Placeholders {
 			return 0;
 		}
 
-		$id = self::store( $wav, sprintf( 'wavira-demo-album-%d.wav', $album_id ), 'audio/wav', false, $album_id );
+		$id = self::store(
+			$wav,
+			sprintf( 'wavira-demo-album-%d.wav', $album_id ),
+			'audio/wav',
+			false,
+			$album_id,
+			__( 'Demo album audio', 'wavira-core' )
+		);
 
 		if ( $id < 1 ) {
 			return 0;
@@ -190,9 +197,11 @@ final class Placeholders {
 	 * @param string $name     File name.
 	 * @param string $mime     MIME type.
 	 * @param bool   $is_image  Whether the file is an image (a WAV is not).
-	 * @param int    $parent_id Post to attach the file to, 0 for none.
-	 * @return int Attachment ID, 0 on failure.
-	 */
+	 * @param string $title     Attachment title. The file name has to be ASCII and
+	 *                          is what the demo generates; the *title* is what a
+	 *                          visitor sees when an image does not load and what the
+	 *                          media library lists, so it is a Persian label and not
+	 *                          the file name (0.15.0).
 	private static function store( string $bytes, string $name, string $mime, bool $is_image = true, int $parent_id = 0 ): int {
 		$upload = wp_upload_bits( $name, null, $bytes );
 
@@ -203,7 +212,7 @@ final class Placeholders {
 		$id = wp_insert_attachment(
 			array(
 				'post_mime_type' => $mime,
-				'post_title'     => pathinfo( $name, PATHINFO_FILENAME ),
+				'post_title'     => '' !== $title ? $title : pathinfo( $name, PATHINFO_FILENAME ),
 				'post_content'   => '',
 				'post_status'    => 'inherit',
 				// Attached to its post: the artist gallery *is* the attachments of

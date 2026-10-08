@@ -28,13 +28,19 @@
 
 /* ---- site header ------------------------------------------------------- */
 
+/* The header is the page's first material: translucent, blurred, with a
+   hairline where it meets the content and a highlight along its top edge. The
+   tint comes from tokens.css, so the fallback for a browser without
+   `backdrop-filter` — and for `prefers-reduced-transparency` — is one override
+   rather than a second rule here. */
 .wavira-header {
 	position: sticky;
 	inset-block-start: 0;
 	z-index: 20;
 	border-block-end: var(--wavira-hairline);
-	background: color-mix(in srgb, var(--wp--preset--color--base) 92%, transparent);
-	backdrop-filter: blur(8px);
+	background: var(--wavira-glass-bg);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: inset 0 1px 0 0 var(--wavira-glass-highlight);
 }
 
 .wavira-header__inner {
@@ -88,15 +94,22 @@
 }
 
 .wp-block-navigation__responsive-container.is-menu-open {
-	background: var(--wp--preset--color--base);
+	background: var(--wavira-glass-bg);
+	backdrop-filter: var(--wavira-glass-filter);
 	color: var(--wp--preset--color--contrast);
 	padding: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+.wavira-theme-toggle:hover {
+	background: var(--wavira-glass-bg-soft);
+	box-shadow: inset 0 0 0 1px var(--wavira-glass-border);
 }
 
 .wavira-theme-toggle {
 	display: inline-flex;
 	align-items: center;
 	gap: 0.375rem;
+	border-radius: var(--wp--custom--radius--pill, 999px);
 	min-block-size: 44px;
 	padding: 0.25rem 0.75rem;
 	border: 1px solid var(--wp--preset--color--border);
@@ -191,9 +204,10 @@
 .wavira-chip {
 	display: inline-block;
 	padding: 0.125rem 0.625rem;
-	border: 1px solid var(--wp--preset--color--border);
+	border: 1px solid var(--wavira-glass-border);
 	border-radius: var(--wp--custom--radius--pill, 999px);
-	background: var(--wp--preset--color--surface);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
 	color: var(--wp--preset--color--contrast);
 	text-decoration: none;
 }
@@ -378,9 +392,21 @@
 	--wavira-player-radius: var(--wp--custom--radius--lg, 20px);
 }
 
+/* The bar is the second material, and the plugin's own background token is what
+   makes it one: the component paints `--wavira-player-bg` on its root, so
+   pointing that token at the glass tint gives the whole bar the material — its
+   buttons keep `--wavira-player-surface`, which is a shade lighter. */
 .wavira-site-player .wavira-player {
+	--wavira-player-bg: var(--wavira-glass-bg);
+	--wavira-player-surface: var(--wavira-glass-surface);
+
 	border-inline: 0;
 	border-block-end: 0;
+	box-shadow: inset 0 1px 0 0 var(--wavira-glass-highlight);
+}
+
+.wavira-site-player .wavira-player--sticky {
+	backdrop-filter: var(--wavira-glass-filter);
 }
 
 /* The mount inside this wrapper carries `.wavira-player--sticky` (the plugin's own
@@ -472,10 +498,11 @@
 	flex-direction: column;
 	inline-size: 100%;
 	overflow: hidden;
-	border: var(--wavira-hairline);
+	border: 1px solid var(--wavira-glass-border);
 	border-radius: var(--wavira-cover-radius);
-	background: var(--wp--preset--color--surface);
-	box-shadow: var(--wavira-cover-shadow);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
 }
 
 .wavira-card__media {
@@ -701,9 +728,10 @@
 	inset-inline-end: -0.75rem;
 	inline-size: 2.75rem;
 	block-size: 2.75rem;
-	border: 0;
+	border: 1px solid var(--wavira-glass-border);
 	border-radius: 999px;
-	background: var(--wp--preset--color--contrast, #1b1f27);
+	background: color-mix(in srgb, var(--wp--preset--color--contrast, #1b1f27) 88%, transparent);
+	backdrop-filter: var(--wavira-glass-filter);
 	color: var(--wp--preset--color--base, #ffffff);
 	font-size: 1.5rem;
 	line-height: 1;
@@ -980,11 +1008,12 @@ body.wavira-no-player {
 	inline-size: 2.75rem;
 	block-size: 2.75rem;
 	padding: 0.5rem;
-	border: var(--wavira-hairline);
+	border: 1px solid var(--wavira-glass-border);
 	border-radius: var(--wp--custom--radius--pill, 999px);
-	background: var(--wp--preset--color--surface);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
 	color: var(--wp--preset--color--contrast);
-	box-shadow: var(--wavira-cover-shadow);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
 	cursor: pointer;
 }
 

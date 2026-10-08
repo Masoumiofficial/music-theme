@@ -113,8 +113,16 @@ msgstr ""
 msgid "Demo Album"
 msgstr ""
 
+#: wavira-core/src/Demo/Placeholders.php:181
+msgid "Demo album audio"
+msgstr ""
+
 #: wavira-core/src/Demo/Fixtures.php:198
 msgid "Demo Artist"
+msgstr ""
+
+#: wavira-core/src/Demo/Placeholders.php:128
+msgid "Demo audio file"
 msgstr ""
 
 #: wavira-core/src/Admin/DemoPage.php:268
@@ -124,8 +132,13 @@ msgid_plural "Demo content imported: %1$d releases, %2$d tracks and %3$d generat
 msgstr[0] ""
 msgstr[1] ""
 
+#: wavira-core/src/Demo/Placeholders.php:56
 #: wavira-core/src/Demo/Placeholders.php:62
 msgid "Demo cover art"
+msgstr ""
+
+#: wavira-core/src/Demo/Placeholders.php:87
+msgid "Demo gallery photo"
 msgstr ""
 
 #: wavira-core/src/Demo/Placeholders.php:97

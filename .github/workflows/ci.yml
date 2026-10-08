@@ -590,6 +590,15 @@ jobs:
             echo "--- the plugin's section headings, on the rendered artist page"
             node tools/check-fa-labels.mjs --page=/tmp/artist.html || asset_failures=1
 
+            # And the whole page, not only its headings: the product promises a
+            # Persian site, so a Latin word a visitor can read (in the text or in
+            # an alt, an aria-label or a placeholder) is a defect that names
+            # itself. Proper nouns are listed in the tool.
+            echo "--- the three rendered pages, in full"
+            for page in home album artist; do
+              node tools/check-persian.mjs --page="/tmp/${page}.html" || asset_failures=1
+            done
+
             # What answers, not only how big it is. `curl | wc -c` said "38378
             # bytes" for the stylesheet in 0.14.0 and the render was still
             # unstyled: `wp server`'s router sends a request for a file that is

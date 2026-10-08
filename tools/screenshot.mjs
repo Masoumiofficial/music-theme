@@ -251,6 +251,39 @@ export function stylesheetVerdict( meta ) {
 }
 
 /**
+ * Decide whether the player a page mounts has anything in it to play.
+ *
+ * The theme prints a mount point and Wavira Core's engine fills it with its own
+ * `<audio>` and buttons. Between those two facts a page can look finished and
+ * have nothing to play: the markup is there, the section has a height, and the
+ * engine never ran — a thrown exception, a script that did not load, a payload
+ * that did not arrive. A screenshot of that page is a screenshot of an empty
+ * section, and for a music theme that is the one thing it must not be.
+ *
+ * A page without a mount is not this check's business: not every template has a
+ * player.
+ *
+ * @param {{players?: Array<{controls: number}>}} meta What the page reported.
+ * @return {string} An empty string when every mount has controls, else why not.
+ */
+export function playerVerdict( meta ) {
+	const mounts = Array.isArray( meta.players ) ? meta.players : [];
+
+	if ( mounts.length === 0 ) {
+		return '';
+	}
+
+	if ( mounts.some( ( mount ) => Number( mount.controls ) > 0 ) ) {
+		return '';
+	}
+
+	return (
+		`the page mounts ${ mounts.length } player(s) and none of them contains a control — ` +
+		'the engine did not run (a script that did not load, or an exception), so the section shows nothing to play'
+	);
+}
+
+/**
  * Run the capture with the arguments given.
  *
  * @param {string[]} args Arguments, without `node script`.
@@ -412,6 +445,14 @@ export async function main( args ) {
 			await page.emulateMediaFeatures( [ { name: 'prefers-color-scheme', value: shot.scheme } ] );
 		}
 
+		// An uncaught exception on the page is invisible in a PNG and usually
+		// explains a section that renders empty: collect it and fail on it.
+		const crashes = [];
+
+		page.on( 'pageerror', ( error ) => {
+			crashes.push( String( error && error.message ? error.message : error ).split( '\n' )[ 0 ] );
+		} );
+
 		const response = await page.goto( shot.url, { waitUntil: 'load', timeout } );
 		const status = response ? response.status() : 0;
 
@@ -467,6 +508,13 @@ export async function main( args ) {
 				( link ) => link.getAttribute( 'href' ) || ''
 			);
 
+			// The player the theme mounts, and what is inside it. A music theme's
+			// page can be complete and have nothing to play — see
+			// `playerVerdict()`.
+			const players = Array.from( document.querySelectorAll( '[data-wavira-player]' ) ).map( ( mount ) => ( {
+				controls: mount.querySelectorAll( 'button, audio, input, select' ).length,
+			} ) );
+
 			return {
 				lang: document.documentElement.lang,
 				dir: document.documentElement.dir || 'ltr',
@@ -474,6 +522,7 @@ export async function main( args ) {
 				text: ( document.body.innerText || '' ).trim().slice( 0, 200 ),
 				rules: rules,
 				stylesheets: stylesheets,
+				players: players,
 			};
 		} );
 
@@ -487,7 +536,7 @@ export async function main( args ) {
 		notes.push(
 			`${ shot.file } — ${ size ? `${ size.width }×${ size.height }` : 'NOT A PNG' }, ${ bytes.length } B, ` +
 				`HTTP ${ status }, lang=${ meta.lang || '(none)' } dir=${ meta.dir }, ${ meta.height }px tall, ` +
-				`${ meta.rules } CSS rule(s) in effect`
+				`${ meta.rules } CSS rule(s) in effect, ${ meta.players.length } player(s)`
 		);
 
 		if ( ! size ) {
@@ -515,6 +564,16 @@ export async function main( args ) {
 
 		if ( '' !== styling ) {
 			fail( `${ shot.url }: ${ styling }` );
+		}
+
+		const playing = playerVerdict( meta );
+
+		if ( '' !== playing ) {
+			fail( `${ shot.url }: ${ playing }` );
+		}
+
+		if ( crashes.length > 0 ) {
+			fail( `${ shot.url } threw ${ crashes.length } JavaScript error(s) — the page is not the page the theme intends: ${ crashes[ 0 ] }` );
 		}
 
 		return { page, file: shot.file, bytes: bytes.length };

@@ -5,7 +5,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Added — 0.15.0 (every section plays, every section downloads)
+### Added — 0.15.0
+
+- **The chrome is a material, not a flat colour.** The header, the sticky player
+  bar, the cards, the chips, the mobile menu, the lightbox's close button and the
+  back-to-top button are frosted glass: a tinted, blurred, slightly saturated
+  surface with a hairline and a highlight along its top edge. The tint is the
+  palette's own colour, so the pair the contrast gate asserts is the worse case
+  over any backdrop rather than the better one, and the whole system has two
+  honest fallbacks that are one override each: `prefers-reduced-transparency`
+  (the platform setting) and `@supports not (backdrop-filter: …)`. A new
+  Appearance setting, «پانل‌های شیشه‌ای مات», turns the effect off by adding one
+  body class — the same override reached a third way, with no rule per component
+  and no `!important` (`wavira/assets/css/tokens.css`, `components.css`). (every section plays, every section downloads)
 
 - **A download in every section** (`wavira/inc/downloads.php`, `wavira/blocks/download/`, the four single
   templates). 0.14.0 showed the music; 0.15.0 lets a visitor *take* it: the track hero lists 128 and
