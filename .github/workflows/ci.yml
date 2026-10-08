@@ -425,6 +425,28 @@ jobs:
             cp -a wavira-core /tmp/site/wp-content/plugins/wavira-core
             wp plugin activate wavira-core
             wp theme activate wavira
+            # The URL WordPress builds must be the URL the render is reached at.
+            # `wp core install --url=…` does not survive WP-CLI's own guess: it
+            # computes the site URL from the phar's location relative to `--path`,
+            # and `/tmp/site` minus `/tmp` is `/site`. Then `wp server`'s router
+            # rewrites the *host* of `option_siteurl` and keeps its path, so every
+            # URL the theme derives from `siteurl` — its stylesheet, its script,
+            # every uploaded cover — pointed at `/wp-content/…` under `/site/`,
+            # which is not a file on disk. The router hands a request for a file
+            # that is not there to `index.php`, so the stylesheet came back as the
+            # front page's `text/html`; a browser refuses a stylesheet with the
+            # wrong content type and drops every rule in it — which is what "the
+            # theme renders unstyled" had been all along. `option_home` *is* forced
+            # to the bare host, which is why the pages themselves answered 200 and
+            # nothing looked wrong.
+            echo "--- the site URL WP-CLI guessed"
+            wp option get home
+            wp option get siteurl
+            wp option update home 'http://127.0.0.1:8080'
+            wp option update siteurl 'http://127.0.0.1:8080'
+            echo "--- the site URL the render will use"
+            wp option get home
+            wp option get siteurl
             wp option update permalink_structure '/%postname%/'
             wp rewrite flush --hard
             wp option update blogdescription 'پخش و انتشار موسیقی ایرانی'
@@ -494,7 +516,12 @@ jobs:
                 # `tools/check-render.mjs` reads the expected strings from the shipped
                 # catalogue, so it fails when the page is English *and* when a heading
                 # loses its translation.
-                node tools/check-render.mjs --page=/tmp/home.html
+                # `--origin`: every `wp-content` URL the page prints has to be the
+                # URL this origin serves. A site URL with a path in it
+                # (`http://127.0.0.1:8080/site`) makes the theme's own stylesheet
+                # unfetchable — the browser gets the front page as `text/html` and
+                # refuses it — and nothing in the HTML looks wrong.
+                node tools/check-render.mjs --page=/tmp/home.html --origin=http://127.0.0.1:8080
                 exit 0
               fi
               sleep 2
@@ -574,8 +601,8 @@ jobs:
             for asset in assets/dist/theme.css assets/dist/theme.js; do
               url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
               local_file="/tmp/site/wp-content/themes/wavira/${asset}"
-              read -r code type size < <( curl -sS -o "/tmp/asset-fetch.bin" \
-                -w '%{http_code} %{content_type} %{size_download}' "$url"; echo )
+              IFS='|' read -r code type size < <( curl -sS -o "/tmp/asset-fetch.bin" \
+                -w '%{http_code}|%{content_type}|%{size_download}' "$url"; echo )
               echo "${asset}: HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 40 /tmp/asset-fetch.bin | tr -d '\n')"
               case "${asset}" in
                 *.css) expected_type='text/css' ;;
@@ -602,8 +629,8 @@ jobs:
             echo "--- the uploads directory"
             ls -la /tmp/site/wp-content/uploads/*/ 2>&1 | head -8 || echo "no uploads directory"
             if [ -n "${image_url}" ]; then
-              read -r code type size < <( curl -sS -o /tmp/asset-image.bin \
-                -w '%{http_code} %{content_type} %{size_download}' "${image_url}"; echo )
+              IFS='|' read -r code type size < <( curl -sS -o /tmp/asset-image.bin \
+                -w '%{http_code}|%{content_type}|%{size_download}' "${image_url}"; echo )
               echo "demo image ${image_url}: HTTP ${code}, ${type}, ${size} byte(s)"
               if [ "${code}" != "200" ] || [ "${type#*image/}" = "${type}" ]; then
                 echo "::error::a demo image did not come back as an image (HTTP ${code}, ${type}) — the render would photograph broken pictures"
@@ -614,15 +641,40 @@ jobs:
               asset_failures=1
             fi
 
+            echo "--- what the front page asks the browser to load"
+            # `|| true`: no match is a result, not a failure, and with `pipefail`
+            # a bare grep would end the step (it did, 0.14.0).
+            { grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12; } || true
+
+            # The check above asks whether the file *at that path* is CSS. This one
+            # asks whether the URL **the page itself prints** is CSS — the two
+            # differ exactly when the site URL carries a path (`/site`), and that
+            # difference is invisible to curl-by-hand and fatal in a browser: the
+            # router answers the missing path with the front page's `text/html`,
+            # and a browser refuses a stylesheet with the wrong content type.
+            # Core prints `<link … href='…'>` with single quotes.
+            page_css="$( grep -oE "href='[^']*assets/dist/theme\.css[^']*'" /tmp/home.html | head -1 | sed "s/^href='//; s/'$//" )"
+            if [ -z "${page_css}" ]; then
+              echo "::error::the front page does not link the theme stylesheet (assets/dist/theme.css) at all — it renders with core's defaults"
+              asset_failures=1
+            else
+              case "${page_css}" in
+                /*) page_css="http://127.0.0.1:8080${page_css}" ;;
+              esac
+              echo "the page's own stylesheet: ${page_css}"
+              IFS='|' read -r code type size < <( curl -sS -o /tmp/asset-page.bin \
+                -w '%{http_code}|%{content_type}|%{size_download}' "${page_css}"; echo )
+              echo "  → HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 32 /tmp/asset-page.bin | tr -d '\n')"
+              if [ "${code}" != "200" ] || [ "${type#*text/css}" = "${type}" ]; then
+                echo "::error::the URL the front page prints for its stylesheet (${page_css}) did not come back as CSS (HTTP ${code}, ${type}) — the browser refuses it and every page renders unstyled"
+                asset_failures=1
+              fi
+            fi
             if [ "${asset_failures}" != "0" ]; then
               echo "the theme's own assets are not being served as assets; stopping before the render"
               exit 1
             fi
 
-            echo "--- what the front page asks the browser to load"
-            # `|| true`: no match is a result, not a failure, and with `pipefail`
-            # a bare grep would end the step (it did, 0.14.0).
-            { grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12; } || true
 
             echo "--- the arguments the renderer will get"
             cat /tmp/extra-pages.txt

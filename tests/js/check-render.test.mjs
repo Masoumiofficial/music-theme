@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
 	FRONT_PAGE_HEADINGS,
+	attributeValue,
 	checkPage,
 	option,
 	plain,
@@ -243,6 +244,74 @@ test( 'the front page has the h1 the other templates get from their titles', () 
 	const template = readFileSync( fileURLToPath( new URL( '../../wavira/templates/front-page.html', import.meta.url ) ), 'utf8' );
 
 	assert.match( template, /wp:site-title \{"level":1,"className":"wavira-visually-hidden"\} \/\-->/ );
+} );
+
+test( 'a wp-content URL the render cannot reach is named, with the URL to fix', () => {
+	const page = DRESSED( '<div class="wavira-section"></div>' );
+	const bent = ( result ) => result.problems.filter( ( problem ) => /wp-content URL/.test( problem ) );
+
+	// The suffix of `--path=/tmp/site`: the site URL carries `/site`, so every URL
+	// the site builds points at a path nothing serves. The stylesheet arrives as
+	// HTML, the browser refuses it, and the page renders unstyled while every
+	// HTML-level check still passes — which is what four screenshots shipped as.
+	const shifted = page
+		.replace( 'href="/wp-content', 'href="http://127.0.0.1:8080/site/wp-content' )
+		.replace( 'src="/wp-content', 'src="http://127.0.0.1:8080/site/wp-content' );
+	const named = bent( checkPage( { page: shifted, catalogue: CATALOGUE, origin: 'http://127.0.0.1:8080' } ) );
+
+	assert.equal( named.length, 1 );
+	assert.match( named[ 0 ], /\/site\/wp-content/ );
+	assert.match( named[ 0 ], /expected it to start with http:\/\/127\.0\.0\.1:8080\/wp-content\// );
+
+	// The same URLs on the origin the page came from: nothing to say.
+	assert.equal(
+		bent(
+			checkPage( {
+				page: page
+					.replace( 'href="/wp-content', 'href="http://127.0.0.1:8080/wp-content' )
+					.replace( 'src="/wp-content', 'src="http://127.0.0.1:8080/wp-content' ),
+				catalogue: CATALOGUE,
+				origin: 'http://127.0.0.1:8080',
+			} )
+		).length,
+		0
+	);
+
+	// No origin to compare against: the check stays quiet rather than guessing.
+	assert.equal( bent( checkPage( { page: shifted, catalogue: CATALOGUE } ) ).length, 0 );
+
+	// An external link is not a defect — the theme's footer thanks its author.
+	assert.equal(
+		bent(
+			checkPage( {
+				page: DRESSED( '<a href="https://example.org/credits">طراحی و توسعه</a>' ),
+				catalogue: CATALOGUE,
+				origin: 'http://127.0.0.1:8080',
+			} )
+		).length,
+		0
+	);
+} );
+
+test( 'the demo images are checked against the origin as well', () => {
+	const shifted = checkPage( {
+		page: DRESSED( '<img src="http://127.0.0.1:8080/site/wp-content/uploads/2026/10/cover.png" alt="طرح جلد">' ),
+		catalogue: CATALOGUE,
+		origin: 'http://127.0.0.1:8080',
+	} ).problems.filter( ( problem ) => /wp-content URL/.test( problem ) );
+
+	assert.equal( shifted.length, 1 );
+	assert.match( shifted[ 0 ], /127\.0\.0\.1:8080\/site\/wp-content\/uploads/ );
+
+	// A relative one resolves against the origin and is fine.
+	assert.equal(
+		checkPage( {
+			page: DRESSED( '<img src="/wp-content/uploads/2026/10/cover.png" alt="طرح جلد">' ),
+			catalogue: CATALOGUE,
+			origin: 'http://127.0.0.1:8080',
+		} ).problems.filter( ( problem ) => /wp-content URL/.test( problem ) ).length,
+		0
+	);
 } );
 
 test( 'the command line refuses to run without a page', () => {

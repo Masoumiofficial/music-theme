@@ -56,6 +56,20 @@ function escapeRegExp( value ) {
 }
 
 /**
+ * The first value of an attribute whose value contains `path`, or an empty string.
+ *
+ * @param {string} page Rendered HTML.
+ * @param {string} name Attribute name, `href` or `src`.
+ * @param {string} path Regex source the value has to contain.
+ * @return {string} The URL as printed, or `''`.
+ */
+export function attributeValue( page, name, path ) {
+	const match = page.match( new RegExp( `${ name }=['"]([^'"]*${ path }[^'"]*)['"]` ) );
+
+	return match ? match[ 1 ] : '';
+}
+
+/**
  * Read the result of a page check.
  *
  * @param {object}   input
@@ -63,9 +77,10 @@ function escapeRegExp( value ) {
  * @param {string}   input.catalogue        The `.po` file the theme ships.
  * @param {string[]} [input.headings]       Source strings to look for.
  * @param {number}   [input.minSections]    How many `wavira-section` elements a front page has.
+ * @param {string}   [input.origin]         The origin the page was fetched from, e.g. `http://127.0.0.1:8080`.
  * @return {{ found: string[], problems: string[] }} What was on the page, and what was wrong with it.
  */
-export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, minSections = 4 } ) {
+export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, minSections = 4, origin = '' } ) {
 	const found = [];
 	const problems = [];
 	const flat = plain( page );
@@ -131,11 +146,51 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 		problems.push( 'the page does not load the theme script (assets/dist/theme.js) — the player and the colour toggle are inert' );
 	}
 
+	// And every `wp-content` URL the page prints has to be the one this origin
+	// serves. A WordPress site URL that carries a path —
+	// `http://127.0.0.1:8080/site`, which is what WP-CLI guesses when
+	// `--path=/tmp/site` puts the installation one directory below its own phar —
+	// makes every URL the site builds point at `/site/wp-content/…`. Nothing
+	// serves that path, so the stylesheet arrives as the front page's `text/html`,
+	// the browser refuses it, and the theme renders with core's defaults while
+	// every HTML-level check still passes (0.15.0's screenshots, four of them).
+	// The URL is the thing that was wrong, so the URL is what is compared — and
+	// it is compared against `--origin`, because only the caller knows where the
+	// page was fetched from.
+	if ( origin ) {
+		const base = origin.replace( /\/+$/, '' );
+		const wantedPrefix = `${ base }/wp-content/`;
+		const inside = ( url ) => {
+			if ( /^[a-z][a-z0-9+.-]*:\/\//i.test( url ) ) {
+				return url.startsWith( wantedPrefix );
+			}
+
+			// A site-relative URL resolves against the origin the page came from,
+			// so it only has to have the right path.
+			try {
+				return new URL( url, `${ base }/` ).href.startsWith( wantedPrefix );
+			} catch {
+				return false;
+			}
+		};
+
+		const outside = [ ...new Set( [ ...page.matchAll( /(?:href|src)=['"]([^'"]*wp-content[^'"]*)['"]/g ) ].map( ( match ) => match[ 1 ] ) ) ]
+			.filter( ( url ) => ! inside( url ) );
+
+		if ( outside.length > 0 ) {
+			problems.push(
+				`${ outside.length } of the page's wp-content URL(s) are not served by ${ base } — ` +
+					`the first is ${ outside[ 0 ] } (expected it to start with ${ wantedPrefix }); ` +
+					'the site URL carries a path the render cannot reach, so the stylesheet and the demo images 404 silently'
+			);
+		}
+	}
+
 	return { found, problems, counts };
 }
 
 export function usage() {
-	return 'usage: node tools/check-render.mjs --page=<file> [--catalogue=wavira/languages/fa_IR.po] [--min-sections=4]';
+	return 'usage: node tools/check-render.mjs --page=<file> [--catalogue=wavira/languages/fa_IR.po] [--min-sections=4] [--origin=http://127.0.0.1:8080]';
 }
 
 /**
@@ -161,6 +216,7 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 	const page = option( args, 'page' );
 	const cataloguePath = option( args, 'catalogue', 'wavira/languages/fa_IR.po' );
 	const minSections = option( args, 'min-sections', '4' );
+	const origin = option( args, 'origin', '' );
 
 	// A bare `--page` (or `--page /tmp/x.html`, which is a flag and a stray word)
 	// reads as `true`: say so instead of failing on a path called "true".
@@ -177,6 +233,7 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 			page: readFileSync( page, 'utf8' ),
 			catalogue: readFileSync( cataloguePath, 'utf8' ),
 			minSections: Number( minSections ),
+			origin: String( origin ),
 		} );
 	} catch ( error ) {
 		console.error( `::error title=Rendered theme::${ error.message }` );
