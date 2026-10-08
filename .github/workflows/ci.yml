@@ -499,16 +499,16 @@ jobs:
           fi
           exit "$status"
 
-      - name: Render the screenshots and run axe
-        env:
-          NODE_PATH: /tmp/render/node_modules
+      - name: Look before rendering (the browsers, and the demo pages)
+        # Diagnostics in their own step, with their own log: the renderer's log has
+        # to stay short, because a run carries a limited number of annotations and
+        # the Checks API returns only part of them — a failure at the end of a long
+        # log is a failure nobody reads (0.14.0).
         run: |
           {
             set -euo pipefail
             wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
 
-            # What the renderer might find, printed before it looks: a launch
-            # failure is the one thing a runner cannot show in a screenshot.
             echo "--- browsers on this runner"
             for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
               path="$(command -v "$candidate" || true)"
@@ -524,17 +524,37 @@ jobs:
             echo "--- the demo pages"
             echo "album: /albums/${ALBUM_SLUG}/ | artist: /artists/${ARTIST_SLUG}/"
 
-            EXTRA_ARGS=()
+            : > /tmp/extra-pages.txt
             for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
               url="http://127.0.0.1:8080${pair#*=}"
               status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
               echo "${pair%%=*}: ${url} → HTTP ${status}"
               if [ "$status" = "200" ]; then
-                EXTRA_ARGS+=( "--page=${pair}" )
+                echo "--page=${pair}" >> /tmp/extra-pages.txt
               else
-                echo "::notice title=Rendered theme::the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
+                echo "the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
               fi
             done
+
+            echo "--- the arguments the renderer will get"
+            cat /tmp/extra-pages.txt
+          } 2>&1 | tee /tmp/preflight.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/preflight.log preflight 20 error --one
+          fi
+          exit "$status"
+
+      - name: Render the screenshots and run axe
+        env:
+          NODE_PATH: /tmp/render/node_modules
+        run: |
+          {
+            set -euo pipefail
+            EXTRA_ARGS=()
+            while IFS= read -r line; do
+              [ -n "$line" ] && EXTRA_ARGS+=( "$line" )
+            done < /tmp/extra-pages.txt
 
             node tools/screenshot.mjs \
               --url=http://127.0.0.1:8080/ \
@@ -547,13 +567,22 @@ jobs:
           } 2>&1 | tee /tmp/render.log
           status="${PIPESTATUS[0]}"
           if [ "$status" != "0" ]; then
-            # One per line for the run page, and the whole tail as a single
-            # annotation because a run carries a limited number of them and the
-            # Checks API hands back only some: the crash has to arrive as one.
-            node tools/annotate-log.mjs /tmp/render.log render 24 error
-            node tools/annotate-log.mjs /tmp/render.log render-failure 24 error --one
+            node tools/annotate-log.mjs /tmp/render.log render 12 error --one
           fi
           exit "$status"
+
+      - name: Say why the render failed
+        # The last word on a failed render, as one annotation: whatever the API
+        # returns, it returns the newest ones, and this step runs last.
+        if: failure()
+        run: |
+          if [ -f /tmp/render.log ]; then
+            node tools/annotate-log.mjs /tmp/render.log render-diagnosis 14 error --one
+          elif [ -f /tmp/preflight.log ]; then
+            node tools/annotate-log.mjs /tmp/preflight.log preflight-diagnosis 14 error --one
+          else
+            echo "::error title=Rendered theme::the render never started — no log was written"
+          fi
 
       - name: Commit the theme screenshot when it changed
         # Only on `main`: a push made with GITHUB_TOKEN does not trigger
