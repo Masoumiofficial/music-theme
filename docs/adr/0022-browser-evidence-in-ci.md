@@ -37,7 +37,13 @@ about the sandbox, not about the product.
 4. **`moderate` and `minor` axe findings are printed, not fatal**, and an allowance has to be named
    (`--allow=color-contrast`): a site owner's accent colour is not machine-checked for contrast (ADR 0020's
    stated limitation), so the rule that fires on it is reported as an allowance rather than suppressed.
-5. **PHP notices are recorded, not yet fatal.** The render runs with `WP_DEBUG` on and uploads
+5. **The page is checked, not just photographed.** `tools/check-render.mjs` reads the fetched HTML and
+   fails when the front page is not Persian — comparing against the strings in the shipped catalogue rather
+   than a list typed into the workflow, so a missing translation and an un-translated page are the same
+   failure — when the front-page template's sections are absent (a blog index at the root, the defect of
+   ADR 0021) and when the page carries no Persian at all. A screenshot can be of the wrong page; the job
+   that takes it has to say which page it is.
+6. **PHP notices are recorded, not yet fatal.** The render runs with `WP_DEBUG` on and uploads
    `debug.log`; a notice is annotated as a warning. The list has to be empty before it becomes a gate —
    wiring a new gate to a list nobody has looked at is how gates get switched off.
 
