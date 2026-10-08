@@ -92,7 +92,12 @@
 		__( 'Profile, works and photos of an artist.', 'wavira' )
 	);
 
-	register( 'wavira/artist-gallery', __( 'Photos attached to an artist.', 'wavira' ) );
+	register(
+		'wavira/download',
+		__( 'Download button for a track, an album, a video or an image — hidden when there is no file.', 'wavira' )
+	);
+
+	register( 'wavira/artist-gallery', __( 'Photos attached to this post: artist, release or video.', 'wavira' ) );
 
 	register( 'wavira/news', __( 'The newest news posts as cards.', 'wavira' ) );
 } )(

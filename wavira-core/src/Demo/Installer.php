@@ -66,6 +66,7 @@ final class Installer {
 			'video'    => 0,
 			'menu'     => 0,
 			'replaced' => 0,
+			'media'    => 0,
 			'notices'  => array(),
 		);
 
@@ -86,6 +87,27 @@ final class Installer {
 
 		$report['artist'] = self::insert_demo_post( PostTypes::ARTIST, $demo['artist'] );
 
+		if ( Placeholders::cover( $report['artist'], self::palette( 4 ), (string) $demo['artist']['title'], 800 ) > 0 ) {
+			$report['media']++;
+		}
+
+		if ( $site ) {
+			for ( $photo = 1; $photo <= 6; $photo++ ) {
+				$id = Placeholders::photo(
+					$report['artist'],
+					self::palette( 4 + $photo ),
+					(string) $demo['artist']['title'] . $photo,
+					$photo
+				);
+
+				if ( $id > 0 ) {
+					$report['media']++;
+				}
+			}
+		}
+
+		$release_index = 0;
+
 		foreach ( $demo['releases'] as $release ) {
 			$release_id = self::insert_demo_post( PostTypes::ALBUM, $release );
 
@@ -94,6 +116,25 @@ final class Installer {
 			update_post_meta( $release_id, MetaSchema::RELEASE_DATE, (string) $release['release_date'] );
 
 			self::attach_term( $release_id, Taxonomies::GENRE, (string) $release['genre'] );
+
+			// The demo ships generated media, never a URL that can 404 (ADR 0010
+			// amended by ADR 0024): a cover per release, a tone per track so the
+			// player and the download button have a file, a photo set for the
+			// artist and a poster for the video.
+			$palette = self::palette( $release_index );
+			$cover   = Placeholders::cover( $release_id, $palette, (string) $release['title'] );
+
+			if ( $cover > 0 ) {
+				$report['media']++;
+			}
+
+			if ( $site ) {
+				$album_file = Placeholders::album_audio( $release_id, 8, 262 + ( $release_index * 55 ) );
+
+				if ( $album_file > 0 ) {
+					$report['media']++;
+				}
+			}
 
 			$release_tracks = array();
 
@@ -120,6 +161,23 @@ final class Installer {
 				self::attach_term( $track_id, Taxonomies::GENRE, (string) $track['genre'] );
 				self::attach_kind( $track_id, (string) ( $track['kind'] ?? 'music' ) );
 
+				$track_cover = Placeholders::cover( $track_id, $palette, (string) $track['title'], 600 );
+
+				if ( $track_cover > 0 ) {
+					$report['media']++;
+				}
+
+				$audio = Placeholders::audio( $track_id, 6, 330 + ( $index * 42 ) );
+
+				if ( ! empty( $audio['id'] ) ) {
+					$report['media']++;
+
+					// The demo's own file length is what the player shows while
+					// nothing has loaded yet: six seconds of tone, not the four
+					// minutes the fixture pretends the song lasts.
+					update_post_meta( $track_id, MetaSchema::DURATION, 6 );
+				}
+
 				$release_tracks[] = $track_id;
 			}
 
@@ -128,6 +186,7 @@ final class Installer {
 			update_post_meta( $release_id, MetaSchema::TRACKLIST, $release_tracks );
 
 			$report['releases'][] = $release_id;
+			$release_index++;
 		}
 
 		$report['video'] = self::insert_demo_post( PostTypes::VIDEO, $demo['video'] );
@@ -135,6 +194,13 @@ final class Installer {
 		update_post_meta( $report['video'], MetaSchema::ARTIST, $report['artist'] );
 		update_post_meta( $report['video'], MetaSchema::ALBUM, (int) reset( $report['releases'] ) );
 		update_post_meta( $report['video'], MetaSchema::VIDEO_SOURCE, 'other' );
+
+		// The video has a poster so the section is not an empty box; there is no
+		// video *file*, and the block says so plainly instead of pointing at a
+		// file that is not there (see docs/DEMO-CONTENT.md).
+		if ( Placeholders::cover( $report['video'], self::palette( 3 ), (string) $demo['video']['title'], 960 ) > 0 ) {
+			$report['media']++;
+		}
 
 		if ( ! $english && $site ) {
 			$report['notices'] = array_merge( $report['notices'], self::apply_site_defaults( $demo ) );
@@ -151,6 +217,31 @@ final class Installer {
 		do_action( 'wavira_core_demo_installed', $report, $demo );
 
 		return $report;
+	}
+
+	/**
+	 * Cover palette of the demo.
+	 *
+	 * Covers are generated, so their colours are the one thing that makes two
+	 * releases distinguishable in a grid. The set is deliberately dark-to-mid: the
+	 * theme's accent is indigo and a demo of pastel covers would look like a
+	 * different product.
+	 *
+	 * @param int $index Palette number; wraps around.
+	 * @return array<int, array<int, int>> Two RGB triples.
+	 */
+	private static function palette( int $index ): array {
+		$palettes = array(
+			array( array( 27, 32, 74 ), array( 118, 96, 232 ) ),   // Indigo night.
+			array( array( 12, 74, 86 ), array( 92, 214, 195 ) ),   // Persian turquoise.
+			array( array( 84, 24, 44 ), array( 240, 138, 122 ) ),  // Warm sunset.
+			array( array( 18, 18, 24 ), array( 108, 122, 148 ) ),  // Charcoal.
+			array( array( 52, 38, 12 ), array( 226, 178, 92 ) ),   // Amber.
+			array( array( 16, 52, 38 ), array( 138, 214, 138 ) ),  // Garden.
+			array( array( 60, 20, 60 ), array( 226, 128, 214 ) ),  // Orchid.
+		);
+
+		return $palettes[ $index % count( $palettes ) ];
 	}
 
 	/**

@@ -82,6 +82,103 @@ final class Access {
 	}
 
 	/**
+	 * Whether a post of *any* downloadable type may expose a download link.
+	 *
+	 * `can_download()` answers for a track and stays the narrow, documented
+	 * question; this is the one the download endpoint and the download button ask,
+	 * because the product grew sections (ADR 0023):
+	 *
+	 * - **track** — published, global downloads on, at least one audio file, the
+	 *   per-track opt-out respected, the login rule respected;
+	 * - **album** — published, global downloads on, the album's own master file
+	 *   present, the per-album opt-out respected;
+	 * - **video** — published, global downloads on, and a *hosted* file: an embed
+	 *   has nothing to hand out, so an embed is never a download;
+	 * - **image** — an attachment whose parent (when it has one) is published, so
+	 *   cover art can be downloaded but a private file cannot.
+	 *
+	 * @param int $post_id Post ID of any type.
+	 * @return bool
+	 */
+	public static function allows( int $post_id ): bool {
+		$type = Sources::type( $post_id );
+
+		if ( Sources::TRACK === $type ) {
+			return self::can_download( $post_id );
+		}
+
+		if ( '' === $type ) {
+			return false;
+		}
+
+		if ( ! Settings::get( 'downloads_enabled', true ) ) {
+			return false;
+		}
+
+		$allowed = '' !== self::file_url( $post_id, $type );
+
+		if ( Sources::IMAGE === $type ) {
+			$allowed = $allowed && self::image_is_public( $post_id );
+		}
+
+		// The same per-post opt-out a track has, for the same reason: `false` and
+		// "never set" are indistinguishable in the value alone.
+		if ( Sources::IMAGE !== $type
+			&& metadata_exists( 'post', $post_id, MetaSchema::DOWNLOAD_ENABLED )
+			&& ! MetaValues::bool( $post_id, MetaSchema::DOWNLOAD_ENABLED ) ) {
+			$allowed = false;
+		}
+
+		if ( $allowed && Settings::get( 'downloads_require_login', false ) ) {
+			$allowed = is_user_logged_in() && current_user_can( 'read' );
+		}
+
+		/**
+		 * Filters whether download links are exposed for a post.
+		 *
+		 * The type-aware companion of `wavira_download_access`, which is kept for
+		 * the track case it has always answered.
+		 *
+		 * @since 0.15.0
+		 * @param bool   $allowed Whether downloads are allowed.
+		 * @param int    $post_id Post ID.
+		 * @param string $type    `track`, `album`, `video` or `image`.
+		 */
+		return (bool) apply_filters( 'wavira_download_access_post', $allowed, $post_id, $type );
+	}
+
+	/**
+	 * The file a non-track post offers, at its best quality.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $type    Download type.
+	 * @return string URL, empty string when there is nothing to hand out.
+	 */
+	private static function file_url( int $post_id, string $type ): string {
+		$resolved = Sources::resolve( $post_id );
+
+		return (string) ( $resolved['url'] ?? '' );
+	}
+
+	/**
+	 * Whether an attachment may be downloaded.
+	 *
+	 * @param int $post_id Attachment ID.
+	 * @return bool
+	 */
+	private static function image_is_public( int $post_id ): bool {
+		$parent = (int) get_post_field( 'post_parent', $post_id );
+
+		if ( $parent < 1 ) {
+			return true;
+		}
+
+		$post = get_post( $parent );
+
+		return $post instanceof \WP_Post && 'publish' === $post->post_status;
+	}
+
+	/**
 	 * The quality matrix for a track.
 	 *
 	 * @param int $post_id Track post ID.

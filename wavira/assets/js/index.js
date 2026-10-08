@@ -9,7 +9,10 @@
  * 2. player instances: ask Wavira Core to take over every mount point on the
  *    page. Without the plugin (or without its bundle) the server-rendered
  *    <audio> fallback simply stays;
- * 3. nothing that a core block already does — navigation, query loops and
+ * 3. the photo gallery: open a photo at full size in a dialog instead of leaving
+ *    the page. Without this script every photo is still a link to the file, which
+ *    is what a gallery was before lightboxes existed;
+ * 4. nothing that a core block already does — navigation, query loops and
  *    comments are core behaviour, not theme script.
  *
  * The navigation drawer is the core Navigation block's own disclosure, so this
@@ -25,6 +28,8 @@
 	var STORAGE_KEY = 'wavira.theme';
 	var MODES = [ 'light', 'dark', 'auto' ];
 	var BASE_STRINGS = {
+		lightbox: 'Photo',
+		close: 'Close',
 		label: 'Colour theme',
 		light: 'Light',
 		dark: 'Dark',
@@ -283,6 +288,85 @@
 	}
 
 	/**
+	 * Turn gallery links into a lightbox, when the browser has `<dialog>`.
+	 *
+	 * Progressive by construction: the markup already links to the full-size
+	 * photo, so this only intercepts the click, shows the picture in a modal
+	 * dialog and closes on click, Escape or the close button. A browser without
+	 * `<dialog>` keeps the plain link — no polyfill, nothing to break (ADR 0006).
+	 *
+	 * @param {Object} doc Document.
+	 * @return {number} Number of galleries upgraded.
+	 */
+	function initLightbox( doc ) {
+		if ( ! doc || 'function' !== typeof doc.querySelectorAll || 'undefined' === typeof doc.createElement ) {
+			return 0;
+		}
+
+		var links = doc.querySelectorAll( '[data-wavira-lightbox]' );
+
+		if ( ! links.length ) {
+			return 0;
+		}
+
+		var probe = doc.createElement( 'dialog' );
+
+		if ( 'function' !== typeof probe.showModal ) {
+			return 0;
+		}
+
+		var dialog = doc.createElement( 'dialog' );
+		var image = doc.createElement( 'img' );
+		var close = doc.createElement( 'button' );
+		var counter = 0;
+
+		dialog.className = 'wavira-lightbox';
+		dialog.setAttribute( 'aria-label', BASE_STRINGS.lightbox || 'Photo' );
+		close.type = 'button';
+		close.className = 'wavira-lightbox__close';
+		close.textContent = '×';
+		close.setAttribute( 'aria-label', BASE_STRINGS.close || 'Close' );
+		image.className = 'wavira-lightbox__image';
+		image.alt = '';
+		dialog.appendChild( image );
+		dialog.appendChild( close );
+		doc.body.appendChild( dialog );
+
+		dialog.addEventListener( 'close', function () {
+			image.removeAttribute( 'src' );
+		} );
+
+		dialog.addEventListener( 'click', function ( event ) {
+			// A click on the backdrop is a click outside the picture.
+			if ( event.target === dialog ) {
+				dialog.close();
+			}
+		} );
+
+		close.addEventListener( 'click', function () {
+			dialog.close();
+		} );
+
+		Array.prototype.forEach.call( links, function ( link ) {
+			link.addEventListener( 'click', function ( event ) {
+				// A modified click (new tab, download, middle button) belongs to
+				// the browser; only a plain left click opens the dialog.
+				if ( event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || 0 !== event.button ) {
+					return;
+				}
+
+				event.preventDefault();
+				image.src = link.getAttribute( 'href' );
+				image.alt = link.getAttribute( 'data-caption' ) || '';
+				dialog.showModal();
+				counter++;
+			} );
+		} );
+
+		return counter > 0 ? 1 : 0;
+	}
+
+	/**
 	 * Start everything that needs a document.
 	 *
 	 * @param {Object} doc     Document.
@@ -297,6 +381,7 @@
 		}
 
 		initBackToTop( doc );
+		initLightbox( doc );
 
 		return controller;
 	}
@@ -313,6 +398,7 @@
 		initThemeMode: initThemeMode,
 		initPlayers: initPlayers,
 		initBackToTop: initBackToTop,
+		initLightbox: initLightbox,
 		init: init,
 		storageKey: STORAGE_KEY
 	};

@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.13.0\n"
+"Project-Id-Version: wavira-core 0.15.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
-"PO-Revision-Date: 2026-10-08 12:04+0000\n"
+"PO-Revision-Date: 2026-10-08 15:20+0000\n"
 "Last-Translator: Etehad WP <https://etehadwp.com/>\n"
 "Language-Team: Persian (Iran) — Etehad WP\n"
 "Language: fa_IR\n"
@@ -17,10 +17,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Downloads/Access.php:118
+#: wavira-core/src/Downloads/Access.php:215
+#: wavira-core/src/Downloads/Sources.php:215
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
 msgstr "%d کیلوبیتبرثانیه"
+
+#: wavira-core/src/Downloads/Sources.php:207
+#. translators: %d: video frame height in pixels, e.g. 720.
+msgid "%d pixels"
+msgstr "%d پیکسل"
 
 #: wavira-core/src/Content/PostTypes.php:182
 #. translators: %s: content type plural name.
@@ -76,13 +82,13 @@ msgstr "هنرمند"
 msgid "Artists"
 msgstr "هنرمندان"
 
+#: wavira-core/src/Rest/DownloadController.php:60
+msgid "Audio bitrate in kbps or video height in pixels. Omit to use the best available."
+msgstr "نرخ بیت صدا بر حسب کیلوبیت‌برثانیه یا ارتفاع ویدیو بر حسب پیکسل. برای استفاده از بهترین گزینهٔ موجود، خالی بگذارید."
+
 #: wavira-core/src/Player/Assets.php:176
 msgid "Audio player"
 msgstr "پخشکنندهٔ صوتی"
-
-#: wavira-core/src/Rest/DownloadController.php:56
-msgid "Audio quality in kbps. Omit to use the best available."
-msgstr "کیفیت صدا بر حسب کیلوبیتبرثانیه. برای استفاده از بهترین کیفیت موجود، خالی بگذارید."
 
 #: wavira-core/src/Settings/SettingsSchema.php:90
 msgid "Autoplay the next track in a queue"
@@ -118,12 +124,21 @@ msgstr "آلبوم نمونه"
 msgid "Demo Artist"
 msgstr "هنرمند نمونه"
 
-#: wavira-core/src/Admin/DemoPage.php:266
-#. translators: 1: number of releases, 2: number of tracks.
-msgid "Demo content imported: %1$d release and %2$d track. Open the front page to see it."
-msgid_plural "Demo content imported: %1$d releases and %2$d tracks. Open the front page to see it."
-msgstr[0] "محتوای نمایشی وارد شد: %1$d آلبوم و %2$d قطعه. برای دیدن آن، صفحهٔ اصلی را باز کنید."
-msgstr[1] "محتوای نمایشی وارد شد: %1$d آلبوم و %2$d قطعه. برای دیدن آن، صفحهٔ اصلی را باز کنید."
+#: wavira-core/src/Admin/DemoPage.php:268
+#. translators: 1: number of releases, 2: number of tracks, 3: number of generated files.
+msgid "Demo content imported: %1$d release, %2$d track and %3$d generated file (covers, audio, gallery photos). Open the front page to see it."
+msgid_plural "Demo content imported: %1$d releases, %2$d tracks and %3$d generated files (covers, audio, gallery photos). Open the front page to see it."
+msgstr[0] "محتوای نمایشی وارد شد: %1$d آلبوم، %2$d قطعه و %3$d فایل ساخته‌شده (جلد، صدا و تصویرهای گالری). برای دیدن آن، صفحهٔ اصلی را باز کنید."
+msgstr[1] "محتوای نمایشی وارد شد: %1$d آلبوم، %2$d قطعه و %3$d فایل ساخته‌شده (جلد، صدا و تصویرهای گالری). برای دیدن آن، صفحهٔ اصلی را باز کنید."
+
+#: wavira-core/src/Demo/Placeholders.php:62
+msgid "Demo cover art"
+msgstr "تصویر جلد نمونه"
+
+#: wavira-core/src/Demo/Placeholders.php:97
+#. translators: %d: photo number in the demo gallery.
+msgid "Demo gallery photo %d"
+msgstr "تصویر نمونهٔ گالری %d"
 
 #: wavira-core/src/Demo/Fixtures.php:177
 msgid "Demo Genre"
@@ -146,9 +161,9 @@ msgstr "همهٔ آنچه واویرا مدیریت می‌کند — هنرمن
 msgid "Download WXR file"
 msgstr "دانلود فایل WXR"
 
-#: wavira-core/src/Rest/DownloadController.php:85
-msgid "Downloads are not available for this track."
-msgstr "دانلود برای این قطعه فعال نیست."
+#: wavira-core/src/Rest/DownloadController.php:99
+msgid "Downloads are not available for this post."
+msgstr "دانلود برای این نوشته فعال نیست."
 
 #: wavira-core/src/Content/PostTypes.php:160
 #: wavira-core/src/Content/Taxonomies.php:279
@@ -297,7 +312,7 @@ msgstr "حالوهوا"
 msgid "Moods"
 msgstr "حالوهواها"
 
-#: wavira-core/src/Settings/Settings.php:42
+#: wavira-core/src/Settings/Settings.php:48
 msgid "Music product settings: appearance, content, player, downloads and data handling."
 msgstr "تنظیمات محصول موسیقی: ظاهر، محتوا، پخشکننده، دانلودها و مدیریت داده."
 
@@ -340,11 +355,6 @@ msgstr "برای شناسهٔ درخواستی %s یافت نشد."
 #: wavira-core/src/Admin/DemoPage.php:107
 msgid "No audio or video files are imported."
 msgstr "هیچ فایل صوتی یا تصویری وارد نمی‌شود."
-
-#: wavira-core/src/Rest/DownloadController.php:106
-#: wavira-core/src/Rest/DownloadController.php:116
-msgid "No downloadable audio file is available for this track."
-msgstr "فایل صوتی قابل دانلودی برای این قطعه موجود نیست."
 
 #: wavira-core/src/Content/Taxonomies.php:102
 msgid "Noha"
@@ -408,11 +418,15 @@ msgstr "فعالسازی افزونه انجام نشد"
 msgid "Podcast"
 msgstr "پادکست"
 
+#: wavira-core/src/Rest/DownloadController.php:54
+msgid "Post ID: a track, an album, a video or a cover/gallery image."
+msgstr "شناسهٔ نوشته: یک قطعه، یک آلبوم، یک ویدیو یا تصویر جلد/گالری."
+
 #: wavira-core/src/Player/Assets.php:180
 msgid "Previous track"
 msgstr "قطعهٔ قبلی"
 
-#: wavira-core/src/Rest/DownloadController.php:62
+#: wavira-core/src/Rest/DownloadController.php:66
 msgid "Redirect to the file (default) instead of returning its URL as JSON."
 msgstr "هدایت به فایل (پیشفرض) بهجای بازگرداندن نشانی آن بهصورت JSON."
 
@@ -511,7 +525,7 @@ msgstr "تک‌آهنگ"
 msgid "Singles"
 msgstr "تک‌آهنگ‌ها"
 
-#: wavira-core/src/Demo/Installer.php:328
+#: wavira-core/src/Demo/Installer.php:419
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr "زبان سایت، منطقهٔ زمانی، نخستین روز هفته و قالب تاریخ روی پیش‌فرض‌های ایرانی تنظیم شد."
 
@@ -532,12 +546,12 @@ msgstr "شروع در حالت تاریک"
 msgid "Telegram"
 msgstr "تلگرام"
 
-#: wavira-core/src/Admin/DemoPage.php:285
+#: wavira-core/src/Admin/DemoPage.php:288
 #. translators: %s: error message.
 msgid "The demo content could not be imported: %s"
 msgstr "محتوای نمایشی وارد نشد: %s"
 
-#: wavira-core/src/Admin/DemoPage.php:288
+#: wavira-core/src/Admin/DemoPage.php:291
 #. translators: %s: error message.
 msgid "The demo content could not be imported."
 msgstr "محتوای نمایشی وارد نشد."
@@ -546,11 +560,16 @@ msgstr "محتوای نمایشی وارد نشد."
 msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
 msgstr "این نمایش یک سایت موسیقی فارسی کوچک و کامل است: یک هنرمند، یک آلبوم با پانزده قطعه (شامل یک ریمیکس)، یک تک‌آهنگ و یک موزیک‌ویدیو — همراه با متن ترانه، سبک، مدت و تاریخ شمسی."
 
+#: wavira-core/src/Rest/DownloadController.php:98
+#: wavira-core/src/Rest/DownloadController.php:117
+msgid "There is no downloadable file for this post."
+msgstr "فایل قابل دانلودی برای این نوشته موجود نیست."
+
 #: wavira-core/src/Player/Assets.php:196
 msgid "There is nothing to play here."
 msgstr "اینجا چیزی برای پخش نیست."
 
-#: wavira-core/src/Admin/DemoPage.php:278
+#: wavira-core/src/Admin/DemoPage.php:281
 msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
 msgstr "این سایت از پیش قطعه دارد، پس چیزی وارد نشد. برای ورود نمایش، گزینهٔ جایگزینی را تیک بزنید."
 
@@ -575,7 +594,6 @@ msgctxt "track duration"
 msgid "%1$s:%2$s"
 msgstr "%1$s:%2$s"
 
-#: wavira-core/src/Rest/DownloadController.php:50
 #: wavira-core/src/Rest/PlayerController.php:53
 msgid "Track post ID."
 msgstr "شناسهٔ نوشتهٔ قطعه."
@@ -584,7 +602,7 @@ msgstr "شناسهٔ نوشتهٔ قطعه."
 msgid "Tracks"
 msgstr "قطعهها"
 
-#: wavira-core/src/Demo/Installer.php:74
+#: wavira-core/src/Demo/Installer.php:75
 msgid "Tracks already exist — nothing was imported. Use force to import anyway."
 msgstr "قطعه‌ها از پیش وجود دارند — چیزی وارد نشد. برای ورود دوباره گزینهٔ جایگزینی را فعال کنید."
 
@@ -639,7 +657,7 @@ msgstr "واویرا کور غیرفعال شد: سرور شما کمترین ن
 msgid "Wavira demo content"
 msgstr "محتوای نمایشی واویرا"
 
-#: wavira-core/src/Settings/Settings.php:41
+#: wavira-core/src/Settings/Settings.php:47
 msgid "Wavira settings"
 msgstr "تنظیمات واویرا"
 
@@ -655,7 +673,7 @@ msgstr "آثار"
 msgid "X (Twitter)"
 msgstr "ایکس (توییتر)"
 
-#: wavira-core/src/Admin/DemoPage.php:207
+#: wavira-core/src/Admin/DemoPage.php:208
 msgid "You are not allowed to export this site."
 msgstr "شما اجازهٔ برون‌بری این سایت را ندارید."
 

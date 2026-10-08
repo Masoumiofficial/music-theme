@@ -1,0 +1,50 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/download",
+	"title": "Download button",
+	"category": "wavira-music",
+	"description": "A download link for the audio of a track, an album\u2019s master file, a hosted video or a cover image — hidden when the post has no file, because a dead download link is worse than none.",
+	"keywords": [
+		"download",
+		"mp3",
+		"audio",
+		"video",
+		"file"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"postId": {
+			"type": "number",
+			"default": 0
+		},
+		"quality": {
+			"type": "number",
+			"default": 0
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"variant": {
+			"type": "string",
+			"default": "button",
+			"enum": [
+				"button",
+				"link",
+				"list"
+			]
+		},
+		"showSize": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

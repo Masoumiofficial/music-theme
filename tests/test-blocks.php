@@ -40,7 +40,7 @@ class Test_Blocks extends Wavira_Test_Case {
 			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'assets', 'player', 'artists', 'news', 'shortcodes', 'blocks' ) as $file ) {
+		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'assets', 'player', 'artists', 'news', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {
@@ -436,6 +436,32 @@ class Test_Blocks extends Wavira_Test_Case {
 
 		$this->assertStringContainsString( 'wavira-gallery__items', $html );
 		$this->assertStringContainsString( 'Live on stage', $html );
+	}
+
+	/**
+	 * The download block prints the theme's link — and prints nothing, not a dead
+	 * link, when the post it points at has no file.
+	 *
+	 * @return void
+	 */
+	public function test_download_block_prints_a_link_and_never_a_dead_one() {
+		$track = $this->make_track( 'Track for the download block' );
+
+		$this->assertSame(
+			'',
+			trim( do_blocks( '<!-- wp:wavira/download {"postId":' . $track . '} /-->' ) ),
+			'a track with no audio offers no download at all'
+		);
+
+		update_post_meta( $track, \Wavira\Core\Content\MetaSchema::AUDIO_320, 'https://example.com/block-320.mp3' );
+		update_post_meta( $track, \Wavira\Core\Content\MetaSchema::FILE_SIZE_320, 3670016 );
+
+		$html = do_blocks( '<!-- wp:wavira/download {"postId":' . $track . ',"variant":"button","showSize":true} /-->' );
+
+		$this->assertStringContainsString( 'wavira-download--button', $html );
+		$this->assertStringContainsString( 'wavira/v1/download/' . $track, $html );
+		$this->assertStringContainsString( 'Download the track', $html );
+		$this->assertStringContainsString( '320 kbps', $html );
 	}
 
 	/**

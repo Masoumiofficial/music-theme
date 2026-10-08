@@ -165,7 +165,9 @@ final class MetaSchema {
 			self::DOWNLOAD_ENABLED   => array(
 				'type'     => 'boolean',
 				'sanitize' => 'bool',
-				'entities' => $track,
+				// Every post that can offer a file: a track its audio, an album its
+				// master file, a video its hosted file (ADR 0023).
+				'entities' => array_merge( $track, $album, $video ),
 			),
 			self::FILE_SIZE_128      => array(
 				'type'     => 'integer',

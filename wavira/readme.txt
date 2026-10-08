@@ -2,7 +2,7 @@
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Version: 0.14.0
+Version: 0.15.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: music, rtl-language-support, translation-ready, block-styles, wide-blocks, custom-colors, accessibility-ready

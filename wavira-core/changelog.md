@@ -5,6 +5,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.15.0 (one download route, four kinds of file — and demo media that exists)
+
+- **`Downloads\Sources`** — one resolver behind the download route: `qualities()`, `meta_key()`,
+  `type()`, `available()`, `resolve()`, `quality_label()` and `url()` cover a **track** (128 and 320 kbps
+  audio), an **album** (its master file), a **video** (the hosted file at 480/720/1080 by frame height — an
+  embed is never downloadable, because there is no file to serve) and an **image** (a published
+  attachment). A quality is the number a visitor recognises, and the label is the number plus its unit.
+- **`Access::allows()`** — the one place that answers “may this be downloaded”: the file has to exist, the
+  post has to be published, the per-post opt-out (`wavira_download_enabled`) has to be untouched, and the
+  site's login rule still applies. `Rest\DownloadController` is type-aware now: the JSON response carries
+  the type, the quality and the label, a missing file is a `404`, a forbidden one is `401`/`403`, and
+  `wavira_download_served_post` fires on every successful delivery so a counter or a log can hook it.
+- **Public API** — `wavira_core_download_url()`, `wavira_core_can_download()` and
+  `wavira_core_download_qualities()` in `public-api.php`, so the theme (and any other theme) can build a
+  download button without reaching into the plugin's internals. `MetaSchema::DOWNLOAD_ENABLED` now covers
+  tracks, albums and videos.
+- **`Demo\Placeholders` and generated demo media** — the demo used to point at files that did not exist,
+  which is exactly the defect the theme's download rule forbids. The installer now *makes* the media: a
+  **PNG encoder** (`png()`, IHDR/IDAT/IEND with real CRCs) and a **WAV writer** (`wav()`, 8 kHz mono
+  16-bit PCM, the 320 kbps take deliberately louder than the 128 so the two qualities differ audibly) in
+  pure PHP — no GD, no Imagick, no ffmpeg, because a host that cannot generate a cover must still get a
+  working demo. Every generated file is stored as an attachment, marked `_wavira_demo_media`, attached to
+  the post it illustrates (album covers, track covers, a video poster, an artist portrait, six gallery
+  photos, the track audio in two qualities, the album masters) and counted in the import report
+  (`report['media']`), which the CLI and the admin notice both print. **23 files on a fresh install**, and
+  nothing is fetched from a third party.
+
+### Changed — 0.15.0
+
+- The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».
+- `Sources::quality_label()` reads `%d pixels` for a video height instead of `%dp`, so the label is a
+  translatable phrase rather than a fragment with an English letter glued to it.
+
 ### Changed — 0.14.0 (shipped with the theme)
 - **A `doing-it-wrong` notice on every request, fixed.** The settings option was registered with
   `type => 'array'` while its value is a map of setting name to value; core has required an item schema for

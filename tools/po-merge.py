@@ -109,6 +109,12 @@ def main():
     pot_header, pot = parse(pot_path)
     po_header, po = parse(po_path)
 
+    # A JSON value that is a *list* is a plural translation: one string per
+    # plural form the catalogue header declares. A string stays the singular
+    # `msgstr`. New plural entries cannot be carried over from the catalogue —
+    # they do not exist there yet — so this is the only way in.
+    plural_json = {key: value for key, value in translations.items() if isinstance(value, list)}
+
     existing = {}
     plurals = {}
     flags = {}
@@ -119,6 +125,9 @@ def main():
         kept = [c for c in entry['comments'] if c.startswith('#,')]
         if kept:
             flags[entry['key']] = kept
+
+    for key, forms in plural_json.items():
+        plurals[key] = [(index, escape(value)) for index, value in enumerate(forms)]
 
     pot_date = ''
     match = re.search(r'"POT-Creation-Date: ([^\\"]+)\\n', pot_header or '')
@@ -163,7 +172,7 @@ def main():
         msgstr = existing.get(key)
         forms = plurals.get(key, [])
 
-        if msgstr is None and key in translations:
+        if msgstr is None and key in translations and not isinstance(translations[key], list):
             msgstr = escape(translations[key])
 
         # A plural entry is translated when its forms are; its singular msgstr is

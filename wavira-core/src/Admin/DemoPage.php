@@ -185,6 +185,7 @@ final class DemoPage implements Registrable {
 				'wavira-demo' => $result,
 				'releases'    => count( $report['releases'] ),
 				'tracks'      => count( $report['tracks'] ),
+				'media'       => (int) ( $report['media'] ?? 0 ),
 			);
 		} catch ( RuntimeException $exception ) {
 			$args = array(
@@ -261,16 +262,18 @@ final class DemoPage implements Registrable {
 				$releases = isset( $_GET['releases'] ) ? (int) $_GET['releases'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- a count for the message.
 				$tracks   = isset( $_GET['tracks'] ) ? (int) $_GET['tracks'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- same.
 				$class    = 'notice-success';
+				$media    = isset( $_GET['media'] ) ? (int) $_GET['media'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- same.
 				$text     = sprintf(
-					/* translators: 1: number of releases, 2: number of tracks. */
+					/* translators: 1: number of releases, 2: number of tracks, 3: number of generated files. */
 					_n(
-						'Demo content imported: %1$d release and %2$d track. Open the front page to see it.',
-						'Demo content imported: %1$d releases and %2$d tracks. Open the front page to see it.',
+						'Demo content imported: %1$d release, %2$d track and %3$d generated file (covers, audio, gallery photos). Open the front page to see it.',
+						'Demo content imported: %1$d releases, %2$d tracks and %3$d generated files (covers, audio, gallery photos). Open the front page to see it.',
 						$releases,
 						'wavira-core'
 					),
 					$releases,
-					$tracks
+					$tracks,
+					$media
 				);
 				break;
 			case 'skipped':

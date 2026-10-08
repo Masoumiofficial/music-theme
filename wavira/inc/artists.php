@@ -242,41 +242,125 @@ if ( ! function_exists( 'wavira_get_artist_works' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
+if ( ! function_exists( 'wavira_get_photos' ) ) {
 	/**
-	 * Artist photo gallery: images attached to the artist post.
+	 * Photos attached to any post: an artist, an album, a music video.
 	 *
-	 * @param array<string, mixed> $artist Artist payload.
-	 * @param array<string, mixed> $args   `columns` (2–4).
-	 * @return string Markup, empty string when the artist has no photos.
+	 * The artist page had the only gallery in the product, and a release page with
+	 * artwork, back covers and studio photos had nowhere to show them. Attachments
+	 * are WordPress's own gallery — upload from the post's screen and the file is
+	 * attached to it — so this asks the same question for every post type instead
+	 * of inventing a second gallery meta (ADR 0024).
+	 *
+	 * @param int                  $post_id Post ID.
+	 * @param array<string, mixed> $args    `limit` (int), `columns` (2–4).
+	 * @return array<int, array<string, mixed>> Each: id, url, alt, caption.
 	 */
-	function wavira_get_artist_gallery( $artist, $args = array() ) {
-		$args = wp_parse_args( $args, array( 'columns' => 3 ) );
+	function wavira_get_photos( $post_id, $args = array() ) {
+		$args    = wp_parse_args( $args, array( 'limit' => 12 ) );
+		$post_id = absint( $post_id );
 
-		$images = isset( $artist['gallery'] ) ? (array) $artist['gallery'] : array();
+		if ( $post_id < 1 ) {
+			return array();
+		}
+
+		$attachments = get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'post_parent'    => $post_id,
+				'post_mime_type' => 'image',
+				'posts_per_page' => (int) max( 1, min( 24, (int) $args['limit'] ) ),
+				'orderby'        => 'menu_order date',
+				'order'          => 'ASC',
+				'no_found_rows'  => true,
+			)
+		);
+
+		$photos = array();
+
+		foreach ( $attachments as $attachment ) {
+			$photos[] = array(
+				'id'      => (int) $attachment->ID,
+				'url'     => (string) wp_get_attachment_image_url( $attachment->ID, 'full' ),
+				'alt'     => (string) get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+				'caption' => (string) wp_get_attachment_caption( $attachment->ID ),
+			);
+		}
+
+		return $photos;
+	}
+}
+
+if ( ! function_exists( 'wavira_get_photo_gallery' ) ) {
+	/**
+	 * The gallery markup for a set of photos.
+	 *
+	 * One renderer for every gallery in the product, so a photo looks the same
+	 * wherever it is shown and the lightbox hook is in one place (ADR 0024).
+	 *
+	 * @param array<int, array<string, mixed>> $images Photos: id, url, alt, caption.
+	 * @param array<string, mixed>             $args   `columns` (2–4), `heading` (string).
+	 * @return string Markup, empty string when there are no photos.
+	 */
+	function wavira_get_photo_gallery( $images, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
 
 		if ( array() === $images ) {
 			return '';
 		}
 
-		$columns = (int) $args['columns'];
-		$columns = (int) max( 2, min( 4, $columns ) );
+		$columns = (int) max( 2, min( 4, (int) $args['columns'] ) );
 
 		$html  = '<section class="wavira-section wavira-gallery">';
-		$html .= wavira_get_section_head( __( 'Photos', 'wavira' ) );
+		$html .= wavira_get_section_head( (string) $args['heading'] );
 		$html .= '<ul class="wavira-gallery__items wavira-gallery__items--' . esc_attr( (string) $columns ) . '">';
 
 		foreach ( $images as $image ) {
 			$image   = (array) $image;
 			$markup  = wavira_get_image( $image, 'wavira-cover-sm', 'wavira-gallery__image' );
 			$caption = isset( $image['caption'] ) ? (string) $image['caption'] : '';
+			$id      = isset( $image['id'] ) ? absint( $image['id'] ) : 0;
 
 			if ( '' === $markup ) {
 				continue;
 			}
 
 			$html .= '<li class="wavira-gallery__item"><figure class="wavira-gallery__figure">';
+
+			// The photo opens at full size and can be saved, because a gallery a
+			// visitor cannot open is a wall of thumbnails. `assets/js/index.js`
+			// upgrades the same link to a dialog when the browser has `<dialog>`;
+			// without JavaScript it stays a link to the picture.
+			$full = $id > 0
+				? (string) wp_get_attachment_image_url( $id, 'full' )
+				: (string) ( $image['url'] ?? '' );
+
+			if ( '' !== $full ) {
+				$html .= sprintf(
+					'<a class="wavira-gallery__link" href="%s" data-wavira-lightbox%s>',
+					esc_url( $full ),
+					'' !== $caption ? ' data-caption="' . esc_attr( $caption ) . '"' : ''
+				);
+			}
+
 			$html .= $markup;
+
+			if ( '' !== $full ) {
+				$html .= '</a>';
+
+				$download = wavira_get_download( $id, 'link', 0, __( 'Download the image', 'wavira' ) );
+
+				if ( '' !== $download ) {
+					$html .= '<span class="wavira-gallery__download">' . $download . '</span>';
+				}
+			}
 
 			// A captionless image gets no empty figcaption: the alt text carries
 			// the meaning and an empty element carries nothing.
@@ -288,6 +372,55 @@ if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
 		}
 
 		return $html . '</ul></section>';
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
+	/**
+	 * Artist photo gallery: images attached to the artist post.
+	 *
+	 * The payload comes from the plugin (it knows the artist model); the markup
+	 * comes from `wavira_get_photo_gallery()` so an artist photo and an album photo
+	 * are the same component.
+	 *
+	 * @param array<string, mixed> $artist Artist payload.
+	 * @param array<string, mixed> $args   `columns` (2–4).
+	 * @return string Markup, empty string when the artist has no photos.
+	 */
+	function wavira_get_artist_gallery( $artist, $args = array() ) {
+		$args = wp_parse_args( $args, array( 'columns' => 3 ) );
+
+		$images = isset( $artist['gallery'] ) ? (array) $artist['gallery'] : array();
+
+		return wavira_get_photo_gallery( $images, array( 'columns' => (int) $args['columns'] ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_get_post_gallery' ) ) {
+	/**
+	 * The gallery of the post being viewed.
+	 *
+	 * @param int                  $post_id Post ID.
+	 * @param array<string, mixed> $args    `limit`, `columns`, `heading`.
+	 * @return string Markup, empty string when the post has no photos.
+	 */
+	function wavira_get_post_gallery( $post_id, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'limit'   => 12,
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
+
+		return wavira_get_photo_gallery(
+			wavira_get_photos( (int) $post_id, array( 'limit' => (int) $args['limit'] ) ),
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
 	}
 }
 

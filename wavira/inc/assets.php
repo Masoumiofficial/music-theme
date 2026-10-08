@@ -57,10 +57,15 @@ function wavira_theme_settings() {
 		// is stored yet.
 		'colourMode' => (string) wavira_option( 'colour_mode', 'auto' ),
 		'strings'    => array(
-			'label' => __( 'Colour theme', 'wavira' ),
-			'light' => __( 'Light', 'wavira' ),
-			'dark'  => __( 'Dark', 'wavira' ),
-			'auto'  => __( 'Auto', 'wavira' ),
+			'label'    => __( 'Colour theme', 'wavira' ),
+			'light'    => __( 'Light', 'wavira' ),
+			'dark'     => __( 'Dark', 'wavira' ),
+			'auto'     => __( 'Auto', 'wavira' ),
+			// The photo lightbox speaks through its own accessible names: the
+			// dialog needs a label and the close button needs a name, or a
+			// screen reader announces an unnamed button (ADR 0024).
+			'lightbox' => __( 'Photo', 'wavira' ),
+			'close'    => __( 'Close', 'wavira' ),
 		),
 	);
 

@@ -295,6 +295,67 @@ if ( ! function_exists( 'wavira_core_video_source' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_core_download_url' ) ) {
+	/**
+	 * A public download URL for a post, or an empty string when there is none.
+	 *
+	 * One function for every section: a track's audio, an album's master file, a
+	 * hosted video and a cover or gallery image. The URL points at the product API
+	 * (`wavira/v1/download/{id}`, ADR 0013), so a link is authorized and counted in
+	 * one place, and the endpoint redirects to the file itself — PHP never proxies
+	 * the bytes (ADR 0023).
+	 *
+	 * @param int $post_id Post ID of any type.
+	 * @param int $quality Audio kbps or video height; 0 uses the best available.
+	 * @return string URL, empty string when the post has nothing to hand out.
+	 */
+	function wavira_core_download_url( $post_id, $quality = 0 ) {
+		if ( ! class_exists( 'Wavira\\Core\\Downloads\\Sources' ) ) {
+			return '';
+		}
+
+		return \Wavira\Core\Downloads\Sources::url( absint( $post_id ), absint( $quality ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_can_download' ) ) {
+	/**
+	 * Whether a post may expose a download link at all.
+	 *
+	 * Ask this before printing a button: a theme that prints a download link for
+	 * every track ends up with dead links on a site that turned downloads off.
+	 *
+	 * @param int $post_id Post ID of any type.
+	 * @return bool
+	 */
+	function wavira_core_can_download( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Downloads\\Access' ) ) {
+			return false;
+		}
+
+		return \Wavira\Core\Downloads\Access::allows( absint( $post_id ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_download_qualities' ) ) {
+	/**
+	 * The qualities a post can be downloaded in.
+	 *
+	 * A `320 kbps` audio file and a `1080p` video are both "a quality" to a
+	 * visitor, so both come back in the same shape and the label is translated.
+	 *
+	 * @param int $post_id Post ID of any type.
+	 * @return array<int, array<string, mixed>> Each: quality, url, type, label.
+	 */
+	function wavira_core_download_qualities( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Downloads\\Sources' ) ) {
+			return array();
+		}
+
+		return \Wavira\Core\Downloads\Sources::available( absint( $post_id ) );
+	}
+}
+
 if ( ! function_exists( 'wavira_core_digits' ) ) {
 	/**
 	 * Persian numerals on a Persian site, Latin digits everywhere else.

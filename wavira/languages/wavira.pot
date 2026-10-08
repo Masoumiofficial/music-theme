@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira 0.14.0\n"
+"Project-Id-Version: wavira 0.15.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: wavira/inc/markup.php:225
+#: wavira/inc/markup.php:237
 #. translators: 1: genre name, 2: number of published items.
 msgid "%1$s (%2$d)"
 msgstr ""
@@ -22,6 +22,16 @@ msgstr ""
 #: wavira/inc/artists.php:209
 #. translators: 1: section name, 2: number of items in that section, formatted for the locale.
 msgid "%1$s (%2$s)"
+msgstr ""
+
+#: wavira/inc/downloads.php:77
+#. translators: %s: file size in kilobytes.
+msgid "%s KB"
+msgstr ""
+
+#: wavira/inc/downloads.php:73
+#. translators: %s: file size in megabytes.
+msgid "%s MB"
 msgstr ""
 
 #: wavira/inc/customizer.php:300
@@ -112,6 +122,11 @@ msgstr ""
 msgid "Base text size (px)"
 msgstr ""
 
+#: wavira/blocks/download/block.json
+msgctxt "block description"
+msgid "A download link for the audio of a track, an album’s master file, a hosted video or a cover image — hidden when the post has no file, because a dead download link is worse than none."
+msgstr ""
+
 #: wavira/blocks/player/block.json
 msgctxt "block description"
 msgid "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post."
@@ -129,7 +144,7 @@ msgstr ""
 
 #: wavira/blocks/artist-gallery/block.json
 msgctxt "block description"
-msgid "Photos attached to an artist: the images uploaded on the artist screen."
+msgid "Photos attached to the post being viewed: an artist, a release or a video."
 msgstr ""
 
 #: wavira/blocks/news/block.json
@@ -158,6 +173,7 @@ msgctxt "block keyword"
 msgid "artist"
 msgstr ""
 
+#: wavira/blocks/download/block.json
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
 msgid "audio"
@@ -188,9 +204,19 @@ msgctxt "block keyword"
 msgid "clip"
 msgstr ""
 
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "download"
+msgstr ""
+
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
 msgid "embed"
+msgstr ""
+
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "file"
 msgstr ""
 
 #: wavira/blocks/artist-gallery/block.json
@@ -211,6 +237,11 @@ msgstr ""
 #: wavira/blocks/news/block.json
 msgctxt "block keyword"
 msgid "magazine"
+msgstr ""
+
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "mp3"
 msgstr ""
 
 #: wavira/blocks/artist-gallery/block.json
@@ -284,6 +315,7 @@ msgctxt "block keyword"
 msgid "tracks"
 msgstr ""
 
+#: wavira/blocks/download/block.json
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
 msgid "video"
@@ -294,14 +326,14 @@ msgctxt "block title"
 msgid "Album tracklist"
 msgstr ""
 
-#: wavira/blocks/artist-gallery/block.json
-msgctxt "block title"
-msgid "Artist photo gallery"
-msgstr ""
-
 #: wavira/blocks/artist-profile/block.json
 msgctxt "block title"
 msgid "Artist profile"
+msgstr ""
+
+#: wavira/blocks/download/block.json
+msgctxt "block title"
+msgid "Download button"
 msgstr ""
 
 #: wavira/blocks/genre-chips/block.json
@@ -322,6 +354,11 @@ msgstr ""
 #: wavira/blocks/video/block.json
 msgctxt "block title"
 msgid "Music video"
+msgstr ""
+
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block title"
+msgid "Photo gallery"
 msgstr ""
 
 #: wavira/inc/options.php:277
@@ -348,6 +385,10 @@ msgstr ""
 
 #: wavira/inc/admin-panel.php:374
 msgid "Clear (use the theme colour)"
+msgstr ""
+
+#: wavira/inc/assets.php:68
+msgid "Close"
 msgstr ""
 
 #: wavira/inc/options.php:146
@@ -427,6 +468,28 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
+#: wavira/inc/downloads.php:53
+#: wavira/inc/markup.php:99
+msgid "Download"
+msgstr ""
+
+#: wavira/inc/downloads.php:44
+msgid "Download the album"
+msgstr ""
+
+#: wavira/inc/artists.php:358
+#: wavira/inc/downloads.php:48
+msgid "Download the image"
+msgstr ""
+
+#: wavira/inc/downloads.php:50
+msgid "Download the track"
+msgstr ""
+
+#: wavira/inc/downloads.php:46
+msgid "Download the video"
+msgstr ""
+
 #: wavira/inc/admin-panel.php:518
 msgid "Download wavira-core"
 msgstr ""
@@ -491,6 +554,11 @@ msgstr ""
 
 #: wavira/inc/customizer.php:97
 msgid "Header"
+msgstr ""
+
+#: wavira/patterns/hidden-heading-album-photos.php:16
+msgctxt "heading above the gallery of an album"
+msgid "Photos"
 msgstr ""
 
 #: wavira/patterns/hidden-heading-music-news.php:20
@@ -617,12 +685,20 @@ msgstr ""
 msgid "No news posts yet. Publish one and it appears here."
 msgstr ""
 
-#: wavira/blocks/tracklist/render.php:37
+#: wavira/blocks/artist-gallery/render.php:54
+msgid "No photos yet. Upload them from this post’s media library."
+msgstr ""
+
+#: wavira/blocks/tracklist/render.php:38
 msgid "No published tracks in this album yet."
 msgstr ""
 
 #: wavira/inc/site-defaults.php:239
 msgid "Not now"
+msgstr ""
+
+#: wavira/blocks/download/render.php:45
+msgid "Nothing to download yet: add an audio file to this track, an album file, a hosted video, or a cover image."
 msgstr ""
 
 #: wavira/inc/customizer.php:296
@@ -663,10 +739,12 @@ msgid "Persian setup"
 msgstr ""
 
 #: wavira/inc/artists.php:143
+#: wavira/inc/assets.php:67
 msgid "Photo"
 msgstr ""
 
-#: wavira/inc/artists.php:266
+#: wavira/inc/artists.php:311
+#: wavira/inc/artists.php:413
 msgid "Photos"
 msgstr ""
 
@@ -886,10 +964,6 @@ msgstr ""
 msgid "Theme settings"
 msgstr ""
 
-#: wavira/blocks/artist-gallery/render.php:41
-msgid "This artist has no photos yet. Upload them from the artist’s media library."
-msgstr ""
-
 #: wavira/blocks/video/render.php:27
 msgid "This post has no video source yet."
 msgstr ""
@@ -938,7 +1012,7 @@ msgstr ""
 msgid "View all"
 msgstr ""
 
-#: wavira/inc/markup.php:159
+#: wavira/inc/markup.php:171
 msgid "Watch the video"
 msgstr ""
 

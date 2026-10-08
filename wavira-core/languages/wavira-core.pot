@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.14.0\n"
+"Project-Id-Version: wavira-core 0.15.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -10,9 +10,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Downloads/Access.php:118
+#: wavira-core/src/Downloads/Access.php:215
+#: wavira-core/src/Downloads/Sources.php:215
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
+msgstr ""
+
+#: wavira-core/src/Downloads/Sources.php:207
+#. translators: %d: video frame height in pixels, e.g. 720.
+msgid "%d pixels"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:182
@@ -69,12 +75,12 @@ msgstr ""
 msgid "Artists"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:176
-msgid "Audio player"
+#: wavira-core/src/Rest/DownloadController.php:60
+msgid "Audio bitrate in kbps or video height in pixels. Omit to use the best available."
 msgstr ""
 
-#: wavira-core/src/Rest/DownloadController.php:56
-msgid "Audio quality in kbps. Omit to use the best available."
+#: wavira-core/src/Player/Assets.php:176
+msgid "Audio player"
 msgstr ""
 
 #: wavira-core/src/Settings/SettingsSchema.php:90
@@ -111,12 +117,21 @@ msgstr ""
 msgid "Demo Artist"
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:266
-#. translators: 1: number of releases, 2: number of tracks.
-msgid "Demo content imported: %1$d release and %2$d track. Open the front page to see it."
-msgid_plural "Demo content imported: %1$d releases and %2$d tracks. Open the front page to see it."
+#: wavira-core/src/Admin/DemoPage.php:268
+#. translators: 1: number of releases, 2: number of tracks, 3: number of generated files.
+msgid "Demo content imported: %1$d release, %2$d track and %3$d generated file (covers, audio, gallery photos). Open the front page to see it."
+msgid_plural "Demo content imported: %1$d releases, %2$d tracks and %3$d generated files (covers, audio, gallery photos). Open the front page to see it."
 msgstr[0] ""
 msgstr[1] ""
+
+#: wavira-core/src/Demo/Placeholders.php:62
+msgid "Demo cover art"
+msgstr ""
+
+#: wavira-core/src/Demo/Placeholders.php:97
+#. translators: %d: photo number in the demo gallery.
+msgid "Demo gallery photo %d"
+msgstr ""
 
 #: wavira-core/src/Demo/Fixtures.php:177
 msgid "Demo Genre"
@@ -139,8 +154,8 @@ msgstr ""
 msgid "Download WXR file"
 msgstr ""
 
-#: wavira-core/src/Rest/DownloadController.php:85
-msgid "Downloads are not available for this track."
+#: wavira-core/src/Rest/DownloadController.php:99
+msgid "Downloads are not available for this post."
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:160
@@ -334,11 +349,6 @@ msgstr ""
 msgid "No audio or video files are imported."
 msgstr ""
 
-#: wavira-core/src/Rest/DownloadController.php:106
-#: wavira-core/src/Rest/DownloadController.php:116
-msgid "No downloadable audio file is available for this track."
-msgstr ""
-
 #: wavira-core/src/Content/Taxonomies.php:102
 msgid "Noha"
 msgstr ""
@@ -401,11 +411,15 @@ msgstr ""
 msgid "Podcast"
 msgstr ""
 
+#: wavira-core/src/Rest/DownloadController.php:54
+msgid "Post ID: a track, an album, a video or a cover/gallery image."
+msgstr ""
+
 #: wavira-core/src/Player/Assets.php:180
 msgid "Previous track"
 msgstr ""
 
-#: wavira-core/src/Rest/DownloadController.php:62
+#: wavira-core/src/Rest/DownloadController.php:66
 msgid "Redirect to the file (default) instead of returning its URL as JSON."
 msgstr ""
 
@@ -504,7 +518,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:328
+#: wavira-core/src/Demo/Installer.php:419
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 
@@ -525,12 +539,12 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:285
+#: wavira-core/src/Admin/DemoPage.php:288
 #. translators: %s: error message.
 msgid "The demo content could not be imported: %s"
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:288
+#: wavira-core/src/Admin/DemoPage.php:291
 #. translators: %s: error message.
 msgid "The demo content could not be imported."
 msgstr ""
@@ -539,11 +553,16 @@ msgstr ""
 msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
 msgstr ""
 
+#: wavira-core/src/Rest/DownloadController.php:98
+#: wavira-core/src/Rest/DownloadController.php:117
+msgid "There is no downloadable file for this post."
+msgstr ""
+
 #: wavira-core/src/Player/Assets.php:196
 msgid "There is nothing to play here."
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:278
+#: wavira-core/src/Admin/DemoPage.php:281
 msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
 msgstr ""
 
@@ -567,7 +586,6 @@ msgctxt "track duration"
 msgid "%1$s:%2$s"
 msgstr ""
 
-#: wavira-core/src/Rest/DownloadController.php:50
 #: wavira-core/src/Rest/PlayerController.php:53
 msgid "Track post ID."
 msgstr ""
@@ -576,7 +594,7 @@ msgstr ""
 msgid "Tracks"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:74
+#: wavira-core/src/Demo/Installer.php:75
 msgid "Tracks already exist — nothing was imported. Use force to import anyway."
 msgstr ""
 
@@ -647,7 +665,7 @@ msgstr ""
 msgid "X (Twitter)"
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:207
+#: wavira-core/src/Admin/DemoPage.php:208
 msgid "You are not allowed to export this site."
 msgstr ""
 

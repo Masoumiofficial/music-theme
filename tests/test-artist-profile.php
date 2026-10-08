@@ -30,7 +30,7 @@ class Test_Artist_Profile extends Wavira_Test_Case {
 			define( 'WAVIRA_THEME_VERSION', '0.9.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'markup', 'artists' ) as $file ) {
+		foreach ( array( 'helpers', 'markup', 'artists', 'downloads' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {

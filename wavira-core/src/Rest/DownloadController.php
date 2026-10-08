@@ -2,11 +2,16 @@
 /**
  * Download endpoint of the product API.
  *
- * `wavira/v1/download/{id}` is the only place that hands out an audio file URL:
- * it asks `Downloads\Access` for a decision, counts the download and then either
- * redirects the visitor to the file (the web server serves the bytes, so PHP
- * never proxies large files) or returns the URL as JSON for players and apps
- * (ADR 0013).
+ * `wavira/v1/download/{id}` is the only place that hands out a file URL: it asks
+ * `Downloads\Access` for a decision, counts the download and then either redirects
+ * the visitor to the file (the web server serves the bytes, so PHP never proxies
+ * large files) or returns the URL as JSON for players and apps (ADR 0013).
+ *
+ * One route, four kinds of file (ADR 0023). The post ID decides: a track hands out
+ * its audio at the requested bitrate, an album its own master file, a hosted video
+ * its file, an attachment the image itself. An embed is never a download — there
+ * is nothing to hand out — and the endpoint says so with a 404 rather than a
+ * broken link.
  *
  * Honest scope: this is authorization plus counting, not content protection.
  * Anyone who knows a public file URL can still fetch it; hotlink protection and
@@ -19,10 +24,9 @@ namespace Wavira\Core\Rest;
 
 use WP_REST_Request;
 use WP_REST_Response;
-use Wavira\Core\Content\MetaSchema;
-use Wavira\Core\Content\MetaValues;
 use Wavira\Core\Downloads\Access;
 use Wavira\Core\Downloads\Counter;
+use Wavira\Core\Downloads\Sources;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -47,16 +51,16 @@ final class DownloadController extends AbstractController {
 					'permission_callback' => array( $this, 'download_permission' ),
 					'args'                => array(
 						'id'       => array(
-							'description'       => __( 'Track post ID.', 'wavira-core' ),
+							'description'       => __( 'Post ID: a track, an album, a video or a cover/gallery image.', 'wavira-core' ),
 							'type'              => 'integer',
 							'required'          => true,
 							'sanitize_callback' => 'absint',
 						),
 						'quality'  => array(
-							'description' => __( 'Audio quality in kbps. Omit to use the best available.', 'wavira-core' ),
+							'description' => __( 'Audio bitrate in kbps or video height in pixels. Omit to use the best available.', 'wavira-core' ),
 							'type'        => 'integer',
 							'default'     => 0,
-							'enum'        => array( 0, 128, 320 ),
+							'enum'        => array( 0, 128, 320, 480, 720, 1080 ),
 						),
 						'redirect' => array(
 							'description' => __( 'Redirect to the file (default) instead of returning its URL as JSON.', 'wavira-core' ),
@@ -79,15 +83,22 @@ final class DownloadController extends AbstractController {
 	 * @return bool|\WP_Error
 	 */
 	public function download_permission( $request ) {
-		if ( ! Access::can_download( (int) $request['id'] ) ) {
-			return new \WP_Error(
-				'wavira_download_forbidden',
-				__( 'Downloads are not available for this track.', 'wavira-core' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
+		if ( Access::allows( (int) $request['id'] ) ) {
+			return true;
 		}
 
-		return true;
+		// Nothing to hand out is a 404; not allowed to hand it out is a 401/403.
+		// The distinction matters to a client and it is free: the file either
+		// exists or the rules said no.
+		$missing = array() === Sources::available( (int) $request['id'] );
+
+		return new \WP_Error(
+			$missing ? 'wavira_download_missing_source' : 'wavira_download_forbidden',
+			$missing
+				? __( 'There is no downloadable file for this post.', 'wavira-core' )
+				: __( 'Downloads are not available for this post.', 'wavira-core' ),
+			array( 'status' => $missing ? 404 : rest_authorization_required_code() )
+		);
 	}
 
 	/**
@@ -98,25 +109,19 @@ final class DownloadController extends AbstractController {
 	 */
 	public function handle( $request ) {
 		$post_id = (int) $request['id'];
-		$quality = $this->resolve_quality( $post_id, (int) $request['quality'] );
+		$file    = Sources::resolve( $post_id, (int) $request['quality'] );
 
-		if ( 0 === $quality ) {
+		if ( empty( $file['url'] ) ) {
 			return new \WP_Error(
 				'wavira_download_missing_source',
-				__( 'No downloadable audio file is available for this track.', 'wavira-core' ),
+				__( 'There is no downloadable file for this post.', 'wavira-core' ),
 				array( 'status' => 404 )
 			);
 		}
 
-		$url = MetaValues::url( $post_id, $this->meta_key_for( $quality ) );
-
-		if ( '' === $url ) {
-			return new \WP_Error(
-				'wavira_download_missing_source',
-				__( 'No downloadable audio file is available for this track.', 'wavira-core' ),
-				array( 'status' => 404 )
-			);
-		}
+		$url     = (string) $file['url'];
+		$type    = (string) $file['type'];
+		$quality = (int) $file['quality'];
 
 		/**
 		 * Fires right before a download is counted and delivered.
@@ -129,6 +134,19 @@ final class DownloadController extends AbstractController {
 		 * @param int    $quality Audio quality in kbps.
 		 * @param string $url     File URL that will be handed out.
 		 */
+		/**
+		 * Fires right before a download is counted and delivered.
+		 *
+		 * The type-aware companion of `wavira_download_served`, which stays for the
+		 * track case it has always carried.
+		 *
+		 * @since 0.15.0
+		 * @param int    $post_id Post ID.
+		 * @param string $type    `track`, `album`, `video` or `image`.
+		 * @param string $url     File URL that will be handed out.
+		 */
+		do_action( 'wavira_download_served_post', $post_id, $type, $url );
+
 		do_action( 'wavira_download_served', $post_id, $quality, $url );
 
 		$count = Counter::increment( $post_id, $quality );
@@ -137,7 +155,9 @@ final class DownloadController extends AbstractController {
 			return rest_ensure_response(
 				array(
 					'id'      => $post_id,
+					'type'    => $type,
 					'quality' => $quality,
+					'label'   => (string) ( $file['label'] ?? '' ),
 					'url'     => $url,
 					'count'   => $count,
 				)
@@ -152,56 +172,4 @@ final class DownloadController extends AbstractController {
 		return $response;
 	}
 
-	/**
-	 * Pick the quality to deliver.
-	 *
-	 * A requested quality is honoured when the track has that file; otherwise the
-	 * best (highest) available quality wins, then the lowest.
-	 *
-	 * @param int $post_id Track post ID.
-	 * @param int $quality Requested quality (0 = best available).
-	 * @return int Quality in kbps, 0 when the track has no audio file at all.
-	 */
-	private function resolve_quality( int $post_id, int $quality ): int {
-		$available = array();
-
-		foreach ( array( 320, 128 ) as $candidate ) {
-			if ( '' !== MetaValues::url( $post_id, $this->meta_key_for( $candidate ) ) ) {
-				$available[] = $candidate;
-			}
-		}
-
-		if ( empty( $available ) ) {
-			return 0;
-		}
-
-		if ( $quality > 0 && in_array( $quality, $available, true ) ) {
-			return $quality;
-		}
-
-		return (int) $available[0];
-	}
-
-	/**
-	 * Meta key that stores the audio file of one quality.
-	 *
-	 * @param int $quality Quality in kbps.
-	 * @return string
-	 */
-	private function meta_key_for( int $quality ): string {
-		$keys = array(
-			128 => MetaSchema::AUDIO_128,
-			320 => MetaSchema::AUDIO_320,
-		);
-
-		/**
-		 * Filters the audio meta key per download quality.
-		 *
-		 * @since 0.4.0
-		 * @param array<int, string> $keys Quality in kbps mapped to a meta key.
-		 */
-		$keys = (array) apply_filters( 'wavira_download_quality_sources', $keys );
-
-		return isset( $keys[ $quality ] ) ? (string) $keys[ $quality ] : '';
-	}
 }

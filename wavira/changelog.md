@@ -5,6 +5,44 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.15.0 (every section plays, every section downloads)
+
+- **A download in every section** (`wavira/inc/downloads.php`, `wavira/blocks/download/`, the four single
+  templates). 0.14.0 showed the music; 0.15.0 lets a visitor *take* it: the track hero lists 128 and
+  320 kbps, the album hero lists the album master, the video hero lists the hosted file at every height the
+  provider offers, and every row of the tracklist carries its own link. The work is a theme-side library
+  (`wavira_get_download()`, `wavira_download_qualities()`, `wavira_download_size_label()`,
+  `wavira_download_file_size()`, `wavira_download_meta_label()`) plus an editor block, and all of it asks
+  the plugin through its public API (`wavira_core_download_url()`, `wavira_core_can_download()`,
+  `wavira_core_download_qualities()`) — the boundary the architecture gate enforces. A post with nothing to
+  give prints nothing at all: the block renders a placeholder in the editor and no markup on the front end,
+  because a download link that leads to an error page is worse than no link.
+- **`wavira/download` block** — one dynamic block, three shapes (`button`, `link`, `list`), an optional file
+  size, a label override and a quality picker, so a site owner can put a download wherever the Site Editor
+  allows one. Eight blocks ship now.
+- **A real photo gallery** (`wavira/blocks/artist-gallery/`, `wavira/inc/artists.php`,
+  `wavira/patterns/hidden-heading-album-photos.php`). The artist gallery became **Photo gallery** and works
+  on any post that has photos attached — an artist, a release or a video: `wavira_get_photos()`,
+  `wavira_get_photo_gallery()` and `wavira_get_post_gallery()` return published attachments with their
+  captions and alt text, the block lays them out in a responsive grid, and the album and artist templates
+  each carry their own section with a translatable heading.
+- **The lightbox** (`wavira/assets/js/index.js`). Each photo is a plain link to the full-size file; where
+  the browser has `<dialog>`, `initLightbox()` intercepts a plain left click and shows the picture in a
+  modal — Escape, the close button, a click on the backdrop and a modified click (new tab, download) all do
+  what the visitor expects. A browser without `showModal` keeps the working link and loads no polyfill
+  (ADR 0006), which is why the theme still works when JavaScript fails.
+
+### Changed — 0.15.0
+
+- **File sizes and qualities are translated, not concatenated**: `%s KB` / `%s MB` (theme) and `%d kbps` /
+  `%d pixels` (plugin) go through the catalogues, so a Persian site reads «۳٫۲ مگابایت» rather than an
+  English fragment glued to a number.
+- **The lightbox has a Persian name**: the dialog's label and the close button's accessible name come from
+  `wavira_theme_settings()` instead of the script's English defaults, so a screen reader on a Persian site
+  does not announce “Close”.
+- The Persian catalogue carries the new strings: **239/239 theme strings and 154/154 plugin strings
+  translated** (`node tools/i18n.mjs check`).
+
 ### Added — 0.14.0 (the front page a customer expects, and a real render)
 - **`front-page.html`** — the blog index moved out of the way (the old `home.html` is deleted, so
   `index.html` serves native posts again, which is what core, feeds and SEO plugins expect) and the front

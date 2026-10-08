@@ -1,10 +1,15 @@
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
 <!-- wp:group {"tagName":"main","className":"wavira-layout wavira-main","layout":{"type":"default"}} -->
 <main class="wp-block-group wavira-layout wavira-main">
-<!-- wp:wavira/artist-profile /-->
+<!-- wp:wavira/artist-profile {"showGallery":false} /-->
 <!-- wp:group {"className":"wavira-section wavira-artist__player","layout":{"type":"default"}} -->
 <div class="wp-block-group wavira-section wavira-artist__player">
 <!-- wp:wavira/player {"context":"artist","sticky":false} /-->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section">
+<!-- wp:wavira/artist-gallery {"limit":12,"columns":4} /-->
 </div>
 <!-- /wp:group -->
 </main>

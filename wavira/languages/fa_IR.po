@@ -1,11 +1,11 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.13.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 12:04+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 15:20+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
 msgstr "(در زبانهٔ جدید باز می‌شود)"
 
-#: wavira/inc/markup.php:225
+#: wavira/inc/markup.php:237
 #. translators: 1: genre name, 2: number of published items.
 #, keep-latin
 msgid "%1$s (%2$d)"
@@ -16,6 +16,16 @@ msgstr "%1$s (%2$d)"
 #, keep-latin
 msgid "%1$s (%2$s)"
 msgstr "%1$s (%2$s)"
+
+#: wavira/inc/downloads.php:77
+#. translators: %s: file size in kilobytes.
+msgid "%s KB"
+msgstr "%s کیلوبایت"
+
+#: wavira/inc/downloads.php:73
+#. translators: %s: file size in megabytes.
+msgid "%s MB"
+msgstr "%s مگابایت"
 
 #: wavira/inc/customizer.php:300
 msgid "A CSS font stack, for example: \"IRANSans\", Tahoma, sans-serif. Used only when “Custom stack” is selected."
@@ -105,6 +115,11 @@ msgstr "دکمهٔ بازگشت به بالا"
 msgid "Base text size (px)"
 msgstr "اندازهٔ متن پایه (پیکسل)"
 
+#: wavira/blocks/download/block.json
+msgctxt "block description"
+msgid "A download link for the audio of a track, an album’s master file, a hosted video or a cover image — hidden when the post has no file, because a dead download link is worse than none."
+msgstr "پیوند دانلود برای صدای یک قطعه، فایل مادر آلبوم، ویدیوی میزبانی‌شده یا تصویر جلد — پنهان می‌شود وقتی نوشته فایلی ندارد، چون پیوند دانلود بی‌مقصد بدتر از نداشتن آن است."
+
 #: wavira/blocks/player/block.json
 msgctxt "block description"
 msgid "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post."
@@ -122,8 +137,8 @@ msgstr "سبکها بهصورت برچسبهای پیوندی، پرکاربرد
 
 #: wavira/blocks/artist-gallery/block.json
 msgctxt "block description"
-msgid "Photos attached to an artist: the images uploaded on the artist screen."
-msgstr "تصاویر پیوست‌شده به هنرمند: همان تصاویری که در صفحهٔ هنرمند بارگذاری می‌شوند."
+msgid "Photos attached to the post being viewed: an artist, a release or a video."
+msgstr "تصویرهای پیوست‌شده به نوشتهٔ در حال نمایش: یک هنرمند، یک آلبوم یا یک ویدیو."
 
 #: wavira/blocks/news/block.json
 msgctxt "block description"
@@ -151,6 +166,7 @@ msgctxt "block keyword"
 msgid "artist"
 msgstr "هنرمند"
 
+#: wavira/blocks/download/block.json
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
 msgid "audio"
@@ -181,10 +197,20 @@ msgctxt "block keyword"
 msgid "clip"
 msgstr "کلیپ"
 
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "download"
+msgstr "دانلود"
+
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
 msgid "embed"
 msgstr "جایگذاری"
+
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "file"
+msgstr "فایل"
 
 #: wavira/blocks/artist-gallery/block.json
 msgctxt "block keyword"
@@ -205,6 +231,11 @@ msgstr "تصاویر"
 msgctxt "block keyword"
 msgid "magazine"
 msgstr "مجله"
+
+#: wavira/blocks/download/block.json
+msgctxt "block keyword"
+msgid "mp3"
+msgstr "ام‌پی‌تری"
 
 #: wavira/blocks/artist-gallery/block.json
 #: wavira/blocks/artist-profile/block.json
@@ -277,6 +308,7 @@ msgctxt "block keyword"
 msgid "tracks"
 msgstr "قطعهها"
 
+#: wavira/blocks/download/block.json
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
 msgid "video"
@@ -287,15 +319,15 @@ msgctxt "block title"
 msgid "Album tracklist"
 msgstr "فهرست قطعههای آلبوم"
 
-#: wavira/blocks/artist-gallery/block.json
-msgctxt "block title"
-msgid "Artist photo gallery"
-msgstr "گالری تصاویر هنرمند"
-
 #: wavira/blocks/artist-profile/block.json
 msgctxt "block title"
 msgid "Artist profile"
 msgstr "نمای هنرمند"
+
+#: wavira/blocks/download/block.json
+msgctxt "block title"
+msgid "Download button"
+msgstr "دکمهٔ دانلود"
 
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block title"
@@ -316,6 +348,11 @@ msgstr "پخشکنندهٔ موسیقی"
 msgctxt "block title"
 msgid "Music video"
 msgstr "موزیکویدیو"
+
+#: wavira/blocks/artist-gallery/block.json
+msgctxt "block title"
+msgid "Photo gallery"
+msgstr "گالری تصاویر"
 
 #: wavira/inc/options.php:277
 msgid "Bold (700)"
@@ -342,6 +379,10 @@ msgstr "انتخاب تصویر"
 #: wavira/inc/admin-panel.php:374
 msgid "Clear (use the theme colour)"
 msgstr "پاک کردن (استفاده از رنگ قالب)"
+
+#: wavira/inc/assets.php:68
+msgid "Close"
+msgstr "بستن"
 
 #: wavira/inc/options.php:146
 msgid "Colour mode for a first visit"
@@ -420,6 +461,28 @@ msgstr "همهٔ آثار را پشتسرهم پخش کنید — پخش تصا�
 msgid "Dismiss"
 msgstr "نادیده گرفتن"
 
+#: wavira/inc/downloads.php:53
+#: wavira/inc/markup.php:99
+msgid "Download"
+msgstr "دانلود"
+
+#: wavira/inc/downloads.php:44
+msgid "Download the album"
+msgstr "دانلود آلبوم"
+
+#: wavira/inc/artists.php:358
+#: wavira/inc/downloads.php:48
+msgid "Download the image"
+msgstr "دانلود تصویر"
+
+#: wavira/inc/downloads.php:50
+msgid "Download the track"
+msgstr "دانلود قطعه"
+
+#: wavira/inc/downloads.php:46
+msgid "Download the video"
+msgstr "دانلود ویدیو"
+
 #: wavira/inc/admin-panel.php:518
 msgid "Download wavira-core"
 msgstr "دانلود wavira-core"
@@ -485,6 +548,11 @@ msgstr "برچسبهای سبک، پرکاربردترین در ابتدا."
 #: wavira/inc/customizer.php:97
 msgid "Header"
 msgstr "سربرگ"
+
+#: wavira/patterns/hidden-heading-album-photos.php:16
+msgctxt "heading above the gallery of an album"
+msgid "Photos"
+msgstr "تصاویر"
 
 #: wavira/patterns/hidden-heading-music-news.php:20
 msgctxt "heading above the news feed"
@@ -610,13 +678,21 @@ msgstr "هنوز سبکی با موسیقی منتشرشده نداریم."
 msgid "No news posts yet. Publish one and it appears here."
 msgstr "هنوز خبری منتشر نشده است. نخستین خبر را منتشر کنید تا اینجا نمایش داده شود."
 
-#: wavira/blocks/tracklist/render.php:37
+#: wavira/blocks/artist-gallery/render.php:54
+msgid "No photos yet. Upload them from this post’s media library."
+msgstr "هنوز تصویری نیست. آن‌ها را از کتابخانهٔ رسانهٔ همین نوشته بارگذاری کنید."
+
+#: wavira/blocks/tracklist/render.php:38
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
 
 #: wavira/inc/site-defaults.php:239
 msgid "Not now"
 msgstr "اکنون نه"
+
+#: wavira/blocks/download/render.php:45
+msgid "Nothing to download yet: add an audio file to this track, an album file, a hosted video, or a cover image."
+msgstr "هنوز چیزی برای دانلود نیست: به این قطعه فایل صوتی، به آلبوم فایل مادر، به ویدیو فایل میزبانی‌شده یا تصویر جلد اضافه کنید."
 
 #: wavira/inc/customizer.php:296
 msgid "Off gives a flat, editorial look."
@@ -656,10 +732,12 @@ msgid "Persian setup"
 msgstr "راه‌اندازی فارسی"
 
 #: wavira/inc/artists.php:143
+#: wavira/inc/assets.php:67
 msgid "Photo"
 msgstr "تصویر"
 
-#: wavira/inc/artists.php:266
+#: wavira/inc/artists.php:311
+#: wavira/inc/artists.php:413
 msgid "Photos"
 msgstr "تصاویر"
 
@@ -879,10 +957,6 @@ msgstr "عرض چیدمان سایت در صفحه‌های پهن."
 msgid "Theme settings"
 msgstr "تنظیمات قالب"
 
-#: wavira/blocks/artist-gallery/render.php:41
-msgid "This artist has no photos yet. Upload them from the artist’s media library."
-msgstr "این هنرمند هنوز تصویری ندارد. آن‌ها را از کتابخانهٔ رسانهٔ هنرمند بارگذاری کنید."
-
 #: wavira/blocks/video/render.php:27
 msgid "This post has no video source yet."
 msgstr "این نوشته هنوز منبع ویدیویی ندارد."
@@ -931,7 +1005,7 @@ msgstr "ویدیو"
 msgid "View all"
 msgstr "مشاهدهٔ همه"
 
-#: wavira/inc/markup.php:159
+#: wavira/inc/markup.php:171
 msgid "Watch the video"
 msgstr "تماشای ویدیو"
 

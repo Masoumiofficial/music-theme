@@ -24,6 +24,10 @@
 		"showSubtitle": {
 			"type": "boolean",
 			"default": true
+		},
+		"showDownload": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

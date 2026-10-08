@@ -164,4 +164,22 @@ class Test_I18n extends Wavira_Test_Case {
 
 		$this->assertSame( 'باز کردن قطعهٔ نمونه', sprintf( __( 'Open %s', 'wavira' ), 'قطعهٔ نمونه' ) );
 	}
+
+	/**
+	 * The strings 0.15.0 adds — downloads and the photo gallery — are Persian.
+	 *
+	 * @return void
+	 */
+	public function test_download_and_gallery_strings_come_back_in_persian() {
+		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
+
+		$this->assertSame( 'دانلود قطعه', __( 'Download the track', 'wavira' ) );
+		$this->assertSame( 'گالری تصاویر', __( 'Photo gallery', 'wavira' ) );
+		$this->assertSame( '3.2 مگابایت', sprintf( __( '%s MB', 'wavira' ), '3.2' ) );
+
+		$this->load_catalogue( 'wavira-core', 'wavira-core/languages/fa_IR.mo' );
+
+		$this->assertSame( 'فایل قابل دانلودی برای این نوشته موجود نیست.', __( 'There is no downloadable file for this post.', 'wavira-core' ) );
+		$this->assertSame( '720 پیکسل', sprintf( __( '%d pixels', 'wavira-core' ), 720 ) );
+	}
 }

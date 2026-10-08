@@ -57,6 +57,7 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 			array(
 				'show_duration' => true,
 				'show_subtitle' => true,
+				'show_download' => true,
 			)
 		);
 		$album_id = absint( $album_id );
@@ -89,6 +90,17 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 
 			if ( $args['show_duration'] && '' !== (string) $row['duration_label'] ) {
 				$html .= '<span class="wavira-tracklist__duration">' . esc_html( (string) $row['duration_label'] ) . '</span>';
+			}
+
+			// One download link per row, only when that track has a file: an album
+			// page that offers nothing to download is a normal album, and a row
+			// with a dead link is worse than a row without one (ADR 0023).
+			if ( $args['show_download'] ) {
+				$download = wavira_get_download( (int) $row['id'], 'link', 0, __( 'Download', 'wavira' ) );
+
+				if ( '' !== $download ) {
+					$html .= '<span class="wavira-tracklist__download">' . $download . '</span>';
+				}
 			}
 
 			$html .= '</li>';

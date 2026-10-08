@@ -418,10 +418,11 @@ final class Cli implements Registrable {
 
 		\WP_CLI::success(
 			sprintf(
-				'Seeded artist #%1$d, %2$d releases, %3$d tracks and a video.',
+				'Seeded artist #%1$d, %2$d releases, %3$d tracks, a video and %4$d generated file(s).',
 				(int) $report['artist'],
 				count( (array) $report['releases'] ),
-				count( (array) $report['tracks'] )
+				count( (array) $report['tracks'] ),
+				(int) ( $report['media'] ?? 0 )
 			)
 		);
 	}

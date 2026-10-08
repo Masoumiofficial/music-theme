@@ -34,7 +34,7 @@ if ( ! function_exists( 'wavira_block_names' ) ) {
 	 * @return string[]
 	 */
 	function wavira_block_names() {
-		return array( 'tracklist', 'player', 'video', 'genre-chips', 'artist-profile', 'artist-gallery', 'news' );
+		return array( 'tracklist', 'player', 'video', 'genre-chips', 'download', 'artist-profile', 'artist-gallery', 'news' );
 	}
 }
 

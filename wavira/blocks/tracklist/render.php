@@ -30,6 +30,7 @@ $wavira_markup = wavira_get_tracklist(
 	array(
 		'show_duration' => ! isset( $attributes['showDuration'] ) || (bool) $attributes['showDuration'],
 		'show_subtitle' => ! isset( $attributes['showSubtitle'] ) || (bool) $attributes['showSubtitle'],
+		'show_download' => ! isset( $attributes['showDownload'] ) || (bool) $attributes['showDownload'],
 	)
 );
 
