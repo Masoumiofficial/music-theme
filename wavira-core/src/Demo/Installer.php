@@ -432,7 +432,7 @@ final class Installer {
 		if ( $first > 0 ) {
 			$notices[] = sprintf(
 				/* translators: %d: number of sample posts and pages. */
-					__( 'WordPress’s sample content (%d item(s)) now reads in the site’s language.', 'wavira-core' ),
+				__( 'WordPress’s sample content (%d item(s)) now reads in the site’s language.', 'wavira-core' ),
 				$first
 			);
 		}
@@ -490,7 +490,20 @@ final class Installer {
 		);
 
 		foreach ( $samples as $slug => $sample ) {
-			$post = get_page_by_path( $slug, OBJECT, $sample['type'] );
+			// A direct `post_name` lookup rather than `get_page_by_path()`: the
+			// helper is built for hierarchical post types, and the sample post is
+			// not one.
+			$found = get_posts(
+				array(
+					'post_type'        => (string) $sample['type'],
+					'name'             => $slug,
+					'posts_per_page'   => 1,
+					'post_status'      => array( 'publish', 'draft', 'pending', 'private' ),
+					'suppress_filters' => true,
+				)
+			);
+
+			$post = $found ? $found[0] : null;
 
 			if ( ! $post instanceof WP_Post ) {
 				continue;

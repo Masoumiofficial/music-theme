@@ -599,6 +599,13 @@ jobs:
               node tools/check-persian.mjs --page="/tmp/${page}.html" || asset_failures=1
             done
 
+            # What the front page's news section actually shows: WordPress's own
+            # sample content is the first thing a visitor reads on a fresh install,
+            # and the import is supposed to put it in the site's language.
+            echo "--- the blog posts the front page can show"
+            wp post list --post_type=post --fields=ID,post_title,post_name,post_status
+            wp term list category --fields=term_id,name,slug
+
             # What answers, not only how big it is. `curl | wc -c` said "38378
             # bytes" for the stylesheet in 0.14.0 and the render was still
             # unstyled: `wp server`'s router sends a request for a file that is

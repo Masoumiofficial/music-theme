@@ -190,9 +190,13 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 		process.exit( 1 );
 	}
 
+	// The name of the file, because a run checks three pages and “the page” is
+	// not an answer.
+	const where = page.split( '/' ).pop();
+
 	for ( const { element, attribute, value, words } of result.attributes ) {
 		console.log(
-			`::error title=Persian page::<${ element } ${ attribute }="${ value.slice( 0, 80 ) }"> is not Persian — it contains ${ words
+			`::error title=Persian page::${ where }: <${ element } ${ attribute }="${ value.slice( 0, 80 ) }"> is not Persian — it contains ${ words
 				.map( ( word ) => `“${ word }”` )
 				.join( ', ' ) }`
 		);
@@ -200,7 +204,7 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 
 	if ( result.text.length > 0 ) {
 		console.log(
-			`::error title=Persian page::the page's text contains ${ result.text.length } Latin word(s) that are not proper nouns — ${ result.text
+			`::error title=Persian page::${ where }: the text contains ${ result.text.length } Latin word(s) that are not proper nouns — ${ result.text
 				.slice( 0, 12 )
 				.map( ( word ) => `“${ word }”` )
 				.join( ', ' ) }`
