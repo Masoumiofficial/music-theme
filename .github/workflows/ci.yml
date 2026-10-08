@@ -286,18 +286,12 @@ jobs:
         run: bash tools/lint.sh
 
       - name: Front-end unit tests (DOM-free)
-        # The same list `npm run test:js` runs: the player engine, the theme
-        # script, the Customizer preview, the settings screen, the renderer's
-        # guard rails and the catalogue consistency check.
-        run: >-
-          node --test
-          tests/js/player.test.mjs
-          tests/js/theme.test.mjs
-          tests/js/customizer.test.mjs
-          tests/js/admin.test.mjs
-          tests/js/screenshot.test.mjs
-          tests/js/check-render.test.mjs
-          tests/js/i18n.test.mjs
+        # The same command `npm run test:js` runs: the player engine, the theme
+        # script, the Customizer preview, the settings screen, the renderer's and
+        # the catalogue's guard rails. A glob rather than a list, because a list
+        # in two places is a test file that runs in one of them — the Persian
+        # labels gate was written, tested and silently not run in CI for an hour.
+        run: node --test tests/js/*.test.mjs
 
       - name: Bundle size report (gzipped)
         run: |
@@ -558,6 +552,7 @@ jobs:
           {
             set -euo pipefail
             wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            asset_failures=0
 
             echo "--- browsers on this runner"
             for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
@@ -577,7 +572,7 @@ jobs:
             : > /tmp/extra-pages.txt
             for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
               url="http://127.0.0.1:8080${pair#*=}"
-              status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
+              status="$(curl -s -o "/tmp/${pair%%=*}.html" -w '%{http_code}' "$url")"
               echo "${pair%%=*}: ${url} → HTTP ${status}"
               if [ "$status" = "200" ]; then
                 # An absolute URL: `--page=album=/albums/…` reached Chrome as
@@ -588,6 +583,13 @@ jobs:
               fi
             done
 
+            # The plugin's own catalogue has to be in effect on the front end, not
+            # only in `wp eval`: the artist page printed “Albums (۲)” — a plugin
+            # label — under Persian headings, and nothing noticed because the
+            # theme's catalogue is a different file.
+            echo "--- the plugin's section headings, on the rendered artist page"
+            node tools/check-fa-labels.mjs --page=/tmp/artist.html || asset_failures=1
+
             # What answers, not only how big it is. `curl | wc -c` said "38378
             # bytes" for the stylesheet in 0.14.0 and the render was still
             # unstyled: `wp server`'s router sends a request for a file that is
@@ -597,7 +599,6 @@ jobs:
             # answer fails the step: a browser refuses a stylesheet served as
             # `text/html`, which is what "the theme is unstyled" looks like.
             echo "--- the theme's own assets, over HTTP"
-            asset_failures=0
             for asset in assets/dist/theme.css assets/dist/theme.js; do
               url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
               local_file="/tmp/site/wp-content/themes/wavira/${asset}"

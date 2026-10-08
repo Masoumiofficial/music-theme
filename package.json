@@ -13,7 +13,7 @@
 		"build": "node tools/build.mjs",
 		"lint": "bash tools/lint.sh",
 		"lint:js": "node tools/lint-js.mjs",
-		"test:js": "node --test tests/js/player.test.mjs tests/js/theme.test.mjs tests/js/customizer.test.mjs tests/js/admin.test.mjs tests/js/screenshot.test.mjs tests/js/check-render.test.mjs tests/js/i18n.test.mjs",
+		"test:js": "node --test tests/js/*.test.mjs",
 		"i18n:extract": "node tools/i18n.mjs extract",
 		"i18n:build": "node tools/i18n.mjs build",
 		"i18n:check": "node tools/i18n.mjs check",

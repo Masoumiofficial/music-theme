@@ -54,6 +54,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `site` now governs the site settings only, and `tests/test-demo.php` asserts the
   media exists, is local, is marker-tagged and is counted.
 
+- **The plugin's own strings are Persian on the front end.** The catalogue was
+  loaded on `plugins_loaded` only, and WordPress 6.7 warns about a translation
+  load that early and skips it — so an artist page printed “Albums (۲)” and
+  “۳۲۰ kbps” under Persian headings, with every theme string translated and
+  every check green. The domain is loaded again on `init` (priority 0) and, if
+  WordPress still refused it, from the plugin's own `languages/<locale>.mo`
+  directly. `tools/check-fa-labels.mjs` reads the expected Persian from the
+  shipped catalogue and fails the render job when a served page prints an
+  English section heading.
+
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».

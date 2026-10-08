@@ -94,6 +94,12 @@ final class Plugin {
 
 		$this->load_textdomain();
 
+		// And again once `init` has started. WordPress 6.7 warns about a
+		// translation load that happens before `init` and skips it, which leaves
+		// the plugin's strings English inside a Persian page; the second call
+		// costs nothing when the first one worked.
+		add_action( 'init', array( $this, 'load_textdomain' ), 0 );
+
 		foreach ( $this->default_modules() as $module ) {
 			$this->register( $module );
 		}
@@ -157,7 +163,22 @@ final class Plugin {
 	 *
 	 * @return void
 	 */
-	private function load_textdomain(): void {
+	public function load_textdomain(): void {
 		load_plugin_textdomain( 'wavira-core', false, dirname( plugin_basename( WAVIRA_CORE_FILE ) ) . '/languages' );
+
+		// `load_plugin_textdomain()` gives up quietly: it loads the plugin's own
+		// `languages/<locale>.mo` only when WordPress lets it, and a load it
+		// considers too early leaves the domain empty. The result is invisible in
+		// an otherwise Persian site — only the plugin's strings stay English, so
+		// an artist page read “Albums (۲)” and every check passed (0.15.0's
+		// render). Loading the file by hand makes the domain load whatever the
+		// request's timing is, and keeps it loaded when the catalogue ships inside
+		// the plugin rather than in `wp-content/languages`.
+		$locale = determine_locale();
+		$file   = WAVIRA_CORE_DIR . 'languages/' . $locale . '.mo';
+
+		if ( ! is_textdomain_loaded( 'wavira-core' ) && file_exists( $file ) ) {
+			load_textdomain( 'wavira-core', $file, $locale );
+		}
 	}
 }
