@@ -591,7 +591,7 @@ jobs:
           # The render is the first time the product runs with WP_DEBUG on in a
           # browser; a notice here is a finding, not a build break, until the
           # list is empty and this becomes a gate.
-          node tools/annotate-log.mjs /tmp/notices.log notices 20 warning
+          node tools/annotate-log.mjs /tmp/notices.log notices 8 warning --one
 
       - name: Accessibility gate (axe)
         run: node tools/check-axe.mjs /tmp/wavira-axe.json --allow=color-contrast
