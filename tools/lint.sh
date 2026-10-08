@@ -263,8 +263,13 @@ PATTERN_HITS=$(grep -rnE \
   "posts_per_page[[:space:]]*=>[[:space:]]*-1|posts_per_page=-1|wp_calculate_image_srcset|wp_is_mobile|create_function|wp_title\(|id=[\"']audio[\"']|getElementById\([\"']audio" \
   "${SOURCES[@]}" --include='*.php' --include='*.js' --include='*.mjs' 2>/dev/null | grep -v '/assets/dist/' || true)
 
+# Comment lines are exempt: a file that documents the rule ("no jQuery") is not
+# a file that breaks it, and a gate that forbids writing the rule down is worse
+# than the rule. Real usage — `jQuery(`, `jQuery.`, `$( 'x' )` — stays caught.
 JQUERY_HITS=$(grep -rnE "jQuery|\\\$\(" \
-  "${SOURCES[@]}" --include='*.js' --include='*.mjs' 2>/dev/null | grep -v '/assets/dist/' || true)
+  "${SOURCES[@]}" --include='*.js' --include='*.mjs' 2>/dev/null \
+  | grep -v '/assets/dist/' \
+  | grep -vE '^[^:]+:[0-9]+:[[:space:]]*(//|/\*|\*)' || true)
 
 if [ -n "$LEGACY_HITS" ]; then
   say "      FAIL  legacy brand/author tokens found:"

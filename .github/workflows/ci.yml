@@ -287,12 +287,14 @@ jobs:
 
       - name: Front-end unit tests (DOM-free)
         # The same list `npm run test:js` runs: the player engine, the theme
-        # script, the Customizer preview and the catalogue consistency check.
+        # script, the Customizer preview, the settings screen and the catalogue
+        # consistency check.
         run: >-
           node --test
           tests/js/player.test.mjs
           tests/js/theme.test.mjs
           tests/js/customizer.test.mjs
+          tests/js/admin.test.mjs
           tests/js/i18n.test.mjs
 
       - name: Bundle size report (gzipped)

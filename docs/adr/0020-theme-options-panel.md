@@ -1,8 +1,8 @@
 # ADR 0020 — Theme options: one schema, CSS variables, and no page-builder switches
 
-* Status: Accepted
+* Status: Accepted (amended in 0.13.0 — see the amendment at the end)
 * Date: 2026-10-07
-* Phase: 0.12.0
+* Phase: 0.12.0 (amendment: 0.13.0)
 * Supersedes: nothing. Relates to: [0014](0014-dark-mode-and-token-mapping.md) (token remapping),
   [0009](0009-accessibility-and-performance-gates.md) (no `!important`, budgets), [0002](0002-theme-vs-core-plugin-split.md)
   (theme vs plugin), [0015](0015-persian-first-localisation.md) (Persian defaults)
@@ -115,3 +115,46 @@ pretend to be: the panel says so, and the theme does not claim to validate what 
   recorded in `docs/VERIFICATION.md` rather than hidden.
 * `wavira/inc/options.php` is loaded before `performance.php`, because the font preload asks the options
   layer whether the bundled font is in use.
+
+## Amendment — 0.13.0: a second door, `Appearance → Wavira settings`
+
+Decision 1 said the panel is the Customizer, reached from Appearance. The Customizer is still where the
+live preview lives, but it stopped being discoverable enough to be the only door. Two facts came back from
+a real installation:
+
+* On a **block theme**, WordPress prints the Appearance → Customize link only when something hooks
+  `customize_register` (`wp-admin/menu.php`). Wavira does hook it, so the link is there — but a site owner
+  looking for the thing commercial themes ship, a screen called *theme settings*, does not necessarily
+  read "Customize" as it, and a panel nobody finds is a panel that does not exist.
+* The **demo import** lives in the plugin under **Tools**, one screen away from anything the theme shows.
+  A user who installed the theme and went looking for "demo import" in the theme's own surface found
+  nothing at all.
+
+0.13.0 therefore adds `inc/admin-panel.php`: `Appearance → Wavira settings`, a screen with the schema's
+sections as tabs and a final `demo` tab. It is a second **door**, not a second panel:
+
+* **the tabs are `wavira_customize_sections()`** — the same function the Customizer panel is built from,
+  plus `demo`, so a section cannot exist in one door and not the other;
+* **the fields render from `wavira_options_schema()`** and are validated by `wavira_sanitize_option()`,
+  the same call the Customizer's settings use; `wavira_admin_panel_values()` only marshals `$_POST` into
+  the shape the schema expects (a checkbox that is not posted is `false`, an array is not a value);
+* **the storage is the same `theme_mod`s**, and a value equal to its declared default is stored as *no
+  row* (`remove_theme_mod()`), which is what keeps decision 5 — "a default site pays nothing" — true for
+  the new screen as well;
+* **the capability is `edit_theme_options`**, the Customizer's own, and the save path is a nonced
+  `admin-post.php` action that redirects back with `wavira-saved=1`: no screen that re-renders a form on
+  `POST`, no nonce hidden in a query string, and the save path is unit-testable without rendering HTML;
+* **what it is not**: not an options framework, not a page builder, not a new option, not a second
+  sanitizer. The screen adds no setting — it exposes the same 32.
+
+The demo tab follows decision 1 rather than fighting it. The import stays in the plugin (ADR 0002): with
+Wavira Core active the tab links to the plugin's own `Tools → Wavira demo content`, and without it the tab
+says what the plugin provides and links to the installer — never a button that fails on click. The plugin
+screen keeps both the capability check (`manage_options`) and its nonce.
+
+`assets/js/admin.js` is the screen's only script: a colour swatch that writes into the text field the form
+actually posts, a `wp.media` picker for the two logo fields, no jQuery (ADR 0006), enqueued on this screen
+alone with `wp_enqueue_media()`, and budgeted at 8 KB gzipped (2.5 KB actual) like the preview script
+before it. `tests/test-admin-panel.php` and `tests/js/admin.test.mjs` are the record: registration and
+capability, tabs equal to the sections plus `demo` last, every field rendering on its own tab, only the
+posted tab being written, a default not being stored, and the demo tab in both states.

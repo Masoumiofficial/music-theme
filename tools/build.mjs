@@ -35,15 +35,20 @@ const TARGETS = [
 		outFile: join(ROOT, 'wavira/assets/dist/theme.js'),
 		layerOrder: ['index'],
 		pattern: /\.js$/,
-		// The Customizer preview is a second entry point with its own target
-		// below: it must not be concatenated into the front-end bundle, because
-		// the front end never loads it.
-		exclude: /^customizer\.js$/,
+		// The Customizer preview and the settings screen are separate entry
+		// points with their own targets below: they must not be concatenated
+		// into the front-end bundle, because the front end never loads them.
+		exclude: /^(customizer|admin)\.js$/,
 	},
 	{
 		name: 'customizer JS',
 		outFile: join(ROOT, 'wavira/assets/dist/customizer.js'),
 		files: [join(ROOT, 'wavira/assets/js/customizer.js')],
+	},
+	{
+		name: 'admin JS',
+		outFile: join(ROOT, 'wavira/assets/dist/admin.js'),
+		files: [join(ROOT, 'wavira/assets/js/admin.js')],
 	},
 	{
 		name: 'core CSS',

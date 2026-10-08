@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira-core 0.11.0\n"
+"Project-Id-Version: wavira-core 0.13.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
-"POT-Creation-Date: 2026-10-07\n"
-"PO-Revision-Date: 2026-10-07\n"
+"POT-Creation-Date: 2026-10-05\n"
+"PO-Revision-Date: 2026-10-08 12:04+0000\n"
 "Last-Translator: Etehad WP <https://etehadwp.com/>\n"
 "Language-Team: Persian (Iran) — Etehad WP\n"
 "Language: fa_IR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Downloads/Access.php:116
+#: wavira-core/src/Downloads/Access.php:118
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
 msgstr "%d کیلوبیتبرثانیه"
@@ -45,7 +45,7 @@ msgid "Ad slot HTML (above the player)"
 msgstr "کد HTML تبلیغ (بالای پخشکننده)"
 
 #: wavira-core/src/Content/PostTypes.php:155
-#: wavira-core/src/Content/Taxonomies.php:183
+#: wavira-core/src/Content/Taxonomies.php:289
 #. translators: %s: content type singular name (e.g. "Track").
 msgid "Add new %s"
 msgstr "افزودن %s تازه"
@@ -54,17 +54,17 @@ msgstr "افزودن %s تازه"
 msgid "Album"
 msgstr "آلبوم"
 
-#: wavira-core/src/Content/ArtistProfile.php:262
+#: wavira-core/src/Content/ArtistProfile.php:263
 #: wavira-core/src/Content/PostTypes.php:119
 msgid "Albums"
 msgstr "آلبومها"
 
-#: wavira-core/src/Content/Taxonomies.php:168
+#: wavira-core/src/Content/Taxonomies.php:274
 #. translators: %s: taxonomy plural name.
 msgid "All %s"
 msgstr "همهٔ %s"
 
-#: wavira-core/src/Content/ArtistProfile.php:197
+#: wavira-core/src/Content/ArtistProfile.php:198
 msgid "Aparat"
 msgstr "آپارات"
 
@@ -110,11 +110,11 @@ msgstr "بلندی صدای پیشفرض پخشکننده (درصد)"
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr "حذف همهٔ محتوای موسیقی هنگام حذف افزونه"
 
-#: wavira-core/src/Admin/Cli.php:163
+#: wavira-core/src/Demo/Fixtures.php:204
 msgid "Demo Album"
 msgstr "آلبوم نمونه"
 
-#: wavira-core/src/Admin/Cli.php:149
+#: wavira-core/src/Demo/Fixtures.php:198
 msgid "Demo Artist"
 msgstr "هنرمند نمونه"
 
@@ -125,15 +125,15 @@ msgid_plural "Demo content imported: %1$d releases and %2$d tracks. Open the fro
 msgstr[0] "محتوای نمایشی وارد شد: %1$d آلبوم و %2$d قطعه. برای دیدن آن، صفحهٔ اصلی را باز کنید."
 msgstr[1] "محتوای نمایشی وارد شد: %1$d آلبوم و %2$d قطعه. برای دیدن آن، صفحهٔ اصلی را باز کنید."
 
-#: wavira-core/src/Admin/Cli.php:221
+#: wavira-core/src/Demo/Fixtures.php:177
 msgid "Demo Genre"
 msgstr "سبک نمونه"
 
-#: wavira-core/src/Admin/Cli.php:209
+#: wavira-core/src/Demo/Fixtures.php:213
 msgid "Demo Music Video"
 msgstr "موزیکویدیوی نمونه"
 
-#: wavira-core/src/Admin/Cli.php:181
+#: wavira-core/src/Demo/Fixtures.php:184
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr "قطعهٔ نمونهٔ %d"
@@ -151,7 +151,7 @@ msgid "Downloads are not available for this track."
 msgstr "دانلود برای این قطعه فعال نیست."
 
 #: wavira-core/src/Content/PostTypes.php:160
-#: wavira-core/src/Content/Taxonomies.php:173
+#: wavira-core/src/Content/Taxonomies.php:279
 #. translators: %s: content type singular name.
 msgid "Edit %s"
 msgstr "ویرایش %s"
@@ -176,7 +176,7 @@ msgstr "فعالسازی طبقهبندی سال انتشار"
 msgid "Export the music content"
 msgstr "برون‌بری محتوای موسیقی"
 
-#: wavira-core/src/Content/ArtistProfile.php:198
+#: wavira-core/src/Content/ArtistProfile.php:199
 msgid "Facebook"
 msgstr "فیس‌بوک"
 
@@ -184,15 +184,15 @@ msgstr "فیس‌بوک"
 msgid "Footer copyright text"
 msgstr "متن حق نشر پاورقی"
 
-#: wavira-core/src/Admin/Cli.php:150
+#: wavira-core/src/Demo/Fixtures.php:199
 msgid "Generated demo biography. Replace with real content."
 msgstr "زندگینامهٔ نمونه. آن را با محتوای واقعی جایگزین کنید."
 
-#: wavira-core/src/Admin/Cli.php:197
+#: wavira-core/src/Demo/Fixtures.php:176
 msgid "Generated demo lyrics — replace this text."
 msgstr "متن ترانهٔ نمونه — این متن را جایگزین کنید."
 
-#: wavira-core/src/Content/Taxonomies.php:105
+#: wavira-core/src/Content/Taxonomies.php:202
 msgid "Genre"
 msgstr "سبک"
 
@@ -200,7 +200,7 @@ msgstr "سبک"
 msgid "Genre slug for a genre queue."
 msgstr "نامک سبک برای صف سبک."
 
-#: wavira-core/src/Content/Taxonomies.php:104
+#: wavira-core/src/Content/Taxonomies.php:201
 msgid "Genres"
 msgstr "سبکها"
 
@@ -216,7 +216,7 @@ msgstr "ورود محتوای نمایشی"
 msgid "Import options"
 msgstr "تنظیمات ورود"
 
-#: wavira-core/src/Content/ArtistProfile.php:194
+#: wavira-core/src/Content/ArtistProfile.php:195
 msgid "Instagram"
 msgstr "اینستاگرام"
 
@@ -228,19 +228,19 @@ msgstr "گونه"
 msgid "Kinds"
 msgstr "گونه‌ها"
 
-#: wavira-core/src/Content/Taxonomies.php:132
+#: wavira-core/src/Content/Taxonomies.php:238
 msgid "Label"
 msgstr "ناشر"
 
-#: wavira-core/src/Content/Taxonomies.php:131
+#: wavira-core/src/Content/Taxonomies.php:237
 msgid "Labels"
 msgstr "ناشران"
 
-#: wavira-core/src/Content/Taxonomies.php:123
+#: wavira-core/src/Content/Taxonomies.php:229
 msgid "Language"
 msgstr "زبان"
 
-#: wavira-core/src/Content/Taxonomies.php:122
+#: wavira-core/src/Content/Taxonomies.php:228
 msgid "Languages"
 msgstr "زبانها"
 
@@ -289,11 +289,11 @@ msgstr "بیشترین تعداد قطعه در صف."
 msgid "Maximum suggestions per entity."
 msgstr "بیشترین پیشنهادها برای هر موجودیت."
 
-#: wavira-core/src/Content/Taxonomies.php:114
+#: wavira-core/src/Content/Taxonomies.php:220
 msgid "Mood"
 msgstr "حالوهوا"
 
-#: wavira-core/src/Content/Taxonomies.php:113
+#: wavira-core/src/Content/Taxonomies.php:219
 msgid "Moods"
 msgstr "حالوهواها"
 
@@ -305,7 +305,7 @@ msgstr "تنظیمات محصول موسیقی: ظاهر، محتوا، پخشک
 msgid "Music video"
 msgstr "موزیکویدیو"
 
-#: wavira-core/src/Content/ArtistProfile.php:268
+#: wavira-core/src/Content/ArtistProfile.php:269
 #: wavira-core/src/Content/PostTypes.php:133
 msgid "Music videos"
 msgstr "موزیکویدیوها"
@@ -323,7 +323,7 @@ msgstr "نمونهٔ انگلیسی خنثی: فقط محتوا؛ هیچ تنظ�
 msgid "New %s"
 msgstr "%s تازه"
 
-#: wavira-core/src/Content/Taxonomies.php:188
+#: wavira-core/src/Content/Taxonomies.php:294
 #. translators: %s: taxonomy singular name.
 msgid "New %s name"
 msgstr "نام %s تازه"
@@ -420,11 +420,11 @@ msgstr "هدایت به فایل (پیشفرض) بهجای بازگرداندن 
 msgid "Related items per block"
 msgstr "موارد مرتبط در هر بخش"
 
-#: wavira-core/src/Content/Taxonomies.php:141
+#: wavira-core/src/Content/Taxonomies.php:247
 msgid "Release year"
 msgstr "سال انتشار"
 
-#: wavira-core/src/Content/Taxonomies.php:140
+#: wavira-core/src/Content/Taxonomies.php:246
 msgid "Release years"
 msgstr "سالهای انتشار"
 
@@ -472,7 +472,7 @@ msgid "Require a logged-in user to download"
 msgstr "الزام ورود کاربر برای دانلود"
 
 #: wavira-core/src/Content/PostTypes.php:175
-#: wavira-core/src/Content/Taxonomies.php:163
+#: wavira-core/src/Content/Taxonomies.php:269
 #. translators: %s: content type plural name.
 msgid "Search %s"
 msgstr "جستوجوی %s"
@@ -507,11 +507,11 @@ msgstr "پخش تصادفی"
 msgid "Single"
 msgstr "تک‌آهنگ"
 
-#: wavira-core/src/Content/ArtistProfile.php:265
+#: wavira-core/src/Content/ArtistProfile.php:266
 msgid "Singles"
 msgstr "تک‌آهنگ‌ها"
 
-#: wavira-core/src/Demo/Installer.php:321
+#: wavira-core/src/Demo/Installer.php:328
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr "زبان سایت، منطقهٔ زمانی، نخستین روز هفته و قالب تاریخ روی پیش‌فرض‌های ایرانی تنظیم شد."
 
@@ -528,7 +528,7 @@ msgstr "شناسهٔ نوشتهٔ مبدأ برای صفهای آلبوم، هن
 msgid "Start in dark mode"
 msgstr "شروع در حالت تاریک"
 
-#: wavira-core/src/Content/ArtistProfile.php:195
+#: wavira-core/src/Content/ArtistProfile.php:196
 msgid "Telegram"
 msgstr "تلگرام"
 
@@ -568,7 +568,7 @@ msgstr "قطعه"
 msgid "Track %1$d of %2$d"
 msgstr "قطعهٔ %1$d از %2$d"
 
-#: wavira-core/src/Content/MetaValues.php:175
+#: wavira-core/src/Content/MetaValues.php:176
 #. translators: 1: minutes, 2: seconds, zero-padded.
 #, keep-latin
 msgctxt "track duration"
@@ -601,7 +601,7 @@ msgstr "شناسهٔ یکتای شیء."
 msgid "Unmute"
 msgstr "باصدا"
 
-#: wavira-core/src/Content/Taxonomies.php:178
+#: wavira-core/src/Content/Taxonomies.php:284
 #. translators: %s: taxonomy singular name.
 msgid "Update %s"
 msgstr "بهروزرسانی %s"
@@ -647,11 +647,11 @@ msgstr "تنظیمات واویرا"
 msgid "What the queue is built from."
 msgstr "صف از چه چیزی ساخته میشود."
 
-#: wavira-core/src/Content/ArtistProfile.php:271
+#: wavira-core/src/Content/ArtistProfile.php:272
 msgid "Works"
 msgstr "آثار"
 
-#: wavira-core/src/Content/ArtistProfile.php:199
+#: wavira-core/src/Content/ArtistProfile.php:200
 msgid "X (Twitter)"
 msgstr "ایکس (توییتر)"
 
@@ -663,6 +663,6 @@ msgstr "شما اجازهٔ برون‌بری این سایت را ندارید.
 msgid "You are not allowed to import demo content on this site."
 msgstr "شما اجازهٔ ورود محتوای نمایشی در این سایت را ندارید."
 
-#: wavira-core/src/Content/ArtistProfile.php:196
+#: wavira-core/src/Content/ArtistProfile.php:197
 msgid "YouTube"
 msgstr "یوتیوب"

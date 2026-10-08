@@ -9,7 +9,7 @@
  *
  *   [size]      theme CSS ≤ 25 KB gzipped, theme JS ≤ 30 KB gzipped,
  *               player bundle ≤ 15 KB gzipped, Customizer preview ≤ 10 KB
- *               gzipped. The player bundle is `core.js` because that is the
+ *               gzipped, settings screen ≤ 8 KB gzipped. The player bundle is `core.js` because that is the
  *               file the plugin enqueues (the engine is part of it, ADR 0005);
  *               the preview script is measured separately because it is only
  *               ever loaded inside the Customizer frame (ADR 0020).
@@ -43,6 +43,7 @@ const BUDGETS = [
 	{ file: 'wavira/assets/dist/theme.css', kbyte: 25, label: 'theme CSS' },
 	{ file: 'wavira/assets/dist/theme.js', kbyte: 30, label: 'theme JS' },
 	{ file: 'wavira/assets/dist/customizer.js', kbyte: 10, label: 'Customizer preview' },
+	{ file: 'wavira/assets/dist/admin.js', kbyte: 8, label: 'settings screen' },
 	{ file: 'wavira-core/assets/dist/core.js', kbyte: 15, label: 'player bundle' }
 ];
 

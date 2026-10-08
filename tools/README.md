@@ -36,7 +36,7 @@ Fails the build when a legacy pattern reappears in product code:
 | `wp_is_mobile` | no UA sniffing for layout (P9) |
 | `getElementById('audio'` / `id="audio"` | the global player-ID anti-pattern (ADR 0005) |
 | `create_function`, `wp_title(` | deprecated APIs (ADR 0007) |
-| `jQuery` / `$( ` in `assets/js` | no front-end jQuery (ADR 0006) |
+| `jQuery` / `$( ` in `assets/js` code (comments are exempt, so a file may document the rule) | no front-end jQuery (ADR 0006) |
 
 ## PHP class-reference gate (`check-class-refs.py`)
 

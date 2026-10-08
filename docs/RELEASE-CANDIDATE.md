@@ -1,9 +1,38 @@
-# RELEASE-CANDIDATE.md — Wavira 0.12.0 (RC)
+# RELEASE-CANDIDATE.md — Wavira 0.13.0 (RC)
 
-> **Status: release candidate.** 0.12.0 adds the settings panel a commercial theme is expected to have and
-> the Persian setup a Persian buyer needs on day one (ADR 0020). Everything below §0.1 describes the
-> 0.11.0 candidate, which is still the record of what was verified then; the numbers in §1 belong to this
-> release.
+> **Status: release candidate.** 0.13.0 makes the settings panel findable: **Appearance → Wavira
+> settings**, a screen of its own built from the same schema as the Customizer panel (ADR 0020's
+> amendment), and it fixes the two defects a real installation reported — a Persian-notice screen id that
+> named a screen the plugin does not register, and two faults in the new screen's script. §0.2 is this
+> increment; §0.1 is the record of 0.12.0; everything below that describes the 0.11.0 candidate. The
+> numbers in §1 belong to the current release.
+
+## 0.2 Added in 0.13.0 — the settings screen, and the two defects behind the report
+
+| Addition | Why it mattered | Where | Tests |
+| --- | --- | --- | --- |
+| **Appearance → Wavira settings** — the same 32 settings, one tab per Customizer section, plus a demo tab last | 0.12.0's panel existed, but the report from a real installation was "there is no settings panel". On a **block theme** WordPress prints the Appearance → Customize link only when something hooks `customize_register`; Wavira does, so the link is there — but a site owner looking for a screen of its own does not necessarily read "Customize" as it, and a panel nobody finds is a panel that does not exist | `inc/admin-panel.php`, ADR 0020's amendment | `tests/test-admin-panel.php` (13 cases) |
+| **One schema, two doors** — tabs from `wavira_customize_sections()`, fields from `wavira_options_schema()`, values through `wavira_sanitize_option()`, storage in the same `theme_mod`s | a second panel that drifts from the first *is* two panels, and the drift is invisible until a customer finds it | `wavira_admin_panel_values()`, `wavira_admin_panel_apply()`, `wavira_admin_panel_save()` | `test_the_tabs_are_the_sections_plus_the_demo_tab`, `test_saving_one_tab_leaves_the_others_alone`, `test_the_screen_refuses_what_the_customizer_refuses`, `test_a_default_value_is_not_stored` |
+| **A demo tab that never offers a button which fails** | "the demo import was not there at all" in the report: it lives in the plugin under **Tools** | `wavira_admin_panel_demo_tab()` | `test_the_demo_tab_points_at_the_plugin_when_it_is_active` — both states: `tools.php?page=wavira-demo` with the plugin, `plugin-install.php?tab=upload` without it |
+| **`assets/js/admin.js`** — colour swatch ↔ text field, a `wp.media` picker for the two logo fields, an explicit clear, no jQuery | a settings screen has to feel like a WordPress screen, and the value the form posts is the text field | built to `assets/dist/admin.js`, enqueued on this screen only, with `wp_enqueue_media()` | `tests/js/admin.test.mjs` (9 cases, stub DOM) |
+| **Fixed: the Persian notice whitelisted a screen that does not exist** | the plugin registers the demo screen under Tools, so its id is `tools_page_wavira-demo`; 0.12.0 checked `appearance_page_wavira-demo`, which is why the notice described a screen and then never appeared on it | `wavira_persian_notice_screens()` in `inc/site-defaults.php` | `test_the_persian_notice_is_shown_on_the_settings_screen` (asserts both real ids and that the 0.12.0 guess is *not* in the list) |
+| **Fixed: two defects in the screen's script** | `renderPreview()` read `model.toJSON` before checking the model, so clearing an empty image field raised a TypeError; the colour text field moved the swatch for any string at all, typo included | `assets/js/admin.js` | the two `tests/js/admin.test.mjs` cases that failed on the first run of the new suite |
+| **Fixed: `tools/po-merge.py` could not round-trip a catalogue** | a plural entry has no `msgstr ""` line, so the merge read it as untranslated and refused to write the plugin's catalogue; the `msgid ""` header was read as an entry and moved into the body; `re.sub()` read the `\n` of a header value as a newline and split the field it was rewriting | `tools/po-merge.py` | both catalogues now merge with no diff beyond the dates and `Project-Id-Version` |
+| **The catalogue stayed complete** | 33 new strings arrived with the screen | `wavira/languages/*` | `node tools/i18n.mjs check` → **374/374, POT/PO/MO in sync** (theme 224, plugin 150) |
+
+**Verification of this increment** — `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned
+standards, 93 PHP files parsed, CSS/contrast/perf/boundaries/legacy gates), `npm run test:js` → **54/54**,
+`node tools/i18n.mjs check` → **374/374**, `node tools/package.mjs` → three archives, rebuild
+byte-identical. Digests of the archives this tree produces with CI's own fixed timestamp (see §8):
+
+| Archive | Bytes | SHA-256 |
+| --- | --- | --- |
+| `wavira-theme-0.13.0.zip` | 286 008 | `278ee95cad4119ef9e7ce9973781e225e2f28e6bf0857c3d4103e8a19bc35375` |
+| `wavira-core-0.13.0.zip` | 180 036 | `8c35d2c6e230f8e6b6303d15af1795ec006d6e7a949e2125bebf55c6ef9501db` |
+| `wavira-0.13.0-bundle.zip` | 499 146 | `f44a87b82046824118bd0ba481412baea2cc5789a8beeddba0ea8d0c78a29f22` |
+
+The theme and the plugin archives are also committed in the repository root, byte-identical to the release
+assets, so a link keeps working even where a release asset does not.
 
 ## 0.1 Added in 0.12.0 — the settings panel and the Persian setup
 
@@ -198,11 +227,11 @@ The stable, public URL for a version is its GitHub release, not the build machin
 
 | Artifact | Link that works today (tag-pinned) |
 | --- | --- |
-| Theme | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-theme-0.12.0.zip` |
-| Core plugin | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-core-0.12.0.zip` |
-| Both, with `README-FIRST/` | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-0.12.0-bundle.zip` |
-| The release page (notes, digests, all five assets) | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.12.0-rc` |
-| The previous candidate, still downloadable | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.11.0-rc` |
+| Theme | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.13.0-rc/wavira-theme-0.13.0.zip` |
+| Core plugin | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.13.0-rc/wavira-core-0.13.0.zip` |
+| Both, with `README-FIRST/` | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.13.0-rc/wavira-0.13.0-bundle.zip` |
+| The release page (notes, digests, all five assets) | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.13.0-rc` |
+| The previous candidate, still downloadable | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.12.0-rc` |
 | All releases | `https://github.com/Masoumiofficial/music-theme/releases` |
 
 The `releases/latest/download/<file>` shorthand names only *published*, non-prerelease releases, and both

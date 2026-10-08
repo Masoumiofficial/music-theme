@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — 0.13.0 (shipped with the theme)
+- **No behaviour change**: 0.13.0 is a theme release (the settings screen, ADR 0020's amendment). The
+  plugin is versioned and shipped in lockstep so the theme and the plugin a customer has installed never
+  disagree about which release they are, and so `Dashboard → Updates` shows one number for the pair. The
+  only source change in this release is the version header.
+
 ### Added — 0.12.0 (the Persian setup, shared)
 - **`wavira_core_apply_persian_defaults()`** (`public-api.php`) — the Iranian defaults (locale, timezone,
   week start, date and time format, and a blog description nobody wrote on purpose) exposed as a public

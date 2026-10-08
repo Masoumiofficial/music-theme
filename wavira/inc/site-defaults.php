@@ -166,12 +166,33 @@ function wavira_handle_persian_dismiss(): void {
 add_action( 'admin_post_wavira_persian_dismiss', 'wavira_handle_persian_dismiss' );
 
 /**
+ * The screens the Persian notice is shown on.
+ *
+ * The list is data, not a condition buried in the notice, because the two names
+ * that matter are the ones that drifted once already: the demo screen belongs to
+ * the plugin and is registered under Tools, so its id is `tools_page_wavira-demo`
+ * — not `appearance_page_…` — and the theme's settings screen is
+ * `appearance_page_wavira-settings`. Both are built from the code that registers
+ * them.
+ *
+ * @return string[] Screen ids.
+ */
+function wavira_persian_notice_screens(): array {
+	return array(
+		'themes',
+		'customize',
+		'tools_page_wavira-demo',
+		'appearance_page_' . wavira_admin_panel_slug(),
+	);
+}
+
+/**
  * Tell an administrator about it when the site is not Persian yet.
  *
- * Shown on the two screens where a theme decision is made — Appearance → Themes
- * and the Customizer — never on every screen, and never to a user who cannot act
- * on it. One dismissal per user, kept in user meta, because a nagging notice is
- * worse than an unfinished setting.
+ * Shown on the screens where a theme decision is made — Appearance → Themes, the
+ * settings screen, the Customizer and the demo importer — never on every screen,
+ * and never to a user who cannot act on it. One dismissal per user, kept in user
+ * meta, because a nagging notice is worse than an unfinished setting.
  *
  * @return void
  */
@@ -186,7 +207,7 @@ function wavira_persian_admin_notice(): void {
 
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-	if ( ! $screen || ! in_array( $screen->id, array( 'themes', 'customize', 'appearance_page_wavira-demo' ), true ) ) {
+	if ( ! $screen || ! in_array( $screen->id, wavira_persian_notice_screens(), true ) ) {
 		return;
 	}
 
@@ -214,6 +235,7 @@ function wavira_persian_admin_notice(): void {
 	} else {
 		esc_html_e( 'The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian.', 'wavira' );
 		echo ' <a href="' . esc_url( wavira_persian_setup_url() ) . '">' . esc_html__( 'Make the site Persian', 'wavira' ) . '</a> · ';
+		echo '<a href="' . esc_url( wavira_admin_panel_url() ) . '">' . esc_html__( 'Theme settings', 'wavira' ) . '</a> · ';
 		echo '<a href="' . esc_url( wavira_persian_dismiss_url() ) . '">' . esc_html__( 'Not now', 'wavira' ) . '</a>';
 	}
 

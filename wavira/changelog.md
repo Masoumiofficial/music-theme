@@ -5,6 +5,44 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.13.0 (the settings screen)
+- **Appearance → Wavira settings** (`inc/admin-panel.php`): the same 32-setting schema, now with a screen
+  of its own in the admin menu — one tab per Customizer section, plus a **demo import** tab — so the panel
+  is found without knowing that a block theme keeps its Customize link behind `customize_register`
+  (`wp-admin/menu.php`). Registration is `add_theme_page()`, the capability is `edit_theme_options` (the
+  Customizer's own), and the save path is a nonced `admin-post.php` action that writes the same
+  `theme_mod`s through the same `wavira_sanitize_option()`. A value equal to its declared default is
+  stored as *no row* (`remove_theme_mod()`), so the screen cannot turn a default site into a site with
+  options.
+- **A demo tab that tells the truth** (`wavira_admin_panel_demo_tab()`): with the plugin active it links
+  to `Tools → Wavira demo content`; without it, it says what Wavira Core provides and links to the plugin
+  installer — never a button that fails on click.
+- **`assets/js/admin.js`** (2.5 KB gzipped, budgeted at 8 KB, enqueued on this screen only): a colour
+  swatch that writes into the text field the form actually posts, a `wp.media` picker for the logo and the
+  dark-mode logo with an explicit clear, and no jQuery (ADR 0006).
+- **`tests/test-admin-panel.php`** (13 cases: registration and capability, the tabs being the sections plus
+  `demo` last, every field rendering on its own tab, escaping, only the posted tab saving, a default value
+  not being stored, the Persian notice, the demo tab with and without the plugin) and
+  `tests/js/admin.test.mjs` (9 cases).
+
+### Fixed — 0.13.0
+- **The Persian notice whitelisted the wrong screen id** (`inc/site-defaults.php`): the demo screen is
+  registered by the plugin under **Tools**, so its id is `tools_page_wavira-demo`. The 0.12.0 code checked
+  `appearance_page_wavira-demo`, which is why a site owner standing on the screen the notice described saw
+  no notice. The list is data now (`wavira_persian_notice_screens()`), both names are asserted in a test,
+  and the notice links to the settings screen.
+- **A cleared image field threw** (`assets/js/admin.js`): `renderPreview()` read `model.toJSON` before
+  checking the model, so clearing an empty logo raised a TypeError and left the preview alone.
+- **The colour field could store a typo** (`assets/js/admin.js`): the text field only moves the swatch for
+  a `#rgb`/`#rrggbb` value, and clearing the text clears the swatch too.
+- **The legacy gate tripped on its own documentation** (`tools/lint.sh`): comment lines are exempt from the
+  jQuery grep, so a file may say "no jQuery" without failing the build.
+- **`tools/po-merge.py` could not round-trip a catalogue**: it read a *plural* entry as untranslated (a
+  plural entry has no `msgstr ""` line, so the merge refused to write the plugin's catalogue), it read the
+  `msgid ""` header block as an entry and moved the header into the body, and `re.sub()` read the `\n` of a
+  header value as a newline and split the field it was rewriting. Both catalogues now merge without a diff
+  beyond the dates, and the header's `Project-Id-Version` follows the template.
+
 ### Added — 0.12.0 (theme options panel and the Persian setup)
 - **The Wavira settings panel** (`inc/options.php`, `inc/customizer.php`): one schema — key, default,
   type, control, section, label, bounds — drives the Customizer panel *and* the front end, so a setting

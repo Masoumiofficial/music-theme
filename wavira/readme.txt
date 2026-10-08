@@ -2,7 +2,7 @@
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Version: 0.12.0
+Version: 0.13.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: music, rtl-language-support, translation-ready, block-styles, wide-blocks, custom-colors, accessibility-ready
@@ -48,8 +48,11 @@ theme never takes your catalogue with it.
    types this theme renders).
 2. Upload this theme, activate it, then set your permalinks to a pretty
    structure (Settings → Permalinks).
-3. Optional: create the Persian demo content with `wp wavira seed --force`.
-4. Optional: if you have a legacy music site, review `wp wavira migrate --dry-run`
+3. Open **Appearance → Wavira settings** — the panel, the logo, the fonts and the
+   demo import are all there. (The demo import itself is on **Tools → Wavira demo
+   content**, which the panel links to.)
+4. Optional: create the Persian demo content with `wp wavira seed --force`.
+5. Optional: if you have a legacy music site, review `wp wavira migrate --dry-run`
    before running `wp wavira migrate`.
 
 == Frequently Asked Questions ==
@@ -88,7 +91,8 @@ See `changelog.md` in the theme folder.
 
 == Settings panel ==
 
-Appearance → Customize → **Wavira settings**:
+**Appearance → Wavira settings** — a screen of its own in the admin menu, one tab per group of settings,
+with the demo import one tab away:
 
 * Identity and logo — logo, logo width, a separate logo for dark mode, site title and tagline
 * Header — sticky header, search block, announcement bar, player bar
@@ -98,12 +102,16 @@ Appearance → Customize → **Wavira settings**:
 * Social networks — Instagram, Telegram, YouTube, X (Twitter), Facebook
 * Texts — footer note, back-to-top button
 * Tools — additional CSS, printed after the theme stylesheet
+* Demo import — one click to **Tools → Wavira demo content**, and a plain explanation of what is missing
+  when the **Wavira Core** plugin is not active yet
 
-Most settings preview live, without a page reload; the ones that change markup (a logo, a social row)
-refresh the preview instead, because only the server can render them.
+The same settings are in **Appearance → Customize → Wavira settings**, where most of them preview live
+without a page reload; the ones that change markup (a logo, a social row) refresh the preview instead,
+because only the server can render them.
 
-Nothing in the panel disables a WordPress feature, bundles a page builder, or fights another plugin.
-A site that changes nothing ships no extra CSS at all.
+Every screen saves through one sanitizer and one capability (`edit_theme_options`), and a value left at
+its default is stored as nothing at all. Nothing in the panel disables a WordPress feature, bundles a page
+builder, or fights another plugin. A site that changes nothing ships no extra CSS at all.
 
 == Copyright ==
 
