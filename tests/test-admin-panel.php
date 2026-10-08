@@ -302,7 +302,11 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 		);
 
 		$this->assertSame( 1, $changed, 'only the announcement bar row is removed' );
-		$this->assertFalse( get_theme_mod( 'wavira_top_bar', 'missing' ), 'the row is removed, not stored as false' );
+		$this->assertSame(
+			'missing',
+			get_theme_mod( 'wavira_top_bar', 'missing' ),
+			'the row is removed, not stored as false: the fallback is what comes back'
+		);
 		$this->assertFalse( wavira_option( 'top_bar' ), 'and the default applies again' );
 	}
 
@@ -363,17 +367,21 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 		// prints, and the one a browser follows.
 		$custom = esc_url( admin_url( 'customize.php?autofocus[panel]=wavira' ) );
 
-		foreach ( array_keys( wavira_admin_panel_tabs() ) as $tab ) {
-			$_GET['tab'] = $tab;
+		try {
+			foreach ( array_keys( wavira_admin_panel_tabs() ) as $tab ) {
+				$_GET['tab'] = $tab;
 
-			$html = $this->capture( 'wavira_admin_panel_render' );
+				$html = $this->capture( 'wavira_admin_panel_render' );
 
-			$this->assertStringContainsString( 'nav-tab-wrapper', $html );
-			$this->assertStringContainsString( esc_url( wavira_admin_panel_url( $tab ) ), $html, "{$tab} is reachable from the nav" );
-			$this->assertStringContainsString( $custom, $html, 'the live preview is one click away' );
+				$this->assertStringContainsString( 'nav-tab-wrapper', $html );
+				$this->assertStringContainsString( esc_url( wavira_admin_panel_url( $tab ) ), $html, "{$tab} is reachable from the nav" );
+				$this->assertStringContainsString( $custom, $html, 'the live preview is one click away' );
+			}
+		} finally {
+			// A test that leaves `$_GET` behind is a test that decides the next
+			// one's behaviour — including when it fails.
+			unset( $_GET['tab'] );
 		}
-
-		unset( $_GET['tab'] );
 	}
 
 	/**
@@ -398,26 +406,38 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 
 		add_filter( 'locale', $pin_english );
 
-		// The notice only reads `->id` from the current screen, so a stub is
-		// enough — and a stub cannot depend on which admin files the test
-		// bootstrap happens to have loaded.
-		$GLOBALS['current_screen'] = (object) array( 'id' => 'appearance_page_' . wavira_admin_panel_slug() );
+		// A real screen, set the way WordPress sets one. Two reasons it cannot be
+		// a stand-in object: `get_current_screen()` returns null unless the
+		// global is a `WP_Screen` (since WordPress 6.8), and `is_admin()` calls
+		// `$GLOBALS['current_screen']->in_admin()` whenever that global is set —
+		// so a stub here would not only feed this test, it would break the next
+		// one. The global is put back in `finally`, because the assertions below
+		// can throw.
+		$previous = isset( $GLOBALS['current_screen'] ) ? $GLOBALS['current_screen'] : null;
 
-		delete_user_meta( get_current_user_id(), 'wavira_persian_notice' );
+		set_current_screen( 'appearance_page_' . wavira_admin_panel_slug() );
 
-		$html = $this->capture( 'wavira_persian_admin_notice' );
+		try {
+			delete_user_meta( get_current_user_id(), 'wavira_persian_notice' );
 
-		$this->assertStringContainsString( esc_url( wavira_admin_panel_url() ), $html, 'the notice offers the settings screen' );
-		$this->assertStringContainsString( esc_url( wavira_persian_setup_url() ), $html, 'and the Persian setup' );
+			$html = $this->capture( 'wavira_persian_admin_notice' );
 
-		// A screen the notice does not belong to prints nothing at all.
-		$GLOBALS['current_screen'] = (object) array( 'id' => 'edit-post' );
+			$this->assertStringContainsString( esc_url( wavira_admin_panel_url() ), $html, 'the notice offers the settings screen' );
+			$this->assertStringContainsString( esc_url( wavira_persian_setup_url() ), $html, 'and the Persian setup' );
 
-		$this->assertSame( '', $this->capture( 'wavira_persian_admin_notice' ), 'the notice stays off other screens' );
+			// A screen the notice does not belong to prints nothing at all.
+			set_current_screen( 'edit-post' );
 
-		unset( $GLOBALS['current_screen'] );
+			$this->assertSame( '', $this->capture( 'wavira_persian_admin_notice' ), 'the notice stays off other screens' );
+		} finally {
+			if ( $previous ) {
+				$GLOBALS['current_screen'] = $previous;
+			} else {
+				unset( $GLOBALS['current_screen'] );
+			}
 
-		remove_filter( 'locale', $pin_english );
+			remove_filter( 'locale', $pin_english );
+		}
 	}
 
 	/**
