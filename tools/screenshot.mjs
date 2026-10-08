@@ -435,6 +435,19 @@ export async function main( args ) {
 }
 
 // Only run when executed, not when imported by a test.
+//
+// The rejection handler matters as much as the call: an unhandled rejection in
+// Node 20 is a crash dump whose last line is the Node version, and the reason is
+// somewhere in the middle of it — which is how the first two runs of `wp-render`
+// failed with nothing legible to show (0.14.0). Anything this script does not
+// expect says what it was doing when it broke.
 if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] ).href ) {
-	main( process.argv.slice( 2 ) ).then( ( status ) => process.exit( status ) );
+	main( process.argv.slice( 2 ) )
+		.then( ( status ) => process.exit( status ) )
+		.catch( ( error ) => {
+			const where = String( error.stack || '' ).split( '\n' ).slice( 0, 6 ).join( '\n    ' );
+
+			process.stderr.write( `screenshot: unexpected ${ error.name || 'error' }: ${ error.message }\n    ${ where }\n` );
+			process.exit( 1 );
+		} );
 }

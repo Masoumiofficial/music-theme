@@ -410,7 +410,9 @@ jobs:
             wp eval 'echo "locale: " . get_locale() . " | timezone: " . get_option( "timezone_string" ) . PHP_EOL;'
           } 2>&1 | tee /tmp/install-site.log
           status="${PIPESTATUS[0]}"
-          node tools/annotate-log.mjs /tmp/install-site.log install-site 40 error
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/install-site.log install-site 40 error
+          fi
           exit "$status"
 
       - name: Install the theme and the plugin from the working tree
@@ -431,7 +433,9 @@ jobs:
             wp plugin list --status=active
           } 2>&1 | tee /tmp/install-product.log
           status="${PIPESTATUS[0]}"
-          node tools/annotate-log.mjs /tmp/install-product.log install-product 40 error
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/install-product.log install-product 40 error
+          fi
           exit "$status"
 
       - name: Seed the Persian demo
@@ -445,7 +449,9 @@ jobs:
             wp post list --post_type=wavira_artist --fields=ID,post_title,post_name
           } 2>&1 | tee /tmp/seed.log
           status="${PIPESTATUS[0]}"
-          node tools/annotate-log.mjs /tmp/seed.log seed 40 error
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/seed.log seed 40 error
+          fi
           exit "$status"
 
       - name: Serve the site
@@ -475,7 +481,9 @@ jobs:
             exit 1
           } 2>&1 | tee /tmp/serve.log
           status="${PIPESTATUS[0]}"
-          node tools/annotate-log.mjs /tmp/serve.log serve 40 error
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/serve.log serve 40 error
+          fi
           exit "$status"
 
       - name: Install the renderer
@@ -486,7 +494,9 @@ jobs:
             ls /tmp/render/node_modules | head -5
           } 2>&1 | tee /tmp/renderer.log
           status="${PIPESTATUS[0]}"
-          node tools/annotate-log.mjs /tmp/renderer.log renderer 20 error
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/renderer.log renderer 20 error
+          fi
           exit "$status"
 
       - name: Render the screenshots and run axe
