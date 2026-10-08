@@ -538,6 +538,16 @@ jobs:
               fi
             done
 
+            echo "--- the theme's own assets, over HTTP"
+            for asset in assets/dist/theme.css assets/dist/theme.js; do
+              url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
+              echo "${asset}: HTTP $(curl -s -o /dev/null -w '%{http_code}' "$url"), $(curl -s "$url" | wc -c) byte(s)"
+            done
+
+            echo "--- what the front page asks the browser to load"
+            grep -o 'href="[^"]*\.css[^"]*"' /tmp/home.html | head -8
+            grep -o 'src="[^"]*\.js[^"]*"' /tmp/home.html | head -8
+
             echo "--- the arguments the renderer will get"
             cat /tmp/extra-pages.txt
           } 2>&1 | tee /tmp/preflight.log

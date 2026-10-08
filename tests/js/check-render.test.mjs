@@ -53,6 +53,12 @@ const CATALOGUE = [
 	'',
 ].join( '\n' );
 
+/** The two assets every real page carries: the theme's own stylesheet and script. */
+const DRESSED = ( body ) =>
+	'<link rel="stylesheet" href="/wp-content/themes/wavira/assets/dist/theme.css?ver=1">' +
+	'<script src="/wp-content/themes/wavira/assets/dist/theme.js?ver=1"></script>' +
+	body;
+
 /** A page that contains the first translation of the first heading. */
 const PAGE = `<main class="wavira-section">جدیدترین آلبوم${ ZWNJ }ها</main>`;
 
@@ -82,7 +88,7 @@ test( 'the zero-width non-joiner is a typographic choice, not a difference', () 
 
 test( 'a page with the translations on it passes, and says what it found', () => {
 	const result = checkPage( {
-		page: `<div class="wavira-section">جدیدترین آلبومها همین حالا بشنوید</div>`,
+		page: DRESSED( `<div class="wavira-section">جدیدترین آلبومها همین حالا بشنوید</div>` ),
 		catalogue: CATALOGUE,
 		headings: [ 'Latest albums', 'Listen now' ],
 		minSections: 1,
@@ -96,7 +102,7 @@ test( 'a page with the translations on it passes, and says what it found', () =>
 test( 'a translation on the page without the ZWNJ still counts', () => {
 	// The catalogue writes «جدیدترین آلبومها»; the page may render «جدیدترین آلبومها».
 	const result = checkPage( {
-		page: PAGE,
+		page: DRESSED( PAGE ),
 		catalogue: CATALOGUE.replace( 'جدیدترین آلبوم‌ها', 'جدیدترین آلبومها' ),
 		headings: [ 'Latest albums' ],
 		minSections: 0,
@@ -107,7 +113,7 @@ test( 'a translation on the page without the ZWNJ still counts', () => {
 
 test( 'a heading the catalogue does not translate is a distinct problem', () => {
 	const result = checkPage( {
-		page: PAGE,
+		page: DRESSED( PAGE ),
 		catalogue: CATALOGUE,
 		headings: [ 'Latest albums', 'Nowhere to be found' ],
 		minSections: 0,
@@ -121,7 +127,7 @@ test( 'an English page is refused, with the translation it should have had', () 
 	// This is the defect the gate exists for: a root page that renders the theme's
 	// source strings because the locale never loaded.
 	const result = checkPage( {
-		page: '<div class="wavira-section"><h2>Latest albums</h2><h2>Listen now</h2></div>',
+		page: DRESSED( '<div class="wavira-section"><h2>Latest albums</h2><h2>Listen now</h2></div>' ),
 		catalogue: CATALOGUE,
 		headings: [ 'Latest albums', 'Listen now' ],
 		minSections: 1,
@@ -137,7 +143,11 @@ test( 'an English page is refused, with the translation it should have had', () 
 } );
 
 test( 'a page with too few sections, or no Persian at all, is refused', () => {
-	const empty = checkPage( { page: '<html><body>Nothing here</body></html>', catalogue: CATALOGUE, headings: [] } );
+	const empty = checkPage( {
+		page: DRESSED( '<html><body>Nothing here</body></html>' ),
+		catalogue: CATALOGUE,
+		headings: [],
+	} );
 
 	assert.equal( empty.problems.length, 2 );
 	assert.match( empty.problems[ 0 ], /the page has 0 wavira-section element\(s\), expected at least 4/ );
@@ -145,7 +155,7 @@ test( 'a page with too few sections, or no Persian at all, is refused', () => {
 
 	// Three sections is the news-only home page the theme shipped until 0.14.0.
 	const blogIndex = checkPage( {
-		page: '<div class="wavira-section">جدیدترین آلبومها</div>'.repeat( 3 ),
+		page: DRESSED( '<div class="wavira-section">جدیدترین آلبومها</div>'.repeat( 3 ) ),
 		catalogue: CATALOGUE,
 		headings: [],
 	} );
@@ -197,13 +207,33 @@ test( 'the command line asks for `=` when a value is written as a separate word'
 
 test( 'the landmarks a page carries are counted, not guessed', () => {
 	const result = checkPage( {
-		page: '<main class=\"wavira-section\"><h1>واویرا</h1><nav></nav><nav></nav><footer></footer><footer></footer></main>',
+		page: DRESSED( '<main class=\"wavira-section\"><h1>واویرا</h1><nav></nav><nav></nav><footer></footer><footer></footer></main>' ),
 		catalogue: CATALOGUE,
 		headings: [],
 		minSections: 1,
 	} );
 
 	assert.deepEqual( result.counts, { h1: 1, footer: 2, nav: 2, main: 1 } );
+} );
+
+test( 'a page without the theme stylesheet is refused, not photographed', () => {
+	// The first render looked almost right with core's defaults: the search button
+	// is styled by core, the headings by theme.json. The stylesheet is the thing
+	// that says the theme rendered rather than merely the blocks.
+	const bare = checkPage( { page: PAGE, catalogue: CATALOGUE, headings: [], minSections: 0 } );
+
+	assert.equal( bare.problems.length, 2 );
+	assert.match( bare.problems[ 0 ], /does not load the theme stylesheet \(assets\/dist\/theme\.css\)/ );
+	assert.match( bare.problems[ 1 ], /does not load the theme script \(assets\/dist\/theme\.js\)/ );
+
+	const dressed = checkPage( {
+		page: DRESSED( PAGE ),
+		catalogue: CATALOGUE,
+		headings: [],
+		minSections: 0,
+	} );
+
+	assert.deepEqual( dressed.problems, [] );
 } );
 
 test( 'the front page has the h1 the other templates get from their titles', () => {
@@ -235,8 +265,8 @@ test( 'the command line passes a Persian page and fails an English one', () => {
 	const english = join( directory, 'en.html' );
 	const sections = ( heading ) => `<div class="wavira-section"><h2>${ heading }</h2></div>`.repeat( 4 );
 
-	writeFileSync( persian, sections( 'جدیدترین آلبومها همین حالا بشنوید جدیدترین قطعهها موزیکویدیوها اخبار موسیقی' ) );
-	writeFileSync( english, sections( 'Latest albums' ) );
+	writeFileSync( persian, DRESSED( sections( 'جدیدترین آلبومها همین حالا بشنوید جدیدترین قطعهها موزیکویدیوها اخبار موسیقی' ) ) );
+	writeFileSync( english, DRESSED( sections( 'Latest albums' ) ) );
 
 	const good = spawnSync(
 		process.execPath,

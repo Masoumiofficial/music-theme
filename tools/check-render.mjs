@@ -110,6 +110,23 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 		problems.push( 'the page carries no Persian text at all' );
 	}
 
+	// The theme's own stylesheet, by the URL this theme builds: a block theme
+	// renders with core's defaults when its stylesheet is not on the page, and a
+	// screenshot of it looks almost right — which is how the first render's layout
+	// survived a review of the HTML alone.
+	const stylesheet = /href="[^"]*assets\/dist\/theme\.css[^"]*"/;
+
+	if ( ! stylesheet.test( page ) ) {
+		problems.push(
+			'the page does not load the theme stylesheet (assets/dist/theme.css) — ' +
+				'the theme is rendering with core’s defaults'
+		);
+	}
+
+	if ( ! /src="[^"]*assets\/dist\/theme\.js[^"]*"/.test( page ) ) {
+		problems.push( 'the page does not load the theme script (assets/dist/theme.js) — the player and the colour toggle are inert' );
+	}
+
 	return { found, problems, counts };
 }
 
