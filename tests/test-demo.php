@@ -298,6 +298,87 @@ class Test_Demo extends Wavira_Test_Case {
 		$locations = (array) get_theme_mod( 'nav_menu_locations', array() );
 
 		$this->assertArrayHasKey( 'primary', $locations );
+
+		// The one link the importer writes as a string, and the only one that can
+		// go stale: a menu that outlives the domain it was imported under.
+		$items = wp_get_nav_menu_items( (int) $report['menu'] );
+
+		$this->assertNotEmpty( $items, 'the menu has items' );
+
+		$home = null;
+
+		foreach ( $items as $item ) {
+			if ( 'custom' === $item->type ) {
+				$home = $item;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $home, 'the menu links to the front page' );
+		$this->assertStringNotContainsString( 'http', (string) $home->url, 'the home link is a path, not an absolute URL' );
+		$this->assertStringEndsWith( '/', (string) $home->url );
+	}
+
+	/**
+	 * Importing the demo twice leaves one menu, not two of everything in it.
+	 *
+	 * The importer reuses the menu it finds, and it used to add the six items to
+	 * whatever was already there — so a second click on Import (which is what a
+	 * site owner does when the first attempt was interrupted) gave them a menu
+	 * with «خانه» twice. A re-run replaces the menu's items.
+	 *
+	 * @return void
+	 */
+	public function test_a_second_import_does_not_duplicate_the_menu() {
+		$report = Installer::install();
+
+		$this->posts = array_merge( $this->posts, $this->demo_ids() );
+
+		$before = count( (array) wp_get_nav_menu_items( (int) $report['menu'] ) );
+
+		$this->assertGreaterThan( 0, $before, 'the first import filled the menu' );
+
+		$again = Installer::install( array( 'force' => true ) );
+
+		$this->posts = array_merge( $this->posts, $this->demo_ids() );
+
+		$items = (array) wp_get_nav_menu_items( (int) $again['menu'] );
+
+		$this->assertSame( $before, count( $items ), 'the second import replaced the items instead of adding to them' );
+
+		$titles = array_map(
+			static function ( $item ) {
+				return (string) $item->title;
+			},
+			$items
+		);
+
+		$this->assertSame( count( $titles ), count( array_unique( $titles ) ), 'and no title appears twice' );
+
+		// The menu a visitor sees is a `wp_navigation` post, not the classic menu:
+		// core converts one into the other the first time a page renders, and
+		// never again - so the front page has to be published, not left to that.
+		$navs = get_posts(
+			array(
+				'post_type'      => 'wp_navigation',
+				'post_status'    => 'any',
+				'posts_per_page' => 5,
+			)
+		);
+
+		$this->posts = array_merge( $this->posts, wp_list_pluck( $navs, 'ID' ) );
+
+		$found = null;
+
+		foreach ( $navs as $nav ) {
+			if ( false !== strpos( (string) $nav->post_content, 'wp:navigation-link' ) ) {
+				$found = $nav;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $found, 'the import published a block navigation' );
+		$this->assertSame( count( $items ), substr_count( (string) $found->post_content, 'wp:navigation-link' ), 'one block per menu item, and not one per import' );
 	}
 
 	/**

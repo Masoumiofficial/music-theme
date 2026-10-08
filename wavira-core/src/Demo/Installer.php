@@ -27,6 +27,7 @@ use Wavira\Core\Content\MetaSchema;
 use Wavira\Core\Content\PostTypes;
 use Wavira\Core\Content\Taxonomies;
 use WP_Post;
+use WP_Classic_To_Block_Menu_Converter;
 use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
@@ -569,16 +570,26 @@ final class Installer {
 	 * @return int Menu ID, 0 when the menu could not be created.
 	 */
 	private static function create_primary_menu( array $demo ): int {
-		$menu_id = wp_create_nav_menu( (string) $demo['menu']['name'] );
+		$name    = (string) $demo['menu']['name'];
+		$menu_id = wp_create_nav_menu( $name );
 
 		if ( is_wp_error( $menu_id ) ) {
-			$existing = wp_get_nav_menu_object( (string) $demo['menu']['name'] );
+			$existing = wp_get_nav_menu_object( $name );
 
 			if ( ! $existing ) {
 				return 0;
 			}
 
 			$menu_id = (int) $existing->term_id;
+
+			// The menu already exists, and every item in it is about to be added
+			// again: importing the demo twice used to leave the site owner with a
+			// menu twice over, which is what clicking Import a second time does.
+			// The menu is the demo's, so a re-run replaces it rather than appends
+			// to it.
+			foreach ( (array) wp_get_nav_menu_items( $menu_id, array( 'post_status' => 'any' ) ) as $item ) {
+				wp_delete_post( (int) $item->ID, true );
+			}
 		}
 
 		foreach ( (array) $demo['menu']['items'] as $item ) {
@@ -591,8 +602,19 @@ final class Installer {
 				$args['menu-item-type']   = 'post_type_archive';
 				$args['menu-item-object'] = (string) $item['object'];
 			} elseif ( 'taxonomy' === $item['type'] ) {
-				$args['menu-item-type']   = 'taxonomy';
-				$args['menu-item-object'] = (string) $item['object'];
+				$term_id = (int) ( $item['object_id'] ?? 0 );
+
+				if ( ! $term_id ) {
+					// A taxonomy has no archive of its own — only a term has a
+					// page — so an item naming a taxonomy and no term renders as
+					// `<a href="">`: a link with no destination, which goes to the
+					// page you are already on. Better to leave it out.
+					continue;
+				}
+
+				$args['menu-item-type']      = 'taxonomy';
+				$args['menu-item-object']    = (string) $item['object'];
+				$args['menu-item-object-id'] = $term_id;
 			} else {
 				$args['menu-item-type'] = 'custom';
 				$args['menu-item-url']  = (string) $item['url'];
@@ -608,6 +630,73 @@ final class Installer {
 
 		set_theme_mod( 'nav_menu_locations', $locations );
 
+		$menu = get_term( (int) $menu_id, 'nav_menu' );
+
+		if ( $menu instanceof WP_Term ) {
+			self::publish_block_menu( $menu );
+		}
+
 		return (int) $menu_id;
+	}
+
+	/**
+	 * Publish the block navigation the theme actually renders.
+	 *
+	 * The theme's two Navigation blocks live in template parts and name no menu,
+	 * so core renders the most recently published `wp_navigation` post - and on a
+	 * site that has none yet, it converts the classic menu into one the first
+	 * time a page is rendered. That conversion happens once and is never
+	 * refreshed: importing the demo twice left the front page showing the menu
+	 * exactly as it was after the first import, however the menu in wp-admin
+	 * looked. Publishing the converted menu here means the menu a visitor sees is
+	 * the menu this importer just built, on every run.
+	 *
+	 * The conversion is core's own (`WP_Classic_To_Block_Menu_Converter`), so the
+	 * markup is the markup the editor would produce.
+	 *
+	 * @since 0.15.0
+	 * @param WP_Term $menu The classic menu that was just built.
+	 * @return int Post ID of the block menu, 0 when it could not be written.
+	 */
+	private static function publish_block_menu( WP_Term $menu ): int {
+		// `::class` and not a string: inside a namespace, `'WP_Classic_To_Block_…'`
+		// is `Wavira\Core\Demo\WP_Classic_To_Block_…` to PHP - which does not
+		// exist, and which `class_exists()` reports as existing because it asks
+		// the autoloader with the name as written.
+		if ( ! class_exists( WP_Classic_To_Block_Menu_Converter::class ) ) {
+			return 0;
+		}
+
+		$blocks = WP_Classic_To_Block_Menu_Converter::convert( $menu );
+
+		if ( is_wp_error( $blocks ) || '' === $blocks ) {
+			return 0;
+		}
+
+		$args = array(
+			'post_type'    => 'wp_navigation',
+			'post_status'  => 'publish',
+			'post_title'   => (string) $menu->name,
+			'post_name'    => (string) $menu->slug,
+			'post_content' => $blocks,
+		);
+
+		$existing = get_posts(
+			array(
+				'post_type'      => 'wp_navigation',
+				'name'           => (string) $menu->slug,
+				'post_status'    => 'any',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+			)
+		);
+
+		if ( $existing ) {
+			$args['ID'] = (int) $existing[0];
+		}
+
+		$post_id = wp_insert_post( $args, true );
+
+		return is_wp_error( $post_id ) ? 0 : (int) $post_id;
 	}
 }

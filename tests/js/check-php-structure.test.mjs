@@ -134,6 +134,55 @@ test( 'a namespaced file that names a global class without importing it is a fin
 	assert.match( findings[ 0 ].message, /never imported/ );
 } );
 
+test( 'a static call and a class name given as a string are findings too', () => {
+	// The same defect in the clothes it wore on the third render:
+	// `class_exists( 'WP_Classic_To_Block_Menu_Converter' )` asks for the
+	// *namespaced* name, so the guard answers true and the very next line fatals
+	// with “class not found”. `instanceof` was never the only way to name one.
+	const source = [
+		'<?php',
+		'namespace Wavira\\Core\\Demo;',
+		'',
+		'if ( ! class_exists( \'WP_Classic_To_Block_Menu_Converter\' ) ) {',
+		'\treturn 0;',
+		'}',
+		'',
+		'$blocks = WP_Classic_To_Block_Menu_Converter::convert( 1 );',
+		'',
+		'if ( is_a( $blocks, \'WP_Error\' ) ) {',
+		'\treturn 0;',
+		'}',
+	].join( '\n' );
+
+	const findings = inspect( source );
+
+	assert.equal( findings.length, 3, 'the string, the static call and is_a()' );
+	assert.equal( findings[ 0 ].rule, 'core-class-import' );
+	assert.deepEqual(
+		findings.map( ( finding ) => finding.line ),
+		[ 4, 8, 10 ],
+		'one finding per use, in source order'
+	);
+	assert.match( findings[ 0 ].message, /WP_Classic_To_Block_Menu_Converter/ );
+	assert.match( findings[ 2 ].message, /WP_Error/ );
+} );
+
+test( 'a fully qualified name is not a finding, and neither is a name in prose', () => {
+	const source = [
+		'<?php',
+		'namespace Wavira\\Core\\Admin;',
+		'',
+		'/**',
+		' * Uses class_exists( \'WP_CLI\' ) to find out whether this is a CLI request.',
+		' */',
+		'function run(): void {',
+		'\t\\WP_CLI::log( \'done\' );',
+		'}',
+	].join( '\n' );
+
+	assert.deepEqual( inspect( source ), [], 'the backslash says global, and the docblock is prose' );
+} );
+
 test( 'and it is not a finding once the class is imported', () => {
 	const source = [
 		'<?php',

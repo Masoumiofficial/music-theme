@@ -224,17 +224,39 @@ export function inspect( source ) {
 			imported.add( match[ 2 ] || match[ 1 ].split( '\\' ).pop() );
 		}
 
-		const globalClass = /(?:\binstanceof\s+|\bcatch\s*\(\s*|\bnew\s+)((?:WP|wpdb)[A-Za-z0-9_]*)/g;
+		// Every place a class can be *named*, not only the three this rule started
+		// with. `WP_Classic_To_Block_Menu_Converter::convert()` and
+		// `class_exists( 'WP_Classic_To_Block_Menu_Converter' )` were missed by the
+		// narrower pattern, and the second one is the cruellest: `class_exists()`
+		// answers for the name as written — the namespaced one — so the guard
+		// passes and the very next line fatals with “class not found”. The same
+		// is true of a static call, a `::class` and the string functions that take
+		// a class name. A name in prose is not a use, so these all require the
+		// syntax around them.
+		const positions = [
+			/(?<![\w\\])(?<=\binstanceof\s+)((?:WP|wpdb)[A-Za-z0-9_]*)/g,
+			/(?<![\w\\])(?<=\bcatch\s*\(\s*)((?:WP|wpdb)[A-Za-z0-9_]*)/g,
+			/(?<![\w\\])(?<=\bnew\s+)((?:WP|wpdb)[A-Za-z0-9_]*)/g,
+			/(?<![\w\\])((?:WP|wpdb)[A-Za-z0-9_]*)::/g,
+		];
 
-		for ( const match of masked.matchAll( globalClass ) ) {
-			const name = match[ 1 ];
+		// The functions that take a class name as a *string* are read from the raw
+		// source: the masker has blanked the strings out, so the masked text has
+		// nothing left to match. What is left to check is that the match is not
+		// prose inside a comment, which `mask()` reports.
+		const named = /(?<![\w\\])(?<=\b(?:class_exists|class_implements|class_parents|is_a|is_subclass_of|method_exists|property_exists)\s*\(\s*(?:[^,)'"]+,\s*)?['"])((?:WP|wpdb)[A-Za-z0-9_]*)['"]/g;
 
-			if ( imported.has( name ) ) {
-				continue;
+		const seen = new Set();
+
+		const report = ( name, index ) => {
+			if ( imported.has( name ) || seen.has( index ) ) {
+				return;
 			}
 
+			seen.add( index );
+
 			findings.push( {
-				line: lineAt( source, match.index ),
+				line: lineAt( source, index ),
 				rule: 'core-class-import',
 				message:
 					`“${ name }” is used unqualified in namespace ${ namespace[ 1 ] } and never imported — ` +
@@ -242,10 +264,25 @@ export function inspect( source ) {
 					name +
 					';`)',
 			} );
+		};
+
+		for ( const pattern of positions ) {
+			for ( const match of masked.matchAll( pattern ) ) {
+				report( match[ 1 ], match.index );
+			}
+		}
+
+		for ( const match of source.matchAll( named ) ) {
+			if ( comments.some( ( comment ) => match.index >= comment.start && match.index < comment.end ) ) {
+				continue; // Prose in a docblock, not a use.
+			}
+
+			report( match[ 1 ], match.index );
 		}
 	}
 
-	return findings;
+	// In source order: a reader follows the file, not the rule numbers.
+	return findings.sort( ( a, b ) => a.line - b.line );
 }
 
 /** Every PHP file under a path. */

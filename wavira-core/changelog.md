@@ -34,6 +34,37 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed — 0.15.0
 
+- **The demo menu's Home link is a path, not an absolute URL.** It was the one
+  item the importer has to write into the database as a string — every other
+  item is an archive or a term, resolved when the page renders — and stored as
+  `home_url()` it is the first thing that breaks when the site moves to another
+  domain, which is how a menu ends up pointing at the host the demo was imported
+  on. `wp_make_link_relative()` keeps a site installed in a subdirectory right,
+  which a plain `/` would not.
+- **Importing the demo twice no longer doubles the menu.** The importer reuses
+  the menu it finds and added the six items to whatever was already in it, so a
+  second click on Import — what a site owner does when the first attempt was
+  interrupted — left them a menu with «خانه» twice. A re-run deletes the menu's
+  items before writing them, which is what "the demo's menu" has always meant.
+- **The WP-CLI name trap, caught in the second place it hides.** `class_exists(
+  'WP_Classic_To_Block_Menu_Converter' )` inside `namespace Wavira\Core\Demo`
+  asks PHP for `Wavira\Core\Demo\WP_Classic_To_Block_Menu_Converter` — and
+  `class_exists()` answers *true* for it, because that is the name as written and
+  the autoloader is free to fail. The guard passes; the next line fatals. It is
+  the same defect as the unqualified `WP_Post` of the previous commit in a
+  different coat, and the gate that caught that one only looked after
+  `instanceof`, `new` and `catch` — so it now looks anywhere a class is named,
+  including a name given as a string, and reports one finding per use in source
+  order. A fully qualified `\WP_CLI::log()` is not a finding, and neither is a
+  class name written in a docblock.
+- **A re-import now updates the menu visitors see, not just the one in
+  wp-admin.** The theme's Navigation blocks name no menu, so core renders the
+  most recently published `wp_navigation` post — and on a site with none it
+  converts the classic menu into one, once, the first time a page renders.
+  Every import after that changed the classic menu and left the front page
+  showing the first one. The importer publishes the converted menu itself now
+  (core's own `WP_Classic_To_Block_Menu_Converter`, so it is the markup the
+  editor would write), and updates it in place on a re-run.
 - **`wavira_core_download_qualities()` is an authorization decision too.** It
   returned every file a post has, and the theme prints a quality list and a
   download link from exactly that answer — so on a site that turned downloads

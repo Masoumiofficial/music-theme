@@ -130,7 +130,16 @@ final class Fixtures {
 					array(
 						'type'  => 'custom',
 						'label' => 'خانه',
-						'url'   => home_url( '/' ),
+						// A path, not an absolute URL: this is the one item whose
+						// link the importer has to write into the database as a
+						// string (the rest are archives and terms, resolved when
+						// the page renders). Stored absolutely, it is the first
+						// thing that breaks when the site moves to another
+						// domain — and it is a link to the site's own front
+						// page, which needs no host at all. `wp_make_link_relative()`
+						// keeps a site installed in a subdirectory right, which
+						// a plain `/` would not.
+						'url'   => wp_make_link_relative( home_url( '/' ) ),
 					),
 					array(
 						'type'   => 'archive',
@@ -152,11 +161,10 @@ final class Fixtures {
 						'label'  => 'ویدیوها',
 						'object' => PostTypes::VIDEO,
 					),
-					array(
-						'type'   => 'taxonomy',
-						'label'  => 'سبک‌ها',
-						'object' => Taxonomies::GENRE,
-					),
+					// No «سبک‌ها» (styles): a taxonomy has no archive of its own and
+				// only a term has a page, so a menu item for it is a link with no
+				// destination. The genres are on the releases, where a visitor can
+				// follow them.
 				),
 			),
 		);
