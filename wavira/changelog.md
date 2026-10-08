@@ -13,14 +13,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Customizer's own), and the save path is a nonced `admin-post.php` action that writes the same
   `theme_mod`s through the same `wavira_sanitize_option()`. A value equal to its declared default is
   stored as *no row* (`remove_theme_mod()`), so the screen cannot turn a default site into a site with
-  options.
+  options. The one case where an absent field does carry a value — an unchecked box — has a test of its
+  own: a switch whose default is on is stored as *off*, or the box could never be turned off.
 - **A demo tab that tells the truth** (`wavira_admin_panel_demo_tab()`): with the plugin active it links
   to `Tools → Wavira demo content`; without it, it says what Wavira Core provides and links to the plugin
   installer — never a button that fails on click.
 - **`assets/js/admin.js`** (2.5 KB gzipped, budgeted at 8 KB, enqueued on this screen only): a colour
   swatch that writes into the text field the form actually posts, a `wp.media` picker for the logo and the
   dark-mode logo with an explicit clear, and no jQuery (ADR 0006).
-- **`tests/test-admin-panel.php`** (13 cases: registration and capability, the tabs being the sections plus
+- **`tests/test-admin-panel.php`** (14 cases: registration and capability, the tabs being the sections plus
   `demo` last, every field rendering on its own tab, escaping, only the posted tab saving, a default value
   not being stored, the Persian notice, the demo tab with and without the plugin) and
   `tests/js/admin.test.mjs` (9 cases).

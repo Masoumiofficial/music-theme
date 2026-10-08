@@ -189,15 +189,11 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 
 			$this->assertStringContainsString( 'name="wavira_' . $key . '"', $html, "{$key} is posted" );
 			$this->assertStringContainsString( 'id="wavira-field-' . $key . '"', $html, "{$key} has a label target" );
-		}
 
-		$width = $this->capture(
-			static function () use ( $schema ) {
-				wavira_admin_panel_field( 'container_width', $schema['container_width'] );
+			if ( 'container_width' === $key ) {
+				$this->assertStringContainsString( 'value="1400"', $html, 'the saved value is what the field shows' );
 			}
-		);
-
-		$this->assertStringContainsString( 'value="1400"', $width, 'the saved value is what the field shows' );
+		}
 	}
 
 	/**
@@ -233,15 +229,21 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 	public function test_saving_one_tab_leaves_the_others_alone() {
 		set_theme_mod( 'wavira_container_width', 1100 );
 
+		// The type tab as a browser posts it: the choice fields holding what
+		// they already hold, the checkbox on, one number changed — plus a field
+		// that belongs to another tab, which this tab has no business writing.
 		$changed = wavira_admin_panel_apply(
 			'type',
 			array(
-				'wavira_font_base_size' => '18',
+				'wavira_font_family'     => 'vazirmatn',
+				'wavira_font_base_size'  => '18',
+				'wavira_heading_weight'  => '700',
+				'wavira_font_preload'    => '1',
 				'wavira_container_width' => '1500',
 			)
 		);
 
-		$this->assertSame( 1, $changed, 'one setting was on the posted tab' );
+		$this->assertSame( 1, $changed, 'only the field that differs from its default was written' );
 		$this->assertSame( 18, wavira_option( 'font_base_size' ) );
 		$this->assertSame( 1100, wavira_option( 'container_width' ), 'the appearance tab was not posted, so it was not touched' );
 	}
@@ -271,15 +273,25 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_a_default_value_is_not_stored() {
-		// `top_bar` is off by default, so switching it on is a real difference.
-		$changed = wavira_admin_panel_apply( 'header', array( 'wavira_top_bar' => '1' ) );
+		// The header tab as a browser posts it: three switches are on by
+		// default and the announcement bar is off, so switching it on is the one
+		// difference on the tab.
+		$changed = wavira_admin_panel_apply(
+			'header',
+			array(
+				'wavira_sticky_header' => '1',
+				'wavira_header_search' => '1',
+				'wavira_player_bar'    => '1',
+				'wavira_top_bar'       => '1',
+			)
+		);
 
-		$this->assertSame( 1, $changed );
+		$this->assertSame( 1, $changed, 'only the announcement bar differs from its default' );
 		$this->assertTrue( get_theme_mod( 'wavira_top_bar' ), 'a non-default value is stored' );
 
-		// Back to the default: an unchecked box is not posted at all, which is
-		// the one case where absence carries a value. The other switches of the
-		// tab are posted the way a browser would post them.
+		// Back to the default. The announcement bar is unchecked now, so it is
+		// not posted at all — absence is the value — and the switches that are
+		// on by default are posted the way a browser posts them.
 		$changed = wavira_admin_panel_apply(
 			'header',
 			array(
@@ -289,9 +301,28 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 			)
 		);
 
-		$this->assertSame( 1, $changed, 'only the announcement bar changed' );
+		$this->assertSame( 1, $changed, 'only the announcement bar row is removed' );
 		$this->assertFalse( get_theme_mod( 'wavira_top_bar', 'missing' ), 'the row is removed, not stored as false' );
 		$this->assertFalse( wavira_option( 'top_bar' ), 'and the default applies again' );
+	}
+
+	/**
+	 * A checkbox that is unchecked is a value, not silence.
+	 *
+	 * The one field type where an absent key means something: a browser does not
+	 * post an unchecked box, so "not posted" is "off". A switch whose default is
+	 * on therefore stores `false` when the owner clears it — the screen is not
+	 * allowed to read that as "leave it alone", which would make the box
+	 * impossible to turn off.
+	 *
+	 * @return void
+	 */
+	public function test_an_unchecked_box_whose_default_is_on_is_stored_as_off() {
+		$changed = wavira_admin_panel_apply( 'header', array( 'wavira_top_bar' => '1' ) );
+
+		$this->assertSame( 4, $changed, 'three switches went off, the announcement bar went on' );
+		$this->assertFalse( wavira_option( 'sticky_header' ), 'the box was not posted, so it is off' );
+		$this->assertTrue( wavira_option( 'top_bar' ) );
 	}
 
 	/**
@@ -327,6 +358,11 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function test_the_screen_renders_on_every_tab() {
+		// `esc_url()` percent-encodes the brackets and writes `&` as `&#038;`,
+		// so the expectation is the escaped value — the same string the screen
+		// prints, and the one a browser follows.
+		$custom = esc_url( admin_url( 'customize.php?autofocus[panel]=wavira' ) );
+
 		foreach ( array_keys( wavira_admin_panel_tabs() ) as $tab ) {
 			$_GET['tab'] = $tab;
 
@@ -334,7 +370,7 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 
 			$this->assertStringContainsString( 'nav-tab-wrapper', $html );
 			$this->assertStringContainsString( esc_url( wavira_admin_panel_url( $tab ) ), $html, "{$tab} is reachable from the nav" );
-			$this->assertStringContainsString( 'autofocus[panel]=wavira', $html, 'the live preview is one click away' );
+			$this->assertStringContainsString( $custom, $html, 'the live preview is one click away' );
 		}
 
 		unset( $_GET['tab'] );
@@ -352,6 +388,16 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 		$this->assertContains( 'tools_page_wavira-demo', $screens, 'the demo screen is under Tools, and its id says so' );
 		$this->assertNotContains( 'appearance_page_wavira-demo', $screens, '0.12.0 guessed the wrong screen id here' );
 
+		// The notice speaks only while the site language is not Persian yet, so
+		// the locale is pinned instead of being whatever the test site happens
+		// to run: a test that passes because the environment is English, and
+		// fails on a Persian CI site, is a test that reports the environment.
+		$pin_english = static function () {
+			return 'en_US';
+		};
+
+		add_filter( 'locale', $pin_english );
+
 		// The notice only reads `->id` from the current screen, so a stub is
 		// enough — and a stub cannot depend on which admin files the test
 		// bootstrap happens to have loaded.
@@ -361,10 +407,17 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 
 		$html = $this->capture( 'wavira_persian_admin_notice' );
 
+		$this->assertStringContainsString( esc_url( wavira_admin_panel_url() ), $html, 'the notice offers the settings screen' );
+		$this->assertStringContainsString( esc_url( wavira_persian_setup_url() ), $html, 'and the Persian setup' );
+
+		// A screen the notice does not belong to prints nothing at all.
+		$GLOBALS['current_screen'] = (object) array( 'id' => 'edit-post' );
+
+		$this->assertSame( '', $this->capture( 'wavira_persian_admin_notice' ), 'the notice stays off other screens' );
+
 		unset( $GLOBALS['current_screen'] );
 
-		$this->assertStringContainsString( wavira_admin_panel_url(), $html, 'the notice offers the settings screen' );
-		$this->assertStringContainsString( wavira_persian_setup_url(), $html, 'and the Persian setup' );
+		remove_filter( 'locale', $pin_english );
 	}
 
 	/**
@@ -385,7 +438,7 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 		}
 
 		$this->assertStringContainsString( 'no audio or video', strtolower( $html ), 'the one thing the demo does not do is said out loud' );
-		$this->assertStringContainsString( wavira_persian_setup_url(), $html, 'the Persian setup lives here too' );
+		$this->assertStringContainsString( esc_url( wavira_persian_setup_url() ), $html, 'the Persian setup lives here too' );
 	}
 
 	/**
