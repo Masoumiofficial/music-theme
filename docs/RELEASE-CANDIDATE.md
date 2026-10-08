@@ -17,10 +17,10 @@
 | **Five social glyphs, a back-to-top button, an announcement bar, a dark-mode logo** | the surfaces a music site actually fills in on day one | `assets/icons/`, `patterns/hidden-*.php`, `wavira_custom_logo()` | `test_optional_surfaces_render_only_when_they_are_on`, `test_the_dark_logo_is_added_beside_core_markup` |
 | **The catalogue stayed complete** | 100 new strings arrived with the panel and the Persian setup; a half-Persian panel is worse than none | `wavira/languages/*`, `tools/po-merge.py` | `node tools/i18n.mjs check` → **341/341, POT/PO/MO in sync** (theme 191, plugin 150) |
 
-**Local verification of this increment** (the CI verdict for the pushed commit is recorded below once the
-run is green): `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned standards, CSS/contrast/
-perf/boundaries/legacy gates), `npm run test:js` → **45/45**, `node tools/i18n.mjs check` → **341/341**,
-`node tools/package.mjs` → three archives, rebuild byte-identical. Digests of the archives this tree
+**Verification of this increment** — `bash tools/lint.sh` → **RESULT: PASS** (PHPCS with the pinned
+standards, CSS/contrast/perf/boundaries/legacy gates), `npm run test:js` → **45/45**,
+`node tools/i18n.mjs check` → **341/341**, `node tools/package.mjs` → three archives, rebuild
+byte-identical, and CI green on the tagged commit (below). Digests of the archives this tree
 produces with CI's own fixed timestamp (see §8):
 
 | Archive | Bytes | SHA-256 |
@@ -29,9 +29,15 @@ produces with CI's own fixed timestamp (see §8):
 | `wavira-core-0.12.0.zip` | 179 841 | `d8602a7f9643a76282175a797eca4229105938c3707ac257e317ed6c7dde7035` |
 | `wavira-0.12.0-bundle.zip` | 479 864 | `11dfd749138777ef009338fd82dd12f255c73c44a0981d2321299f0982c75f82` |
 
-The remaining pre-upload item is the same one 0.11.0 recorded (§6): `screenshot.png`. It needs a rendered
-page and a browser, and the authoring environment has neither — the file is `optional` in
-`tools/package.mjs`, so `--check` passes and `--strict` reports it. Everything else in the panel, the
+The candidate is published: tag `v0.12.0-rc` → `b804ae2`; run `37760791865` (push on the tag, the
+`Release assets` job included) and run `37760785528` (push on the branch) are both green, and the release
+carries the five files whose digests are listed above. GitHub's own SHA-256 for the three archives is identical to
+`dist/SHA256SUMS`; `manifest.json` differs by design, because the runner records the commit it built
+from (`"built_from": "b804ae2…"`) where a local build says `"working tree"`.
+
+The remaining item before a marketplace upload is the same one 0.11.0 recorded (§6): `screenshot.png`. It
+needs a rendered page and a browser, and the authoring environment has neither — the file is `optional`
+in `tools/package.mjs`, so `--check` passes and `--strict` reports it. Everything else in the panel, the
 Persian setup and the catalogue is machine-verified above.
 
 ---
@@ -192,19 +198,23 @@ The stable, public URL for a version is its GitHub release, not the build machin
 
 | Artifact | Link that works today (tag-pinned) |
 | --- | --- |
-| Theme | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-theme-0.11.0.zip` |
-| Core plugin | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-core-0.11.0.zip` |
-| Both, with `README-FIRST/` | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.11.0-rc/wavira-0.11.0-bundle.zip` |
-| The release page (notes, digests, all four assets) | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.11.0-rc` |
+| Theme | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-theme-0.12.0.zip` |
+| Core plugin | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-core-0.12.0.zip` |
+| Both, with `README-FIRST/` | `https://github.com/Masoumiofficial/music-theme/releases/download/v0.12.0-rc/wavira-0.12.0-bundle.zip` |
+| The release page (notes, digests, all five assets) | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.12.0-rc` |
+| The previous candidate, still downloadable | `https://github.com/Masoumiofficial/music-theme/releases/tag/v0.11.0-rc` |
 | All releases | `https://github.com/Masoumiofficial/music-theme/releases` |
 
-The `releases/latest/download/<file>` shorthand names only *published* releases, and `v0.11.0-rc` is
-marked **prerelease** — checked on 2026-10-07: those three `latest` URLs answer `404` today and start
-working when `1.0.0` is published without the flag. Use the tag-pinned links above until then.
+The `releases/latest/download/<file>` shorthand names only *published*, non-prerelease releases, and both
+candidates are marked **prerelease** — checked on 2026-10-08: the `latest` forms still answer `404` and
+start working when `1.0.0` is published without the flag. Use the tag-pinned links above until then.
 
 The `release-assets` job (`.github/workflows/ci.yml`) attaches the archives whenever a `v*` tag is
 pushed: it runs the same `build` → `package` pair with the same `SOURCE_DATE_EPOCH`, so the attached
-bytes are the ones the other jobs verified. An upload is a `POST` to `uploads.github.com`, which is
+bytes are the ones the other jobs verified. It then reads the release's asset list back and fails with an
+`::error::` naming any file that did not attach — the first tag run of this candidate reported a
+successful upload and left the release with nothing on it, and a release page with no files on it looks
+fine until someone clicks a link. An upload is a `POST` to `uploads.github.com`, which is
 why it happens on a runner rather than from a sandbox that cannot reach that host. `--prerelease`
 releases are excluded from `releases/latest`, so those links only resolve once `1.0.0` is published
 without the flag.
