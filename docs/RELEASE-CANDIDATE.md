@@ -1,11 +1,27 @@
-# RELEASE-CANDIDATE.md — Wavira 0.13.0 (RC)
+# RELEASE-CANDIDATE.md — Wavira 0.14.0 (RC)
 
-> **Status: release candidate.** 0.13.0 makes the settings panel findable: **Appearance → Wavira
+> **Status: release candidate.** 0.14.0 gives the theme a front page — the music sections a customer
+> buys a music theme for, at the site root, instead of a news loop — and puts the first rendered evidence
+> in the repository: the marketplace screenshot, an album page, an artist profile, a dark-mode home and an
+> axe report, produced by a real browser in CI (§0.3). 0.13.0 made the settings panel findable: **Appearance → Wavira
 > settings**, a screen of its own built from the same schema as the Customizer panel (ADR 0020's
 > amendment), and it fixes the two defects a real installation reported — a Persian-notice screen id that
 > named a screen the plugin does not register, and two faults in the new screen's script. §0.2 is this
 > increment; §0.1 is the record of 0.12.0; everything below that describes the 0.11.0 candidate. The
 > numbers in §1 belong to the current release.
+
+## 0.3 Added in 0.14.0 — the front page, and the first rendered evidence
+
+| Addition | Why it mattered | Where | Tests |
+| --- | --- | --- | --- |
+| **A front page that shows the music** — latest albums, the catalogue player, latest tracks, latest videos, music news | the theme shipped `home.html` (a news loop) and `index.html` as a second copy of it, so a default install — where the blog index *is* the front page — showed three news cards at the root and the music sections only under `/blog/`. A music theme whose front page does not show the music is a defect no static gate can see and a screenshot catches | `front-page.html`, ADR 0021 | `tools/lint.sh` fails if `home.html` comes back; the render (`wp-render`) refuses a picture with no text on it |
+| **`tools/screenshot.mjs` — a renderer with a spine** | `wavira/screenshot.png` was the one blocking item a marketplace requires that cannot be produced from source, and the authoring sandbox has no browser. The tool captures the 1200×900 screenshot, extra pages and a dark-mode home, and refuses an image whose size, HTTP status or visible text says it is not the page it claims to be | `tools/screenshot.mjs`, ADR 0022 | `tests/js/screenshot.test.mjs` (9 cases: PNG size reading, option parsing, the refusals) |
+| **`tools/check-axe.mjs` — the accessibility verdict, kept apart from the measurement** | so the screenshot and the report about it always come from the same render, and a `serious`/`critical` finding fails the build while `moderate`/`minor` are printed and an `--allow=` is named in the output | `tools/check-axe.mjs` | the `wp-render` job |
+| **`wp-render` in CI — WordPress, a browser, and the demo seeded** | the first time the product is photographed rather than measured: real WordPress, Persian locale, `wp wavira seed --force`, `wp server`, then the render. It closes checklist items 1 and 4 (below) on a runner, and uploads `screenshot.png`, `docs/screenshots/`, the axe report and `debug.log` as artifacts | `.github/workflows/ci.yml` | the job itself; `node tools/package.mjs --strict` now passes with the screenshot in the tree |
+
+**Verification of this increment** — `bash tools/lint.sh` → **PASS**, `npm run test:js` → **63/63**,
+`node tools/i18n.mjs check` → **374/374**, `node tools/package.mjs` → three archives. The rendered images
+are in `docs/screenshots/` with the report that produced them.
 
 ## 0.2 Added in 0.13.0 — the settings screen, and the two defects behind the report
 
@@ -186,10 +202,10 @@ Because the product is sold to Persian-language markets, the claim is worth stat
 
 | # | Item | State | What it needs |
 | --- | --- | --- | --- |
-| 1 | `wavira/screenshot.png` (1200×900, theme preview) | **MISSING** | a rendered site screenshot. The build environment has no browser (`storage.googleapis.com` is unreachable, no Chrome/Firefox/WebKit, no headless renderer), so this cannot be generated here — it must be captured from a real render. `node tools/package.mjs --strict` fails while it is missing, on purpose |
+| 1 | `wavira/screenshot.png` (1200×900, theme preview) | **PRODUCED IN CI** (0.14.0) | `wp-render` renders it on a runner: real WordPress, Persian locale, the demo seeded, `tools/screenshot.mjs` driving Chrome, and the PNG committed on `main` (ADR 0022). On a branch the image is an artifact and `--strict` proves the packaging path with a screenshot in the tree. The authoring sandbox still has no browser — that is now a fact about the sandbox, not a blocker |
 | 2 | Marketplace listing copy (title, description, feature bullets, FAQ) | **PARTIAL** | `wavira/readme.txt` is written for a WordPress-style listing; the marketplace-specific fields (price, category, demo URL, support terms) need the account |
 | 3 | Demo site for reviewers | **NOT_STARTED** | one command (`wp wavira seed --force`) produces it; it needs a host |
-| 4 | Real-browser audit (Lighthouse ≥ 90, axe clean, RTL/LTR and dark/light screenshots) | **NOT_STARTED** | a browser and a live install; the static gates already enforce the budgets the audit measures |
+| 4 | Real-browser audit (Lighthouse ≥ 90, axe clean, RTL/LTR and dark/light screenshots) | **PARTIAL** (0.14.0) | **axe**: run on every push by `wp-render`, verdict in `tools/check-axe.mjs` — a `serious`/`critical` finding fails the build. **Screenshots**: RTL front page, an album, an artist profile and a dark-mode home in `docs/screenshots/`. **Lighthouse**: still open, and deliberately — it needs a Chromium build pinned to a matching Lighthouse version and its score moves between releases, so the budgets it measures stay enforced statically (`tools/check-perf.mjs`). Recorded here rather than implied |
 | 5 | `Tested up to` in the headers | **DONE** (upper bound) | CI now annotates the version it installed: **WordPress 7.1.3** (runs `37618881223`/`37618887341`), so the headers say `Tested up to: 7.1`. The **floor** is still a policy floor, not a tested one: 6.6 is what the code requires by decision (ADR 0007) and 6.7.2 is the oldest version this phase actually ran the product on (`docs/VERIFICATION.md`) |
 | 6 | Trademark clearance | **LEGAL_REVIEW_REQUIRED** | preliminary screening only (`docs/BRAND-DECISION.md`) — professional clearance is still recommended |
 

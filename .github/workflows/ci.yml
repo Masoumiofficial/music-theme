@@ -287,14 +287,15 @@ jobs:
 
       - name: Front-end unit tests (DOM-free)
         # The same list `npm run test:js` runs: the player engine, the theme
-        # script, the Customizer preview, the settings screen and the catalogue
-        # consistency check.
+        # script, the Customizer preview, the settings screen, the renderer's
+        # guard rails and the catalogue consistency check.
         run: >-
           node --test
           tests/js/player.test.mjs
           tests/js/theme.test.mjs
           tests/js/customizer.test.mjs
           tests/js/admin.test.mjs
+          tests/js/screenshot.test.mjs
           tests/js/i18n.test.mjs
 
       - name: Bundle size report (gzipped)
@@ -304,6 +305,207 @@ jobs:
             [ -f "$file" ] || continue
             printf '%s — %s raw, %s gzipped\n' "$file" "$(du -h "$file" | cut -f1)" "$(gzip -9 -c "$file" | wc -c | awk '{printf "%.1f KB", $1/1024}')"
           done
+
+  # ---------------------------------------------------------------------------
+  # Rendered theme: a real WordPress, a real browser.
+  #
+  # `wavira/screenshot.png` is the one thing a marketplace requires that cannot
+  # be produced from source: it is a picture of the theme with content on it, and
+  # the authoring environment has no browser (docs/RELEASE-CANDIDATE.md §6,
+  # item 1; `node tools/package.mjs --strict` fails while it is missing). So the
+  # render happens here, where both a browser and WordPress exist: the Persian
+  # demo is seeded into a throwaway site, the site is served, and
+  # `tools/screenshot.mjs` captures the front page at 1200×900, two inner pages,
+  # a dark-mode home and an axe-core report.
+  #
+  # The screenshot is committed back to the branch when it changes, because the
+  # file has to be in the tree for the packages to carry it. A push made with
+  # GITHUB_TOKEN does not trigger workflows, so this cannot loop.
+  # ---------------------------------------------------------------------------
+  wp-render:
+    name: "Rendered theme (screenshot, axe)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        # The packages ship the compiled bundles, and so does the render: the
+        # site must be the one a customer downloads.
+        run: node tools/build.mjs
+
+      - name: Install the MySQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq default-mysql-client
+
+      - name: Install WP-CLI
+        run: |
+          set -euo pipefail
+          curl -sSLo /tmp/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x /tmp/wp-cli.phar
+          php /tmp/wp-cli.phar --info
+
+      - name: Install WordPress
+        run: |
+          set -euo pipefail
+          mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wavira_render;"
+          php /tmp/wp-cli.phar core download --path=/tmp/site --locale=fa_IR --version=latest
+          php /tmp/wp-cli.phar config create --path=/tmp/site --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --locale=fa_IR --extra-php <<'PHP'
+          define( 'WP_DEBUG', true );
+          define( 'WP_DEBUG_LOG', '/tmp/site/debug.log' );
+          define( 'WP_DEBUG_DISPLAY', false );
+          PHP
+          php /tmp/wp-cli.phar core install --path=/tmp/site --url=http://127.0.0.1:8080 --title='واویرا موزیک' --admin_user=admin --admin_password=wavira-render-only --admin_email=render@example.test --skip-email
+
+      - name: Install the theme and the plugin from the working tree
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/site/wp-content/themes/wavira /tmp/site/wp-content/plugins/wavira-core
+          cp -a wavira /tmp/site/wp-content/themes/wavira
+          cp -a wavira-core /tmp/site/wp-content/plugins/wavira-core
+          php /tmp/wp-cli.phar plugin activate wavira-core --path=/tmp/site
+          php /tmp/wp-cli.phar theme activate wavira --path=/tmp/site
+          php /tmp/wp-cli.phar option update permalink_structure '/%postname%/' --path=/tmp/site
+          php /tmp/wp-cli.phar rewrite flush --hard --path=/tmp/site
+          php /tmp/wp-cli.phar option update blogdescription 'پخش و انتشار موسیقی ایرانی' --path=/tmp/site
+
+      - name: Seed the Persian demo
+        run: |
+          set -euo pipefail
+          php /tmp/wp-cli.phar wavira seed --force --path=/tmp/site
+          echo "--- what the demo contains ---"
+          php /tmp/wp-cli.phar post list --post_type=wavira_album --fields=ID,post_title,post_name --path=/tmp/site
+
+      - name: Serve the site
+        run: |
+          set -euo pipefail
+          nohup php /tmp/wp-cli.phar server --host=127.0.0.1 --port=8080 --docroot=/tmp/site > /tmp/server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS -o /dev/null http://127.0.0.1:8080/; then
+              echo "the site answered after ${attempt} attempt(s)"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::the site never answered on 127.0.0.1:8080"
+          tail -40 /tmp/server.log
+          exit 1
+
+      - name: Install the renderer
+        run: npm install --no-save --fund=false --audit=false --prefix /tmp/render puppeteer-core axe-core
+
+      - name: Render the screenshots and run axe
+        env:
+          NODE_PATH: /tmp/render/node_modules
+        run: |
+          set -euo pipefail
+          ALBUM_SLUG="$(php /tmp/wp-cli.phar post list --post_type=wavira_album --posts_per_page=1 --field=post_name --path=/tmp/site)"
+          ARTIST_SLUG="$(php /tmp/wp-cli.phar post list --post_type=wavira_artist --posts_per_page=1 --field=post_name --path=/tmp/site)"
+
+          EXTRA_ARGS=()
+          for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
+            url="http://127.0.0.1:8080${pair#*=}"
+            status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
+            echo "${pair%%=*}: ${url} → HTTP ${status}"
+            if [ "$status" = "200" ]; then
+              EXTRA_ARGS+=( "--page=${pair}" )
+            else
+              echo "::notice title=Rendered theme::the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
+            fi
+          done
+
+          node tools/screenshot.mjs \
+            --url=http://127.0.0.1:8080/ \
+            --out=wavira/screenshot.png \
+            --width=1200 --height=900 \
+            --colour=light \
+            --extra=docs/screenshots \
+            --axe=/tmp/wavira-axe.json \
+            "${EXTRA_ARGS[@]}" | tee /tmp/render.log
+          node tools/annotate-log.mjs /tmp/render.log render 20 notice
+
+      - name: Commit the theme screenshot when it changed
+        # Only on `main`: a push made with GITHUB_TOKEN does not trigger
+        # workflows, so a branch that commits its own screenshot can never go
+        # green — the commit that adds the file is not the commit the checks
+        # already passed on. Tag refs are a detached HEAD and have no branch to
+        # commit to either; both run the strict-packaging check below.
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          if [ ! -f wavira/screenshot.png ]; then
+            echo "::error::wavira/screenshot.png was not written"
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add wavira/screenshot.png docs/screenshots
+          if git diff --cached --quiet; then
+            echo "the committed screenshot is already what this render produces"
+            exit 0
+          fi
+          git commit -m "assets: render wavira/screenshot.png from the seeded demo (${GITHUB_SHA::7})"
+          git push
+
+      - name: What the render logged (PHP notices, if any)
+        if: always()
+        run: |
+          set -uo pipefail
+          if [ ! -s /tmp/site/debug.log ]; then
+            echo "no PHP notice was logged during the render"
+            exit 0
+          fi
+          echo "--- /tmp/site/debug.log ---"
+          tee /tmp/notices.log < /tmp/site/debug.log
+          # The render is the first time the product runs with WP_DEBUG on in a
+          # browser; a notice here is a finding, not a build break, until the
+          # list is empty and this becomes a gate.
+          node tools/annotate-log.mjs /tmp/notices.log notices 20 warning
+
+      - name: Accessibility gate (axe)
+        run: node tools/check-axe.mjs /tmp/wavira-axe.json --allow=color-contrast
+
+      - name: Strict packaging (the marketplace files exist now)
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs --strict | tee /tmp/strict.log
+          node tools/annotate-log.mjs /tmp/strict.log strict 20 notice
+
+      - name: Upload the rendered images and the axe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wavira-rendered-theme
+          path: |
+            wavira/screenshot.png
+            docs/screenshots/*.png
+            /tmp/wavira-axe.json
+            /tmp/render.log
+          if-no-files-found: warn
+          retention-days: 30
 
   # ---------------------------------------------------------------------------
   # Release packages: the two uploadable artefacts and the bundle, plus the

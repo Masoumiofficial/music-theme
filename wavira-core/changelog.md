@@ -5,6 +5,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed — 0.14.0 (shipped with the theme)
+- **No behaviour change**: the front page this release adds is the theme's, and it renders the content the
+  plugin already exposes — the four post types, the genre taxonomy and the player. The plugin is versioned
+  and shipped in lockstep with the theme so `Dashboard → Updates` shows one number for the pair. The only
+  source change in this release is the version header.
+
 ### Changed — 0.13.0 (shipped with the theme)
 - **No behaviour change**: 0.13.0 is a theme release (the settings screen, ADR 0020's amendment). The
   plugin is versioned and shipped in lockstep so the theme and the plugin a customer has installed never

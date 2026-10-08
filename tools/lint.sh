@@ -266,6 +266,18 @@ PATTERN_HITS=$(grep -rnE \
 # Comment lines are exempt: a file that documents the rule ("no jQuery") is not
 # a file that breaks it, and a gate that forbids writing the rule down is worse
 # than the rule. Real usage — `jQuery(`, `jQuery.`, `$( 'x' )` — stays caught.
+# A `home.html` in a block theme hijacks the blog index *and* the front page on a
+# default install (WordPress uses the blog index as the front page until an
+# owner says otherwise), so the music sections would only ever be reachable under
+# `/blog/`. The front page is `front-page.html`; the blog index is core's.
+HOME_TEMPLATE="wavira/templates/home.html"
+if [ -f "$HOME_TEMPLATE" ]; then
+  say "      FAIL  $HOME_TEMPLATE shadows the blog index and the front page"
+  say "            the front page belongs in wavira/templates/front-page.html;"
+  say "            index.html is the blog index and core already provides it"
+  FAIL=1
+fi
+
 JQUERY_HITS=$(grep -rnE "jQuery|\\\$\(" \
   "${SOURCES[@]}" --include='*.js' --include='*.mjs' 2>/dev/null \
   | grep -v '/assets/dist/' \
@@ -286,7 +298,8 @@ if [ -n "$JQUERY_HITS" ]; then
   printf '%s\n' "$JQUERY_HITS" | sed 's/^/            /'
   FAIL=1
 fi
-[ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && say "      OK    no legacy echoes, no forbidden patterns, no jQuery"
+[ -z "$LEGACY_HITS$PATTERN_HITS$JQUERY_HITS" ] && [ ! -f "$HOME_TEMPLATE" ] \
+  && say "      OK    no legacy echoes, no forbidden patterns, no jQuery, no home.html shadowing the front page"
 
 # -------------------------------------------------------------- 7. Module boundaries
 say "[BOUNDARIES] Module boundaries (ARCHITECTURE §2)"

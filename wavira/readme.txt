@@ -2,7 +2,7 @@
 Requires at least: 6.6
 Requires PHP: 7.4
 Tested up to: 7.1
-Version: 0.13.0
+Version: 0.14.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Tags: music, rtl-language-support, translation-ready, block-styles, wide-blocks, custom-colors, accessibility-ready
@@ -23,7 +23,9 @@ theme never takes your catalogue with it.
 **What you get**
 
 * Four content types — artists, albums, tracks, music videos — plus a genre
-  taxonomy, with templates, archives and curated front-page sections.
+  taxonomy, with templates, archives and a front page that composes them: latest
+  albums, the catalogue player, latest tracks, videos and the music news, each a
+  native Query Loop a site owner can rearrange in the Site Editor.
 * A component-based player engine: several players on one page, Media Session
   support, full keyboard operation, no global element IDs, no jQuery.
 * Persian by default: the interface is translated (the catalogue ships in the

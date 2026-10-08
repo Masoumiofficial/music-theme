@@ -13,7 +13,7 @@ the theme**. The theme never queries the music model itself.
 - Markup: `wavira/inc/artists.php` (`wavira_get_artist()`, `wavira_get_artist_gallery_only()`)
 - Blocks: `wavira/artist-profile`, `wavira/artist-gallery` (+ `wavira/news`, `wavira/genre-chips`)
 - Shortcodes: `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]`
-- Templates: `single-wavira_artist.html`, `home.html`, `archive.html`
+- Templates: `single-wavira_artist.html`, `index.html` (the blog index), `archive.html`
 - News feed: `wavira_core_news_feed()` → `Wavira\Core\News\NewsFeed::items()`
 - Tests: `tests/test-artist-profile.php`, `tests/test-news.php`, `tests/test-blocks.php`
 
@@ -99,7 +99,7 @@ News ships as **ordinary posts and categories**, not a `wavira_news` post type:
 - a site that wants a magazine structure gets it from categories (`Concerts`, `Interviews`,
   `Releases`) and the menu — the WordPress-native way.
 
-The theme provides the presentation: `home.html` (the blog index, paginated), `archive.html` (every
+The theme provides the presentation: `index.html` (the blog index, paginated), `archive.html` (every
 category/tag/author/date archive, with the term title and description) and the `wavira/news` block for
 a feed inside any page or article. Both template paths use **core's Query Loop**, so pagination,
 `?paged=`, feeds and the archive title stay core's business.
@@ -129,7 +129,7 @@ thumbnail { id, url }, categories[] { name, link }, author { id, name }
 | --- | --- |
 | `wavira/news` block | `source` (`blog`/`category`), `category`, `perPage`, `columns` (1–4), `showCategories`, `showDate`, `showExcerpt`, `showImage` |
 | `[wavira_news]` | `count`, `category`, `date`, `excerpt`, `image` |
-| `home.html` | heading pattern + Query Loop (9 per page) + pagination |
+| `index.html` | heading pattern + Query Loop (9 per page) + pagination |
 | `archive.html` | archive title + term description + the same grid + pagination |
 
 The block's cards and the templates' loop cards share one component (`.wavira-card`), so a restyle

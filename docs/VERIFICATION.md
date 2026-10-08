@@ -102,6 +102,17 @@ Those rows stay `IMPLEMENTED` rather than being reported as verified.
 
 ---
 
+## 0.14.0 — The front page, and the first rendered evidence
+
+| Claim | Status | Evidence |
+| --- | --- | --- |
+| A default install shows the music at the site root | **IMPLEMENTED — CI render pending** | `wavira/templates/front-page.html` composes latest albums, the catalogue player, latest tracks, latest videos and the news section out of native Query Loops (ADR 0021). Before this release `home.html` served the root as a news grid and the music was reachable only under `/blog/`, `/albums/`, `/tracks/` — see the row below for how that survived five releases. The `wp-render` job photographs the front page on every push; until its first green run, this row stays short of `TESTED` || The blog index is core's again, and the front page cannot be re-hijacked | **TESTED** | `tools/lint.sh` fails when `wavira/templates/home.html` exists, with the reason in the output (the check was exercised by creating the file and watching the gate fail). `wavira/templates/index.html` is deleted: `home.html` was `index.html` under a second name, so the blog index was unreachable at `/` with a static front page and duplicated the news query at `/` without one |
+| The product is photographed, not only measured | **IMPLEMENTED — CI render pending** | `tools/screenshot.mjs` renders the theme in a real browser and writes the 1200×900 screenshot, `docs/screenshots/{home,album,artist,home-dark}.png` and an axe report; the `wp-render` CI job runs it against WordPress with the Persian demo seeded. First execution is the run for this commit |
+| A screenshot that is not the page it claims to be is refused, not committed | **VERIFIED** (static gate) | `node --test tests/js/screenshot.test.mjs` → 9 tests: the PNG reader (a real PNG of a known size, a GIF, a JPEG, a text file, an empty buffer, three truncations, a chunk whose type is not `IHDR`), option parsing (value, bare flag, absence, repeats, a malformed `--page`), the missing-browser refusal, and the command line exiting 1 with a usage message. The capture path additionally refuses a wrong size, a non-200 and a page with under 40 characters of visible text |
+| Accessibility has a real-browser gate | **IMPLEMENTED — CI render pending** | `tools/check-axe.mjs` fails on a `serious` or `critical` axe finding and prints `moderate`/`minor`; the `wp-render` job runs it after the render and names any allowance (`--allow=color-contrast`, the site owner's own accent colour, ADR 0020's stated limitation) in the output. The measurement is `tools/screenshot.mjs --axe=`, deliberately not the same file as the verdict, so a finding cannot cost the screenshot it was measured on |
+| Lighthouse and field Core Web Vitals | **NOT_STARTED** (unchanged) | still needs a pinned Chromium/Lighthouse pair and a live install; the budgets those numbers measure stay enforced statically by `tools/check-perf.mjs`. Stated in `docs/RELEASE-CANDIDATE.md` §6 item 4 rather than implied |
+| How a defect this visible survived five releases | **RECORDED** | every gate measured the *sources*: templates registered, blocks consistent, PHP and JS clean, budgets met. None asked what a visitor sees at `/`. The render job (ADR 0022) is the first gate that can, and it failed its way into existence — the front page was written because a screenshot of the product, had there been one, would have shown a news grid |
+
 ## 0.13.0 — The settings screen, and the two defects behind the report
 
 | Claim | Status | Evidence |

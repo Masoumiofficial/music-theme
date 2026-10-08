@@ -5,6 +5,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added — 0.14.0 (the front page a customer expects, and a real render)
+- **`front-page.html`** — the blog index moved out of the way (the old `home.html` is deleted, so
+  `index.html` serves native posts again, which is what core, feeds and SEO plugins expect) and the front
+  page is now the composition the legacy theme sold and the product never shipped: the latest albums, the
+  catalogue player, the latest tracks, the latest videos and the music news, each section a native Query
+  Loop over the plugin's post types with its own heading pattern (docs/FEATURE-MAP.md F-20). Every section
+  works with the plugin's own defaults, and every one disappears cleanly when its post type is empty.
+- **`tools/screenshot.mjs`** — renders the theme in a real browser: the 1200×900 marketplace screenshot,
+  extra pages, a dark-mode home and an axe-core report. `wavira/screenshot.png` was the one blocking item
+  a marketplace requires that cannot be produced from source (docs/RELEASE-CANDIDATE.md §6, item 1), and
+  the authoring environment has no browser — so the render happens in CI, on a real WordPress with the
+  Persian demo seeded (`wp-render`), which is also the first time the product is photographed rather than
+  measured. The tool refuses a screenshot whose size, status code or rendered text says it is not the page
+  it claims to be, because a silently blank image is worse than none (9 unit tests in
+  `tests/js/screenshot.test.mjs` cover exactly those refusals).
+- **`tools/check-axe.mjs`** — the accessibility verdict, kept separate from the measurement so the
+  screenshot and the report about it always come from the same render: a `serious` or `critical` axe
+  finding fails the build, `moderate`/`minor` are printed, and anything allowed by `--allow=` is named in
+  the output instead of disappearing.
+- **`docs/screenshots/`** — the render's own record: the front page, an album, an artist profile and a
+  dark-mode home, committed so a review needs no running site and a visual regression shows up in a diff.
+
+### Fixed — 0.14.0
+- **The theme shipped no front page at all** (`wavira/templates/`): `home.html` existed and `index.html`
+  was `home.html` under a second name, so a WordPress default install — which uses the blog index as the
+  front page — showed a news grid at the root and the music sections were reachable only on `/blog/`.
+  A music theme whose front page does not show the music is a defect a screenshot catches and a static
+  gate cannot. `home.html`'s news loop moved into `front-page.html` as a section, and the legacy gate now
+  refuses a `home.html` that shadows the blog index.
+
 ### Added — 0.13.0 (the settings screen)
 - **Appearance → Wavira settings** (`inc/admin-panel.php`): the same 32-setting schema, now with a screen
   of its own in the admin menu — one tab per Customizer section, plus a **demo import** tab — so the panel

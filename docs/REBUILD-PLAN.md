@@ -31,7 +31,7 @@ tracks, videos, genres, downloads, player settings live in **Core plugin**, neve
 ```
 wavira/                       (theme, text domain "wavira")
 ├── style.css  functions.php  theme.json  screenshot.png  readme.txt
-├── templates/    index.html  front-page.html  home.html  single.html  page.html  archive.html
+├── templates/    index.html  front-page.html  single.html  page.html  archive.html
 │                 search.html  404.html  single-wavira_artist.html  archive-wavira_artist.html
 │                 single-wavira_album.html  archive-wavira_album.html
 │                 single-wavira_track.html  archive-wavira_track.html
@@ -125,7 +125,9 @@ preferences (volume, theme, last queue position) in documented localStorage keys
 | 0.10.0 | SEO + PERF | SEO cooperation (music schema, plugin-aware fallbacks), a measured performance budget | ✅ **VERIFIED**: CI `37358851972`/`37358981113` 8/8, 118 tests / 948 assertions on PHP 7.4 + 8.2; music JSON-LD + `[PERF]` gate (7.2 / 2.5 / 13.9 KB gzipped against 25 / 30 / 15 KB), zero third-party URLs, no unbounded query; `docs/SEO-AND-PERF.md`; evidence in `docs/VERIFICATION.md`. Lighthouse/field CWV stay `WP-RUNTIME` |
 | 0.10.1 | LOCALISATION | Jalali dates + Iranian defaults + a Persian demo and harness | ✅ **VERIFIED**: CI `37438117893`/`37438125487` 8/8, 134 tests / 1090 assertions on PHP 7.4 + 8.2; `Content\Jalali`/`Content\Dates` (anchor set + 40-year round trip + re-entrancy guard in `tests/test-jalali.php`), Persian seeder with `--english`/`--no-site`, Persian `tools/preview/`, Persian numerals through `wavira_core_digits()`, ADR 0017 + `docs/PERSIAN-LOCALIZATION.md`; evidence in `docs/VERIFICATION.md` |
 | 0.11.0 | RELEASE CANDIDATE | migration tool, demo import, docs, packaging | 🚧 in progress: packaging landed (`tools/package.mjs`, `[PACKAGE]` gate, deterministic theme/plugin/bundle archives install-tested against a real WordPress, CI job uploading them, `docs/RELEASE-CANDIDATE.md`, ADR 0019) and the bundled Vazirmatn typeface replaced the system-stack default; **pre-upload items still open**: `wavira/screenshot.png`, marketplace listing metadata, demo host, real-browser audit (§6 of the RC document). Earlier in the phase: the migration tool landed (`src/Migration/LegacySchema.php`, `src/Migration/Migrator.php`, `wp wavira migrate --detect/--dry-run/--rollback`, `tests/test-migration.php` covering blueprint §7 M1–M7); the migration tool is **VERIFIED** (CI `37440743623`/`37440749435`, 146 tests / 1198 assertions on PHP 7.4 + 8.2); packaging (`tools/package.mjs`) and the docs pass are open |
-| 1.0.0 | PRODUCTION | marketplace packages | final quality gate (§88 of the brief) fully green |
+| 0.12.0–0.13.0 | PANEL | theme options panel + the settings screen a buyer finds | ✅ `docs/RELEASE-CANDIDATE.md` §0.1–§0.2, evidence in `docs/VERIFICATION.md` |
+| 0.14.0 | FRONT PAGE + RENDER | the root shows the music (ADR 0021) and the product is photographed in CI (ADR 0022) | 🚧 implemented; first render on the CI run for this commit |
+| 1.0.0 | PRODUCTION | marketplace packages | final quality gate (§88 of the brief) fully green; open items are the Lighthouse run, marketplace metadata, a demo host and trademark clearance (`docs/RELEASE-CANDIDATE.md` §6) |
 
 Every phase ends with: implemented → tested → documented → translated → accessible → responsive →
 secure → performant → compatible → reviewed (Definition of Done from the brief).
