@@ -234,18 +234,32 @@ export async function main( args ) {
 
 	const notes = [];
 
-	const browser = await puppeteer.launch( {
-		executablePath: chrome,
-		headless: true,
-		args: [
-			'--no-sandbox',
-			'--disable-dev-shm-usage',
-			'--hide-scrollbars',
-			'--force-color-profile=srgb',
-			'--font-render-hinting=none',
-			'--disable-lcd-text',
-		],
-	} );
+	// The launch is the first thing that can fail on a machine that has a browser
+	// binary but not the libraries it links against, and an unhandled rejection
+	// there says nothing a reader can act on. Say which browser, and say what it
+	// said.
+	let browser;
+
+	try {
+		browser = await puppeteer.launch( {
+			executablePath: chrome,
+			headless: true,
+			args: [
+				'--no-sandbox',
+				'--disable-dev-shm-usage',
+				'--hide-scrollbars',
+				'--force-color-profile=srgb',
+				'--font-render-hinting=none',
+				'--disable-lcd-text',
+			],
+		} );
+	} catch ( error ) {
+		fail( `could not launch ${ chrome }: ${ String( error.message ).split( '\n' ).slice( 0, 4 ).join( ' ' ) }` );
+	}
+
+	if ( process.env.WAVIRA_SCREENSHOT_QUIET !== '1' ) {
+		process.stdout.write( `browser: ${ browser.version() } (${ chrome })\n` );
+	}
 
 	// Every page this script opens gets the determinism style before the page's
 	// own scripts run: a hover style, a transition or a blinking caret would
@@ -287,7 +301,7 @@ export async function main( args ) {
 			await page.emulateMediaFeatures( [ { name: 'prefers-color-scheme', value: shot.scheme } ] );
 		}
 
-		const response = await page.goto( shot.url, { waitUntil: 'networkidle0', timeout } );
+		const response = await page.goto( shot.url, { waitUntil: 'load', timeout } );
 		const status = response ? response.status() : 0;
 
 		await page.evaluate( async () => {
@@ -372,7 +386,7 @@ export async function main( args ) {
 				const page = await browser.newPage();
 
 				await page.setViewport( { ...viewport, deviceScaleFactor: 1 } );
-				await page.goto( target.url, { waitUntil: 'networkidle0', timeout } );
+				await page.goto( target.url, { waitUntil: 'load', timeout } );
 				await page.addScriptTag( { path: axePath } );
 
 				const violations = await page.evaluate( async () => {

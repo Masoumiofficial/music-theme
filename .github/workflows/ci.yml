@@ -493,31 +493,53 @@ jobs:
         env:
           NODE_PATH: /tmp/render/node_modules
         run: |
-          set -euo pipefail
-          ALBUM_SLUG="$(php /tmp/wp-cli.phar post list --post_type=wavira_album --posts_per_page=1 --field=post_name --path=/tmp/site)"
-          ARTIST_SLUG="$(php /tmp/wp-cli.phar post list --post_type=wavira_artist --posts_per_page=1 --field=post_name --path=/tmp/site)"
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
 
-          EXTRA_ARGS=()
-          for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
-            url="http://127.0.0.1:8080${pair#*=}"
-            status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
-            echo "${pair%%=*}: ${url} → HTTP ${status}"
-            if [ "$status" = "200" ]; then
-              EXTRA_ARGS+=( "--page=${pair}" )
-            else
-              echo "::notice title=Rendered theme::the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
-            fi
-          done
+            # What the renderer might find, printed before it looks: a launch
+            # failure is the one thing a runner cannot show in a screenshot.
+            echo "--- browsers on this runner"
+            for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
+              path="$(command -v "$candidate" || true)"
+              if [ -n "$path" ]; then
+                echo "${candidate}: ${path} — $("$path" --version 2>&1 | head -1)"
+              else
+                echo "${candidate}: not found"
+              fi
+            done
 
-          node tools/screenshot.mjs \
-            --url=http://127.0.0.1:8080/ \
-            --out=wavira/screenshot.png \
-            --width=1200 --height=900 \
-            --colour=light \
-            --extra=docs/screenshots \
-            --axe=/tmp/wavira-axe.json \
-            "${EXTRA_ARGS[@]}" | tee /tmp/render.log
-          node tools/annotate-log.mjs /tmp/render.log render 20 notice
+            ALBUM_SLUG="$(wp post list --post_type=wavira_album --posts_per_page=1 --field=post_name)"
+            ARTIST_SLUG="$(wp post list --post_type=wavira_artist --posts_per_page=1 --field=post_name)"
+            echo "--- the demo pages"
+            echo "album: /albums/${ALBUM_SLUG}/ | artist: /artists/${ARTIST_SLUG}/"
+
+            EXTRA_ARGS=()
+            for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
+              url="http://127.0.0.1:8080${pair#*=}"
+              status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
+              echo "${pair%%=*}: ${url} → HTTP ${status}"
+              if [ "$status" = "200" ]; then
+                EXTRA_ARGS+=( "--page=${pair}" )
+              else
+                echo "::notice title=Rendered theme::the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
+              fi
+            done
+
+            node tools/screenshot.mjs \
+              --url=http://127.0.0.1:8080/ \
+              --out=wavira/screenshot.png \
+              --width=1200 --height=900 \
+              --colour=light \
+              --extra=docs/screenshots \
+              --axe=/tmp/wavira-axe.json \
+              "${EXTRA_ARGS[@]}"
+          } 2>&1 | tee /tmp/render.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/render.log render 40 error
+          fi
+          exit "$status"
 
       - name: Commit the theme screenshot when it changed
         # Only on `main`: a push made with GITHUB_TOKEN does not trigger
