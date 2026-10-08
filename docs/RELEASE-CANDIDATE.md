@@ -29,9 +29,15 @@ produces with CI's own fixed timestamp (see §8):
 
 | Archive | Bytes | SHA-256 |
 | --- | --- | --- |
-| `wavira-theme-0.13.0.zip` | 286 008 | `278ee95cad4119ef9e7ce9973781e225e2f28e6bf0857c3d4103e8a19bc35375` |
+| `wavira-theme-0.13.0.zip` | 286 089 | `50668208a905261a92e3019519f5a20f11fec8f27c4a2d4e347abdf8453fc029` |
 | `wavira-core-0.13.0.zip` | 180 036 | `8c35d2c6e230f8e6b6303d15af1795ec006d6e7a949e2125bebf55c6ef9501db` |
-| `wavira-0.13.0-bundle.zip` | 499 146 | `f44a87b82046824118bd0ba481412baea2cc5789a8beeddba0ea8d0c78a29f22` |
+| `wavira-0.13.0-bundle.zip` | 499 227 | `2554a46ade3d2fe4706cfd12ab88d4c0b35b6556aa834029397b477dd437bd69` |
+
+These are the bytes GitHub's release reports for the tag (below), and this tree reproduces them with
+CI's own fixed timestamp (§8) — `node tools/package.mjs` says *rebuild is byte-identical*. The first local
+build of this release said `278ee95cad41…` (286 008 B): it predated the changelog edit in the test-fix
+commit, which lives inside the theme archive. The lesson is in the order, not in the bytes — build after
+the last edit that ships, not after the last edit that matters.
 
 The theme and the plugin archives are also committed in the repository root, byte-identical to the release
 assets, so a link keeps working even where a release asset does not.
