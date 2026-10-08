@@ -296,6 +296,7 @@ jobs:
           tests/js/customizer.test.mjs
           tests/js/admin.test.mjs
           tests/js/screenshot.test.mjs
+          tests/js/check-render.test.mjs
           tests/js/i18n.test.mjs
 
       - name: Bundle size report (gzipped)
@@ -377,9 +378,13 @@ jobs:
             wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
             mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wavira_render;"
             echo "--- wp core download"
-            wp core download --locale=fa_IR
+            # No `--locale=` here: that flag asks the translations API whether the
+            # requested locale has a core package *for this exact version*, and one
+            # WordPress release earlier it answered "the requested locale was not
+            # found". The site language is set after install instead, below.
+            wp core download
             echo "--- wp config create"
-            wp config create --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --locale=fa_IR --extra-php <<'PHP'
+            wp config create --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --extra-php <<'PHP'
           define( 'WP_DEBUG', true );
           define( 'WP_DEBUG_LOG', '/tmp/site/debug.log' );
           define( 'WP_DEBUG_DISPLAY', false );
@@ -388,6 +393,21 @@ jobs:
             wp core install --url=http://127.0.0.1:8080 --title='واویرا موزیک' --admin_user=admin --admin_password=wavira-render-only --admin_email=render@example.test --skip-email
             echo "--- wp core version"
             wp core version
+            echo "--- the site language"
+            if wp language core install fa_IR --activate; then
+              echo "the fa_IR core language pack is installed"
+            else
+              echo "::warning title=Rendered theme::no fa_IR core language pack for this WordPress version — the front end is still Persian from the theme's and the plugin's own catalogues"
+              # WordPress refuses to store a locale it has no translation file for
+              # (`sanitize_option()` asks `get_available_languages()`), so an empty
+              # marker is what lets the locale stick; the theme's and the plugin's own
+              # `fa_IR.mo` files are what translate the product. This is the same
+              # order the theme's Persian setup uses, for the same reason.
+              mkdir -p /tmp/site/wp-content/languages
+              touch /tmp/site/wp-content/languages/fa_IR.mo
+              wp option update WPLANG fa_IR
+            fi
+            wp eval 'echo "locale: " . get_locale() . " | timezone: " . get_option( "timezone_string" ) . PHP_EOL;'
           } 2>&1 | tee /tmp/install-site.log
           status="${PIPESTATUS[0]}"
           node tools/annotate-log.mjs /tmp/install-site.log install-site 40 error
@@ -438,6 +458,14 @@ jobs:
                 echo "the site answered after ${attempt} attempt(s)"
                 curl -sS -o /tmp/home.html -w 'front page: HTTP %{http_code}, %{size_download} bytes\n' http://127.0.0.1:8080/
                 grep -o '<title>[^<]*</title>' /tmp/home.html | head -1 || true
+                # The claim that needs a rendered page rather than a catalogue: the
+                # front page carries the theme's *own* Persian headings, not only the
+                # Persian demo content, and it is the front-page template rather than
+                # the blog index that shipped in its place until 0.14.0 (ADR 0021).
+                # `tools/check-render.mjs` reads the expected strings from the shipped
+                # catalogue, so it fails when the page is English *and* when a heading
+                # loses its translation.
+                node tools/check-render.mjs --page=/tmp/home.html
                 exit 0
               fi
               sleep 2

@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+/**
+ * Decide whether a rendered page is the Persian front page it claims to be.
+ *
+ * `wp-render` renders the theme on a real WordPress and `tools/screenshot.mjs`
+ * refuses an image that is not the page it asked for. This is the other half: the
+ * page itself has to be Persian, and it has to be the *front page* — the theme's
+ * own headings around the theme's own sections — rather than the blog index that
+ * shipped in place of one until 0.14.0 (ADR 0021).
+ *
+ * The expected strings are read from the shipped Persian catalogue instead of
+ * being typed here, so the gate compares the page against the translation the
+ * theme actually ships and fails when either side is missing. ZWNJ is dropped on
+ * both sides: it is a typographic choice, not a different string.
+ *
+ * Usage: node tools/check-render.mjs --page=<file> [--catalogue=<file>]
+ *        [--min-sections=4]
+ * Exits 1 and prints `::error` annotations when the page is not what it claims.
+ */
+
+import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+
+/** The heading patterns the front page uses, by their English source string. */
+export const FRONT_PAGE_HEADINGS = [
+	'Latest albums',
+	'Listen now',
+	'Latest tracks',
+	'Music videos',
+	'Music news',
+];
+
+const ZWNJ = '\u200c';
+const PERSIAN = /[\u0600-\u06FF]/;
+
+/** Drop the zero-width non-joiner: the same sentence with and without it matches. */
+export function plain( text ) {
+	return text.replaceAll( ZWNJ, '' );
+}
+
+/**
+ * Every translation of a source string in a `.po` catalogue — one per context or
+ * plural form, so a heading may legitimately translate more than once.
+ */
+export function translations( catalogue, msgid ) {
+	const pattern = new RegExp(
+		`^msgid ${ escapeRegExp( JSON.stringify( msgid ) ) }$\\nmsgstr "(.*)"$`,
+		'mg',
+	);
+
+	return [ ...catalogue.matchAll( pattern ) ].map( ( match ) => match[ 1 ] );
+}
+
+function escapeRegExp( value ) {
+	return value.replaceAll( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+}
+
+/**
+ * Read the result of a page check.
+ *
+ * @param {object}   input
+ * @param {string}   input.page             Rendered HTML.
+ * @param {string}   input.catalogue        The `.po` file the theme ships.
+ * @param {string[]} [input.headings]       Source strings to look for.
+ * @param {number}   [input.minSections]    How many `wavira-section` elements a front page has.
+ * @return {{ found: string[], problems: string[] }} What was on the page, and what was wrong with it.
+ */
+export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, minSections = 4 } ) {
+	const found = [];
+	const problems = [];
+	const flat = plain( page );
+
+	for ( const heading of headings ) {
+		const known = translations( catalogue, heading );
+		const onPage = known.filter( ( translation ) => translation && flat.includes( plain( translation ) ) );
+
+		if ( onPage.length > 0 ) {
+			found.push( `${ heading } → ${ onPage[ 0 ] }` );
+			continue;
+		}
+
+		problems.push(
+			known.length === 0
+				? `the catalogue has no Persian translation for “${ heading }”`
+				: `the page does not contain “${ heading }” as “${ known[ 0 ] }”`,
+		);
+	}
+
+	// The front page is the template, not the blog index: it marks its sections.
+	const sections = flat.split( 'wavira-section' ).length - 1;
+
+	if ( sections < minSections ) {
+		problems.push(
+			`the page has ${ sections } wavira-section element(s), expected at least ${ minSections } — ` +
+				'front-page.html did not render',
+		);
+	}
+
+	if ( ! PERSIAN.test( page ) ) {
+		problems.push( 'the page carries no Persian text at all' );
+	}
+
+	return { found, problems };
+}
+
+export function usage() {
+	return 'usage: node tools/check-render.mjs --page=<file> [--catalogue=wavira/languages/fa_IR.po] [--min-sections=4]';
+}
+
+/**
+ * Read `--name=value` (or a bare `--flag`) out of an argv-style array.
+ *
+ * The same rules as `tools/screenshot.mjs`: a value is always attached with `=`,
+ * a bare flag reads as `true`. Two parsers in one repository is one too many, so
+ * `tests/js/check-render.test.mjs` asserts the two agree.
+ */
+export function option( args, name, absent = null ) {
+	const withValue = args.find( ( argument ) => argument.startsWith( `--${ name }=` ) );
+
+	if ( withValue ) {
+		return withValue.slice( name.length + 3 );
+	}
+
+	return args.includes( `--${ name }` ) ? true : absent;
+}
+
+/* c8 ignore start — the CLI half is exercised by the CI job, not by node:test. */
+if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] ).href ) {
+	const args = process.argv.slice( 2 );
+	const page = option( args, 'page' );
+	const cataloguePath = option( args, 'catalogue', 'wavira/languages/fa_IR.po' );
+	const minSections = option( args, 'min-sections', '4' );
+
+	// A bare `--page` (or `--page /tmp/x.html`, which is a flag and a stray word)
+	// reads as `true`: say so instead of failing on a path called "true".
+	if ( typeof page !== 'string' || typeof cataloguePath !== 'string' || typeof minSections !== 'string' ) {
+		console.error( usage() );
+		console.error( 'note: values are attached with `=`, e.g. --page=/tmp/home.html' );
+		process.exit( 2 );
+	}
+
+	let result;
+
+	try {
+		result = checkPage( {
+			page: readFileSync( page, 'utf8' ),
+			catalogue: readFileSync( cataloguePath, 'utf8' ),
+			minSections: Number( minSections ),
+		} );
+	} catch ( error ) {
+		console.error( `::error title=Rendered theme::${ error.message }` );
+		process.exit( 1 );
+	}
+
+	for ( const line of result.found ) {
+		console.log( `      · heading on the page: ${ line }` );
+	}
+
+	for ( const problem of result.problems ) {
+		console.log( `::error title=Rendered theme::front page: ${ problem }` );
+	}
+
+	if ( result.problems.length > 0 ) {
+		process.exit( 1 );
+	}
+
+	console.log( `      OK    the front page is Persian, with the theme’s own headings (${ result.found.length })` );
+}
+/* c8 ignore stop */
