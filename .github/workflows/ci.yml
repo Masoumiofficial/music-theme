@@ -595,7 +595,12 @@ jobs:
             # from `wp-content/uploads/`, the same static path as the stylesheet,
             # and a screenshot full of broken images is as wrong as an unstyled
             # one.
-            image_url="$(wp post list --post_type=attachment --post_mime_type=image --posts_per_page=1 --field=guid)"
+            # `--field=guid` is the attachment's *page* (and for one attached to a
+            # video it is `/videos/<slug>/<name>/`, which 404s); the URL the theme
+            # prints is `wp_get_attachment_url()`, so that is what is checked.
+            image_url="$(wp eval '$ids = get_posts( array( "post_type" => "attachment", "post_mime_type" => "image", "posts_per_page" => 1, "fields" => "ids" ) ); foreach ( $ids as $id ) { echo (string) wp_get_attachment_url( $id ); }')"
+            echo "--- the uploads directory"
+            ls -la /tmp/site/wp-content/uploads/*/ 2>&1 | head -8 || echo "no uploads directory"
             if [ -n "${image_url}" ]; then
               read -r code type size < <( curl -sS -o /tmp/asset-image.bin \
                 -w '%{http_code} %{content_type} %{size_download}' "${image_url}"; echo )
