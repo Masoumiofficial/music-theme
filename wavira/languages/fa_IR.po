@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 17:45+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 19:25+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
@@ -533,6 +533,10 @@ msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr "— همهٔ حقوق محفوظ است."
 
+#: wavira/inc/options.php:1008
+msgid "Footer menu"
+msgstr "منوی پاورقی"
+
 #: wavira/inc/setup.php:47
 msgid "Footer navigation"
 msgstr "ناوبری پاورقی"
@@ -758,6 +762,10 @@ msgstr "پخشکننده برای آلبوم، هنرمند یا صف سبک."
 #: wavira/inc/options.php:301
 msgid "Preload the bundled font"
 msgstr "پیش‌بارگذاری فونت همراه قالب"
+
+#: wavira/inc/options.php:1006
+msgid "Primary menu"
+msgstr "منوی اصلی"
 
 #: wavira/inc/setup.php:46
 msgid "Primary navigation"

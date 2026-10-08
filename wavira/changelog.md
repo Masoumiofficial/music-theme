@@ -63,6 +63,28 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   page only, so core builds the tag; `.wavira-site-title` pins the font family
   and line box the `h1` rule would otherwise change, so the header does not move.
 
+- **One `<h1>`, not two — and only one footer.** The front page template also
+  carried a visually hidden site title, a fallback for a logo-only header. With
+  the header's title promoted that became two first-level headings, so the page
+  read the site name twice. Both sides now ask one question
+  (`wavira_front_page_title_is_the_heading()`): the header promotes its title
+  when the title is shown, and the fallback is *removed* — not hidden — when it
+  is, so a logo-only site still has its heading and a titled site has exactly
+  one.
+- **The sticky player bar is not a second footer.** The template part was
+  registered in the `footer` area, and core renders a part with its area's tag
+  when the template does not name one — so every page shipped two `<footer>`
+  elements and a duplicate `contentinfo` landmark (`landmark-no-duplicate-
+  contentinfo`, and `landmark-unique` on top of it). The player bar is a player,
+  not a footer: its area is `uncategorized` now, which renders a `<div>`.
+- **The two navigations are named.** A page carries two `core/navigation`
+  blocks and core names one only when it has been given a menu or a label, so
+  both were unnamed landmarks (`landmark-unique`) and the landmark list a
+  screen-reader user steps through offered «منوی اصلی» and «منوی پاورقی» as two
+  identical entries. The theme's two parts mark their navigation with a class and
+  `render_block_data` labels it — in Persian, and only when the site owner has
+  not chosen a label.
+
 
 - **The album page showed «تصاویر» twice.** The template supplied the section
   heading as a pattern and the gallery block rendered one of its own beneath it.

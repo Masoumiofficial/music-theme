@@ -540,6 +540,10 @@ msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr ""
 
+#: wavira/inc/options.php:1008
+msgid "Footer menu"
+msgstr ""
+
 #: wavira/inc/setup.php:47
 msgid "Footer navigation"
 msgstr ""
@@ -764,6 +768,10 @@ msgstr ""
 
 #: wavira/inc/options.php:301
 msgid "Preload the bundled font"
+msgstr ""
+
+#: wavira/inc/options.php:1006
+msgid "Primary menu"
 msgstr ""
 
 #: wavira/inc/setup.php:46

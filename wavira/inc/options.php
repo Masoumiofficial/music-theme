@@ -901,6 +901,24 @@ function wavira_custom_logo( $html ) {
 add_filter( 'get_custom_logo', 'wavira_custom_logo' );
 
 /**
+ * Whether the header's site title is the page's visible first-level heading.
+ *
+ * On the front page there is no post title, so the site title in the header is
+ * the only heading that can be the document's `<h1>` — and it can only be that
+ * when it is actually shown: a site owner who replaced the name with a logo
+ * turns it off (`show_site_title`), and then the header hides it with CSS. The
+ * template carries a fallback heading for exactly that case
+ * (`wavira_drop_duplicate_front_page_title()`), and both sides ask this one
+ * question, so the page ends up with one `<h1>` either way and never two.
+ *
+ * @since 0.15.0
+ * @return bool True when the header's site title is the front page's heading.
+ */
+function wavira_front_page_title_is_the_heading() {
+	return is_front_page() && wavira_option( 'show_site_title' );
+}
+
+/**
  * The site name is the front page's first heading, and a paragraph anywhere else.
  *
  * The header renders the site title as a paragraph (`"level": 0`) on purpose —
@@ -922,7 +940,7 @@ function wavira_promote_front_page_title( $parsed_block ) {
 		isset( $parsed_block['blockName'], $parsed_block['attrs']['level'] )
 		&& 'core/site-title' === $parsed_block['blockName']
 		&& 0 === (int) $parsed_block['attrs']['level']
-		&& is_front_page()
+		&& wavira_front_page_title_is_the_heading()
 	) {
 		$parsed_block['attrs']['level'] = 1;
 	}
@@ -930,6 +948,74 @@ function wavira_promote_front_page_title( $parsed_block ) {
 	return $parsed_block;
 }
 add_filter( 'render_block_data', 'wavira_promote_front_page_title' );
+
+/**
+ * Drop the template's fallback heading when the header already provides one.
+ *
+ * `front-page.html` carries a visually hidden site title (level 1) so that a
+ * logo-only header still leaves the page a first-level heading. It is a
+ * fallback, not a second heading: read out by a screen reader it is the site
+ * name heard twice, which is why it goes when the header's own title is the
+ * `<h1>`. Removing the block beats hiding it with CSS — a hidden heading is
+ * still a heading to everything that reads the document.
+ *
+ * @since 0.15.0
+ * @param string $content Rendered block.
+ * @param array  $block   Parsed block.
+ * @return string The block, or an empty string when the header covers it.
+ */
+function wavira_drop_duplicate_front_page_title( $content, $block ) {
+	if ( 'core/site-title' !== ( isset( $block['blockName'] ) ? $block['blockName'] : '' ) ) {
+		return $content;
+	}
+
+	$classes = isset( $block['attrs']['className'] ) ? explode( ' ', (string) $block['attrs']['className'] ) : array();
+
+	if ( ! in_array( 'wavira-visually-hidden', $classes, true ) ) {
+		return $content;
+	}
+
+	return wavira_front_page_title_is_the_heading() ? '' : $content;
+}
+add_filter( 'render_block', 'wavira_drop_duplicate_front_page_title', 10, 2 );
+
+/**
+ * Name the two navigations, so each landmark is distinguishable.
+ *
+ * A page carries two `core/navigation` blocks — the header's and the footer's —
+ * and core names a navigation only when it has been given a menu (`ref`) or a
+ * label. Two unnamed `<nav>` landmarks are one axe `landmark-unique` finding and
+ * an unusable landmark list for anyone tabbing through it. The class is how the
+ * theme tells them apart: core's navigation block has no attribute that says
+ * which one it is, and the two live in different template parts, which is not
+ * something a block filter can see.
+ *
+ * @since 0.15.0
+ * @param array $parsed_block Block being rendered.
+ * @return array The block, with a Persian label when the theme recognises it.
+ */
+function wavira_label_navigation_landmarks( $parsed_block ) {
+	if ( 'core/navigation' !== ( isset( $parsed_block['blockName'] ) ? $parsed_block['blockName'] : '' ) ) {
+		return $parsed_block;
+	}
+
+	$class = isset( $parsed_block['attrs']['className'] ) ? (string) $parsed_block['attrs']['className'] : '';
+	$label = '';
+
+	if ( false !== strpos( $class, 'wavira-nav--primary' ) ) {
+		$label = __( 'Primary menu', 'wavira' );
+	} elseif ( false !== strpos( $class, 'wavira-nav--footer' ) ) {
+		$label = __( 'Footer menu', 'wavira' );
+	}
+
+	// A label the site owner chose wins; this is only for the unnamed case.
+	if ( $label && empty( $parsed_block['attrs']['ariaLabel'] ) ) {
+		$parsed_block['attrs']['ariaLabel'] = $label;
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'wavira_label_navigation_landmarks' );
 
 /**
  * Leave the player bar out of the page when the site owner turned it off.

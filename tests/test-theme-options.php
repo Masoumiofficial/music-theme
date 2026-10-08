@@ -625,7 +625,7 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	}
 
 	/**
-	 * The front page promotes the site title to the page's `<h1>`.
+	 * The front page promotes the site title, and only when it is shown.
 	 *
 	 * The header renders it as a paragraph on purpose — on a single view the post
 	 * title is the `<h1>` — which left the front page with no first-level heading
@@ -655,6 +655,17 @@ class Test_Theme_Options extends Wavira_Test_Case {
 		$this->assertFalse( is_front_page(), 'the query is a page now' );
 		$this->assertSame( 0, wavira_promote_front_page_title( $block )['attrs']['level'], 'and a paragraph everywhere else' );
 
+		$this->go_to( home_url( '/' ) );
+		set_theme_mod( 'wavira_show_site_title', false );
+
+		$this->assertSame(
+			0,
+			wavira_promote_front_page_title( $block )['attrs']['level'],
+			'a logo-only header has no heading to promote — the template keeps its own'
+		);
+
+		remove_theme_mod( 'wavira_show_site_title' );
+
 		$this->assertSame(
 			array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ),
 			wavira_promote_front_page_title( array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ) ),
@@ -665,6 +676,88 @@ class Test_Theme_Options extends Wavira_Test_Case {
 			array( 'blockName' => 'core/site-title' ),
 			wavira_promote_front_page_title( array( 'blockName' => 'core/site-title' ) ),
 			'so is a site title without the attribute'
+		);
+	}
+
+	/**
+	 * The template's fallback heading goes when the header provides one.
+	 *
+	 * `front-page.html` carries a visually hidden site title so that a logo-only
+	 * header still leaves the page an `<h1>`. It is a fallback: with the header's
+	 * own title promoted, keeping it means the site name is a heading twice, which
+	 * is what a screen reader reads out. One question decides both sides, so the
+	 * page has exactly one `<h1>` either way.
+	 *
+	 * @return void
+	 */
+	public function test_the_fallback_heading_is_dropped_when_the_header_has_one() {
+		$fallback = array(
+			'blockName' => 'core/site-title',
+			'attrs'     => array( 'level' => 1, 'className' => 'wavira-visually-hidden' ),
+		);
+
+		$block = array( 'blockName' => 'core/site-title', 'attrs' => array( 'level' => 0, 'className' => 'wavira-site-title' ) );
+
+		$this->go_to( home_url( '/' ) );
+
+		$this->assertSame( '', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'the header is the h1, so the fallback goes' );
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $block ), 'the header title itself is not the fallback' );
+
+		set_theme_mod( 'wavira_show_site_title', false );
+
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'and it stays when the header has no heading' );
+
+		remove_theme_mod( 'wavira_show_site_title' );
+
+		$this->go_to( get_permalink( self::factory()->post->create( array( 'post_type' => 'page' ) ) ) );
+
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'other pages are none of this filter business' );
+
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', array( 'blockName' => 'core/navigation' ) ), 'so is another block' );
+	}
+
+	/**
+	 * The two navigations are named, so each landmark is distinguishable.
+	 *
+	 * Core names a navigation only when it has been given a menu or a label, and a
+	 * page carries two of them — so both were unnamed landmarks (`landmark-unique`)
+	 * and the landmark list was useless. The class is the marker: core's navigation
+	 * block has no attribute that says which one it is, and the two live in
+	 * different template parts, which a block filter cannot see.
+	 *
+	 * @return void
+	 */
+	public function test_the_navigations_are_named_by_the_theme() {
+		$primary = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array( 'className' => 'is-responsive wavira-nav--primary' ),
+		);
+
+		$footer = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array( 'className' => 'wavira-nav--footer' ),
+		);
+
+		$this->assertSame( 'Primary menu', wavira_label_navigation_landmarks( $primary )['attrs']['ariaLabel'] );
+		$this->assertSame( 'Footer menu', wavira_label_navigation_landmarks( $footer )['attrs']['ariaLabel'] );
+
+		$chosen = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array( 'className' => 'wavira-nav--primary', 'ariaLabel' => 'My menu' ),
+		);
+
+		$this->assertSame( 'My menu', wavira_label_navigation_landmarks( $chosen )['attrs']['ariaLabel'], 'a label the site owner chose wins' );
+
+		$this->assertSame(
+			array( 'blockName' => 'core/navigation', 'attrs' => array() ),
+			wavira_label_navigation_landmarks( array( 'blockName' => 'core/navigation', 'attrs' => array() ) ),
+			'a navigation the theme does not recognise is left unnamed'
+		);
+
+		$this->assertSame(
+			array( 'blockName' => 'core/group', 'attrs' => array( 'className' => 'wavira-nav--primary' ) ),
+			wavira_label_navigation_landmarks( array( 'blockName' => 'core/group', 'attrs' => array( 'className' => 'wavira-nav--primary' ) ) ),
+			'so is another block carrying the same class'
 		);
 	}
 

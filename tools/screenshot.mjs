@@ -562,10 +562,14 @@ export async function main( args ) {
 					.map( ( node ) => `<footer class="${ node.className || '(none)' }">` ),
 			};
 
+			// Only what a visitor or a screen reader can actually reach: `axe`
+			// ignores a link that is not rendered, and a diagnostic that lists
+			// eleven of them while axe reports none is worse than no diagnostic.
 			const unnamed = Array.from( document.querySelectorAll( 'a[href]' ) )
+				.filter( ( link ) => link.getClientRects().length > 0 )
 				.filter( ( link ) => '' === ( link.textContent || '' ).trim() )
-				.filter( ( link ) => ! link.getAttribute( 'aria-label' ) )
-				.filter( ( link ) => ! link.querySelector( 'img[alt]:not([alt=\"\"])' ) )
+				.filter( ( link ) => ! link.getAttribute( 'aria-label' ) && ! link.getAttribute( 'title' ) )
+				.filter( ( link ) => ! link.querySelector( '[aria-label], img[alt]:not([alt=\"\"])' ) )
 				.map( ( link ) => ( link.className || '(no class)' ).toString().split( ' ' )[ 0 ] );
 
 			return {

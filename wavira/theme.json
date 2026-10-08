@@ -271,7 +271,7 @@
 		{
 			"name": "player-bar",
 			"title": "Sticky player bar",
-			"area": "footer"
+			"area": "uncategorized"
 		},
 		{
 			"name": "footer",
