@@ -83,7 +83,7 @@ msgstr ""
 msgid "Audio bitrate in kbps or video height in pixels. Omit to use the best available."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:176
+#: wavira-core/src/Player/Assets.php:186
 msgid "Audio player"
 msgstr ""
 
@@ -91,7 +91,7 @@ msgstr ""
 msgid "Autoplay the next track in a queue"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:194
+#: wavira-core/src/Player/Assets.php:204
 #. translators: %s: track title.
 msgid "Buffering…"
 msgstr ""
@@ -293,7 +293,7 @@ msgstr ""
 msgid "Limit results to one entity type."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:193
+#: wavira-core/src/Player/Assets.php:203
 #. translators: %s: track title.
 msgid "Loading track…"
 msgstr ""
@@ -335,7 +335,7 @@ msgstr ""
 msgid "Music videos"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:183
+#: wavira-core/src/Player/Assets.php:193
 msgid "Mute"
 msgstr ""
 
@@ -353,7 +353,7 @@ msgstr ""
 msgid "New %s name"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:179
+#: wavira-core/src/Player/Assets.php:189
 msgid "Next track"
 msgstr ""
 
@@ -380,7 +380,7 @@ msgstr ""
 msgid "Nothing found."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:198
+#: wavira-core/src/Player/Assets.php:208
 #. translators: %s: track title.
 msgid "Now playing: %s"
 msgstr ""
@@ -389,7 +389,7 @@ msgstr ""
 msgid "Offer audio downloads"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:201
+#: wavira-core/src/Player/Assets.php:211
 #. translators: 1: position in the queue, 2: queue length.
 msgid "Open the track page"
 msgstr ""
@@ -399,7 +399,7 @@ msgstr ""
 msgid "Order direction."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:178
+#: wavira-core/src/Player/Assets.php:188
 msgid "Pause"
 msgstr ""
 
@@ -407,15 +407,15 @@ msgstr ""
 msgid "Persian demo (recommended): also sets the site language, the Tehran timezone, a Saturday week and Jalali dates."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:177
+#: wavira-core/src/Player/Assets.php:187
 msgid "Play"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:190
+#: wavira-core/src/Player/Assets.php:200
 msgid "Play queue"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:204
+#: wavira-core/src/Player/Assets.php:214
 #. translators: %s: track title.
 msgid "Playback needs a tap on the play button first."
 msgstr ""
@@ -432,7 +432,7 @@ msgstr ""
 msgid "Post ID: a track, an album, a video or a cover/gallery image."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:180
+#: wavira-core/src/Player/Assets.php:190
 msgid "Previous track"
 msgstr ""
 
@@ -461,29 +461,29 @@ msgstr ""
 msgid "Remove cover image"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:192
+#: wavira-core/src/Player/Assets.php:202
 #. translators: %s: track title.
 msgid "Remove from the queue: %s"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:203
+#: wavira-core/src/Player/Assets.php:213
 #. translators: %s: track title.
 msgid "Removed from the queue: %s"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:188
+#: wavira-core/src/Player/Assets.php:198
 msgid "Repeat all"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:186
+#: wavira-core/src/Player/Assets.php:196
 msgid "Repeat mode"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:187
+#: wavira-core/src/Player/Assets.php:197
 msgid "Repeat off"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:189
+#: wavira-core/src/Player/Assets.php:199
 msgid "Repeat one"
 msgstr ""
 
@@ -506,7 +506,7 @@ msgstr ""
 msgid "Search term."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:181
+#: wavira-core/src/Player/Assets.php:191
 msgid "Seek"
 msgstr ""
 
@@ -523,7 +523,7 @@ msgstr ""
 msgid "Show the sticky player bar"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:185
+#: wavira-core/src/Player/Assets.php:195
 msgid "Shuffle"
 msgstr ""
 
@@ -575,7 +575,7 @@ msgstr ""
 msgid "There is no downloadable file for this post."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:196
+#: wavira-core/src/Player/Assets.php:206
 msgid "There is nothing to play here."
 msgstr ""
 
@@ -591,7 +591,7 @@ msgstr ""
 msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:195
+#: wavira-core/src/Player/Assets.php:205
 #. translators: %s: track title.
 msgid "This track could not be played."
 msgstr ""
@@ -600,7 +600,7 @@ msgstr ""
 msgid "Track"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:200
+#: wavira-core/src/Player/Assets.php:210
 #. translators: 1: position in the queue, 2: queue length.
 msgid "Track %1$d of %2$d"
 msgstr ""
@@ -636,7 +636,7 @@ msgstr ""
 msgid "Unique identifier for the object."
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:184
+#: wavira-core/src/Player/Assets.php:194
 msgid "Unmute"
 msgstr ""
 
@@ -654,7 +654,7 @@ msgstr ""
 msgid "View %s"
 msgstr ""
 
-#: wavira-core/src/Player/Assets.php:182
+#: wavira-core/src/Player/Assets.php:192
 msgid "Volume"
 msgstr ""
 

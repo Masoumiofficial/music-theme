@@ -50,11 +50,21 @@ final class Assets implements Registrable {
 	/**
 	 * Register the hooks that publish the player bundle.
 	 *
+	 * `init`, not `wp_enqueue_scripts`, and that is the whole point: a block theme
+	 * renders its template **before** `<head>` — core's own `template-canvas.php`
+	 * says so, “so that blocks can add scripts and styles in `wp_head()`” — and
+	 * the theme's mount point asks for the bundle while it renders. Registering on
+	 * `wp_enqueue_scripts` therefore happened after the question was asked, the
+	 * handle was never registered when the mount needed it,
+	 * `wavira_core_enqueue_player()` answered false on every page of this theme,
+	 * and the player shipped as an empty `<div>`: mounts on the page, no engine,
+	 * nothing to play. The render job's new player verdict is what found it.
+	 *
 	 * @return void
 	 */
 	public function register(): void {
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_script' ), 5 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'register_style' ), 5 );
+		add_action( 'init', array( $this, 'register_script' ), 5 );
+		add_action( 'init', array( $this, 'register_style' ), 5 );
 	}
 
 	/**

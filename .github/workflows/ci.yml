@@ -651,9 +651,16 @@ jobs:
             # answer fails the step: a browser refuses a stylesheet served as
             # `text/html`, which is what "the theme is unstyled" looks like.
             echo "--- the theme's own assets, over HTTP"
-            for asset in assets/dist/theme.css assets/dist/theme.js; do
-              url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
-              local_file="/tmp/site/wp-content/themes/wavira/${asset}"
+            for asset in theme:assets/dist/theme.css theme:assets/dist/theme.js plugin:assets/dist/core.js plugin:assets/dist/player.css; do
+              where="${asset%%:*}"
+              asset="${asset#*:}"
+              if [ "${where}" = "plugin" ]; then
+                url="http://127.0.0.1:8080/wp-content/plugins/wavira-core/${asset}"
+                local_file="/tmp/site/wp-content/plugins/wavira-core/${asset}"
+              else
+                url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
+                local_file="/tmp/site/wp-content/themes/wavira/${asset}"
+              fi
               IFS='|' read -r code type size < <( curl -sS -o "/tmp/asset-fetch.bin" \
                 -w '%{http_code}|%{content_type}|%{size_download}' "$url"; echo )
               echo "${asset}: HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 40 /tmp/asset-fetch.bin | tr -d '\n')"
@@ -670,6 +677,23 @@ jobs:
                 asset_failures=1
               fi
             done
+
+            # The player's engine is a *plugin* asset enqueued by the theme while
+            # the template renders, and a page can reference it without the file
+            # ever being there — or the other way round, which is what shipped:
+            # the mount points were on every page and the bundle was never
+            # registered, so the player was an empty `<div>`. Two questions, then:
+            # does the page reference it, and does what it references answer as
+            # JavaScript. A page with mounts and no engine fails here.
+            echo "--- the player bundle the front page asks for"
+            page="$(curl -sS http://127.0.0.1:8080/)"
+            mounts="$(printf '%s' "${page}" | grep -c 'data-wavira-player' || true)"
+            engine="$(printf '%s' "${page}" | grep -o 'wp-content/plugins/wavira-core/assets/dist/core\.js[^\"'"'"']*' | head -1 || true)"
+            echo "mount points on the front page: ${mounts}; engine: ${engine:-none}"
+            if [ "${mounts}" -gt 0 ] && [ -z "${engine}" ]; then
+              echo "::error::the front page mounts ${mounts} player(s) and never loads the engine (assets/dist/core.js) — every player on every page is an empty box"
+              asset_failures=1
+            fi
 
             # One generated media file too: the demo's covers and photos come
             # from `wp-content/uploads/`, the same static path as the stylesheet,

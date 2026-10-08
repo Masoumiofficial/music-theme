@@ -518,9 +518,12 @@ class Test_Player extends Wavira_Test_Case {
 			return;
 		}
 
-		do_action( 'wp_enqueue_scripts' );
-
-		$this->assertTrue( wp_script_is( Assets::HANDLE, 'registered' ), 'the built bundle registers its handle' );
+		// And *without* firing `wp_enqueue_scripts`: a block theme renders its
+		// template before `<head>`, so the handle has to exist by the time a
+		// mount point asks for it. This test used to fire the action by hand,
+		// which is how a page whose player never loaded passed the suite (the
+		// front page mounted two players and the engine was not on the page).
+		$this->assertTrue( wp_script_is( Assets::HANDLE, 'registered' ), 'the built bundle registers its handle before any block renders' );
 
 		$inline = wp_scripts()->get_data( Assets::HANDLE, 'before' );
 		$joined = is_array( $inline ) ? implode( '', $inline ) : (string) $inline;

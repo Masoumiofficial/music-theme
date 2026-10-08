@@ -32,11 +32,41 @@ class Test_Demo extends Wavira_Test_Case {
 	private $posts = array();
 
 	/**
+	 * Whether a test switched the locale and still has to switch back.
+	 *
+	 * @var bool
+	 */
+	private $switched_locale = false;
+
+	/**
+	 * Put the locale and the catalogue back the way the other tests expect them.
+	 *
+	 * In `tear_down()` as well as at the end of the test that switches them: an
+	 * assertion failure ends the test at the failing line, and the English demo's
+	 * test after it would then read the Persian catalogue and fail too — one real
+	 * defect reported as two.
+	 *
+	 * @param bool $switched Whether the locale was switched.
+	 * @return void
+	 */
+	private function restore_catalogue( $switched ): void {
+		if ( is_textdomain_loaded( 'wavira-core' ) ) {
+			unload_textdomain( 'wavira-core', true );
+		}
+
+		if ( $switched ) {
+			restore_previous_locale();
+		}
+	}
+
+	/**
 	 * Track every post the demo created, so nothing leaks into the next test.
 	 *
 	 * @return void
 	 */
 	public function tear_down() {
+		$this->restore_catalogue( $this->switched_locale );
+
 		// The generated files first: `wp_delete_post()` does not take an
 		// attachment with it, so a class that installed the demo five times would
 		// leave five catalogues' worth of covers and tones in the uploads folder —
@@ -303,13 +333,24 @@ class Test_Demo extends Wavira_Test_Case {
 			)
 		);
 
-		$term = self::factory()->term->create( array( 'taxonomy' => 'category', 'name' => 'Uncategorized', 'slug' => 'uncategorized' ) );
+		// The default category a WordPress install creates, not a second one: the
+		// factory returns a `WP_Error` when the slug is taken, which is how the
+		// first version of this test read an empty name and blamed the importer.
+		$category    = get_term_by( 'slug', 'uncategorized', 'category' );
+		$category_id = $category instanceof WP_Term ? (int) $category->term_id : 0;
+
+		if ( 0 === $category_id ) {
+			$created     = wp_insert_term( 'Uncategorized', 'category', array( 'slug' => 'uncategorized' ) );
+			$category_id = is_array( $created ) ? (int) $created['term_id'] : 0;
+		}
+
+		$this->assertGreaterThan( 0, $category_id, 'the fixture category exists' );
 
 		$this->posts[] = $post;
 		$this->posts[] = $page;
 
 		// The catalogue, loaded the way the plugin loads it on a Persian site.
-		$switched = switch_to_locale( 'fa_IR' );
+		$this->switched_locale = (bool) switch_to_locale( 'fa_IR' );
 		load_textdomain( 'wavira-core', WAVIRA_CORE_DIR . 'languages/fa_IR.mo', 'fa_IR' );
 
 		$report = Installer::install();
@@ -325,7 +366,7 @@ class Test_Demo extends Wavira_Test_Case {
 		$this->assertNotSame( 'This is your first post.', get_post_field( 'post_content', $post ) );
 
 		$this->assertNotSame( 'Sample Page', get_the_title( $page ) );
-		$this->assertSame( 'دسته‌بندی‌نشده', get_term( $term, 'category' )->name );
+		$this->assertSame( 'دسته‌بندی‌نشده', get_term( $category_id, 'category' )->name );
 
 		// One notice says how much was rewritten — the post, the page and the
 		// category, all three of them. The report is what the CLI and the admin
@@ -340,11 +381,8 @@ class Test_Demo extends Wavira_Test_Case {
 
 		$this->assertNotSame( '', $sample_notice, 'the report says how many items were rewritten' );
 
-		unload_textdomain( 'wavira-core', true );
-
-		if ( $switched ) {
-			restore_previous_locale();
-		}
+		$this->restore_catalogue( $this->switched_locale );
+		$this->switched_locale = false;
 	}
 
 	/**

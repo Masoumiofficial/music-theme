@@ -82,6 +82,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   by the canonical slugs core itself writes, so anything an owner renamed is left
   alone. The render job's Persian gate found it.
 
+- **The player's engine is registered before the template renders.** The bundle's
+  handle was registered on `wp_enqueue_scripts`, and a block theme renders its
+  template *before* `<head>` — core's `template-canvas.php` does it on purpose,
+  “so that blocks can add scripts and styles in `wp_head()`”. The theme's mount
+  point therefore asked for the bundle before the handle existed,
+  `wavira_core_enqueue_player()` answered `false` on every page, and the player
+  shipped as an empty `<div>`: mounts on every page, no engine, nothing to play.
+  Registration happens on `init` now, the render job's new player verdict is what
+  found it, and both the integration test (which used to fire
+  `wp_enqueue_scripts` by hand) and the render preflight ask the question the
+  browser asks.
+
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».
