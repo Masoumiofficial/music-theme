@@ -17,6 +17,7 @@ use Wavira\Core\Content\Taxonomies;
 use Wavira\Core\Demo\Exporter;
 use Wavira\Core\Demo\Fixtures;
 use Wavira\Core\Demo\Installer;
+use Wavira\Core\Demo\Placeholders;
 
 /**
  * Class Test_Demo
@@ -36,6 +37,15 @@ class Test_Demo extends Wavira_Test_Case {
 	 * @return void
 	 */
 	public function tear_down() {
+		// The generated files first: `wp_delete_post()` does not take an
+		// attachment with it, so a class that installed the demo five times would
+		// leave five catalogues' worth of covers and tones in the uploads folder —
+		// and the next test's count of "what the import made" would be somebody
+		// else's leftovers (found by exactly that assertion).
+		foreach ( $this->demo_media() as $attachment ) {
+			wp_delete_attachment( (int) $attachment, true );
+		}
+
 		foreach ( $this->posts as $id ) {
 			wp_delete_post( (int) $id, true );
 		}
@@ -165,7 +175,7 @@ class Test_Demo extends Wavira_Test_Case {
 				'post_status'    => 'inherit',
 				'posts_per_page' => -1,
 				'fields'         => 'ids',
-				'meta_key'       => '_wavira_demo_media',
+				'meta_key'       => Placeholders::MARKER, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- test fixture lookup.
 				'no_found_rows'  => true,
 			)
 		);

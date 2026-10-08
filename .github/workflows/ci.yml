@@ -480,11 +480,58 @@ jobs:
                 # HTTP, and what the page links to. Print all three before deciding.
                 echo "--- the theme's built assets on disk"
                 ls -la /tmp/site/wp-content/themes/wavira/assets/dist/ 2>&1 || echo "no assets/dist directory"
+                # The same assets over HTTP — and *what* answers, not only how big
+                # it is. `curl ... | wc -c` said "38378 bytes" for the stylesheet
+                # in 0.14.0 and the render still had no styles: `wp server`'s
+                # router sends a request for a file that is not there to
+                # `index.php`, so a missing asset answers HTTP 200 with the front
+                # page's HTML, and a byte count cannot tell that from a stylesheet.
+                # A content type and the first bytes can, and a wrong answer is a
+                # failed step — the browser refuses a stylesheet served as
+                # `text/html`, which is what "the theme is unstyled" is.
                 echo "--- the same assets over HTTP"
+                asset_failures=0
                 for asset in assets/dist/theme.css assets/dist/theme.js; do
                   url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
-                  echo "${asset}: HTTP $(curl -s -o /dev/null -w '%{http_code}' "$url"), $(curl -s "$url" | wc -c) byte(s)"
+                  read -r code type size < <( curl -sS -o "/tmp/asset-$(basename "$asset")" \
+                    -w '%{http_code} %{content_type} %{size_download}' "$url"; echo )
+                  local_file="/tmp/site/wp-content/themes/wavira/${asset}"
+                  echo "${asset}: HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 40 "/tmp/asset-$(basename "$asset")" | tr -d '\n')"
+                  case "${asset}" in
+                    *.css) expected_type='text/css' ;;
+                    *)     expected_type='javascript' ;;
+                  esac
+                  if [ "${code}" != "200" ] || [ "${type#*${expected_type}}" = "${type}" ]; then
+                    echo "::error file=${asset}::the theme's ${asset} did not come back as ${expected_type} (HTTP ${code}, ${type}) — a browser will refuse it, and every page renders unstyled"
+                    asset_failures=1
+                  fi
+                  if [ ! -s "${local_file}" ]; then
+                    echo "::error file=${asset}::the theme's ${asset} is missing or empty in the installed theme — the build ran before the copy"
+                    asset_failures=1
+                  fi
                 done
+                # One generated media file too: the demo's covers and photos are
+                # delivered from `wp-content/uploads/`, which is the same static
+                # path as the stylesheet, and a screenshot full of broken images is
+                # as wrong as an unstyled one.
+                image_url="$(wp post list --post_type=attachment --post_mime_type=image --posts_per_page=1 --field=guid)"
+                if [ -n "${image_url}" ]; then
+                  read -r code type size < <( curl -sS -o /tmp/asset-image.bin \
+                    -w '%{http_code} %{content_type} %{size_download}' "${image_url}"; echo )
+                  echo "demo image ${image_url}: HTTP ${code}, ${type}, ${size} byte(s)"
+                  if [ "${code}" != "200" ] || [ "${type#*image/}" = "${type}" ]; then
+                    echo "::error::a demo image did not come back as an image (HTTP ${code}, ${type}) — the render would photograph broken pictures"
+                    asset_failures=1
+                  fi
+                else
+                  echo "no image attachment found — the demo's media did not import"
+                  asset_failures=1
+                fi
+
+                if [ "${asset_failures}" != "0" ]; then
+                  echo "the theme's own assets are not being served as assets; stopping before the render"
+                  exit 1
+                fi
                 echo "--- stylesheets and scripts the front page asks for"
                 grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12
                 # The claim that needs a rendered page rather than a catalogue: the
