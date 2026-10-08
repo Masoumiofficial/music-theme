@@ -28,12 +28,14 @@ about the sandbox, not about the product.
    `tools/check-axe.mjs` decides. The screenshot has to exist even when the audit fails — otherwise a
    contrast regression costs the image the review was going to look at — and a gate that measures nothing
    is not a gate.
-3. **The screenshot is committed, the branch does not commit it.** `wavira/screenshot.png` must be in the
-   tree for the packages to carry it, so the job commits it — but only on `main`. A workflow token's push
-   does not trigger workflows, so a branch that commits its own screenshot can never go green: the commit
-   that adds the file is not the commit the checks already passed on. On a branch the render runs, the
-   image is uploaded as an artifact, and `--strict` proves the packaging path works with a screenshot
-   present.
+3. **The screenshot is committed on a branch, never on a tag.** `wavira/screenshot.png` must be in the
+   tree for the packages to carry it and for a reviewer to see it, so the job commits it when it changed —
+   on a branch. A tag ref is a detached HEAD with no branch to commit to, and the tag run keeps the
+   strict-packaging check instead. A workflow token's push triggers no workflows of its own, so the commit
+   that adds the image is verified by the *next* push rather than by itself; the image is a binary asset,
+   not a code path, and the render that produced it was verified in the same run. The first version of this
+   rule only committed on `main` — and the image the deliverable needed stayed an artifact nobody could
+   open (0.14.0).
 4. **`moderate` and `minor` axe findings are printed, not fatal**, and an allowance has to be named
    (`--allow=color-contrast`): a site owner's accent colour is not machine-checked for contrast (ADR 0020's
    stated limitation), so the rule that fires on it is reported as an allowance rather than suppressed.

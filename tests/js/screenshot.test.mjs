@@ -178,6 +178,14 @@ test( 'the command line refuses to run without a URL and an output file', () => 
 	assert.equal( malformed.status, 1 );
 	assert.match( malformed.stderr, /--page=broken must be --page=name=URL/ );
 
+	// A relative path is a usage mistake, not a Chrome protocol error: the message
+	// has to say which argument was wrong (this is how `wp-render` failed).
+	const relative = run( [ '--url=http://site.test/', '--out=/tmp/x.png', '--page=album=/albums/example/' ] );
+
+	assert.equal( relative.status, 1 );
+	assert.match( relative.stderr, /is not an absolute URL/ );
+	assert.match( relative.stderr, /\/albums\/example\// );
+
 	const noBrowser = run( [ '--url=http://site.test/', '--out=/tmp/x.png', '--chrome=/definitely/not/a/browser' ] );
 
 	assert.equal( noBrowser.status, 1 );

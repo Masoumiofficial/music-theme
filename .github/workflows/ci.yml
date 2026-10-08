@@ -530,7 +530,9 @@ jobs:
               status="$(curl -s -o /dev/null -w '%{http_code}' "$url")"
               echo "${pair%%=*}: ${url} → HTTP ${status}"
               if [ "$status" = "200" ]; then
-                echo "--page=${pair}" >> /tmp/extra-pages.txt
+                # An absolute URL: `--page=album=/albums/…` reached Chrome as
+                # "Protocol error (Page.navigate): Cannot navigate to invalid URL".
+                echo "--page=${pair%%=*}=${url}" >> /tmp/extra-pages.txt
               else
                 echo "the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
               fi
@@ -572,12 +574,13 @@ jobs:
           exit "$status"
 
       - name: Commit the theme screenshot when it changed
-        # Only on `main`: a push made with GITHUB_TOKEN does not trigger
-        # workflows, so a branch that commits its own screenshot can never go
-        # green — the commit that adds the file is not the commit the checks
-        # already passed on. Tag refs are a detached HEAD and have no branch to
-        # commit to either; both run the strict-packaging check below.
-        if: github.ref == 'refs/heads/main'
+        # On a branch, but never on a tag: a tag ref is a detached HEAD with no
+        # branch to commit to, and the tag run still gets the strict-packaging
+        # check below. A branch does commit the image, because the file has to be
+        # in the tree for the packages to carry it and for a review to see it —
+        # and while a push made with GITHUB_TOKEN triggers no workflows of its own,
+        # the next push re-runs everything with the screenshot in place (ADR 0022).
+        if: github.ref_type == 'branch'
         run: |
           set -euo pipefail
           if [ ! -f wavira/screenshot.png ]; then

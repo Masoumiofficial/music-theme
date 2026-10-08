@@ -117,7 +117,18 @@ export function parsePages( values ) {
 			throw new Error( `--page=${ value } must be --page=name=URL` );
 		}
 
-		return { name: value.slice( 0, split ), url: value.slice( split + 1 ) };
+		const url = value.slice( split + 1 );
+
+		// A relative path reaches Chrome as "Protocol error (Page.navigate):
+		// Cannot navigate to invalid URL", which says nothing about what to fix
+		// (`wp-render` passed `/albums/…` and failed exactly that way, 0.14.0).
+		try {
+			new URL( url );
+		} catch {
+			throw new Error( `--page=${ value }: “${ url }” is not an absolute URL — a page must start with http:// or https://` );
+		}
+
+		return { name: value.slice( 0, split ), url };
 	} );
 }
 
@@ -258,7 +269,9 @@ export async function main( args ) {
 	}
 
 	if ( process.env.WAVIRA_SCREENSHOT_QUIET !== '1' ) {
-		process.stdout.write( `browser: ${ browser.version() } (${ chrome })\n` );
+		const version = await browser.version().catch( () => 'unknown version' );
+
+		process.stdout.write( `browser: ${ version } (${ chrome })\n` );
 	}
 
 	// Every page this script opens gets the determinism style before the page's

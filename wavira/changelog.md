@@ -26,6 +26,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the output instead of disappearing.
 - **`docs/screenshots/`** — the render's own record: the front page, an album, an artist profile and a
   dark-mode home, committed so a review needs no running site and a visual regression shows up in a diff.
+  The render job commits them on a branch (never on a tag, where there is no branch to commit to), because
+  an image that only exists as a build artifact is an image the packaged theme cannot carry.
 
 - **`tools/check-render.mjs`** — the page has to be the front page: every front-page heading must be
   translated in the shipped `fa_IR.po` **and** on the page, and the page must carry the front-page
