@@ -595,7 +595,15 @@ jobs:
             exit 0
           fi
           git commit -m "assets: render wavira/screenshot.png from the seeded demo (${GITHUB_SHA::7})"
-          git push
+
+          # The branch can move while this job runs (a push during a render is
+          # normal), and a rejected push must not fail a job whose verification
+          # passed: rebase, retry once, and say so if it still will not go. Exit
+          # 128 with no message is what this replaced.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          if ! git push; then
+            echo "::warning title=Rendered theme::the screenshot commit could not be pushed (the branch moved during the run) — the next run will commit it"
+          fi
 
       - name: What the render logged (PHP notices, if any)
         if: always()

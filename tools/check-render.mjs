@@ -89,6 +89,16 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 	// The front page is the template, not the blog index: it marks its sections.
 	const sections = flat.split( 'wavira-section' ).length - 1;
 
+	// Landmarks and headings, counted rather than judged: axe reported a duplicate
+	// contentinfo landmark and no h1 on the front page, and the count in an
+	// annotation is what says which element is which.
+	const counts = {
+		h1: ( page.match( /<h1[\s>]/g ) || [] ).length,
+		footer: ( page.match( /<footer[\s>]/g ) || [] ).length,
+		nav: ( page.match( /<nav[\s>]/g ) || [] ).length,
+		main: ( page.match( /<main[\s>]/g ) || [] ).length,
+	};
+
 	if ( sections < minSections ) {
 		problems.push(
 			`the page has ${ sections } wavira-section element(s), expected at least ${ minSections } — ` +
@@ -100,7 +110,7 @@ export function checkPage( { page, catalogue, headings = FRONT_PAGE_HEADINGS, mi
 		problems.push( 'the page carries no Persian text at all' );
 	}
 
-	return { found, problems };
+	return { found, problems, counts };
 }
 
 export function usage() {
@@ -155,6 +165,11 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 	for ( const line of result.found ) {
 		console.log( `      · heading on the page: ${ line }` );
 	}
+
+	console.log(
+		`      · landmarks: ${ result.counts.h1 } h1, ${ result.counts.main } main, ${ result.counts.nav } nav, ` +
+			`${ result.counts.footer } footer`
+	);
 
 	for ( const problem of result.problems ) {
 		console.log( `::error title=Rendered theme::front page: ${ problem }` );

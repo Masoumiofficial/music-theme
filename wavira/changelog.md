@@ -46,6 +46,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   theme — «پوسته‌های مستقل باید یک پروندهٔ `templates/index.html` یا `index.php` داشته باشند» — so the gate
   now also fails when `index.html` is missing: the theme's one required file is a thing a static check can
   hold.
+- **The front page had no `h1`** (found by the render's axe run, `page-has-heading-one`): the header
+  renders the site title as a `<p>` on purpose, so every other template gets its heading level one from the
+  post or page title and the front page got none. It carries its own now — the site name, visually hidden —
+  and `tools/check-render.mjs` counts the page's landmarks and headings while it is checking the language.
 - **The whole theme rendered as a 720px column** (`wavira/templates`, `wavira/parts`, `wavira/patterns`):
   every group wrapper carrying one of the theme's own container classes — `wavira-layout`, `wavira-section`,
   the header, the footer, the top bar, the surface, the player — was declared with a *constrained* block

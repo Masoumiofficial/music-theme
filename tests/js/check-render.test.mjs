@@ -195,6 +195,27 @@ test( 'the command line asks for `=` when a value is written as a separate word'
 	assert.match( run.stderr, /values are attached with `=`/ );
 } );
 
+test( 'the landmarks a page carries are counted, not guessed', () => {
+	const result = checkPage( {
+		page: '<main class=\"wavira-section\"><h1>واویرا</h1><nav></nav><nav></nav><footer></footer><footer></footer></main>',
+		catalogue: CATALOGUE,
+		headings: [],
+		minSections: 1,
+	} );
+
+	assert.deepEqual( result.counts, { h1: 1, footer: 2, nav: 2, main: 1 } );
+} );
+
+test( 'the front page has the h1 the other templates get from their titles', () => {
+	// axe's `page-has-heading-one` fired on the rendered front page: the header
+	// renders the site title as a `<p>` (a heading on every other page comes from
+	// the post or page title), so the front page carries its own, visually hidden.
+	const template = readFileSync( fileURLToPath( new URL( '../../wavira/templates/front-page.html', import.meta.url ) ), 'utf8' );
+
+	assert.match( template, /wp:site-title \{"level":1\} \/\-->/ );
+	assert.match( template, /wavira-visually-hidden/ );
+} );
+
 test( 'the command line refuses to run without a page', () => {
 	const run = spawnSync( process.execPath, [ CLI ], { encoding: 'utf8' } );
 
