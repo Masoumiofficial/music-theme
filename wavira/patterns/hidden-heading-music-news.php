@@ -22,7 +22,11 @@ defined( 'ABSPATH' ) || exit;
 <h2 class="wp-block-heading"><?php echo esc_html_x( 'Music news', 'heading above the news feed', 'wavira' ); ?></h2>
 <!-- /wp:heading -->
 <!-- wp:paragraph {"className":"wavira-section__more"} -->
-<p class="wavira-section__more"><a href="<?php echo esc_url( get_permalink( (int) get_option( 'page_for_posts' ) ) ?: home_url( '/' ) ); ?>"><?php echo esc_html__( 'View all', 'wavira' ); ?></a></p>
+<p class="wavira-section__more"><a href="<?php
+$wavira_posts_page = absint( get_option( 'page_for_posts' ) );
+$wavira_news_url   = $wavira_posts_page > 0 ? get_permalink( $wavira_posts_page ) : home_url( '/' );
+echo esc_url( $wavira_news_url );
+?>"><?php echo esc_html__( 'View all', 'wavira' ); ?></a></p>
 <!-- /wp:paragraph -->
 </div>
 <!-- /wp:group -->

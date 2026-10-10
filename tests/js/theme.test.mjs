@@ -349,3 +349,47 @@ test( 'a card starts playback in place and keeps the page link as its failure fa
 	assert.equal( prevented, true );
 	assert.deepEqual( navigations, [ '/tracks/song/' ], 'a failed play still follows the link to the track page' );
 } );
+
+test( 'the exact track card wins over its album card when the player changes track', () => {
+	const sandbox = { console };
+	sandbox.window = sandbox;
+	const theme = vm.runInNewContext( SOURCE + '\nwindow.Wavira.theme;', vm.createContext( sandbox ), {
+		filename: 'wavira/assets/js/index.js',
+	} );
+	const makeCard = ( kind, id ) => {
+		const classes = new Set();
+		return {
+			classes,
+			getAttribute: ( name ) => ( 'data-wavira-kind' === name ? kind : String( id ) ),
+			classList: {
+				add: ( value ) => classes.add( value ),
+				remove: ( value ) => classes.delete( value ),
+				contains: ( value ) => classes.has( value ),
+			},
+		};
+	};
+	const album = makeCard( 'wavira_album', 7 );
+	const track = makeCard( 'wavira_track', 22 );
+	const listeners = {};
+	const mount = {
+		addEventListener: ( name, handler ) => {
+			listeners[ name ] = handler;
+		},
+		removeEventListener: ( name ) => {
+			delete listeners[ name ];
+		},
+	};
+	const doc = {
+		addEventListener() {},
+		removeEventListener() {},
+		querySelectorAll: ( selector ) => ( '[data-wavira-player]' === selector ? [ mount ] : [ album, track ] ),
+	};
+
+	theme.initCardPlayback( doc );
+	listeners[ 'wavira:player:trackchange' ]( {
+		detail: { track: { id: 22, album: { id: 7 }, artist: { id: 3 } } },
+	} );
+
+	assert.equal( track.classes.has( 'is-current' ), true );
+	assert.equal( album.classes.has( 'is-current' ), false );
+} );

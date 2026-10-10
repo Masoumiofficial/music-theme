@@ -156,7 +156,7 @@ class Test_I18n extends Wavira_Test_Case {
 	public function test_placeholders_survive_translation() {
 		$this->load_catalogue( 'wavira-core', 'wavira-core/languages/fa_IR.mo' );
 
-		$this->assertSame( '320 کیلوبیتبرثانیه', sprintf( __( '%d kbps', 'wavira-core' ), 320 ) );
+		$this->assertSame( '320 کیلوبیت‌برثانیه', sprintf( __( '%d kbps', 'wavira-core' ), 320 ) );
 		$this->assertSame( 'قطعهٔ 2 از 9', sprintf( __( 'Track %1$d of %2$d', 'wavira-core' ), 2, 9 ) );
 		$this->assertSame( 'آرشیو نمونهٔ قطعه', sprintf( __( '%s archive', 'wavira-core' ), 'نمونهٔ قطعه' ) );
 

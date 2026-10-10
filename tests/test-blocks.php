@@ -535,7 +535,7 @@ class Test_Blocks extends Wavira_Test_Case {
 		$this->assertStringContainsString( 'data-wavira-post="' . $track_id . '"', $html );
 		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $html );
 		$this->assertStringContainsString( 'data-wavira-context="tracks"', $html );
-		$this->assertStringContainsString( '/wp-json/wavira/v1/download/' . $track_id, $html );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track_id ), $html );
 	}
 
 	/**
@@ -599,7 +599,7 @@ class Test_Blocks extends Wavira_Test_Case {
 
 		$this->assertStringContainsString( 'data-wavira-card', $rendered );
 		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $rendered );
-		$this->assertStringContainsString( '/wp-json/wavira/v1/download/' . $track_id, $rendered );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track_id ), $rendered );
 		$this->assertStringNotContainsString( 'href=""', $rendered );
 	}
 

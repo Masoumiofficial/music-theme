@@ -408,6 +408,8 @@
 			var trackId = postId( track.id );
 			var albumId = postId( track.album && track.album.id );
 			var artistId = postId( track.artist && track.artist.id );
+			var albumCard = null;
+			var artistCard = null;
 			var cards = doc.querySelectorAll( CARD );
 
 			for ( var index = 0; index < cards.length; index++ ) {
@@ -415,12 +417,22 @@
 				var id = postId( card.getAttribute( 'data-wavira-post' ) );
 				var kind = card.getAttribute( 'data-wavira-kind' );
 
-				if ( ( 'wavira_track' === kind && trackId === id ) || ( 'wavira_album' === kind && albumId === id ) || ( 'wavira_artist' === kind && artistId === id ) ) {
+				// A song can be on the page twice: in its album card and in a
+				// tracklist. Prefer the exact song; the album/artist is a fallback.
+				if ( 'wavira_track' === kind && trackId === id ) {
 					return card;
+				}
+
+				if ( ! albumCard && 'wavira_album' === kind && albumId === id ) {
+					albumCard = card;
+				}
+
+				if ( ! artistCard && 'wavira_artist' === kind && artistId === id ) {
+					artistCard = card;
 				}
 			}
 
-			return null;
+			return albumCard || artistCard;
 		}
 
 		/**

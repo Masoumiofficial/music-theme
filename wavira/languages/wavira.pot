@@ -706,11 +706,11 @@ msgstr ""
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr ""
 
-#: wavira/blocks/tracklist/render.php:67
+#: wavira/blocks/tracklist/render.php:71
 msgid "No published tracks in this album yet."
 msgstr ""
 
-#: wavira/blocks/tracklist/render.php:66
+#: wavira/blocks/tracklist/render.php:70
 msgid "No published tracks yet."
 msgstr ""
 
@@ -1046,7 +1046,7 @@ msgstr ""
 #: wavira/inc/artists.php:215
 #: wavira/patterns/hidden-heading-latest-albums.php:21
 #: wavira/patterns/hidden-heading-latest-tracks.php:21
-#: wavira/patterns/hidden-heading-music-news.php:25
+#: wavira/patterns/hidden-heading-music-news.php:29
 #: wavira/patterns/hidden-heading-music-videos.php:21
 msgid "View all"
 msgstr ""

@@ -621,3 +621,9 @@ test( 'a card pauses the player that is actually playing when the page has two m
 	assert.equal( await player.toggle(), true );
 	assert.deepEqual( calls, [ 'active inline' ] );
 } );
+
+test( 'the view reads state after a queue event and the track from its event payload', () => {
+	assert.match( SOURCE, /engine\.subscribe\( 'trackchange', function \( event \) \{\s*renderTrack\( event\.track \);/ );
+	assert.match( SOURCE, /engine\.subscribe\( 'change', function \(\) \{\s*renderState\( engine\.get\(\) \);/ );
+	assert.match( SOURCE, /var state = engine\.get\(\);\s*renderQueue\( state \);\s*renderState\( state \);/ );
+} );

@@ -36,7 +36,7 @@ if ( 'latest' === $wavira_source ) {
 		array(
 			'post_type'      => 'wavira_track',
 			'post_status'    => 'publish',
-			'posts_per_page' => $wavira_limit > 0 ? $wavira_limit : 6,
+			'posts_per_page' => $wavira_limit,
 			'orderby'        => 'date',
 			'order'          => 'DESC',
 			'fields'         => 'ids',
@@ -47,16 +47,20 @@ if ( 'latest' === $wavira_source ) {
 	$wavira_ids = $wavira_query->posts;
 }
 
-$wavira_markup = wavira_get_tracklist(
-	$wavira_album_id,
-	array(
-		'show_duration' => ! isset( $attributes['showDuration'] ) || (bool) $attributes['showDuration'],
-		'show_subtitle' => ! isset( $attributes['showSubtitle'] ) || (bool) $attributes['showSubtitle'],
-		'show_download' => ! isset( $attributes['showDownload'] ) || (bool) $attributes['showDownload'],
-		'show_play'     => ! isset( $attributes['showPlay'] ) || (bool) $attributes['showPlay'],
-		'ids'           => $wavira_ids,
-	)
+$wavira_tracklist_args = array(
+	'show_duration' => ! isset( $attributes['showDuration'] ) || (bool) $attributes['showDuration'],
+	'show_subtitle' => ! isset( $attributes['showSubtitle'] ) || (bool) $attributes['showSubtitle'],
+	'show_download' => ! isset( $attributes['showDownload'] ) || (bool) $attributes['showDownload'],
+	'show_play'     => ! isset( $attributes['showPlay'] ) || (bool) $attributes['showPlay'],
 );
+
+// An empty ID list is meaningful only in `latest` mode: it means the query
+// returned no tracks, not "fall back to this album's hand-curated order".
+if ( 'latest' === $wavira_source ) {
+	$wavira_tracklist_args['ids'] = $wavira_ids;
+}
+
+$wavira_markup = wavira_get_tracklist( $wavira_album_id, $wavira_tracklist_args );
 
 if ( '' === $wavira_markup ) {
 	// «Nothing here yet» is a different sentence for a section of the home page

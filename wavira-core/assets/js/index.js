@@ -1826,13 +1826,15 @@
 			engine.setVolume( toNumber( volume.value, settings.defaults.volume ) );
 		} );
 
-		unsubscribe.push( engine.subscribe( 'change', function ( state ) {
-			renderState( state );
+		unsubscribe.push( engine.subscribe( 'change', function () {
+			renderState( engine.get() );
 		} ) );
-		unsubscribe.push( engine.subscribe( 'trackchange', function ( state ) {
-			renderTrack( state.currentTrack );
+		unsubscribe.push( engine.subscribe( 'trackchange', function ( event ) {
+			renderTrack( event.track );
 		} ) );
-		unsubscribe.push( engine.subscribe( 'queuechange', function ( state ) {
+		unsubscribe.push( engine.subscribe( 'queuechange', function () {
+			var state = engine.get();
+
 			renderQueue( state );
 			renderState( state );
 		} ) );
