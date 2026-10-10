@@ -108,6 +108,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   catalogue) with Persian numerals. The lightbox's accessible name and the close
   button's name reach the script the same way, from the theme settings.
 
+- **Twenty-five Persian plurals lost their نیم‌فاصله.** Persian separates the
+  suffix «ها» from a stem that joins forward, so `/tracks/` titled itself
+  «قطعهها» and `/albums/` «آلبومها» while the menu one line above said
+  «آلبوم‌ها» — and «برچسبهای»، «شبکههای»، «سالهای» and «صفحهای» were waiting in
+  the block descriptions and the settings. The catalogue was complete: 405 of
+  405 strings translated, the POT and the MO in sync, not one English word on a
+  rendered page. It is what a gate that only asks *whether* a translation exists
+  cannot see. Both catalogues are corrected, and `node tools/i18n.mjs check`
+  reads the Persian now: it names the string, the word it wrote and the word it
+  should have written (`قطعهها` → `قطعه‌ها`), and a suffix left attached after
+  the seven letters that never join forward (ا، د، ذ، ر، ز، ژ، و) is left alone,
+  because there is nothing to separate.
 ### Changed — 0.15.0
 
 - **File sizes and qualities are translated, not concatenated**: `%s KB` / `%s MB` (theme) and `%d kbps` /

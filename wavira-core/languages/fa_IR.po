@@ -67,7 +67,7 @@ msgstr "آلبوم"
 #: wavira-core/src/Content/ArtistProfile.php:263
 #: wavira-core/src/Content/PostTypes.php:119
 msgid "Albums"
-msgstr "آلبومها"
+msgstr "آلبوم‌ها"
 
 #: wavira-core/src/Content/Taxonomies.php:274
 #. translators: %s: taxonomy plural name.
@@ -234,11 +234,11 @@ msgstr "نامک سبک برای صف سبک."
 
 #: wavira-core/src/Content/Taxonomies.php:201
 msgid "Genres"
-msgstr "سبکها"
+msgstr "سبک‌ها"
 
 #: wavira-core/src/Settings/SettingsSchema.php:122
 msgid "Global social profile URLs"
-msgstr "نشانی شبکههای اجتماعی سراسری"
+msgstr "نشانی شبکه‌های اجتماعی سراسری"
 
 #: wavira-core/src/Admin/DemoPage.php:140
 msgid "Import demo content"
@@ -274,7 +274,7 @@ msgstr "زبان"
 
 #: wavira-core/src/Content/Taxonomies.php:228
 msgid "Languages"
-msgstr "زبانها"
+msgstr "زبان‌ها"
 
 #: wavira-core/src/Rest/AbstractController.php:123
 msgid "Limit results to a genre slug."
@@ -457,7 +457,7 @@ msgstr "سال انتشار"
 
 #: wavira-core/src/Content/Taxonomies.php:246
 msgid "Release years"
-msgstr "سالهای انتشار"
+msgstr "سال‌های انتشار"
 
 #: wavira-core/src/Content/Taxonomies.php:101
 msgid "Remix"
@@ -553,7 +553,7 @@ msgstr "ترتیب مجموعه بر پایهٔ فیلد."
 
 #: wavira-core/src/Rest/PlayerController.php:77
 msgid "Source post ID for album, artist and related queues."
-msgstr "شناسهٔ نوشتهٔ مبدأ برای صفهای آلبوم، هنرمند و موارد مرتبط."
+msgstr "شناسهٔ نوشتهٔ مبدأ برای صف‌های آلبوم، هنرمند و موارد مرتبط."
 
 #: wavira-core/src/Settings/SettingsSchema.php:42
 msgid "Start in dark mode"
@@ -625,7 +625,7 @@ msgstr "شناسهٔ نوشتهٔ قطعه."
 
 #: wavira-core/src/Content/PostTypes.php:126
 msgid "Tracks"
-msgstr "قطعهها"
+msgstr "قطعه‌ها"
 
 #: wavira-core/src/Demo/Installer.php:75
 msgid "Tracks already exist — nothing was imported. Use force to import anyway."
@@ -669,7 +669,7 @@ msgstr "بلندی صدا"
 #: wavira-core/wavira-core.php:96
 #. translators: 1: required PHP version, 2: required WordPress version.
 msgid "Wavira Core needs PHP %1$s+ and WordPress %2$s+ to run. Music features are disabled until the server meets these versions."
-msgstr "افزونهٔ واویرا کور برای اجرا به PHP %1$s+ و وردپرس %2$s+ نیاز دارد. تا زمانی که سرور این نسخهها را برآورده نکند، امکانات موسیقی غیرفعال است."
+msgstr "افزونهٔ واویرا کور برای اجرا به PHP %1$s+ و وردپرس %2$s+ نیاز دارد. تا زمانی که سرور این نسخه‌ها را برآورده نکند، امکانات موسیقی غیرفعال است."
 
 #: wavira-core/wavira-core.php:47
 #. translators: 1: required PHP version, 2: current PHP version.

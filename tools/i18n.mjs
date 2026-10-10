@@ -70,10 +70,63 @@ const FUNCTIONS = {
 const PERSIAN = /[\u0600-\u06FF]/;
 const LATIN = /[A-Za-z]/;
 
+/**
+ * The letters that join the letter after them.
+ *
+ * Persian separates the plural suffix «ها» from its stem with a نیم‌فاصله
+ * (U+200C) — except after the seven letters that never join forward
+ * (ا، د، ذ، ر، ز، ژ، و), where there is nothing to separate: «پیوندها» and
+ * «تصویرها» are right as they are, «قطعهها» is not.
+ */
+const JOINS_FORWARD = 'بپتثجچحخسشصضطظعغفقکلمنهی';
+
+/**
+ * A plural suffix stuck to a stem it should have been separated from.
+ *
+ * The suffix may carry a possessive ending — «کتاب‌های», «کتاب‌هایشان» — which
+ * is why the pattern lets a ی and one of the six endings follow before it
+ * demands the end of the word.
+ */
+const STUCK_PLURAL = new RegExp(
+	`[${ JOINS_FORWARD }]ها(?:ی(?:مان|تان|شان|م|ت|ش)?)?(?![\\u0621-\\u06cc])`,
+	'g'
+);
+
 const problems = [];
 const notes = [];
 
 // --------------------------------------------------------------------- helpers
+
+/**
+ * The plural suffixes a translation writes without a نیم‌فاصله.
+ *
+ * A complete catalogue is not a Persian catalogue. Every string can be
+ * translated, the POT and the MO can be in sync, and the rendered page can
+ * still read like «قطعهها» — which is what the archive titles of 0.15.0 said,
+ * because the rule that separates a suffix from a stem that joins forward is a
+ * rule about Persian, and nothing in this tool knew any Persian beyond
+ * “is there a Persian letter in it”.
+ *
+ * @param {string} text A translated string.
+ * @return {string[]} The words that should carry a U+200C, each one once.
+ */
+export function stuckPlurals( text ) {
+	const words = new Set();
+
+	for ( const match of text.matchAll( STUCK_PLURAL ) ) {
+		let word = match[ 0 ];
+
+		// Walk back to the beginning of the word so the report names it —
+		// «قطعه‌ها», not «عهها».
+		for ( let at = match.index - 1; at >= 0 && /[\u0621-\u06cc]/.test( text[ at ] ) && '‌' !== text[ at ]; at-- ) {
+			word = text[ at ] + word;
+		}
+
+		words.add( word );
+	}
+
+	return [ ...words ];
+}
 
 /**
  * Remove PHP comments while keeping offsets stable (comments become spaces).
@@ -897,6 +950,18 @@ function modeCheck() {
 
 				if ( keepLatin && value === entry.msgid && LATIN.test( entry.msgid ) && PERSIAN.test( entry.msgid ) === false && ! /[%$©]|\d/.test( entry.msgid ) ) {
 					problems.push( `${ artifact.languages }/${ name }: “${ entry.msgid.slice( 0, 48 ) }” is flagged keep-latin but is an ordinary sentence` );
+					continue;
+				}
+
+				// A translation can be complete and still read wrong. Persian
+				// separates the plural suffix from a stem that joins forward,
+				// and «قطعهها» passed every other rule in this file.
+				const slips = poEntry.msgstr.flatMap( ( form ) => stuckPlurals( form ?? '' ) );
+
+				if ( slips.length > 0 ) {
+					problems.push(
+						`${ artifact.languages }/${ name }: “${ entry.msgid.slice( 0, 48 ) }” writes ${ slips.join( '، ' ) } without a نیم‌فاصله — it should be ${ slips.map( ( slip ) => slip.replace( /ها/, '‌ها' ) ).join( '، ' ) }`
+					);
 					continue;
 				}
 

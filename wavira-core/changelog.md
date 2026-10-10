@@ -133,6 +133,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   `wp_enqueue_scripts` by hand) and the render preflight ask the question the
   browser asks.
 
+- **Twenty-five Persian plurals lost their نیم‌فاصله.** The plugin's own
+  strings: «نسخهها»، «سالهای»، «شبکههای»، «صفهای» and the post type label every
+  archive page prints, «قطعهها». Persian separates the suffix «ها» from a stem
+  that joins forward, and a catalogue can be complete — 163 of 163 translated,
+  the POT and the MO in sync — and still print a page that reads wrong. Fixed in
+  the catalogue, and `node tools/i18n.mjs check` refuses the next one: it names
+  the string, the word and the word it should have been.
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».

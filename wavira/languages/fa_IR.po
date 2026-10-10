@@ -123,7 +123,7 @@ msgstr "پیوند دانلود برای صدای یک قطعه، فایل ما�
 #: wavira/blocks/player/block.json
 msgctxt "block description"
 msgid "A player instance bound to an album, an artist, a genre, the latest tracks or the related items of the current post."
-msgstr "یک نمونهٔ پخشکننده که به آلبوم، هنرمند، سبک، جدیدترین قطعهها یا موارد مرتبط با نوشتهٔ جاری متصل میشود."
+msgstr "یک نمونهٔ پخشکننده که به آلبوم، هنرمند، سبک، جدیدترین قطعه‌ها یا موارد مرتبط با نوشتهٔ جاری متصل میشود."
 
 #: wavira/blocks/artist-profile/block.json
 msgctxt "block description"
@@ -133,7 +133,7 @@ msgstr "یک هنرمند: تصویر، زندگی‌نامه، شبکه‌ها�
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block description"
 msgid "Linked genre terms as chips, most used first."
-msgstr "سبکها بهصورت برچسبهای پیوندی، پرکاربردترین در ابتدا."
+msgstr "سبک‌ها بهصورت برچسب‌های پیوندی، پرکاربردترین در ابتدا."
 
 #: wavira/blocks/artist-gallery/block.json
 msgctxt "block description"
@@ -148,7 +148,7 @@ msgstr "تازه‌ترین خبرها به‌صورت کارت، به‌صور�
 #: wavira/blocks/tracklist/block.json
 msgctxt "block description"
 msgid "The ordered, linked tracklist of an album. Renders nothing when the album has no published tracks."
-msgstr "فهرست مرتب و پیوندی قطعههای یک آلبوم. اگر آلبوم قطعهٔ منتشرشدهای نداشته باشد، چیزی نمایش داده نمیشود."
+msgstr "فهرست مرتب و پیوندی قطعه‌های یک آلبوم. اگر آلبوم قطعهٔ منتشرشدهای نداشته باشد، چیزی نمایش داده نمیشود."
 
 #: wavira/blocks/video/block.json
 msgctxt "block description"
@@ -296,17 +296,17 @@ msgstr "طبقهبندی"
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block keyword"
 msgid "terms"
-msgstr "واژهها"
+msgstr "واژه‌ها"
 
 #: wavira/blocks/tracklist/block.json
 msgctxt "block keyword"
 msgid "tracklist"
-msgstr "فهرست قطعهها"
+msgstr "فهرست قطعه‌ها"
 
 #: wavira/blocks/tracklist/block.json
 msgctxt "block keyword"
 msgid "tracks"
-msgstr "قطعهها"
+msgstr "قطعه‌ها"
 
 #: wavira/blocks/download/block.json
 #: wavira/blocks/video/block.json
@@ -317,7 +317,7 @@ msgstr "ویدیو"
 #: wavira/blocks/tracklist/block.json
 msgctxt "block title"
 msgid "Album tracklist"
-msgstr "فهرست قطعههای آلبوم"
+msgstr "فهرست قطعه‌های آلبوم"
 
 #: wavira/blocks/artist-profile/block.json
 msgctxt "block title"
@@ -332,7 +332,7 @@ msgstr "دکمهٔ دانلود"
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block title"
 msgid "Genre chips"
-msgstr "برچسبهای سبک"
+msgstr "برچسب‌های سبک"
 
 #: wavira/blocks/news/block.json
 msgctxt "block title"
@@ -361,7 +361,7 @@ msgstr "ضخیم (۷۰۰)"
 #: wavira/patterns/featured-album.php:33
 msgctxt "button label in the featured album pattern"
 msgid "Browse all albums"
-msgstr "مشاهدهٔ همهٔ آلبومها"
+msgstr "مشاهدهٔ همهٔ آلبوم‌ها"
 
 #: wavira/inc/customizer.php:297
 msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
@@ -551,7 +551,7 @@ msgstr "پانل‌های شیشه‌ای مات"
 
 #: wavira/inc/blocks.php:64
 msgid "Genre chips, most used first."
-msgstr "برچسبهای سبک، پرکاربردترین در ابتدا."
+msgstr "برچسب‌های سبک، پرکاربردترین در ابتدا."
 
 #: wavira/inc/customizer.php:97
 msgid "Header"
@@ -570,7 +570,7 @@ msgstr "صفحه یافت نشد"
 #: wavira/patterns/album-grid.php:18
 msgctxt "heading of the album grid pattern"
 msgid "Latest albums"
-msgstr "جدیدترین آلبومها"
+msgstr "جدیدترین آلبوم‌ها"
 
 #: wavira/patterns/latest-tracks.php:18
 msgctxt "heading of the catalogue player pattern"
@@ -661,7 +661,7 @@ msgstr "فارسی‌سازی سایت"
 #: wavira/patterns/hidden-404.php:23
 msgctxt "message of the 404 template"
 msgid "The page you were looking for does not exist. Try a search, or browse the latest releases."
-msgstr "صفحهای که به دنبالش بودید وجود ندارد. جستوجو کنید یا جدیدترین آثار را ببینید."
+msgstr "صفح‌های که به دنبالش بودید وجود ندارد. جستوجو کنید یا جدیدترین آثار را ببینید."
 
 #: wavira/patterns/album-grid.php:29
 #: wavira/patterns/hidden-no-results.php:20
@@ -809,7 +809,7 @@ msgstr "تصاویر"
 #: wavira/patterns/hidden-heading-tracks.php:16
 msgctxt "section heading above an album tracklist"
 msgid "Tracks"
-msgstr "قطعهها"
+msgstr "قطعه‌ها"
 
 #: wavira/patterns/hidden-heading-listen-now.php:16
 msgctxt "section heading above the catalogue player"
@@ -819,12 +819,12 @@ msgstr "همین حالا بشنوید"
 #: wavira/patterns/hidden-heading-latest-albums.php:16
 msgctxt "section heading on the home and 404 templates"
 msgid "Latest albums"
-msgstr "جدیدترین آلبومها"
+msgstr "جدیدترین آلبوم‌ها"
 
 #: wavira/patterns/hidden-heading-latest-tracks.php:16
 msgctxt "section heading on the home template"
 msgid "Latest tracks"
-msgstr "جدیدترین قطعهها"
+msgstr "جدیدترین قطعه‌ها"
 
 #: wavira/patterns/hidden-heading-music-videos.php:16
 msgctxt "section heading on the home template"
@@ -986,7 +986,7 @@ msgstr "ابزارها → محتوای نمایشی واویرا"
 
 #: wavira/inc/blocks.php:58
 msgid "Tracklist of the album chosen in the sidebar."
-msgstr "فهرست قطعههای آلبومی که در نوار کناری انتخاب شده است."
+msgstr "فهرست قطعه‌های آلبومی که در نوار کناری انتخاب شده است."
 
 #: wavira/inc/admin-panel.php:705
 msgid "Use this image"

@@ -18,7 +18,7 @@ import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-import { compileMo, extractDomain, parsePo, readMo, stripComments } from '../../tools/i18n.mjs';
+import { compileMo, extractDomain, parsePo, readMo, stripComments, stuckPlurals } from '../../tools/i18n.mjs';
 
 const ROOT = resolve( dirname( fileURLToPath( import.meta.url ) ), '../..' );
 const PERSIAN = /[\u0600-\u06FF]/;
@@ -171,4 +171,49 @@ test( 'block metadata is translated in the contexts core looks up', () => {
 	assert.ok( contexts.has( 'block title' ) );
 	assert.ok( contexts.has( 'block description' ) );
 	assert.ok( contexts.has( 'block keyword' ) );
+} );
+
+test( 'a Persian plural keeps its نیم‌فاصله', () => {
+	// A catalogue can be complete — every string translated, the POT and the MO
+	// in sync — and still print «قطعهها» where Persian reads «قطعه‌ها». It is
+	// the archive title of a post type, so it was on /tracks/ and /albums/ in
+	// 0.15.0. The rule: the suffix is separated from a stem that joins forward,
+	// and left attached after the seven letters that never join (ا، د، ذ، ر،
+	// ز، ژ، و), where there is nothing to separate.
+	for ( const wrong of [ 'قطعهها', 'آلبومها', 'زبانها', 'سبکها', 'نسخهها', 'قطعههای', 'برچسبهای', 'شبکههای' ] ) {
+		assert.deepEqual(
+			stuckPlurals( wrong ),
+			[ wrong ],
+			`${ wrong } must be reported`
+		);
+	}
+
+	for ( const right of [ 'قطعه‌ها', 'آلبوم‌ها', 'کتاب‌هایشان', 'پیوندها', 'تصویرها', 'ابزارها', 'ویدیوها', 'خبرها', 'تازه‌ترین خبرها' ] ) {
+		assert.deepEqual(
+			stuckPlurals( right ),
+			[],
+			`${ right } is written correctly and must not be reported`
+		);
+	}
+
+	// One report per word, however many times the sentence says it.
+	assert.deepEqual( stuckPlurals( 'فهرست قطعهها و قطعهها' ), [ 'قطعهها' ] );
+} );
+
+test( 'the shipped catalogues have no stuck plural', () => {
+	// The same rule the `check` mode enforces, asserted against the files that
+	// ship, so a regression fails here as well as in CI.
+	for ( const artifact of [ 'wavira/languages', 'wavira-core/languages' ] ) {
+		const { entries } = parsePo( readFileSync( join( ROOT, artifact, 'fa_IR.po' ), 'utf8' ) );
+
+		for ( const entry of entries ) {
+			for ( const form of entry.msgstr ) {
+				assert.deepEqual(
+					stuckPlurals( form ),
+					[],
+					`${ artifact }: “${ entry.msgid }” must separate its plural suffix`
+				);
+			}
+		}
+	}
 } );
