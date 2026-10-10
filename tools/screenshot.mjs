@@ -563,13 +563,18 @@ export async function main( args ) {
 			};
 
 			// Only what a visitor or a screen reader can actually reach: `axe`
-			// ignores a link that is not rendered, and a diagnostic that lists
-			// eleven of them while axe reports none is worse than no diagnostic.
+			// ignores a link that is not rendered, and one that is hidden from
+			// assistive technology on purpose - a card's cover is `aria-hidden`
+			// and `tabindex="-1"` because the card's heading already links to the
+			// same place, and a diagnostic that names eight of them while axe
+			// reports none sends the next reader hunting a defect that is not
+			// there.
 			const unnamed = Array.from( document.querySelectorAll( 'a[href]' ) )
 				.filter( ( link ) => link.getClientRects().length > 0 )
+				.filter( ( link ) => ! link.closest( '[aria-hidden="true"]' ) )
 				.filter( ( link ) => '' === ( link.textContent || '' ).trim() )
 				.filter( ( link ) => ! link.getAttribute( 'aria-label' ) && ! link.getAttribute( 'title' ) )
-				.filter( ( link ) => ! link.querySelector( '[aria-label], img[alt]:not([alt=\"\"])' ) )
+				.filter( ( link ) => ! link.querySelector( '[aria-label], img[alt]:not([alt=""])' ) )
 				.map( ( link ) => ( link.className || '(no class)' ).toString().split( ' ' )[ 0 ] );
 
 			return {
