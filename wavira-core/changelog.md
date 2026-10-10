@@ -57,6 +57,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   including a name given as a string, and reports one finding per use in source
   order. A fully qualified `\WP_CLI::log()` is not a finding, and neither is a
   class name written in a docblock.
+- **The importer registers the content types it writes into.** They are
+  registered on `init`, and an import does not always get a request of its own: a
+  setup wizard, or a command that activates the plugin and seeds the site in one
+  breath, runs after that hook has fired. WordPress will still insert a post of an
+  unregistered type, so the content appeared — but a menu item for an archive
+  whose post type is unknown is *invalid*, and `wp_get_nav_menu_items()` drops it
+  without a word. The demo's menu came out as «خانه» and nothing else, on a site
+  that had four archives full of music behind it.
 - **A re-import now updates the menu visitors see, not just the one in
   wp-admin.** The theme's Navigation blocks name no menu, so core renders the
   most recently published `wp_navigation` post — and on a site with none it

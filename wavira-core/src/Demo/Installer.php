@@ -57,6 +57,15 @@ final class Installer {
 	 * @throws RuntimeException When WordPress refuses to create a post.
 	 */
 	public static function install( array $args = array() ): array {
+		// The content types have to exist before anything is written for them.
+		// They are registered on `init`, and an import does not always get its own
+		// request: a setup wizard, or a command that activates the plugin and seeds
+		// the site in one breath, runs after `init` has already fired — and a menu
+		// item for an archive whose post type is not registered is *invalid*, which
+		// WordPress drops without a word. It showed up as a demo menu with only
+		// «خانه» in it.
+		self::ensure_content_types();
+
 		$force   = ! empty( $args['force'] );
 		$english = ! empty( $args['english'] );
 		$site    = ! array_key_exists( 'site', $args ) || ! empty( $args['site'] );
@@ -561,6 +570,29 @@ final class Installer {
 		} while ( array() !== $ids );
 
 		return $deleted;
+	}
+
+	/**
+	 * Register the music content types when this request has not done it yet.
+	 *
+	 * `PostTypes` and `Taxonomies` do their work on `init`. An import that runs
+	 * in the same request that activated the plugin — a setup wizard, or a CLI
+	 * that activates and seeds in one command — runs after that hook has fired,
+	 * and then every post type this importer writes into is unknown: posts of an
+	 * unregistered type are still created (WordPress does not check the type when
+	 * inserting), but a menu item pointing at their archive is invalid, and the
+	 * menu a visitor sees comes out short.
+	 *
+	 * @return void
+	 */
+	private static function ensure_content_types(): void {
+		if ( ! post_type_exists( PostTypes::TRACK ) ) {
+			( new PostTypes() )->register_post_types();
+		}
+
+		if ( ! taxonomy_exists( Taxonomies::GENRE ) ) {
+			( new Taxonomies() )->register_taxonomies();
+		}
 	}
 
 	/**
