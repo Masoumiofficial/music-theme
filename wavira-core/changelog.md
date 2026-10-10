@@ -140,6 +140,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   the POT and the MO in sync — and still print a page that reads wrong. Fixed in
   the catalogue, and `node tools/i18n.mjs check` refuses the next one: it names
   the string, the word and the word it should have been.
+- **A player with a Play button but no queue did nothing.** Mounts now quietly load
+  their own queue when initialized, never start audio until the visitor asks, and
+  are initialized only once when both the plugin and theme scripts run. The public
+  `Wavira.player.play()`, `playContext()` and `toggle()` methods let a card choose
+  one track or an album/artist queue in the sticky player; an out-of-queue track
+  is kept in the queue so Next starts from the song the visitor chose. If the
+  browser refuses playback, the card does not pretend it worked — it follows its
+  ordinary track/album link instead.
+
 ### Changed — 0.15.0
 
 - The demo-import notice now counts what it made: «%1$d release, %2$d track and %3$d generated file».

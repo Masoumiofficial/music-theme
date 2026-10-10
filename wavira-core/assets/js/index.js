@@ -1939,6 +1939,13 @@
 								// first position on `next`.
 								if ( index > -1 ) {
 									engine.setQueue( items, index );
+								} else {
+									var queue = items.filter( function ( item ) {
+										return item && item.id !== track.id;
+									} );
+
+									queue.push( track );
+									engine.setQueue( queue, queue.length - 1 );
 								}
 							}
 
@@ -1960,17 +1967,23 @@
 				if ( adapter ) {
 					adapter.destroy();
 				}
+
+				var index = instances.indexOf( controller );
+
+				if ( index > -1 ) {
+					instances.splice( index, 1 );
+				}
 			}
 		};
 
-		if ( mount.getAttribute( 'data-autoplay' ) || settings.defaults.autoplayOnLoad ) {
-			controller
-				.load()
-				.then( function () {
+		controller
+			.load()
+			.then( function () {
+				if ( mount.getAttribute( 'data-autoplay' ) || settings.defaults.autoplayOnLoad ) {
 					engine.play();
-				} )
-				.catch( function () {} );
-		}
+				}
+			} )
+			.catch( function () {} );
 
 		return controller;
 	}
@@ -1993,19 +2006,151 @@
 		var settings = normaliseSettings( global.waviraPlayerSettings );
 
 		Array.prototype.slice.call( root.querySelectorAll( MOUNT_SELECTOR ) ).forEach( function ( mount ) {
+			var alreadyMounted = instances.some( function ( instance ) {
+				return instance && instance.mount === mount;
+			} );
+
+			if ( alreadyMounted ) {
+				return;
+			}
+
 			instances.push( createPlayer( mount, { settings: settings } ) );
 		} );
 
 		return instances;
 	}
 
+	/** Return the sticky player, or the first one. */
+	function primary() {
+		var first = null;
+
+		for ( var i = 0; i < instances.length; i++ ) {
+			var instance = instances[ i ];
+			var mount = instance && instance.mount;
+
+			if ( ! first ) {
+				first = instance;
+			}
+
+			if ( mount && -1 !== ( ' ' + mount.className + ' ' ).indexOf( ' wavira-player--sticky ' ) ) {
+				return instance;
+			}
+		}
+
+		return first;
+	}
+
+	/** @param {Object} engine Player engine. @return {Promise<boolean>} */
+	function confirmPlaying( engine ) {
+		return Promise.resolve( engine.play() ).then( function () {
+			return 'function' !== typeof engine.field || !! engine.field( 'isPlaying' );
+		} );
+	}
+
+	/** Play a track in the primary player. */
+	function playTrack( trackId, context ) {
+		var instance = primary();
+		var id = toNumber( trackId, 0 );
+
+		if ( ! instance || id < 1 ) {
+			return Promise.resolve( false );
+		}
+
+		var engine = instance.engine;
+
+		return engine
+			.loadQueue( context || 'tracks', { id: 0, slug: '', limit: 0 } )
+			.then( function ( items ) {
+				var index = -1;
+
+				( items || [] ).forEach( function ( item, position ) {
+					if ( item && item.id === id ) {
+						index = position;
+					}
+				} );
+
+				if ( index > -1 ) {
+					engine.setQueue( items, index );
+
+					return confirmPlaying( engine );
+				}
+
+				// Outside the queue — a limit, or another context: keep the queue
+				// for «next» and load the track the visitor actually asked for.
+				engine.setQueue( items, -1 );
+
+				return engine.loadTrack( id, false ).then(
+					function ( track ) {
+						items.push( track );
+						engine.setQueue( items, items.length - 1 );
+
+						return confirmPlaying( engine );
+					},
+					function () {
+						return false;
+					}
+				);
+			} )
+			.catch( function () {
+				return false;
+			} );
+	}
+
+	/** Play an album, artist or genre queue. */
+	function playContext( context, id ) {
+		var instance = primary();
+
+		if ( ! instance ) {
+			return Promise.resolve( false );
+		}
+
+		return instance.engine
+			.loadQueue( context || 'tracks', { id: toNumber( id, 0 ), slug: '', limit: 0 } )
+			.then( function ( items ) {
+				if ( ! items || ! items.length ) {
+					return false;
+				}
+
+				instance.engine.setQueue( items, 0 );
+
+				return confirmPlaying( instance.engine );
+			} )
+			.catch( function () {
+				return false;
+			} );
+	}
+
+	/**
+	 * Toggle the visitor's primary player from a card whose track is current.
+	 *
+	 * @return {Promise<boolean>} Resolves false when no player is mounted.
+	 */
+	function togglePrimary() {
+		var instance = primary();
+
+		for ( var i = 0; i < instances.length; i++ ) {
+			var active = instances[ i ];
+
+			if ( active.engine && 'function' === typeof active.engine.field && active.engine.field( 'isPlaying' ) ) {
+				instance = active;
+				break;
+			}
+		}
+
+		return instance ? instance.engine.toggle().then( function () { return true; } ) : Promise.resolve( false );
+	}
+
 	global.Wavira = global.Wavira || {};
 	global.Wavira.player = {
-		version: '0.5.0',
+		version: '0.6.0',
 		create: createPlayer,
 		init: init,
 		instances: instances,
 		settings: normaliseSettings,
+		primary: primary,
+		play: playTrack,
+		playContext: playContext,
+		toggle: togglePrimary,
 		core: {
 			createEngine: createEngine,
 			createStore: createStore,

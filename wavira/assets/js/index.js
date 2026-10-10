@@ -367,6 +367,239 @@
 	}
 
 	/**
+	 * Card play buttons: a link that plays in place when it can.
+	 *
+	 * The markup is an ordinary link to the track, so a browser with no script —
+	 * or a site with the plugin switched off — opens the page, which is what a
+	 * link has always done. When the engine is on the page the click is taken
+	 * over, the track starts in the visitor's player, and the card says so.
+	 *
+	 * @param {Object} doc Document.
+	 * @return {Object} Controller with `destroy()`.
+	 */
+	function initCardPlayback( doc ) {
+		var CARD = '[data-wavira-card]';
+		var TRIGGER = '[data-wavira-play], [data-wavira-play-context]';
+		var bridge = [];
+
+		/**
+		 * @param {*} value Post ID.
+		 * @return {number} Positive ID or zero.
+		 */
+		function postId( value ) {
+			var id = parseInt( value, 10 );
+
+			return id > 0 ? id : 0;
+		}
+
+		/**
+		 * Find the track, album or artist card that owns the playing track.
+		 *
+		 * @param {Object} detail Player event detail.
+		 * @return {Element|null} Matching card.
+		 */
+		function cardFor( detail ) {
+			var track = detail && detail.track;
+
+			if ( ! track || ! doc || 'function' !== typeof doc.querySelectorAll ) {
+				return null;
+			}
+
+			var trackId = postId( track.id );
+			var albumId = postId( track.album && track.album.id );
+			var artistId = postId( track.artist && track.artist.id );
+			var cards = doc.querySelectorAll( CARD );
+
+			for ( var index = 0; index < cards.length; index++ ) {
+				var card = cards[ index ];
+				var id = postId( card.getAttribute( 'data-wavira-post' ) );
+				var kind = card.getAttribute( 'data-wavira-kind' );
+
+				if ( ( 'wavira_track' === kind && trackId === id ) || ( 'wavira_album' === kind && albumId === id ) || ( 'wavira_artist' === kind && artistId === id ) ) {
+					return card;
+				}
+			}
+
+			return null;
+		}
+
+		/**
+		 * Clear the visual state on every card before marking the current one.
+		 *
+		 * @return {void}
+		 */
+		function clear() {
+			if ( ! doc || 'function' !== typeof doc.querySelectorAll ) {
+				return;
+			}
+
+			Array.prototype.forEach.call( doc.querySelectorAll( CARD ), function ( node ) {
+				node.classList.remove( 'is-current' );
+				node.classList.remove( 'is-playing' );
+				node.classList.remove( 'is-loading' );
+			} );
+		}
+
+		/**
+		 * Mark the player event's track as selected (and, if appropriate, playing).
+		 *
+		 * @param {Object}  detail  Player event detail.
+		 * @param {boolean} playing Whether the player is now playing.
+		 * @return {void}
+		 */
+		function syncTrack( detail, playing ) {
+			clear();
+
+			var card = cardFor( detail );
+
+			if ( ! card ) {
+				return;
+			}
+
+			card.classList.add( 'is-current' );
+
+			if ( playing ) {
+				card.classList.add( 'is-playing' );
+			}
+		}
+
+		/**
+		 * @param {Event} event Click event.
+		 * @return {void}
+		 */
+		function onClick( event ) {
+			if ( event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ) {
+				return;
+			}
+
+			var trigger = event.target && event.target.closest ? event.target.closest( TRIGGER ) : null;
+
+			if ( ! trigger ) {
+				return;
+			}
+
+			var api = global.Wavira && global.Wavira.player;
+
+			if ( ! api ) {
+				return;
+			}
+
+			var card = trigger.closest ? trigger.closest( CARD ) : null;
+			var href = trigger.getAttribute( 'href' ) || '';
+
+			// The same card toggles pause/play; another card selects and starts its
+			// item. With no engine, every control remains a normal link.
+			if ( card && card.classList.contains( 'is-playing' ) && 'function' === typeof api.toggle ) {
+				event.preventDefault();
+				api.toggle();
+				card.classList.remove( 'is-playing' );
+
+				return;
+			}
+
+			var context = trigger.getAttribute( 'data-wavira-play-context' );
+			var id = postId( trigger.getAttribute( 'data-wavira-play' ) || trigger.getAttribute( 'data-wavira-play-id' ) );
+			var started;
+
+			if ( context ) {
+				if ( 'function' !== typeof api.playContext ) {
+					return;
+				}
+
+				started = api.playContext( context, id );
+			} else {
+				if ( 'function' !== typeof api.play ) {
+					return;
+				}
+
+				started = api.play( id, trigger.getAttribute( 'data-wavira-context' ) || 'tracks' );
+			}
+
+			// No player, invalid ID or an older script: leave the anchor alone.
+			if ( ! started || 'function' !== typeof started.then ) {
+				return;
+			}
+
+			event.preventDefault();
+
+			if ( card ) {
+				clear();
+				card.classList.add( 'is-loading' );
+			}
+
+			started.then( function ( ok ) {
+				if ( card ) {
+					card.classList.remove( 'is-loading' );
+				}
+
+				if ( ! ok && href && global.location && 'function' === typeof global.location.assign ) {
+					// Playback could not start: keep the user's click useful by taking
+					// them to the same track/album page that the link promises.
+					global.location.assign( href );
+				}
+			} ).catch( function () {
+				if ( card ) {
+					card.classList.remove( 'is-loading' );
+				}
+
+				if ( href && global.location && 'function' === typeof global.location.assign ) {
+					global.location.assign( href );
+				}
+			} );
+		}
+
+		if ( ! doc || 'function' !== typeof doc.addEventListener ) {
+			return {
+				destroy: function () {}
+			};
+		}
+
+		doc.addEventListener( 'click', onClick );
+
+		// Every player mount bridges its state as DOM events. Listen to the
+		// selection, play and pause events so the card follows controls in the
+		// sticky bar as well as the overlay button on the card itself.
+		if ( 'function' === typeof doc.querySelectorAll ) {
+			Array.prototype.forEach.call( doc.querySelectorAll( '[data-wavira-player]' ), function ( mount ) {
+				var onTrack = function ( event ) {
+					syncTrack( event.detail, false );
+				};
+				var onPlay = function ( event ) {
+					syncTrack( event.detail, true );
+				};
+				var onPause = function ( event ) {
+					var card = cardFor( event.detail );
+
+					if ( card ) {
+						card.classList.remove( 'is-playing' );
+					}
+				};
+
+				mount.addEventListener( 'wavira:player:trackchange', onTrack );
+				mount.addEventListener( 'wavira:player:play', onPlay );
+				mount.addEventListener( 'wavira:player:pause', onPause );
+				bridge.push( function () {
+					mount.removeEventListener( 'wavira:player:trackchange', onTrack );
+					mount.removeEventListener( 'wavira:player:play', onPlay );
+					mount.removeEventListener( 'wavira:player:pause', onPause );
+				} );
+			} );
+		}
+
+		return {
+			destroy: function () {
+			doc.removeEventListener( 'click', onClick );
+
+			bridge.forEach( function ( off ) {
+				off();
+			} );
+
+			bridge.length = 0;
+		}
+		};
+	}
+
+	/**
 	 * Start everything that needs a document.
 	 *
 	 * @param {Object} doc     Document.
@@ -380,6 +613,7 @@
 			initPlayers( doc );
 		}
 
+		initCardPlayback( doc );
 		initBackToTop( doc );
 		initLightbox( doc );
 
@@ -397,6 +631,7 @@
 		applyMode: applyMode,
 		initThemeMode: initThemeMode,
 		initPlayers: initPlayers,
+		initCardPlayback: initCardPlayback,
 		initBackToTop: initBackToTop,
 		initLightbox: initLightbox,
 		init: init,

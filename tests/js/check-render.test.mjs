@@ -237,13 +237,16 @@ test( 'a page without the theme stylesheet is refused, not photographed', () => 
 	assert.deepEqual( dressed.problems, [] );
 } );
 
-test( 'the front page has the h1 the other templates get from their titles', () => {
-	// axe's `page-has-heading-one` fired on the rendered front page: the header
-	// renders the site title as a `<p>` (a heading on every other page comes from
-	// the post or page title), so the front page carries its own, visually hidden.
+test( 'the front-page banner is its visible h1, not a hidden heading', () => {
+	// The site title is the visitor-facing banner, not a visually hidden heading
+	// added only to silence axe. The page has one clear h1 and an obvious action.
 	const template = readFileSync( fileURLToPath( new URL( '../../wavira/templates/front-page.html', import.meta.url ) ), 'utf8' );
+	const banner = readFileSync( fileURLToPath( new URL( '../../wavira/patterns/hero-banner.php', import.meta.url ) ), 'utf8' );
 
-	assert.match( template, /wp:site-title \{"level":1,"className":"wavira-visually-hidden"\} \/\-->/ );
+	assert.match( template, /wp:pattern \{"slug":"wavira\/hero-banner"\} \/\-->/ );
+	assert.doesNotMatch( template, /wavira-visually-hidden/ );
+	assert.match( banner, /wp:site-title \{"level":1,"className":"wavira-banner__title"\} \/\-->/ );
+	assert.match( banner, /href="#listen-now"/ );
 } );
 
 test( 'a wp-content URL the render cannot reach is named, with the URL to fix', () => {
@@ -382,4 +385,15 @@ test( 'the front page uses exactly the headings the gate checks', () => {
 	};
 
 	assert.deepEqual( patterns.map( ( name ) => patternHeadings[ name ] ).sort(), [ ...FRONT_PAGE_HEADINGS ].sort() );
+} );
+
+test( 'home page gives tracks an in-place play button and the section a real archive link', () => {
+	const template = readFileSync( fileURLToPath( new URL( '../../wavira/templates/front-page.html', import.meta.url ) ), 'utf8' );
+	const trackHeading = readFileSync( fileURLToPath( new URL( '../../wavira/patterns/hidden-heading-latest-tracks.php', import.meta.url ) ), 'utf8' );
+	const tracklist = readFileSync( fileURLToPath( new URL( '../../wavira/inc/markup.php', import.meta.url ) ), 'utf8' );
+
+	assert.match( template, /wp:wavira\/tracklist \{\"source\":\"latest\",\"limit\":6/ );
+	assert.match( trackHeading, /get_post_type_archive_link\( 'wavira_track' \)/ );
+	assert.match( tracklist, /data-wavira-play=/ );
+	assert.match( tracklist, /data-wavira-context=\"tracks\"/ );
 } );

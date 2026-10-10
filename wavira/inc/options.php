@@ -901,68 +901,30 @@ function wavira_custom_logo( $html ) {
 add_filter( 'get_custom_logo', 'wavira_custom_logo' );
 
 /**
- * Whether the header's site title is the page's visible first-level heading.
+ * Whether the front page has its banner heading.
  *
- * On the front page there is no post title, so the site title in the header is
- * the only heading that can be the document's `<h1>` — and it can only be that
- * when it is actually shown: a site owner who replaced the name with a logo
- * turns it off (`show_site_title`), and then the header hides it with CSS. The
- * template carries a fallback heading for exactly that case
- * (`wavira_drop_duplicate_front_page_title()`), and both sides ask this one
- * question, so the page ends up with one `<h1>` either way and never two.
+ * The visible banner carries the site title as level one. The shared header
+ * keeps its title at level zero on every template.
  *
- * @since 0.15.0
- * @return bool True when the header's site title is the front page's heading.
+ * @return bool True on the front page.
  */
 function wavira_front_page_title_is_the_heading() {
-	return is_front_page() && wavira_option( 'show_site_title' );
+	return is_front_page();
 }
 
 /**
- * The site name is the front page's first heading, and a paragraph anywhere else.
+ * Drop an old hidden fallback heading when the banner provides one.
  *
- * The header renders the site title as a paragraph (`"level": 0`) on purpose —
- * a `<p>` in a shared header is right on a single view, where the post title is
- * the page's `<h1>`. On the front page there is no post title, so the document
- * had no `<h1>` at all (axe's `page-has-heading-one`, and the reason the front
- * page's sections hang off nothing). `render_block_data` is the hook for this:
- * it runs before the block renders, with the parsed attributes, so core builds
- * the `h1` itself instead of this theme editing core's markup with a regular
- * expression. The class and the CSS are the same for both tags
- * (`.wavira-site-title`), so nothing moves.
- *
- * @since 0.15.0
- * @param array $parsed_block Block being rendered.
- * @return array The block, with the site title promoted on the front page.
- */
-function wavira_promote_front_page_title( $parsed_block ) {
-	if (
-		isset( $parsed_block['blockName'], $parsed_block['attrs']['level'] )
-		&& 'core/site-title' === $parsed_block['blockName']
-		&& 0 === (int) $parsed_block['attrs']['level']
-		&& wavira_front_page_title_is_the_heading()
-	) {
-		$parsed_block['attrs']['level'] = 1;
-	}
-
-	return $parsed_block;
-}
-add_filter( 'render_block_data', 'wavira_promote_front_page_title' );
-
-/**
- * Drop the template's fallback heading when the header already provides one.
- *
- * `front-page.html` carries a visually hidden site title (level 1) so that a
- * logo-only header still leaves the page a first-level heading. It is a
- * fallback, not a second heading: read out by a screen reader it is the site
- * name heard twice, which is why it goes when the header's own title is the
- * `<h1>`. Removing the block beats hiding it with CSS — a hidden heading is
- * still a heading to everything that reads the document.
+ * `front-page.html` used to carry a visually hidden site title as a fallback. The
+ * visible banner now supplies the page's `<h1>` regardless of the header's
+ * display option, so retaining the old block would announce the site name
+ * twice. Removing it beats hiding it with CSS — a hidden heading is still a
+ * heading to everything that reads the document.
  *
  * @since 0.15.0
  * @param string $content Rendered block.
  * @param array  $block   Parsed block.
- * @return string The block, or an empty string when the header covers it.
+ * @return string The block, or an empty string when the banner covers it.
  */
 function wavira_drop_duplicate_front_page_title( $content, $block ) {
 	if ( 'core/site-title' !== ( isset( $block['blockName'] ) ? $block['blockName'] : '' ) ) {

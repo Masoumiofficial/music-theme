@@ -491,3 +491,133 @@ test( 'the view builder mounts the queue list and wires its toggle', () => {
 	assert.match( SOURCE, /mount\.setAttribute\( 'data-queue-open'/, 'the open state is exposed on the mount for CSS' );
 	assert.match( SOURCE, /controls\.appendChild\( queueToggle \)/, 'the toggle lives in the controls group' );
 } );
+
+test( 'a card starts its track in the sticky player and leaves the queue intact', async () => {
+	const player = loadPlayer();
+	const calls = [];
+	const items = [ track( 11 ), track( 12 ) ];
+	const ordinary = {
+		mount: { className: 'wavira-player' },
+		engine: {
+			loadQueue: ( context, args ) => {
+				calls.push( [ 'loadQueue', context, args ] );
+
+				return Promise.resolve( items );
+			},
+			setQueue: ( queue, index ) => calls.push( [ 'setQueue', queue, index ] ),
+			play: () => {
+				calls.push( [ 'play' ] );
+
+				return Promise.resolve();
+			},
+		},
+	};
+	const sticky = {
+		mount: { className: 'wavira-player wavira-player--sticky' },
+		engine: {
+			loadQueue: ( context, args ) => {
+				calls.push( [ 'stickyQueue', context, args ] );
+
+				return Promise.resolve( items );
+			},
+			setQueue: ( queue, index ) => calls.push( [ 'stickySet', queue, index ] ),
+			play: () => {
+				calls.push( [ 'stickyPlay' ] );
+
+				return Promise.resolve();
+			},
+		},
+	};
+
+	player.instances.push( ordinary, sticky );
+
+	assert.equal( await player.play( 12, 'tracks' ), true );
+	assert.equal( player.primary(), sticky );
+	assert.equal( calls[ 0 ][ 0 ], 'stickyQueue' );
+	assert.equal( calls.find( ( call ) => 'stickySet' === call[ 0 ] )[ 2 ], 1 );
+	assert.equal( calls.some( ( call ) => 'stickyPlay' === call[ 0 ] ), true );
+} );
+
+test( 'a card can play a track outside the current queue and still advance from it', async () => {
+	const player = loadPlayer();
+	const calls = [];
+	const original = [ track( 21 ) ];
+	const requested = track( 29 );
+	player.instances.push( {
+		mount: { className: 'wavira-player wavira-player--sticky' },
+		engine: {
+			loadQueue: () => Promise.resolve( original ),
+			loadTrack: ( id, autoplay ) => {
+				calls.push( [ 'loadTrack', id, autoplay ] );
+
+				return Promise.resolve( requested );
+			},
+			setQueue: ( queue, index ) => calls.push( [ 'setQueue', queue, index ] ),
+			play: () => Promise.resolve(),
+		},
+	} );
+
+	assert.equal( await player.play( 29, 'tracks' ), true );
+	const selected = calls.filter( ( call ) => 'setQueue' === call[ 0 ] ).at( -1 );
+
+	assert.equal( selected[ 1 ].length, 2 );
+	assert.equal( selected[ 1 ][ 1 ].id, 29 );
+	assert.equal( selected[ 2 ], 1 );
+	assert.deepEqual( calls.find( ( call ) => 'loadTrack' === call[ 0 ] ), [ 'loadTrack', 29, false ] );
+} );
+
+test( 'a card plays the selected album or artist queue', async () => {
+	const player = loadPlayer();
+	const calls = [];
+	const items = [ track( 31 ), track( 32 ) ];
+	player.instances.push( {
+		mount: { className: 'wavira-player wavira-player--sticky' },
+		engine: {
+			loadQueue: ( context, args ) => {
+				calls.push( [ 'loadQueue', context, args ] );
+
+				return Promise.resolve( items );
+			},
+			setQueue: ( queue, index ) => calls.push( [ 'setQueue', index ] ),
+			play: () => Promise.resolve(),
+		},
+	} );
+
+	assert.equal( await player.playContext( 'album', 91 ), true );
+	assert.deepEqual( plain( calls[ 0 ] ), [ 'loadQueue', 'album', { id: 91, slug: '', limit: 0 } ] );
+	assert.deepEqual( plain( calls[ 1 ] ), [ 'setQueue', 0 ] );
+} );
+
+test( 'every player quietly preloads its queue before the visitor presses play', () => {
+	assert.match( SOURCE, /controller\s*\.load\(\)\s*\.then\(/ );
+	assert.match( SOURCE, /alreadyMounted = instances\.some/ );
+	assert.match( SOURCE, /if \( mount\.getAttribute\( 'data-autoplay' \) \|\| settings\.defaults\.autoplayOnLoad \)/ );
+} );
+
+test( 'a card pauses the player that is actually playing when the page has two mounts', async () => {
+	const player = loadPlayer();
+	const calls = [];
+	player.instances.push(
+		{
+			mount: { className: 'wavira-player wavira-player--sticky' },
+			engine: {
+				field: () => false,
+				toggle: () => calls.push( 'idle sticky' ),
+			},
+		},
+		{
+			mount: { className: 'wavira-player' },
+			engine: {
+				field: () => true,
+				toggle: () => {
+					calls.push( 'active inline' );
+
+					return Promise.resolve();
+				},
+			},
+		}
+	);
+
+	assert.equal( await player.toggle(), true );
+	assert.deepEqual( calls, [ 'active inline' ] );
+} );

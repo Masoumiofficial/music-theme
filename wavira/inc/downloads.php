@@ -126,6 +126,12 @@ if ( ! function_exists( 'wavira_get_download' ) ) {
 				if ( $sizes ) {
 					$size = wavira_download_size_label( wavira_download_file_size( $post_id, (int) $item['quality'], $type ) );
 
+					// The quality label beside it is Persian; the size has to be
+					// too, or the pair reads «۳۲۰ کیلوبیت‌برثانیه  94 کیلوبایت».
+					if ( '' !== $size && function_exists( 'wavira_core_digits' ) ) {
+						$size = wavira_core_digits( $size );
+					}
+
 					if ( '' !== $size ) {
 						$suffix .= ' <span class="wavira-download__meta">' . esc_html( $size ) . '</span>';
 					}

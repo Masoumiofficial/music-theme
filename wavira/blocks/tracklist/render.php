@@ -25,17 +25,47 @@ if ( $wavira_album_id < 1 ) {
 	$wavira_album_id = (int) get_the_ID();
 }
 
+$wavira_source = isset( $attributes['source'] ) ? (string) $attributes['source'] : 'album';
+$wavira_ids    = array();
+
+if ( 'latest' === $wavira_source ) {
+	$wavira_limit = isset( $attributes['limit'] ) ? absint( $attributes['limit'] ) : 6;
+	$wavira_limit = max( 1, min( 12, $wavira_limit > 0 ? $wavira_limit : 6 ) );
+
+	$wavira_query = new WP_Query(
+		array(
+			'post_type'      => 'wavira_track',
+			'post_status'    => 'publish',
+			'posts_per_page' => $wavira_limit > 0 ? $wavira_limit : 6,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+		)
+	);
+
+	$wavira_ids = $wavira_query->posts;
+}
+
 $wavira_markup = wavira_get_tracklist(
 	$wavira_album_id,
 	array(
 		'show_duration' => ! isset( $attributes['showDuration'] ) || (bool) $attributes['showDuration'],
 		'show_subtitle' => ! isset( $attributes['showSubtitle'] ) || (bool) $attributes['showSubtitle'],
 		'show_download' => ! isset( $attributes['showDownload'] ) || (bool) $attributes['showDownload'],
+		'show_play'     => ! isset( $attributes['showPlay'] ) || (bool) $attributes['showPlay'],
+		'ids'           => $wavira_ids,
 	)
 );
 
 if ( '' === $wavira_markup ) {
-	wavira_block_placeholder( __( 'No published tracks in this album yet.', 'wavira' ) );
+	// «Nothing here yet» is a different sentence for a section of the home page
+	// than for an album that has not been filled in.
+	wavira_block_placeholder(
+		'latest' === $wavira_source
+			? __( 'No published tracks yet.', 'wavira' )
+			: __( 'No published tracks in this album yet.', 'wavira' )
+	);
 
 	return;
 }

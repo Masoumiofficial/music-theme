@@ -44,6 +44,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   what the visitor expects. A browser without `showModal` keeps the working link and loads no polyfill
   (ADR 0006), which is why the theme still works when JavaScript fails.
 
+
+- **A front page with a first impression.** The visible site title is now the
+  banner’s single `<h1>`, not a hidden heading; its «همین حالا بشنوید» button
+  lands on the player section. Latest tracks are a proper listening list —
+  numbered, timed rows, each with an in-place play control and a download —
+  instead of a third, indistinguishable cover grid. Album, track and video headings lead to
+  their corresponding archive pages.
+- **Play and download from the cards.** Album, track and artist cards have a
+  glass play button; any file the download rules actually allow has a download
+  button. Hover reveals the controls on a pointer, focus reveals them to a
+  keyboard user, touch keeps them visible, and a page without JavaScript still
+  follows the card link. The player queues before the first tap without
+  autoplaying, the sticky player owns card playback, and a failed play follows
+  the link instead of swallowing it. Cards in the shared WordPress query loop
+  and the artist-profile work lists use the same controls.
+- **The download labels read Persian end to end.** Size digits use Persian
+  numerals too, and «کیلوبیت‌برثانیه» carries the نیم‌فاصله.
+
 ### Fixed — 0.15.0
 
 - **The player is not an empty box any more.** Two defects, one cause each: the
@@ -56,21 +74,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   arrives `hidden` and is revealed with the track's own title, and the render job
   measures both: the player verdict, and the landmark/link counts in an
   annotation of their own.
-- **The front page has an `<h1>`.** The header renders the site title as a
-  paragraph on purpose — on a single view the post title is the page's `<h1>` —
-  which left the front page with no first-level heading, and its sections hanging
-  off nothing. `render_block_data` promotes the site title's `level` on the front
-  page only, so core builds the tag; `.wavira-site-title` pins the font family
-  and line box the `h1` rule would otherwise change, so the header does not move.
+- **The front page has a visible `<h1>`.** The shared header stays a paragraph;
+  the full-width banner renders the site title itself as level one. It has a
+  purpose, a translated tagline and a button that lands at the player. The
+  heading is part of the design, not hidden markup added to satisfy axe.
 
-- **One `<h1>`, not two — and only one footer.** The front page template also
-  carried a visually hidden site title, a fallback for a logo-only header. With
-  the header's title promoted that became two first-level headings, so the page
-  read the site name twice. Both sides now ask one question
-  (`wavira_front_page_title_is_the_heading()`): the header promotes its title
-  when the title is shown, and the fallback is *removed* — not hidden — when it
-  is, so a logo-only site still has its heading and a titled site has exactly
-  one.
+- **One `<h1>`, not two — and only one footer.** The first banner pass promoted
+  the header title *and* added a banner title; the real render showed the site
+  name twice. The header's promotion is removed. The banner is the single h1,
+  and the old visually hidden fallback is removed on the front page, independent
+  of the header display option; single pages keep their own post-title h1.
 - **The sticky player bar is not a second footer.** The template part was
   registered in the `footer` area, and core renders a part with its area's tag
   when the template does not name one — so every page shipped two `<footer>`

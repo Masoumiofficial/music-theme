@@ -55,7 +55,7 @@ if ( ! function_exists( 'wavira_block_editor_strings' ) ) {
 		// One statement per string: a four-row array of these keys would have to be
 		// padded to its longest key, and the padding is unreadable next to a
 		// sentence. The key is the English source, which is also the gettext msgid.
-		$strings['Tracklist of the album chosen in the sidebar.'] = __( 'Tracklist of the album chosen in the sidebar.', 'wavira' );
+		$strings['An album’s ordered tracks or the newest tracks on this site.'] = __( 'An album’s ordered tracks or the newest tracks on this site.', 'wavira' );
 
 		$strings['Player for an album, artist or genre queue.'] = __( 'Player for an album, artist or genre queue.', 'wavira' );
 

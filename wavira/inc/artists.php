@@ -222,6 +222,8 @@ if ( ! function_exists( 'wavira_get_artist_works' ) ) {
 				$html .= '<li class="wavira-cards__item">';
 				$html .= wavira_get_card(
 					array(
+						'id'         => isset( $item['id'] ) ? absint( $item['id'] ) : 0,
+						'type'       => isset( $item['type'] ) ? (string) $item['type'] : '',
 						'title'      => isset( $item['title'] ) ? (string) $item['title'] : '',
 						'permalink'  => isset( $item['permalink'] ) ? (string) $item['permalink'] : '',
 						'subtitle'   => isset( $item['subtitle'] ) ? (string) $item['subtitle'] : '',

@@ -261,3 +261,91 @@ test( 'the storage key matches the one PHP prints', () => {
 		'the server and the script must agree on the storage key'
 	);
 } );
+
+test( 'a card starts playback in place and keeps the page link as its failure fallback', async () => {
+	const calls = [];
+	const navigations = [];
+	const sandbox = { console };
+
+	sandbox.window = sandbox;
+	sandbox.location = { assign: ( url ) => navigations.push( url ) };
+	sandbox.Wavira = {
+		player: {
+			play: ( id, context ) => {
+				calls.push( [ 'play', id, context ] );
+
+				return Promise.resolve( true );
+			},
+			playContext: ( context, id ) => {
+				calls.push( [ 'context', context, id ] );
+
+				return Promise.resolve( true );
+			},
+			toggle: () => Promise.resolve( true ),
+		},
+	};
+
+	const theme = vm.runInNewContext( SOURCE + '\nwindow.Wavira.theme;', vm.createContext( sandbox ), {
+		filename: 'wavira/assets/js/index.js',
+	} );
+	const classes = new Set();
+	const card = {
+		getAttribute: ( name ) => ( 'data-wavira-kind' === name ? 'wavira_track' : '22' ),
+		classList: {
+			add: ( name ) => classes.add( name ),
+			remove: ( name ) => classes.delete( name ),
+			contains: ( name ) => classes.has( name ),
+		},
+	};
+	const trigger = {
+		getAttribute: ( name ) => ( {
+			href: '/tracks/song/',
+			'data-wavira-play': '22',
+			'data-wavira-context': 'tracks',
+		}[ name ] || null ),
+		closest: ( selector ) => ( selector.includes( 'data-wavira-play' ) ? trigger : card ),
+	};
+	const handlers = {};
+	const doc = {
+		addEventListener: ( name, handler ) => {
+			handlers[ name ] = handler;
+		},
+		removeEventListener: ( name ) => {
+			delete handlers[ name ];
+		},
+		querySelectorAll: ( selector ) => ( '[data-wavira-card]' === selector ? [ card ] : [] ),
+	};
+	let prevented = false;
+
+	theme.initCardPlayback( doc );
+	handlers.click( {
+		button: 0,
+		target: trigger,
+		preventDefault: () => {
+			prevented = true;
+		},
+	} );
+
+	await Promise.resolve();
+	await Promise.resolve();
+
+	assert.deepEqual( calls, [ [ 'play', 22, 'tracks' ] ] );
+	assert.equal( prevented, true );
+	assert.equal( classes.has( 'is-loading' ), false );
+	assert.equal( navigations.length, 0 );
+
+	sandbox.Wavira.player.play = () => Promise.resolve( false );
+	prevented = false;
+	handlers.click( {
+		button: 0,
+		target: trigger,
+		preventDefault: () => {
+			prevented = true;
+		},
+	} );
+	await Promise.resolve();
+	await Promise.resolve();
+
+	assert.equal( prevented, true );
+	assert.deepEqual( navigations, [ '/tracks/song/' ], 'a failed play still follows the link to the track page' );
+} );

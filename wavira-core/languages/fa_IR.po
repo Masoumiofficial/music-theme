@@ -21,7 +21,7 @@ msgstr ""
 #: wavira-core/src/Downloads/Sources.php:216
 #. translators: %d: audio bitrate in kbps.
 msgid "%d kbps"
-msgstr "%d کیلوبیتبرثانیه"
+msgstr "%d کیلوبیت‌برثانیه"
 
 #: wavira-core/src/Downloads/Sources.php:208
 #. translators: %d: video frame height in pixels, e.g. 720.

@@ -625,95 +625,45 @@ class Test_Theme_Options extends Wavira_Test_Case {
 	}
 
 	/**
-	 * The front page promotes the site title, and only when it is shown.
-	 *
-	 * The header renders it as a paragraph on purpose — on a single view the post
-	 * title is the `<h1>` — which left the front page with no first-level heading
-	 * at all (`page-has-heading-one`, and the sections hanging off nothing).
-	 * `render_block_data` changes the block's `level` attribute before it renders,
-	 * so core builds the tag itself rather than this theme editing core's markup,
-	 * and the class's CSS pins what the `h1` element rule would otherwise change
-	 * so the header does not move.
+	 * The visible banner owns the front page's h1; the shared header is not one.
 	 *
 	 * @return void
 	 */
-	public function test_the_front_page_promotes_the_site_title() {
-		$block = array(
-			'blockName' => 'core/site-title',
-			'attrs'     => array( 'level' => 0 ),
-		);
-
+	public function test_the_front_page_banner_is_its_heading() {
 		$this->go_to( home_url( '/' ) );
+		$this->assertTrue( is_front_page() );
 
-		$this->assertTrue( is_front_page(), 'the query is the front page' );
-		$this->assertSame( 1, wavira_promote_front_page_title( $block )['attrs']['level'], 'the site title is the h1 there' );
+		$header = (string) file_get_contents( WAVIRA_THEME_DIR . 'parts/header.html' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- repository template under test.
+		$banner = (string) file_get_contents( WAVIRA_THEME_DIR . 'patterns/hero-banner.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- repository pattern under test.
 
-		$page = self::factory()->post->create( array( 'post_type' => 'page', 'post_title' => 'A page' ) );
-
-		$this->go_to( get_permalink( $page ) );
-
-		$this->assertFalse( is_front_page(), 'the query is a page now' );
-		$this->assertSame( 0, wavira_promote_front_page_title( $block )['attrs']['level'], 'and a paragraph everywhere else' );
-
-		$this->go_to( home_url( '/' ) );
-		set_theme_mod( 'wavira_show_site_title', false );
-
-		$this->assertSame(
-			0,
-			wavira_promote_front_page_title( $block )['attrs']['level'],
-			'a logo-only header has no heading to promote — the template keeps its own'
-		);
-
-		remove_theme_mod( 'wavira_show_site_title' );
-
-		$this->assertSame(
-			array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ),
-			wavira_promote_front_page_title( array( 'blockName' => 'core/navigation', 'attrs' => array( 'level' => 0 ) ) ),
-			'another block is left alone'
-		);
-
-		$this->assertSame(
-			array( 'blockName' => 'core/site-title' ),
-			wavira_promote_front_page_title( array( 'blockName' => 'core/site-title' ) ),
-			'so is a site title without the attribute'
-		);
+		$this->assertStringContainsString( 'wp:site-title {"level":0,"className":"wavira-site-title"}', $header );
+		$this->assertStringContainsString( 'wp:site-title {"level":1,"className":"wavira-banner__title"}', $banner );
+		$this->assertFalse( has_filter( 'render_block_data', 'wavira_promote_front_page_title' ), 'the header title must not become a second h1' );
 	}
 
 	/**
-	 * The template's fallback heading goes when the header provides one.
-	 *
-	 * `front-page.html` carries a visually hidden site title so that a logo-only
-	 * header still leaves the page an `<h1>`. It is a fallback: with the header's
-	 * own title promoted, keeping it means the site name is a heading twice, which
-	 * is what a screen reader reads out. One question decides both sides, so the
-	 * page has exactly one `<h1>` either way.
+	 * An obsolete hidden heading goes when the visible banner supplies the h1.
 	 *
 	 * @return void
 	 */
-	public function test_the_fallback_heading_is_dropped_when_the_header_has_one() {
+	public function test_the_old_fallback_heading_is_dropped_when_the_banner_has_one() {
 		$fallback = array(
 			'blockName' => 'core/site-title',
 			'attrs'     => array( 'level' => 1, 'className' => 'wavira-visually-hidden' ),
 		);
-
-		$block = array( 'blockName' => 'core/site-title', 'attrs' => array( 'level' => 0, 'className' => 'wavira-site-title' ) );
+		$header = array( 'blockName' => 'core/site-title', 'attrs' => array( 'level' => 0, 'className' => 'wavira-site-title' ) );
 
 		$this->go_to( home_url( '/' ) );
-
-		$this->assertSame( '', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'the header is the h1, so the fallback goes' );
-		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $block ), 'the header title itself is not the fallback' );
+		$this->assertSame( '', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ) );
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $header ) );
 
 		set_theme_mod( 'wavira_show_site_title', false );
-
-		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'and it stays when the header has no heading' );
-
+		$this->assertSame( '', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'the banner is independent of the header visibility option' );
 		remove_theme_mod( 'wavira_show_site_title' );
 
 		$this->go_to( get_permalink( self::factory()->post->create( array( 'post_type' => 'page' ) ) ) );
-
-		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'other pages are none of this filter business' );
-
-		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', array( 'blockName' => 'core/navigation' ) ), 'so is another block' );
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', $fallback ), 'other pages are outside this front-page filter' );
+		$this->assertSame( 'rendered', wavira_drop_duplicate_front_page_title( 'rendered', array( 'blockName' => 'core/navigation' ) ) );
 	}
 
 	/**

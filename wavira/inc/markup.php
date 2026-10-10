@@ -52,21 +52,54 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 	 * @return string Markup, empty string when there is nothing to show.
 	 */
 	function wavira_get_tracklist( $album_id, $args = array() ) {
-		$args     = wp_parse_args(
+		$has_explicit_ids = is_array( $args ) && array_key_exists( 'ids', $args );
+		$args             = wp_parse_args(
 			$args,
 			array(
 				'show_duration' => true,
 				'show_subtitle' => true,
 				'show_download' => true,
+				'show_play'     => true,
+				'ids'           => array(),
 			)
 		);
-		$album_id = absint( $album_id );
 
-		if ( $album_id < 1 || ! function_exists( 'wavira_core_album_tracklist' ) ) {
+		// An album's own order, or a list somebody else chose — a section of the
+		// home page says «the newest tracks», which is not an album's business.
+		if ( $has_explicit_ids ) {
+			$rows = array();
+
+			foreach ( (array) $args['ids'] as $track_id ) {
+				$payload = function_exists( 'wavira_core_track_playback' )
+					? wavira_core_track_playback( (int) $track_id )
+					: array();
+
+				if ( empty( $payload['id'] ) ) {
+					continue;
+				}
+
+				$subtitle = '';
+
+				if ( ! empty( $payload['artist']['name'] ) ) {
+					$subtitle = (string) $payload['artist']['name'];
+				} elseif ( ! empty( $payload['album']['title'] ) ) {
+					$subtitle = (string) $payload['album']['title'];
+				}
+
+				$rows[] = array(
+					'id'             => (int) $payload['id'],
+					'title'          => (string) $payload['title'],
+					'subtitle'       => $subtitle,
+					'permalink'      => (string) $payload['permalink'],
+					'duration'       => (int) ( $payload['duration'] ?? 0 ),
+					'duration_label' => (string) ( $payload['duration_label'] ?? '' ),
+				);
+			}
+		} elseif ( absint( $album_id ) > 0 && function_exists( 'wavira_core_album_tracklist' ) ) {
+			$rows = wavira_core_album_tracklist( absint( $album_id ) );
+		} else {
 			return '';
 		}
-
-		$rows = wavira_core_album_tracklist( $album_id );
 
 		if ( array() === $rows ) {
 			return '';
@@ -77,7 +110,12 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 		foreach ( $rows as $index => $row ) {
 			$subtitle = isset( $row['subtitle'] ) ? (string) $row['subtitle'] : '';
 
-			$html .= '<li class="wavira-tracklist__item">';
+			$item_class = 'wavira-tracklist__item' . ( $args['show_play'] ? ' has-wavira-actions' : '' );
+			$card_attrs = $args['show_play']
+				? ' data-wavira-card data-wavira-post="' . absint( $row['id'] ) . '" data-wavira-kind="wavira_track"'
+				: '';
+			$html      .= '<li class="' . esc_attr( $item_class ) . '"' . $card_attrs . '>';
+
 			$html .= '<span class="wavira-tracklist__index" aria-hidden="true">' . esc_html( wavira_core_digits( $index + 1 ) ) . '</span>';
 			$html .= '<span class="wavira-tracklist__title">';
 			$html .= '<a href="' . esc_url( (string) $row['permalink'] ) . '">' . esc_html( (string) $row['title'] ) . '</a>';
@@ -90,6 +128,19 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 
 			if ( $args['show_duration'] && '' !== (string) $row['duration_label'] ) {
 				$html .= '<span class="wavira-tracklist__duration">' . esc_html( (string) $row['duration_label'] ) . '</span>';
+			}
+
+			// A row must play without making a visitor open a second page. The
+			// ordinary link remains useful when the engine is not available.
+			if ( $args['show_play'] && function_exists( 'wavira_card_action_icon' ) ) {
+				/* translators: %s: the name of the track being played. */
+				$play_label = sprintf( __( 'Play: %s', 'wavira' ), (string) $row['title'] );
+				$html .= '<span class="wavira-tracklist__play">';
+				$html .= '<a class="wavira-card__action wavira-card__action--play"';
+				$html .= ' href="' . esc_url( (string) $row['permalink'] ) . '"';
+				$html .= ' data-wavira-play="' . absint( $row['id'] ) . '"';
+				$html .= ' data-wavira-context="tracks" aria-label="' . esc_attr( $play_label ) . '">';
+				$html .= wavira_card_action_icon( 'play' ) . '</a></span>';
 			}
 
 			// One download link per row, only when that track has a file: an album
@@ -354,6 +405,11 @@ if ( ! function_exists( 'wavira_get_card' ) ) {
 		$image     = isset( $card['image'] ) ? (array) $card['image'] : array();
 		$level     = isset( $card['level'] ) ? (string) $card['level'] : 'h3';
 		$class     = isset( $card['class'] ) ? trim( 'wavira-card ' . (string) $card['class'] ) : 'wavira-card';
+		$post_id   = isset( $card['id'] ) ? absint( $card['id'] ) : 0;
+		$post_type = isset( $card['type'] ) ? sanitize_key( (string) $card['type'] ) : '';
+		$actions   = $post_id > 0 && '' !== $post_type && function_exists( 'wavira_card_actions' )
+			? wavira_card_actions( $post_id, $post_type )
+			: '';
 
 		if ( ! in_array( $level, array( 'h2', 'h3', 'h4' ), true ) ) {
 			$level = 'h3';
@@ -373,9 +429,24 @@ if ( ! function_exists( 'wavira_get_card' ) ) {
 
 		$heading .= '</' . $level . '>';
 
-		$html = '<article class="' . esc_attr( $class ) . '">';
-
 		$media = wavira_get_image( $image, 'wavira-cover-sm', 'wavira-card__image' );
+
+		if ( '' !== $actions ) {
+			$class .= ' has-wavira-actions';
+
+			if ( '' === $media ) {
+				$class .= ' has-wavira-actions--row';
+			}
+		}
+
+		$card_attributes = '';
+
+		if ( '' !== $actions ) {
+			$card_attributes = ' data-wavira-card data-wavira-post="' . $post_id
+				. '" data-wavira-kind="' . esc_attr( $post_type ) . '"';
+		}
+
+		$html = '<article class="' . esc_attr( $class ) . '"' . $card_attributes . '>';
 
 		if ( '' !== $media ) {
 			$html .= '<figure class="wavira-card__media">';
@@ -426,7 +497,7 @@ if ( ! function_exists( 'wavira_get_card' ) ) {
 			$html .= '<p class="wavira-card__meta"><time datetime="' . esc_attr( gmdate( 'c', $date ) ) . '">' . esc_html( $date_html ) . '</time></p>';
 		}
 
-		$html .= '</div></article>';
+		$html .= '</div>' . $actions . '</article>';
 
 		return $html;
 	}

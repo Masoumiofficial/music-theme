@@ -22,6 +22,7 @@ require_once WAVIRA_THEME_DIR . 'inc/site-defaults.php';
 require_once WAVIRA_THEME_DIR . 'inc/customizer.php';
 require_once WAVIRA_THEME_DIR . 'inc/admin-panel.php';
 require_once WAVIRA_THEME_DIR . 'inc/markup.php';
+require_once WAVIRA_THEME_DIR . 'inc/cards.php';
 require_once WAVIRA_THEME_DIR . 'inc/downloads.php';
 require_once WAVIRA_THEME_DIR . 'inc/hooks.php';
 require_once WAVIRA_THEME_DIR . 'inc/performance.php';

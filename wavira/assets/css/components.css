@@ -50,11 +50,8 @@
 	min-block-size: var(--wavira-header-height);
 }
 
-/* The site title is a `<p>` in the header and an `<h1>` on the front page
-   (`wavira_promote_front_page_title()`), and the two have to measure the same:
-   `h1` would take the display font and a tighter line box from base.css, so the
-   header would change shape on the front page and nowhere else. Every property
-   the element rule sets that the class does not is pinned here. */
+/* The site title stays a paragraph in the shared header. The front-page banner
+   owns the visible h1; the header's size and line box do not change by template. */
 .wavira-site-title {
 	margin: 0;
 	font-family: inherit;
@@ -323,8 +320,17 @@
 	font-variant-numeric: tabular-nums;
 }
 
+.wavira-tracklist__play,
 .wavira-tracklist__download {
+	display: inline-flex;
 	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+}
+
+.wavira-tracklist__play .wavira-card__action {
+	inline-size: 2.5rem;
+	block-size: 2.5rem;
 }
 
 .wavira-tracklist__download .wavira-download {
@@ -501,6 +507,7 @@
 }
 
 .wavira-card {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	inline-size: 100%;
@@ -1038,4 +1045,328 @@ body.wavira-no-player {
 	color: var(--wp--preset--color--muted);
 	font-size: var(--wp--preset--font-size--small, 0.875rem);
 	margin-block-start: var(--wp--preset--spacing--20, 0.5rem);
+}
+
+/* ---- card actions (play and download on the cover) --------------------- */
+
+/*
+ * A grid of covers is a shop window, so every card that has something to play
+ * or to hand over says so on itself. The controls are quiet until the card is
+ * pointed at — and loud the moment it is touched, because a phone has no hover
+ * to wait for.
+ */
+
+.has-wavira-actions {
+	position: relative;
+}
+
+.wavira-card__actions {
+	position: absolute;
+	inset-block-start: var(--wp--preset--spacing--20, 0.5rem);
+	inset-inline-end: var(--wp--preset--spacing--20, 0.5rem);
+	z-index: 2;
+	display: flex;
+	gap: var(--wp--preset--spacing--10, 0.25rem);
+	opacity: 0;
+	transform: translateY(calc(-1 * var(--wp--preset--spacing--10, 0.25rem)));
+	transition:
+		opacity var(--wp--custom--motion--fast, 120ms) ease,
+		transform var(--wp--custom--motion--fast, 120ms) ease;
+}
+
+.wp-block-post:hover .wavira-card__actions,
+.wavira-card:hover .wavira-card__actions,
+.wavira-card__actions:focus-within,
+.has-wavira-actions.is-current .wavira-card__actions,
+.has-wavira-actions.is-playing .wavira-card__actions,
+.has-wavira-actions.is-loading .wavira-card__actions {
+	opacity: 1;
+	transform: none;
+}
+
+/*
+ * No pointer to hover with: the controls stay where they are. Hiding them
+ * behind a tap that has to guess is how a mobile card loses its player.
+ */
+@media (hover: none) {
+	.wavira-card__actions {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.wavira-card__action {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 2.25rem;
+	block-size: 2.25rem;
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wp--custom--radius--pill, 999px);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	color: var(--wp--preset--color--contrast);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
+	text-decoration: none;
+	transition:
+		background var(--wp--custom--motion--fast, 120ms) ease,
+		color var(--wp--custom--motion--fast, 120ms) ease,
+		border-color var(--wp--custom--motion--fast, 120ms) ease;
+}
+
+.wavira-card__action:hover,
+.wavira-card__action:focus-visible {
+	color: var(--wp--preset--color--base);
+	background: var(--wp--preset--color--primary);
+	border-color: var(--wp--preset--color--primary);
+}
+
+/* The one a visitor reaches for first is the one that looks like a button. */
+.wavira-card__action--play {
+	color: var(--wp--preset--color--base);
+	background: var(--wp--preset--color--primary);
+	border-color: var(--wp--preset--color--primary);
+}
+
+.wavira-card__action--play:hover,
+.wavira-card__action--play:focus-visible {
+	background: var(--wp--preset--color--primary-dark, var(--wp--preset--color--primary));
+}
+
+.wavira-card__icon {
+	inline-size: 1.25rem;
+	block-size: 1.25rem;
+}
+
+/* The card whose track is in the player: a ring, and the controls stay put. */
+.has-wavira-actions.is-playing .wavira-card__action--play {
+	box-shadow:
+		var(--wavira-glass-shadow),
+		0 0 0 2px var(--wavira-ring, var(--wp--preset--color--accent));
+}
+
+/* A card with no cover has nothing to float over: the row sits under it. */
+.has-wavira-actions--row .wavira-card__actions {
+	position: static;
+	margin-block-start: var(--wp--preset--spacing--20, 0.5rem);
+	opacity: 1;
+	transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wavira-card__actions,
+	.wavira-card__action,
+	.wavira-section--tracklist .wavira-tracklist__item {
+		transition: none;
+	}
+}
+
+/* ---- section head ------------------------------------------------------- */
+
+/*
+ * A heading that opens a list on its own promises more than the list shows:
+ * the link next to it is where the rest of that list lives.
+ */
+
+.wavira-section__head {
+	align-items: baseline;
+	gap: var(--wp--preset--spacing--30, 0.75rem);
+	margin-block-end: var(--wp--preset--spacing--40, 1rem);
+	border-block-end: 1px solid var(--wavira-hairline, var(--wp--preset--color--border));
+	padding-block-end: var(--wp--preset--spacing--20, 0.5rem);
+}
+
+.wavira-section__head > .wp-block-heading {
+	margin: 0;
+}
+
+.wavira-section__more {
+	margin: 0;
+	font-size: var(--wp--preset--font-size--small, 0.9rem);
+}
+
+.wavira-section__more a {
+	color: var(--wp--preset--color--muted);
+	text-decoration: none;
+}
+
+.wavira-section__more a:hover,
+.wavira-section__more a:focus-visible {
+	color: var(--wp--preset--color--primary);
+	text-decoration: underline;
+}
+
+/* ---- banner ------------------------------------------------------------- */
+
+/*
+ * The front page's heading: the site's own name, set large, on a panel of the
+ * site's glass. No photograph is asked for — a theme that only looks right once
+ * somebody has art-directed it is a theme that looks unfinished out of the box.
+ */
+
+.wavira-banner {
+	margin-block-end: var(--wp--preset--spacing--60, 2.5rem);
+	padding: clamp(2.5rem, 7vw, 5.5rem) var(--wp--preset--spacing--50, 1.5rem);
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wp--custom--radius--lg, 20px);
+	background:
+		radial-gradient(120% 130% at 100% 0%, color-mix(in srgb, var(--wp--preset--color--accent) 14%, transparent), transparent 62%),
+		radial-gradient(90% 120% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent), transparent 58%),
+		var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
+	text-align: center;
+}
+
+.wavira-banner__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--wp--preset--spacing--30, 0.75rem);
+}
+
+/* The site name is the page heading here, so it is set like one. */
+.wavira-banner__title {
+	margin: 0;
+	font-size: clamp(2rem, 6vw, 3.25rem);
+	line-height: 1.15;
+}
+
+.wavira-banner__title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.wavira-banner__tagline {
+	margin: 0;
+	max-inline-size: var(--wavira-measure, 46rem);
+	color: var(--wp--preset--color--muted);
+}
+
+.wavira-banner__actions {
+	margin-block-start: var(--wp--preset--spacing--20, 0.5rem);
+}
+
+/* The latest-track section is an actual listening list, not another cover grid. */
+.wavira-section--tracklist .wavira-tracklist {
+	display: grid;
+	gap: var(--wp--preset--spacing--20, 0.5rem);
+	border-block-start: 0;
+}
+
+.wavira-section--tracklist .wavira-tracklist__item {
+	min-inline-size: 0;
+	padding: var(--wp--preset--spacing--20, 0.5rem);
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: inset 0 1px 0 0 var(--wavira-glass-highlight);
+	transition: background var(--wp--custom--motion--fast, 120ms) ease;
+}
+
+.wavira-section--tracklist .wavira-tracklist__item:hover {
+	background: var(--wavira-glass-bg-soft);
+}
+
+.wavira-tracklist__title {
+	line-height: 1.5;
+}
+
+.wavira-tracklist__play .wavira-card__action,
+.wavira-tracklist__download .wavira-download__link {
+	min-inline-size: 2.75rem;
+	min-block-size: 2.75rem;
+}
+
+@media (max-width: 560px) {
+	.wavira-tracklist__item {
+		flex-wrap: wrap;
+	}
+
+	.wavira-tracklist__title {
+		flex: 1 1 calc(100% - 3rem);
+	}
+
+	.wavira-tracklist__duration {
+		margin-inline-start: 2.75rem;
+	}
+}
+
+.wavira-section--listen {
+	scroll-margin-block-start: calc(var(--wavira-header-height, 4.5rem) + var(--wp--preset--spacing--30, 0.75rem));
+}
+
+
+/* ---- query-loop cards (home, archives, search and video) ---------------- */
+
+.wp-block-post-template > .wp-block-post {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-inline-size: 0;
+	overflow: hidden;
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wavira-cover-radius);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
+}
+
+.wp-block-post-template > .wp-block-post .wp-block-post-featured-image {
+	margin: 0;
+}
+
+.wp-block-post-template > .wp-block-post .wp-block-post-featured-image img {
+	display: block;
+}
+
+.wp-block-post-template > .wp-block-post > .wp-block-post-title,
+.wp-block-post-template > .wp-block-post > .wp-block-post-terms,
+.wp-block-post-template > .wp-block-post > .wp-block-post-excerpt,
+.wp-block-post-template > .wp-block-post > .wp-block-post-date {
+	margin-inline: var(--wp--preset--spacing--40, 1rem);
+}
+
+.wp-block-post-template > .wp-block-post > .wp-block-post-title {
+	margin-block: var(--wp--preset--spacing--30, 0.75rem) var(--wp--preset--spacing--20, 0.5rem);
+}
+
+.wp-block-post-template > .wp-block-post > .wp-block-post-excerpt {
+	color: var(--wp--preset--color--muted);
+}
+
+.wp-block-post-template > .wp-block-post > .wp-block-post-date {
+	margin-block: 0 var(--wp--preset--spacing--40, 1rem);
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+/* Music videos are landscape: don't crop the poster to a square like an album. */
+.wavira-video-grid .wp-block-post-featured-image img {
+	aspect-ratio: 16 / 9;
+}
+
+/* ---- single-page hero --------------------------------------------------- */
+
+.wavira-hero {
+	padding-inline: var(--wp--preset--spacing--40, 1rem);
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wp--custom--radius--lg, 20px);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
+}
+
+@media (min-width: 768px) {
+	.wavira-hero {
+		padding-inline: var(--wp--preset--spacing--50, 1.5rem);
+	}
+}
+
+@media (pointer: coarse) {
+	.wavira-card__action {
+		inline-size: 2.75rem;
+		block-size: 2.75rem;
+	}
 }

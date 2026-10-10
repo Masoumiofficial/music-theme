@@ -75,7 +75,7 @@
 
 	register(
 		'wavira/tracklist',
-		__( 'Tracklist of the album chosen in the sidebar.', 'wavira' )
+		__( 'An album’s ordered tracks or the newest tracks on this site.', 'wavira' )
 	);
 
 	register(

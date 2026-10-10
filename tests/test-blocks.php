@@ -40,7 +40,7 @@ class Test_Blocks extends Wavira_Test_Case {
 			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'assets', 'player', 'artists', 'news', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
+		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'cards', 'assets', 'player', 'artists', 'news', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {
@@ -510,4 +510,97 @@ class Test_Blocks extends Wavira_Test_Case {
 		$this->assertSame( $block, $shortcode, 'a tracklist must not have two implementations' );
 		$this->assertStringContainsString( '3:35', $block, 'the duration label is part of the shared markup' );
 	}
+
+	/**
+	 * A latest-tracks block uses explicit query IDs and has play/download actions.
+	 *
+	 * @return void
+	 */
+	public function test_latest_tracklist_plays_and_downloads_each_track() {
+		$track_id = $this->make_track(
+			'Home track',
+			'publish',
+			array(
+				\Wavira\Core\Content\MetaSchema::AUDIO_128 => 'https://example.test/home-128.mp3',
+				\Wavira\Core\Content\MetaSchema::AUDIO_320 => 'https://example.test/home-320.mp3',
+			)
+		);
+
+		$album_id = $this->make_album( array( $track_id ) );
+		$this->assertSame( '', wavira_get_tracklist( $album_id, array( 'ids' => array() ) ), 'an explicit empty recent-track query must not fall back to the album order' );
+
+		$html = do_blocks( '<!-- wp:wavira/tracklist {"source":"latest","limit":6} /-->' );
+
+		$this->assertStringContainsString( 'class="wavira-tracklist__item has-wavira-actions"', $html );
+		$this->assertStringContainsString( 'data-wavira-post="' . $track_id . '"', $html );
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $html );
+		$this->assertStringContainsString( 'data-wavira-context="tracks"', $html );
+		$this->assertStringContainsString( '/wp-json/wavira/v1/download/' . $track_id, $html );
+	}
+
+	/**
+	 * A card without a downloadable source never advertises a dead download.
+	 *
+	 * @return void
+	 */
+	public function test_track_card_keeps_play_fallback_and_hides_download_when_audio_is_missing() {
+		$track_id = $this->make_track( 'Silent track' );
+		$html     = wavira_card_actions( $track_id, 'wavira_track' );
+
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $html );
+		$this->assertStringNotContainsString( 'wavira-card__action--download', $html );
+	}
+
+	/**
+	 * Artist-profile work cards share the player and download controls.
+	 *
+	 * @return void
+	 */
+	public function test_work_card_has_an_accessible_play_control() {
+		$track_id = $this->make_track(
+			'Artist work',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::AUDIO_128 => 'https://example.test/work.mp3' )
+		);
+		$html = wavira_get_card(
+			array(
+				'id'        => $track_id,
+				'type'      => 'wavira_track',
+				'title'     => 'Artist work',
+				'permalink' => get_permalink( $track_id ),
+			)
+		);
+
+		$this->assertStringContainsString( 'data-wavira-card', $html );
+		$this->assertStringContainsString( 'data-wavira-kind="wavira_track"', $html );
+		$this->assertStringContainsString( 'aria-label="', $html );
+	}
+
+
+	/**
+	 * WordPress post-template cards are enhanced once, at the shared renderer.
+	 *
+	 * @return void
+	 */
+	public function test_query_loop_card_gets_real_play_and_download_targets() {
+		$track_id = $this->make_track(
+			'Query-loop track',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::AUDIO_320 => 'https://example.test/query-track.mp3' )
+		);
+		$content = '<ul class="wp-block-post-template"><li class="wp-block-post post-' . $track_id . ' type-wavira_track"><figure><img src="/cover.jpg" alt=""></figure><h3>Query-loop track</h3></li></ul>';
+		$rendered = wavira_render_card_actions(
+			$content,
+			array(
+				'blockName' => 'core/post-template',
+				'attrs'     => array(),
+			)
+		);
+
+		$this->assertStringContainsString( 'data-wavira-card', $rendered );
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $rendered );
+		$this->assertStringContainsString( '/wp-json/wavira/v1/download/' . $track_id, $rendered );
+		$this->assertStringNotContainsString( 'href=""', $rendered );
+	}
+
 }

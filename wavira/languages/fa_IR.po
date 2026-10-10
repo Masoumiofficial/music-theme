@@ -1,11 +1,11 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-08 19:25+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-10 13:25+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
 msgstr "(در زبانهٔ جدید باز می‌شود)"
 
-#: wavira/inc/markup.php:237
+#: wavira/inc/markup.php:279
 #. translators: 1: genre name, 2: number of published items.
 #, keep-latin
 msgid "%1$s (%2$d)"
@@ -74,6 +74,10 @@ msgstr "پس از نصب و فعال‌سازی آن، به همین زبانه 
 #: wavira/inc/artists.php:140
 msgid "Album"
 msgstr "آلبوم"
+
+#: wavira/inc/blocks.php:58
+msgid "An album’s ordered tracks or the newest tracks on this site."
+msgstr "فهرست مرتب قطعه‌های آلبوم یا تازه‌ترین قطعه‌های این سایت."
 
 #: wavira/inc/options.php:116
 msgid "Announcement bar above the header"
@@ -147,8 +151,8 @@ msgstr "تازه‌ترین خبرها به‌صورت کارت، به‌صور�
 
 #: wavira/blocks/tracklist/block.json
 msgctxt "block description"
-msgid "The ordered, linked tracklist of an album. Renders nothing when the album has no published tracks."
-msgstr "فهرست مرتب و پیوندی قطعه‌های یک آلبوم. اگر آلبوم قطعهٔ منتشرشدهای نداشته باشد، چیزی نمایش داده نمیشود."
+msgid "The ordered, linked tracklist of an album, or the newest tracks on the site. Renders nothing when there is nothing to list."
+msgstr "فهرستِ مرتب و پیوندخوردهٔ قطعه‌های یک آلبوم، یا تازه‌ترین قطعه‌های سایت. اگر چیزی برای فهرست کردن نباشد، چیزی نمایش نمی‌دهد."
 
 #: wavira/blocks/video/block.json
 msgctxt "block description"
@@ -363,6 +367,11 @@ msgctxt "button label in the featured album pattern"
 msgid "Browse all albums"
 msgstr "مشاهدهٔ همهٔ آلبوم‌ها"
 
+#: wavira/patterns/hero-banner.php:29
+msgctxt "button label in the home page banner"
+msgid "Listen now"
+msgstr "همین حالا بشنوید"
+
 #: wavira/inc/customizer.php:297
 msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
 msgstr "کارت‌ها در هر تعداد ستونی که جا شود می‌شکنند. عدد بزرگ‌تر یعنی کارت‌های کمتر و بزرگ‌تر."
@@ -462,7 +471,7 @@ msgid "Dismiss"
 msgstr "نادیده گرفتن"
 
 #: wavira/inc/downloads.php:53
-#: wavira/inc/markup.php:99
+#: wavira/inc/markup.php:141
 msgid "Download"
 msgstr "دانلود"
 
@@ -470,7 +479,7 @@ msgstr "دانلود"
 msgid "Download the album"
 msgstr "دانلود آلبوم"
 
-#: wavira/inc/artists.php:364
+#: wavira/inc/artists.php:366
 #: wavira/inc/downloads.php:48
 msgid "Download the image"
 msgstr "دانلود تصویر"
@@ -486,6 +495,11 @@ msgstr "دانلود ویدیو"
 #: wavira/inc/admin-panel.php:518
 msgid "Download wavira-core"
 msgstr "دانلود wavira-core"
+
+#: wavira/inc/cards.php:133
+#. translators: %s: the track, album or video being downloaded.
+msgid "Download: %s"
+msgstr "دانلود: %s"
 
 #: wavira/inc/customizer.php:305
 msgid "Each new tab gets rel=\"noopener\" — the browser cannot hand the tab to the linked page."
@@ -557,7 +571,7 @@ msgstr "برچسب‌های سبک، پرکاربردترین در ابتدا."
 msgid "Header"
 msgstr "سربرگ"
 
-#: wavira/patterns/hidden-heading-music-news.php:20
+#: wavira/patterns/hidden-heading-music-news.php:22
 msgctxt "heading above the news feed"
 msgid "Music news"
 msgstr "اخبار موسیقی"
@@ -685,9 +699,13 @@ msgstr "هنوز خبری منتشر نشده است. نخستین خبر را �
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr "هنوز تصویری نیست. آن‌ها را از کتابخانهٔ رسانهٔ همین نوشته بارگذاری کنید."
 
-#: wavira/blocks/tracklist/render.php:38
+#: wavira/blocks/tracklist/render.php:67
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
+
+#: wavira/blocks/tracklist/render.php:66
+msgid "No published tracks yet."
+msgstr "قطعهٔ منتشرشده‌ای هنوز وجود ندارد."
 
 #: wavira/inc/site-defaults.php:239
 msgid "Not now"
@@ -740,16 +758,22 @@ msgid "Photo"
 msgstr "تصویر"
 
 #: wavira/blocks/artist-gallery/render.php:27
-#: wavira/inc/artists.php:311
-#: wavira/inc/artists.php:402
-#: wavira/inc/artists.php:432
-#: wavira/inc/artists.php:522
+#: wavira/inc/artists.php:313
+#: wavira/inc/artists.php:404
+#: wavira/inc/artists.php:434
+#: wavira/inc/artists.php:524
 msgid "Photos"
 msgstr "تصاویر"
 
 #: wavira/inc/blocks.php:68
 msgid "Photos attached to an artist."
 msgstr "تصاویر پیوست‌شده به یک هنرمند."
+
+#: wavira/inc/cards.php:111
+#: wavira/inc/markup.php:133
+#. translators: %s: the track, album or artist being played.
+msgid "Play: %s"
+msgstr "پخش: %s"
 
 #: wavira/inc/options.php:137
 msgid "Player bar on every page"
@@ -816,17 +840,17 @@ msgctxt "section heading above the catalogue player"
 msgid "Listen now"
 msgstr "همین حالا بشنوید"
 
-#: wavira/patterns/hidden-heading-latest-albums.php:16
+#: wavira/patterns/hidden-heading-latest-albums.php:18
 msgctxt "section heading on the home and 404 templates"
 msgid "Latest albums"
 msgstr "جدیدترین آلبوم‌ها"
 
-#: wavira/patterns/hidden-heading-latest-tracks.php:16
+#: wavira/patterns/hidden-heading-latest-tracks.php:18
 msgctxt "section heading on the home template"
 msgid "Latest tracks"
 msgstr "جدیدترین قطعه‌ها"
 
-#: wavira/patterns/hidden-heading-music-videos.php:16
+#: wavira/patterns/hidden-heading-music-videos.php:18
 msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr "موزیکویدیوها"
@@ -984,10 +1008,6 @@ msgstr "ابزارها"
 msgid "Tools → Wavira demo content"
 msgstr "ابزارها → محتوای نمایشی واویرا"
 
-#: wavira/inc/blocks.php:58
-msgid "Tracklist of the album chosen in the sidebar."
-msgstr "فهرست قطعه‌های آلبومی که در نوار کناری انتخاب شده است."
-
 #: wavira/inc/admin-panel.php:705
 msgid "Use this image"
 msgstr "استفاده از این تصویر"
@@ -1017,10 +1037,14 @@ msgid "Video"
 msgstr "ویدیو"
 
 #: wavira/inc/artists.php:215
+#: wavira/patterns/hidden-heading-latest-albums.php:21
+#: wavira/patterns/hidden-heading-latest-tracks.php:21
+#: wavira/patterns/hidden-heading-music-news.php:25
+#: wavira/patterns/hidden-heading-music-videos.php:21
 msgid "View all"
 msgstr "مشاهدهٔ همه"
 
-#: wavira/inc/markup.php:171
+#: wavira/inc/markup.php:213
 msgid "Watch the video"
 msgstr "تماشای ویدیو"
 

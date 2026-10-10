@@ -4,7 +4,7 @@
 	"name": "wavira/tracklist",
 	"title": "Album tracklist",
 	"category": "wavira-music",
-	"description": "The ordered, linked tracklist of an album. Renders nothing when the album has no published tracks.",
+	"description": "The ordered, linked tracklist of an album, or the newest tracks on the site. Renders nothing when there is nothing to list.",
 	"keywords": [
 		"album",
 		"tracks",
@@ -26,6 +26,22 @@
 			"default": true
 		},
 		"showDownload": {
+			"type": "boolean",
+			"default": true
+		},
+		"source": {
+			"type": "string",
+			"default": "album",
+			"enum": [
+				"album",
+				"latest"
+			]
+		},
+		"limit": {
+			"type": "number",
+			"default": 6
+		},
+		"showPlay": {
 			"type": "boolean",
 			"default": true
 		}
