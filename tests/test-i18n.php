@@ -67,8 +67,8 @@ class Test_I18n extends Wavira_Test_Case {
 	public function test_front_end_strings_come_back_in_persian() {
 		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
 
-		$this->assertSame( 'جدیدترین آلبومها', esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ) );
-		$this->assertSame( 'قطعهها', esc_html_x( 'Tracks', 'section heading above an album tracklist', 'wavira' ) );
+		$this->assertSame( 'جدیدترین آلبوم‌ها', esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ) );
+		$this->assertSame( 'قطعه‌ها', esc_html_x( 'Tracks', 'section heading above an album tracklist', 'wavira' ) );
 		$this->assertSame( 'تماشای ویدیو', esc_html__( 'Watch the video', 'wavira' ) );
 		$this->assertSame( 'همین حالا بشنوید', esc_html_x( 'Listen now', 'heading of the catalogue player pattern', 'wavira' ) );
 		$this->assertSame( 'صفحه یافت نشد', esc_html_x( 'Page not found', 'heading of the 404 template', 'wavira' ) );
@@ -98,7 +98,7 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
 
 		$this->assertSame( 'پخشکنندهٔ موسیقی', _x( 'Music player', 'block title', 'wavira' ) );
-		$this->assertSame( 'برچسبهای سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
+		$this->assertSame( 'برچسب‌های سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
 		$this->assertSame( 'موسیقی', _x( 'music', 'block keyword', 'wavira' ) );
 		$this->assertSame( 'نمای هنرمند', _x( 'Artist profile', 'block title', 'wavira' ) );
 		$this->assertSame( 'گالری تصاویر', _x( 'Photo gallery', 'block title', 'wavira' ) );
@@ -143,7 +143,7 @@ class Test_I18n extends Wavira_Test_Case {
 
 		$this->assertSame( 'تنظیمات واویرا', __( 'Wavira settings', 'wavira-core' ) );
 		$this->assertSame( 'تعداد قطعه در هر صفحهٔ آرشیو', __( 'Tracks per archive page', 'wavira-core' ) );
-		$this->assertSame( 'قطعهها', __( 'Tracks', 'wavira-core' ) );
+		$this->assertSame( 'قطعه‌ها', __( 'Tracks', 'wavira-core' ) );
 		$this->assertSame( 'موزیکویدیوها', __( 'Music videos', 'wavira-core' ) );
 		$this->assertSame( 'زندگینامهٔ نمونه. آن را با محتوای واقعی جایگزین کنید.', __( 'Generated demo biography. Replace with real content.', 'wavira-core' ) );
 	}
@@ -182,5 +182,46 @@ class Test_I18n extends Wavira_Test_Case {
 
 		$this->assertSame( 'فایل قابل دانلودی برای این نوشته موجود نیست.', __( 'There is no downloadable file for this post.', 'wavira-core' ) );
 		$this->assertSame( '720 پیکسل', sprintf( __( '%d pixels', 'wavira-core' ), 720 ) );
+	}
+
+	/**
+	 * A Persian plural keeps its نیم‌فاصله.
+	 *
+	 * Persian separates the suffix «ها» from a stem that joins forward with a
+	 * U+200C, and leaves it attached after the seven letters that never join
+	 * forward at all (ا، د، ذ، ر، ز، ژ، و): «پیوندها» and «تصویرها» are right,
+	 * «قطعهها» is not. Twenty-five translations joined the two in 0.15.0 — three
+	 * of them were literals in this very file, which is how a test ends up
+	 * defending a defect. The literals are corrected above; this reads every
+	 * translation in both catalogues so the next one is caught here too, before
+	 * it reaches a page.
+	 *
+	 * @return void
+	 */
+	public function test_persian_plurals_keep_their_nim_fasele() {
+		// The letters that join the letter after them, and the suffix that has to
+		// be separated from them: written as characters, because a single-quoted
+		// PHP string does not read \u escapes.
+		$joins_forward = 'بپتثجچحخسشصضطظعغفقکگلمنهی';
+		$stuck         = '/[' . $joins_forward . ']ها(?:ی(?:مان|تان|شان|م|ت|ش)?)?(?![\x{0621}-\x{06cc}])/u';
+
+
+		foreach ( array( 'wavira/languages/fa_IR.po', 'wavira-core/languages/fa_IR.po' ) as $file ) {
+			$lines = file( dirname( __DIR__ ) . '/' . $file, FILE_IGNORE_NEW_LINES );
+
+			$this->assertNotFalse( $lines, "{$file} must be readable" );
+
+			foreach ( $lines as $number => $line ) {
+				if ( 0 !== strpos( $line, 'msgstr' ) ) {
+					continue;
+				}
+
+				$this->assertSame(
+					0,
+					preg_match( $stuck, $line ),
+					sprintf( '%s:%d writes a plural without a نیم‌فاصله: %s', $file, $number + 1, $line )
+				);
+			}
+		}
 	}
 }
