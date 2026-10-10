@@ -1,0 +1,54 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/news",
+	"title": "Music news",
+	"category": "wavira-music",
+	"description": "The newest news posts as cards, optionally restricted to one category. Pair it with the blog templates for a full news section.",
+	"keywords": [
+		"news",
+		"blog",
+		"magazine",
+		"posts",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"source": {
+			"type": "string",
+			"default": "blog"
+		},
+		"category": {
+			"type": "string",
+			"default": ""
+		},
+		"perPage": {
+			"type": "number",
+			"default": 6
+		},
+		"showCategories": {
+			"type": "boolean",
+			"default": false
+		},
+		"columns": {
+			"type": "number",
+			"default": 3
+		},
+		"showDate": {
+			"type": "boolean",
+			"default": true
+		},
+		"showExcerpt": {
+			"type": "boolean",
+			"default": true
+		},
+		"showImage": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php"
+}

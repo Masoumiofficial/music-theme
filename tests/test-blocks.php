@@ -1,0 +1,606 @@
+<?php
+/**
+ * Runtime verification of the 0.7.0 block layer on a real WordPress install.
+ *
+ * The blocks live in the theme (ARCHITECTURE §1: presentation), and the
+ * WordPress test install does not contain the theme directory, so this suite
+ * loads the theme's PHP from the repository with the same constants the theme
+ * bootstrap defines. Everything after that is real: `register_block_type()`
+ * reads the shipped `block.json` files, and `do_blocks()` renders through the
+ * shipped `render.php` files.
+ *
+ * @package Wavira\Tests
+ */
+
+/**
+ * Class Test_Blocks
+ */
+class Test_Blocks extends Wavira_Test_Case {
+
+	/**
+	 * Load the theme and register its surfaces once for the class.
+	 *
+	 * @return void
+	 */
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		self::load_theme();
+	}
+
+	/**
+	 * Load the theme's PHP the way the theme bootstrap does.
+	 *
+	 * @return void
+	 */
+	private static function load_theme() {
+		if ( ! defined( 'WAVIRA_THEME_DIR' ) ) {
+			define( 'WAVIRA_THEME_DIR', trailingslashit( dirname( __DIR__ ) . '/wavira' ) );
+			define( 'WAVIRA_THEME_URI', 'https://example.test/wp-content/themes/wavira/' );
+			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
+		}
+
+		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'cards', 'assets', 'player', 'artists', 'news', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
+			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
+
+			if ( file_exists( $path ) ) {
+				require_once $path;
+			}
+		}
+
+		if ( function_exists( 'wavira_register_blocks' ) ) {
+			wavira_register_block_editor_script();
+			wavira_register_blocks();
+		}
+	}
+
+	/**
+	 * Create an album with an explicit tracklist.
+	 *
+	 * @param int[] $track_ids Track IDs in playing order.
+	 * @return int Album ID.
+	 */
+	private function make_album( array $track_ids = array() ) {
+		$album_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_album',
+				'post_status' => 'publish',
+				'post_title'  => 'Album fixture',
+			)
+		);
+
+		if ( array() !== $track_ids ) {
+			update_post_meta( $album_id, \Wavira\Core\Content\MetaSchema::TRACKLIST, $track_ids );
+		}
+
+		return (int) $album_id;
+	}
+
+	/**
+	 * Create a track.
+	 *
+	 * @param string $title    Track title.
+	 * @param string $status   Post status.
+	 * @param array  $meta     Extra meta, keyed by schema constant value.
+	 * @return int Track ID.
+	 */
+	private function make_track( $title = 'Track fixture', $status = 'publish', array $meta = array() ) {
+		$track_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_track',
+				'post_status' => $status,
+				'post_title'  => $title,
+			)
+		);
+
+		foreach ( $meta as $key => $value ) {
+			update_post_meta( $track_id, $key, $value );
+		}
+
+		return (int) $track_id;
+	}
+
+	/**
+	 * The block metadata the theme ships matches the registrar.
+	 *
+	 * @return void
+	 */
+	public function test_block_metadata_is_complete() {
+		$this->assertTrue( function_exists( 'wavira_block_names' ), 'the theme must expose its block list' );
+
+		foreach ( wavira_block_names() as $directory ) {
+			$path = WAVIRA_THEME_DIR . 'blocks/' . $directory . '/block.json';
+
+			$this->assertFileExists( $path );
+
+			$metadata = json_decode( (string) file_get_contents( $path ), true ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- repository file under test.
+
+			$this->assertIsArray( $metadata, "{$directory}/block.json must be valid JSON" );
+			$this->assertSame( 'wavira/' . $directory, $metadata['name'] );
+			$this->assertSame( 3, $metadata['apiVersion'] );
+			$this->assertSame( 'file:./render.php', $metadata['render'] );
+			$this->assertSame( 'wavira', $metadata['textdomain'] );
+			$this->assertSame( 'wavira-music', $metadata['category'] );
+			$this->assertArrayHasKey( 'attributes', $metadata );
+			$this->assertFileExists( WAVIRA_THEME_DIR . 'blocks/' . $directory . '/render.php' );
+		}
+	}
+
+	/**
+	 * Every block is registered with the server renderer and the loop context.
+	 *
+	 * @return void
+	 */
+	public function test_blocks_are_registered() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		foreach ( wavira_block_names() as $directory ) {
+			$name = 'wavira/' . $directory;
+
+			$this->assertTrue( $registry->is_registered( $name ), "{$name} should be registered" );
+
+			$block = $registry->get_registered( $name );
+
+			$this->assertNotNull( $block->render_callback, "{$name} must render on the server" );
+			$this->assertSame( 'wavira-music', $block->category );
+			$this->assertFalse( $block->supports['html'], "{$name} is dynamic: no static HTML may be stored" );
+		}
+
+		$this->assertContains( 'postId', $registry->get_registered( 'wavira/tracklist' )->uses_context );
+		$this->assertContains( 'postId', $registry->get_registered( 'wavira/player' )->uses_context );
+		$this->assertContains( 'postId', $registry->get_registered( 'wavira/video' )->uses_context );
+	}
+
+	/**
+	 * The tracklist block renders the album's published tracks in order.
+	 *
+	 * @return void
+	 */
+	public function test_tracklist_block_renders_published_tracks_in_order() {
+		$second  = $this->make_track( 'Second in the album' );
+		$first   = $this->make_track( 'First in the album' );
+		$draft   = $this->make_track( 'Never published', 'draft' );
+		$album   = $this->make_album( array( $first, $second, $draft, 999999 ) );
+		$markup  = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
+
+		$this->assertStringContainsString( 'class="wavira-tracklist"', $markup );
+		$this->assertStringContainsString( 'First in the album', $markup );
+		$this->assertStringContainsString( 'Second in the album', $markup );
+		$this->assertStringNotContainsString( 'Never published', $markup, 'drafts must not leak into a public tracklist' );
+		$this->assertLessThan(
+			strpos( $markup, 'Second in the album' ),
+			strpos( $markup, 'First in the album' ),
+			'the album tracklist order is the editor order, not the date order'
+		);
+	}
+
+	/**
+	 * Stored text reaches the page escaped, never as markup.
+	 *
+	 * The fixtures are chosen to be identical whether or not the site runs KSES
+	 * on save: `<b>` is in core's title allow-list, and the subtitle carries the
+	 * two characters that break unescaped output (`&` and a double quote).
+	 *
+	 * @return void
+	 */
+	public function test_tracklist_block_escapes_stored_text() {
+		$track = $this->make_track(
+			'Bold <b>title</b>',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::SUBTITLE => 'Tom & Jerry "Live"' )
+		);
+		$album = $this->make_album( array( $track ) );
+		$html  = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
+
+		$this->assertStringContainsString( 'Bold &lt;b&gt;title&lt;/b&gt;', $html );
+		$this->assertStringContainsString( 'Tom &amp; Jerry &quot;Live&quot;', $html );
+		$this->assertStringNotContainsString( '<b>title</b>', $html, 'a stored tag must never be printed as markup' );
+	}
+
+	/**
+	 * The optional subtitle travels from meta to markup.
+	 *
+	 * @return void
+	 */
+	public function test_tracklist_block_renders_the_subtitle() {
+		$track = $this->make_track(
+			'Main title',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::SUBTITLE => 'feat. Demo Artist' )
+		);
+		$album = $this->make_album( array( $track ) );
+		$html  = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
+
+		$this->assertStringContainsString( 'wavira-tracklist__subtitle', $html );
+		$this->assertStringContainsString( 'feat. Demo Artist', $html );
+	}
+
+	/**
+	 * An album with nothing to play renders nothing on the front end.
+	 *
+	 * @return void
+	 */
+	public function test_empty_album_renders_nothing() {
+		$album = $this->make_album();
+		$html  = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
+
+		// Never any tracklist markup. The front end prints nothing at all; a
+		// REST render is the editor's ServerSideRender preview, where an empty
+		// block is invisible, so the render file prints a hint instead.
+		// REST_REQUEST is a process-wide constant: a REST test that ran earlier
+		// in the same process defines it, so both branches are asserted for.
+		$this->assertStringNotContainsString( 'wavira-tracklist', $html );
+
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			$this->assertSame( '', $html, 'the front end prints nothing for an album without tracks' );
+			$this->assertSame( '', do_blocks( '<!-- wp:wavira/video {"videoId":' . $album . '} /-->' ) );
+		} else {
+			$this->assertStringContainsString( 'wavira-block-placeholder', $html );
+		}
+	}
+
+	/**
+	 * The video block renders a hosted file and a fallback link.
+	 *
+	 * @return void
+	 */
+	public function test_video_block_renders_hosted_and_embedded_sources() {
+		$hosted = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_video',
+				'post_status' => 'publish',
+				'post_title'  => 'Hosted video fixture',
+			)
+		);
+
+		update_post_meta( $hosted, \Wavira\Core\Content\MetaSchema::VIDEO_720, 'https://example.com/clip-720.mp4' );
+
+		$html = do_blocks( '<!-- wp:wavira/video {"videoId":' . $hosted . '} /-->' );
+
+		$this->assertStringContainsString( '<video', $html );
+		$this->assertStringContainsString( 'https://example.com/clip-720.mp4', $html );
+		$this->assertStringContainsString( 'class="wavira-video-frame"', $html );
+
+		$provider = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_video',
+				'post_status' => 'publish',
+				'post_title'  => 'Provider video fixture',
+			)
+		);
+
+		update_post_meta( $provider, \Wavira\Core\Content\MetaSchema::VIDEO_SOURCE, 'youtube' );
+		update_post_meta( $provider, \Wavira\Core\Content\MetaSchema::VIDEO_URL, 'https://www.youtube.com/watch?v=wavira-demo' );
+
+		// The provider is unreachable in the test environment (and must be: a unit
+		// test never calls the network), so this asserts the degraded path — the
+		// one a visitor gets when the embed provider is down or blocked.
+		$offline = static function () {
+			return new WP_Error( 'http_request_failed', 'Blocked during tests.' );
+		};
+
+		add_filter( 'pre_http_request', $offline );
+
+		$linked = do_blocks( '<!-- wp:wavira/video {"videoId":' . $provider . '} /-->' );
+
+		remove_filter( 'pre_http_request', $offline );
+
+		// A provider WordPress cannot embed still gets a link, never an empty box.
+		$this->assertStringContainsString( 'https://www.youtube.com/watch?v=wavira-demo', $linked );
+		$this->assertStringContainsString( 'wavira-video-link', $linked );
+	}
+
+	/**
+	 * The genre-chips block lists terms, most used first, and nothing else.
+	 *
+	 * @return void
+	 */
+	public function test_genre_chips_block_lists_terms() {
+		$none = do_blocks( '<!-- wp:wavira/genre-chips /-->' );
+
+		// No terms yet: no chips. The REST preview (editor) gets a hint instead
+		// of an invisible block; see test_empty_album_renders_nothing().
+		$this->assertStringNotContainsString( 'wavira-chip', $none );
+
+		if ( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) {
+			$this->assertSame( '', $none, 'no terms means no output on the front end' );
+		}
+
+		$popular = self::factory()->term->create(
+			array(
+				'taxonomy' => 'wavira_genre',
+				'name'     => 'Popular genre',
+			)
+		);
+		$rare    = self::factory()->term->create(
+			array(
+				'taxonomy' => 'wavira_genre',
+				'name'     => 'Rare genre',
+			)
+		);
+
+		wp_set_object_terms( $this->make_track( 'Track A' ), array( $popular ), 'wavira_genre' );
+		wp_set_object_terms( $this->make_track( 'Track B' ), array( $popular ), 'wavira_genre' );
+		wp_set_object_terms( $this->make_track( 'Track C' ), array( $rare ), 'wavira_genre' );
+
+		$html = do_blocks( '<!-- wp:wavira/genre-chips {"limit":10,"showCount":true} /-->' );
+
+		$this->assertStringContainsString( 'class="wavira-chip"', $html );
+		$this->assertStringContainsString( 'Popular genre (2)', $html );
+		$this->assertStringContainsString( 'Rare genre (1)', $html );
+		$this->assertLessThan(
+			strpos( $html, 'Rare genre' ),
+			strpos( $html, 'Popular genre' ),
+			'orderby=count must put the most used genre first'
+		);
+	}
+
+	/**
+	 * The player block emits the documented mount contract for a singular album.
+	 *
+	 * @return void
+	 */
+	public function test_player_block_emits_the_mount_contract() {
+		$track = $this->make_track( 'Playable fixture' );
+		$album = $this->make_album( array( $track ) );
+
+		update_post_meta( $track, \Wavira\Core\Content\MetaSchema::AUDIO_320, 'https://example.com/track-320.mp3' );
+
+		$this->go_to( get_permalink( $album ) );
+
+		$html = do_blocks( '<!-- wp:wavira/player {"context":"album"} /-->' );
+
+		$this->assertStringContainsString( 'data-wavira-player="1"', $html );
+		$this->assertStringContainsString( 'data-context="album"', $html );
+		$this->assertStringContainsString( 'data-id="' . $album . '"', $html );
+		$this->assertStringContainsString( 'class="wavira-player', $html );
+	}
+
+	/**
+	 * The editor's strings are translated through the theme catalogue.
+	 *
+	 * `wavira_block_editor_strings()` is keyed by the English source string, so
+	 * every key must exist as a msgid in `languages/fa_IR.po` — otherwise the
+	 * editor shows English on a Persian site while the front end is translated.
+	 *
+	 * @return void
+	 */
+	public function test_editor_strings_are_in_the_catalogue() {
+		$catalogue = (string) file_get_contents( WAVIRA_THEME_DIR . 'languages/fa_IR.po' );
+		$strings   = wavira_block_editor_strings();
+
+		$this->assertNotEmpty( $strings, 'the editor script must receive its strings from PHP' );
+
+		foreach ( $strings as $source => $translated ) {
+			$this->assertStringContainsString(
+				'msgid "' . $source . '"',
+				$catalogue,
+				"the editor string “{$source}” must exist in the theme catalogue"
+			);
+			$this->assertSame( $source, $translated, 'without a loaded catalogue the payload falls back to the source string' );
+		}
+	}
+
+	/**
+	 * The artist profile block renders the artist page surfaces.
+	 *
+	 * @return void
+	 */
+	public function test_artist_profile_block_renders_the_profile() {
+		$artist = self::factory()->post->create(
+			array(
+				'post_type'    => 'wavira_artist',
+				'post_status'  => 'publish',
+				'post_title'   => 'Block artist',
+				'post_content' => '<p>Biography from the block fixture.</p>',
+			)
+		);
+
+		$html = do_blocks( '<!-- wp:wavira/artist-profile {"artistId":' . $artist . ',"showGallery":false} /-->' );
+
+		$this->assertStringContainsString( 'wavira-artist__name', $html );
+		$this->assertStringContainsString( 'Block artist', $html );
+		$this->assertStringContainsString( 'Biography from the block fixture.', $html );
+		$this->assertStringNotContainsString( 'wavira-gallery', $html, 'a disabled section is not rendered' );
+
+		// Without an artist to resolve, the block explains itself in the editor
+		// instead of printing an empty page element.
+		$empty = do_blocks( '<!-- wp:wavira/artist-profile /-->' );
+		$this->assertStringNotContainsString( 'wavira-artist__name', $empty );
+	}
+
+	/**
+	 * The gallery block renders the images attached to the artist.
+	 *
+	 * @return void
+	 */
+	public function test_artist_gallery_block_renders_attached_images() {
+		$artist = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_artist',
+				'post_status' => 'publish',
+				'post_title'  => 'Gallery artist',
+			)
+		);
+
+		self::factory()->attachment->create_object(
+			'live.jpg',
+			$artist,
+			array(
+				'post_mime_type' => 'image/jpeg',
+				'post_excerpt'   => 'Live on stage',
+			)
+		);
+
+		$html = do_blocks( '<!-- wp:wavira/artist-gallery {"artistId":' . $artist . '} /-->' );
+
+		$this->assertStringContainsString( 'wavira-gallery__items', $html );
+		$this->assertStringContainsString( 'Live on stage', $html );
+	}
+
+	/**
+	 * The download block prints the theme's link — and prints nothing, not a dead
+	 * link, when the post it points at has no file.
+	 *
+	 * @return void
+	 */
+	public function test_download_block_prints_a_link_and_never_a_dead_one() {
+		$track = $this->make_track( 'Track for the download block' );
+
+		$this->assertSame(
+			'',
+			trim( do_blocks( '<!-- wp:wavira/download {"postId":' . $track . '} /-->' ) ),
+			'a track with no audio offers no download at all'
+		);
+
+		update_post_meta( $track, \Wavira\Core\Content\MetaSchema::AUDIO_320, 'https://example.com/block-320.mp3' );
+		update_post_meta( $track, \Wavira\Core\Content\MetaSchema::FILE_SIZE_320, 3670016 );
+
+		$html = do_blocks( '<!-- wp:wavira/download {"postId":' . $track . ',"variant":"button","showSize":true} /-->' );
+
+		$this->assertStringContainsString( 'wavira-download--button', $html );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track ), $html );
+		$this->assertStringContainsString( 'Download the track', $html );
+		$this->assertStringContainsString( '320 kbps', $html );
+	}
+
+	/**
+	 * The news block renders posts as cards and honours its own limit.
+	 *
+	 * @return void
+	 */
+	public function test_news_block_renders_cards() {
+		foreach ( array( 'First headline', 'Second headline' ) as $index => $title ) {
+			self::factory()->post->create(
+				array(
+					'post_type'   => 'post',
+					'post_status' => 'publish',
+					'post_title'  => $title,
+					'post_date'   => sprintf( '2026-05-%02d 10:00:00', $index + 1 ),
+				)
+			);
+		}
+
+		$html = do_blocks( '<!-- wp:wavira/news {"perPage":1,"showCategories":true} /-->' );
+
+		$this->assertStringContainsString( 'wavira-news__list', $html );
+		$this->assertStringContainsString( 'wavira-card--news', $html );
+		$this->assertSame( 1, substr_count( $html, 'wavira-card--news' ), 'perPage limits the feed' );
+	}
+
+	/**
+	 * Block and shortcode output are the same markup (one implementation).
+	 *
+	 * @return void
+	 */
+	public function test_blocks_and_shortcodes_share_the_markup() {
+		$track = $this->make_track(
+			'Shared fixture',
+			'publish',
+			array(
+				\Wavira\Core\Content\MetaSchema::DURATION    => 215,
+				\Wavira\Core\Content\MetaSchema::SUBTITLE    => 'live take',
+			)
+		);
+		$album = $this->make_album( array( $track ) );
+
+		$block      = do_blocks( '<!-- wp:wavira/tracklist {"albumId":' . $album . '} /-->' );
+		$shortcode  = do_shortcode( '[wavira_tracklist id="' . $album . '"]' );
+
+		$this->assertSame( $block, $shortcode, 'a tracklist must not have two implementations' );
+		$this->assertStringContainsString( '3:35', $block, 'the duration label is part of the shared markup' );
+	}
+
+	/**
+	 * A latest-tracks block uses explicit query IDs and has play/download actions.
+	 *
+	 * @return void
+	 */
+	public function test_latest_tracklist_plays_and_downloads_each_track() {
+		$track_id = $this->make_track(
+			'Home track',
+			'publish',
+			array(
+				\Wavira\Core\Content\MetaSchema::AUDIO_128 => 'https://example.test/home-128.mp3',
+				\Wavira\Core\Content\MetaSchema::AUDIO_320 => 'https://example.test/home-320.mp3',
+			)
+		);
+
+		$album_id = $this->make_album( array( $track_id ) );
+		$this->assertSame( '', wavira_get_tracklist( $album_id, array( 'ids' => array() ) ), 'an explicit empty recent-track query must not fall back to the album order' );
+
+		$html = do_blocks( '<!-- wp:wavira/tracklist {"source":"latest","limit":6} /-->' );
+
+		$this->assertStringContainsString( 'class="wavira-tracklist__item has-wavira-actions"', $html );
+		$this->assertStringContainsString( 'data-wavira-post="' . $track_id . '"', $html );
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $html );
+		$this->assertStringContainsString( 'data-wavira-context="tracks"', $html );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track_id ), $html );
+	}
+
+	/**
+	 * A card without a downloadable source never advertises a dead download.
+	 *
+	 * @return void
+	 */
+	public function test_track_card_keeps_play_fallback_and_hides_download_when_audio_is_missing() {
+		$track_id = $this->make_track( 'Silent track' );
+		$html     = wavira_card_actions( $track_id, 'wavira_track' );
+
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $html );
+		$this->assertStringNotContainsString( 'wavira-card__action--download', $html );
+	}
+
+	/**
+	 * Artist-profile work cards share the player and download controls.
+	 *
+	 * @return void
+	 */
+	public function test_work_card_has_an_accessible_play_control() {
+		$track_id = $this->make_track(
+			'Artist work',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::AUDIO_128 => 'https://example.test/work.mp3' )
+		);
+		$html = wavira_get_card(
+			array(
+				'id'        => $track_id,
+				'type'      => 'wavira_track',
+				'title'     => 'Artist work',
+				'permalink' => get_permalink( $track_id ),
+			)
+		);
+
+		$this->assertStringContainsString( 'data-wavira-card', $html );
+		$this->assertStringContainsString( 'data-wavira-kind="wavira_track"', $html );
+		$this->assertStringContainsString( 'aria-label="', $html );
+	}
+
+
+	/**
+	 * WordPress post-template cards are enhanced once, at the shared renderer.
+	 *
+	 * @return void
+	 */
+	public function test_query_loop_card_gets_real_play_and_download_targets() {
+		$track_id = $this->make_track(
+			'Query-loop track',
+			'publish',
+			array( \Wavira\Core\Content\MetaSchema::AUDIO_320 => 'https://example.test/query-track.mp3' )
+		);
+		$content = '<ul class="wp-block-post-template"><li class="wp-block-post post-' . $track_id . ' type-wavira_track"><figure><img src="/cover.jpg" alt=""></figure><h3>Query-loop track</h3></li></ul>';
+		$rendered = wavira_render_card_actions(
+			$content,
+			array(
+				'blockName' => 'core/post-template',
+				'attrs'     => array(),
+			)
+		);
+
+		$this->assertStringContainsString( 'data-wavira-card', $rendered );
+		$this->assertStringContainsString( 'data-wavira-play="' . $track_id . '"', $rendered );
+		$this->assertStringContainsString( rawurlencode( '/wavira/v1/download/' . $track_id ), $rendered );
+		$this->assertStringNotContainsString( 'href=""', $rendered );
+	}
+
+}

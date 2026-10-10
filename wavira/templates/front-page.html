@@ -1,0 +1,92 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+<!-- wp:group {"tagName":"main","className":"wavira-main","layout":{"type":"default"}} -->
+<main class="wp-block-group wavira-main">
+<!-- wp:pattern {"slug":"wavira/hero-banner"} /-->
+<!-- wp:group {"className":"wavira-layout","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-layout">
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section">
+<!-- wp:pattern {"slug":"wavira/hidden-heading-latest-albums"} /-->
+<!-- wp:query {"queryId":1,"query":{"perPage":6,"pages":0,"offset":0,"postType":"wavira_album","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":3}} -->
+<div class="wp-block-query">
+<!-- wp:post-template {"layout":{"type":"grid","columnCount":3}} -->
+<!-- wp:post-featured-image {"aspectRatio":"1"} /-->
+<!-- wp:post-title {"level":3,"isLink":true} /-->
+<!-- wp:post-terms {"term":"wavira_genre","separator":"","prefix":""} /-->
+<!-- /wp:post-template -->
+<!-- wp:query-no-results -->
+<!-- wp:pattern {"slug":"wavira/hidden-no-results"} /-->
+<!-- /wp:query-no-results -->
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination -->
+</div>
+<!-- /wp:query -->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"anchor":"listen-now","className":"wavira-section wavira-section--listen","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section wavira-section--listen" id="listen-now">
+<!-- wp:pattern {"slug":"wavira/hidden-heading-listen-now"} /-->
+<!-- wp:wavira/player {"context": "tracks", "sticky": false} /-->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"wavira-section wavira-section--tracklist","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section wavira-section--tracklist">
+<!-- wp:pattern {"slug":"wavira/hidden-heading-latest-tracks"} /-->
+<!-- wp:wavira/tracklist {"source":"latest","limit":6,"showDownload":true,"showDuration":true,"showSubtitle":true} /-->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section">
+<!-- wp:pattern {"slug":"wavira/hidden-heading-music-videos"} /-->
+<!-- wp:query {"queryId":1,"query":{"perPage":4,"pages":0,"offset":0,"postType":"wavira_video","order":"desc","orderBy":"date","inherit":false},"layout":{"type":"grid","columnCount":2},"className":"wavira-video-grid"} -->
+<div class="wp-block-query wavira-video-grid">
+<!-- wp:post-template {"layout":{"type":"grid","columnCount":2}} -->
+<!-- wp:post-featured-image {"aspectRatio":"1"} /-->
+<!-- wp:post-title {"level":3,"isLink":true} /-->
+<!-- wp:post-terms {"term":"wavira_genre","separator":"","prefix":""} /-->
+<!-- /wp:post-template -->
+<!-- wp:query-no-results -->
+<!-- wp:pattern {"slug":"wavira/hidden-no-results"} /-->
+<!-- /wp:query-no-results -->
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination -->
+</div>
+<!-- /wp:query -->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"className":"wavira-section","layout":{"type":"default"}} -->
+<div class="wp-block-group wavira-section">
+<!-- wp:pattern {"slug":"wavira/hidden-heading-music-news"} /-->
+<!-- wp:query {"queryId":1,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","inherit":false},"className":"wavira-news","layout":{"type":"grid","columnCount":3}} -->
+<div class="wp-block-query wavira-news">
+<!-- wp:post-template {"className":"wavira-news-grid","layout":{"type":"grid","columnCount":3}} -->
+<!-- wp:post-featured-image {"isLink":true,"aspectRatio":"16/9"} /-->
+<!-- wp:post-terms {"term":"category","separator":"","prefix":""} /-->
+<!-- wp:post-title {"level":3,"isLink":true} /-->
+<!-- wp:post-excerpt {"excerptLength":24} /-->
+<!-- wp:post-date {"format":"Y/m/d"} /-->
+<!-- /wp:post-template -->
+<!-- wp:query-no-results -->
+<!-- wp:pattern {"slug":"wavira/hidden-no-results"} /-->
+<!-- /wp:query-no-results -->
+<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"space-between"}} -->
+<!-- wp:query-pagination-previous /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next /-->
+<!-- /wp:query-pagination -->
+</div>
+<!-- /wp:query -->
+</div>
+<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+</main>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
+<!-- wp:template-part {"slug":"player-bar"} /-->

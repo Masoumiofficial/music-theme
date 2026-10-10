@@ -1,0 +1,724 @@
+# Persian (fa_IR) translation of wavira-core.
+# Copyright (C) 2026 Etehad WP — اتحاد وردپرس
+# This file is distributed under the GPL-2.0-or-later licence.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wavira-core 0.15.0\n"
+"Report-Msgid-Bugs-To: https://etehadwp.com/\n"
+"POT-Creation-Date: 2026-10-05\n"
+"PO-Revision-Date: 2026-10-08 17:17+0000\n"
+"Last-Translator: Etehad WP <https://etehadwp.com/>\n"
+"Language-Team: Persian (Iran) — Etehad WP\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Domain: wavira-core\n"
+
+#: wavira-core/src/Downloads/Access.php:214
+#: wavira-core/src/Downloads/Sources.php:216
+#. translators: %d: audio bitrate in kbps.
+msgid "%d kbps"
+msgstr "%d کیلوبیت‌برثانیه"
+
+#: wavira-core/src/Downloads/Sources.php:208
+#. translators: %d: video frame height in pixels, e.g. 720.
+msgid "%d pixels"
+msgstr "%d پیکسل"
+
+#: wavira-core/src/Content/PostTypes.php:182
+#. translators: %s: content type plural name.
+msgid "%s archive"
+msgstr "آرشیو %s"
+
+#: wavira-core/src/Rest/PlayerController.php:182
+#. translators: %s: queue context, e.g. "album".
+msgid "A %s queue needs the ID of its source item."
+msgstr "صف %s به شناسهٔ مورد مبدأ نیاز دارد."
+
+#: wavira-core/src/Admin/DemoPage.php:108
+msgid "A demo pointing at files that do not exist would break the player on the first click; add your own media and the player picks it up."
+msgstr "نمایشی که به فایل‌های ناموجود اشاره کند، با نخستین کلیک پخش‌کننده را خراب می‌کند؛ فایل‌های خودتان را اضافه کنید تا پخش‌کننده آن‌ها را بردارد."
+
+#: wavira-core/src/Rest/PlayerController.php:192
+msgid "A genre queue needs a genre slug."
+msgstr "صف سبک به نامک سبک نیاز دارد."
+
+#: wavira-core/src/Demo/Installer.php:487
+msgid "About the site"
+msgstr "دربارهٔ سایت"
+
+#: wavira-core/src/Settings/SettingsSchema.php:129
+msgid "Ad slot HTML (above the player)"
+msgstr "کد HTML تبلیغ (بالای پخشکننده)"
+
+#: wavira-core/src/Content/PostTypes.php:155
+#: wavira-core/src/Content/Taxonomies.php:289
+#. translators: %s: content type singular name (e.g. "Track").
+msgid "Add new %s"
+msgstr "افزودن %s تازه"
+
+#: wavira-core/src/Content/PostTypes.php:120
+msgid "Album"
+msgstr "آلبوم"
+
+#: wavira-core/src/Content/ArtistProfile.php:263
+#: wavira-core/src/Content/PostTypes.php:119
+msgid "Albums"
+msgstr "آلبوم‌ها"
+
+#: wavira-core/src/Content/Taxonomies.php:274
+#. translators: %s: taxonomy plural name.
+msgid "All %s"
+msgstr "همهٔ %s"
+
+#: wavira-core/src/Content/ArtistProfile.php:198
+msgid "Aparat"
+msgstr "آپارات"
+
+#: wavira-core/src/Content/PostTypes.php:113
+msgid "Artist"
+msgstr "هنرمند"
+
+#: wavira-core/src/Content/PostTypes.php:112
+msgid "Artists"
+msgstr "هنرمندان"
+
+#: wavira-core/src/Rest/DownloadController.php:60
+msgid "Audio bitrate in kbps or video height in pixels. Omit to use the best available."
+msgstr "نرخ بیت صدا بر حسب کیلوبیت‌برثانیه یا ارتفاع ویدیو بر حسب پیکسل. برای استفاده از بهترین گزینهٔ موجود، خالی بگذارید."
+
+#: wavira-core/src/Player/Assets.php:176
+msgid "Audio player"
+msgstr "پخشکنندهٔ صوتی"
+
+#: wavira-core/src/Settings/SettingsSchema.php:90
+msgid "Autoplay the next track in a queue"
+msgstr "پخش خودکار قطعهٔ بعدی صف"
+
+#: wavira-core/src/Player/Assets.php:194
+#. translators: %s: track title.
+msgid "Buffering…"
+msgstr "در حال آمادهسازی…"
+
+#: wavira-core/src/Content/PostTypes.php:185
+#. translators: %s: content type plural name.
+msgid "Cover image"
+msgstr "تصویر جلد"
+
+#: wavira-core/src/Rest/AbstractController.php:90
+msgid "Current page of the collection."
+msgstr "صفحهٔ جاری مجموعه."
+
+#: wavira-core/src/Settings/SettingsSchema.php:97
+msgid "Default player volume (percent)"
+msgstr "بلندی صدای پیشفرض پخشکننده (درصد)"
+
+#: wavira-core/src/Settings/SettingsSchema.php:136
+msgid "Delete all music content when the plugin is uninstalled"
+msgstr "حذف همهٔ محتوای موسیقی هنگام حذف افزونه"
+
+#: wavira-core/src/Demo/Fixtures.php:204
+msgid "Demo Album"
+msgstr "آلبوم نمونه"
+
+#: wavira-core/src/Demo/Placeholders.php:181
+msgid "Demo album audio"
+msgstr "فایل صوتی آلبوم نمایشی"
+
+#: wavira-core/src/Demo/Fixtures.php:198
+msgid "Demo Artist"
+msgstr "هنرمند نمونه"
+
+#: wavira-core/src/Demo/Placeholders.php:128
+msgid "Demo audio file"
+msgstr "فایل صوتی نمایشی"
+
+#: wavira-core/src/Admin/DemoPage.php:268
+#. translators: 1: number of releases, 2: number of tracks, 3: number of generated files.
+msgid "Demo content imported: %1$d release, %2$d track and %3$d generated file (covers, audio, gallery photos). Open the front page to see it."
+msgid_plural "Demo content imported: %1$d releases, %2$d tracks and %3$d generated files (covers, audio, gallery photos). Open the front page to see it."
+msgstr[0] "محتوای نمایشی وارد شد: %1$d آلبوم، %2$d قطعه و %3$d فایل ساخته‌شده (جلد، صدا و تصویرهای گالری). برای دیدن آن، صفحهٔ اصلی را باز کنید."
+msgstr[1] "محتوای نمایشی وارد شد: %1$d آلبوم، %2$d قطعه و %3$d فایل ساخته‌شده (جلد، صدا و تصویرهای گالری). برای دیدن آن، صفحهٔ اصلی را باز کنید."
+
+#: wavira-core/src/Demo/Placeholders.php:56
+#: wavira-core/src/Demo/Placeholders.php:62
+msgid "Demo cover art"
+msgstr "تصویر جلد نمونه"
+
+#: wavira-core/src/Demo/Placeholders.php:87
+msgid "Demo gallery photo"
+msgstr "تصویر نمایشی گالری"
+
+#: wavira-core/src/Demo/Placeholders.php:97
+#. translators: %d: photo number in the demo gallery.
+msgid "Demo gallery photo %d"
+msgstr "تصویر نمونهٔ گالری %d"
+
+#: wavira-core/src/Demo/Fixtures.php:177
+msgid "Demo Genre"
+msgstr "سبک نمونه"
+
+#: wavira-core/src/Demo/Fixtures.php:213
+msgid "Demo Music Video"
+msgstr "موزیکویدیوی نمونه"
+
+#: wavira-core/src/Demo/Fixtures.php:184
+#. translators: %d: demo track number.
+msgid "Demo Track %d"
+msgstr "قطعهٔ نمونهٔ %d"
+
+#: wavira-core/src/Admin/DemoPage.php:148
+msgid "Download everything Wavira manages — artists, albums, tracks, videos, their terms and metadata — as a WXR file, the format any WordPress importer reads."
+msgstr "همهٔ آنچه واویرا مدیریت می‌کند — هنرمندان، آلبوم‌ها، قطعه‌ها، ویدیوها، اصطلاح‌ها و فراداده‌هایشان — را به‌صورت فایل WXR دانلود کنید؛ قالب‌بندی‌ای که هر ابزار ورود وردپرس می‌خواند."
+
+#: wavira-core/src/Admin/DemoPage.php:154
+msgid "Download WXR file"
+msgstr "دانلود فایل WXR"
+
+#: wavira-core/src/Rest/DownloadController.php:99
+msgid "Downloads are not available for this post."
+msgstr "دانلود برای این نوشته فعال نیست."
+
+#: wavira-core/src/Content/PostTypes.php:160
+#: wavira-core/src/Content/Taxonomies.php:279
+#. translators: %s: content type singular name.
+msgid "Edit %s"
+msgstr "ویرایش %s"
+
+#: wavira-core/src/Settings/SettingsSchema.php:73
+msgid "Enable the Label taxonomy"
+msgstr "فعالسازی طبقهبندی ناشر"
+
+#: wavira-core/src/Settings/SettingsSchema.php:68
+msgid "Enable the Language taxonomy"
+msgstr "فعالسازی طبقهبندی زبان"
+
+#: wavira-core/src/Settings/SettingsSchema.php:63
+msgid "Enable the Mood taxonomy"
+msgstr "فعالسازی طبقهبندی حالوهوا"
+
+#: wavira-core/src/Settings/SettingsSchema.php:78
+msgid "Enable the Release-year taxonomy"
+msgstr "فعالسازی طبقهبندی سال انتشار"
+
+#: wavira-core/src/Admin/DemoPage.php:145
+msgid "Export the music content"
+msgstr "برون‌بری محتوای موسیقی"
+
+#: wavira-core/src/Content/ArtistProfile.php:199
+msgid "Facebook"
+msgstr "فیس‌بوک"
+
+#: wavira-core/src/Settings/SettingsSchema.php:116
+msgid "Footer copyright text"
+msgstr "متن حق نشر پاورقی"
+
+#: wavira-core/src/Demo/Fixtures.php:199
+msgid "Generated demo biography. Replace with real content."
+msgstr "زندگینامهٔ نمونه. آن را با محتوای واقعی جایگزین کنید."
+
+#: wavira-core/src/Demo/Fixtures.php:176
+msgid "Generated demo lyrics — replace this text."
+msgstr "متن ترانهٔ نمونه — این متن را جایگزین کنید."
+
+#: wavira-core/src/Content/Taxonomies.php:202
+msgid "Genre"
+msgstr "سبک"
+
+#: wavira-core/src/Rest/PlayerController.php:83
+msgid "Genre slug for a genre queue."
+msgstr "نامک سبک برای صف سبک."
+
+#: wavira-core/src/Content/Taxonomies.php:201
+msgid "Genres"
+msgstr "سبک‌ها"
+
+#: wavira-core/src/Settings/SettingsSchema.php:122
+msgid "Global social profile URLs"
+msgstr "نشانی شبکه‌های اجتماعی سراسری"
+
+#: wavira-core/src/Admin/DemoPage.php:140
+msgid "Import demo content"
+msgstr "ورود محتوای نمایشی"
+
+#: wavira-core/src/Admin/DemoPage.php:116
+msgid "Import options"
+msgstr "تنظیمات ورود"
+
+#: wavira-core/src/Content/ArtistProfile.php:195
+msgid "Instagram"
+msgstr "اینستاگرام"
+
+#: wavira-core/src/Content/Taxonomies.php:211
+msgid "Kind"
+msgstr "گونه"
+
+#: wavira-core/src/Content/Taxonomies.php:210
+msgid "Kinds"
+msgstr "گونه‌ها"
+
+#: wavira-core/src/Content/Taxonomies.php:238
+msgid "Label"
+msgstr "ناشر"
+
+#: wavira-core/src/Content/Taxonomies.php:237
+msgid "Labels"
+msgstr "ناشران"
+
+#: wavira-core/src/Content/Taxonomies.php:229
+msgid "Language"
+msgstr "زبان"
+
+#: wavira-core/src/Content/Taxonomies.php:228
+msgid "Languages"
+msgstr "زبان‌ها"
+
+#: wavira-core/src/Rest/AbstractController.php:123
+msgid "Limit results to a genre slug."
+msgstr "محدود کردن نتایج به یک نامک سبک."
+
+#: wavira-core/src/Rest/AbstractController.php:135
+msgid "Limit results to an album post ID."
+msgstr "محدود کردن نتایج به شناسهٔ نوشتهٔ آلبوم."
+
+#: wavira-core/src/Rest/AbstractController.php:129
+msgid "Limit results to an artist post ID."
+msgstr "محدود کردن نتایج به شناسهٔ نوشتهٔ هنرمند."
+
+#: wavira-core/src/Rest/AbstractController.php:141
+msgid "Limit results to featured items."
+msgstr "محدود کردن نتایج به موارد ویژه."
+
+#: wavira-core/src/Rest/AbstractController.php:105
+msgid "Limit results to items matching a search term."
+msgstr "محدود کردن نتایج به موارد همخوان با عبارت جستوجو."
+
+#: wavira-core/src/Rest/SearchController.php:148
+msgid "Limit results to one entity type."
+msgstr "محدود کردن نتایج به یک نوع موجودیت."
+
+#: wavira-core/src/Player/Assets.php:193
+#. translators: %s: track title.
+msgid "Loading track…"
+msgstr "در حال بارگذاری قطعه…"
+
+#: wavira-core/src/Rest/AbstractController.php:97
+msgid "Maximum number of items returned."
+msgstr "بیشترین تعداد موارد بازگشتی."
+
+#: wavira-core/src/Rest/ContentController.php:95
+msgid "Maximum number of related items."
+msgstr "بیشترین تعداد موارد مرتبط."
+
+#: wavira-core/src/Rest/PlayerController.php:89
+msgid "Maximum number of tracks in the queue."
+msgstr "بیشترین تعداد قطعه در صف."
+
+#: wavira-core/src/Rest/SearchController.php:68
+msgid "Maximum suggestions per entity."
+msgstr "بیشترین پیشنهادها برای هر موجودیت."
+
+#: wavira-core/src/Content/Taxonomies.php:220
+msgid "Mood"
+msgstr "حالوهوا"
+
+#: wavira-core/src/Content/Taxonomies.php:219
+msgid "Moods"
+msgstr "حالوهواها"
+
+#: wavira-core/src/Settings/Settings.php:48
+msgid "Music product settings: appearance, content, player, downloads and data handling."
+msgstr "تنظیمات محصول موسیقی: ظاهر، محتوا، پخشکننده، دانلودها و مدیریت داده."
+
+#: wavira-core/src/Content/PostTypes.php:134
+msgid "Music video"
+msgstr "موزیکویدیو"
+
+#: wavira-core/src/Content/ArtistProfile.php:269
+#: wavira-core/src/Content/PostTypes.php:133
+msgid "Music videos"
+msgstr "موزیکویدیوها"
+
+#: wavira-core/src/Player/Assets.php:183
+msgid "Mute"
+msgstr "بیصدا"
+
+#: wavira-core/src/Admin/DemoPage.php:128
+msgid "Neutral English fixture: content only, nothing about the site is changed."
+msgstr "نمونهٔ انگلیسی خنثی: فقط محتوا؛ هیچ تنظیمی از سایت تغییر نمی‌کند."
+
+#: wavira-core/src/Content/PostTypes.php:165
+#. translators: %s: content type singular name.
+msgid "New %s"
+msgstr "%s تازه"
+
+#: wavira-core/src/Content/Taxonomies.php:294
+#. translators: %s: taxonomy singular name.
+msgid "New %s name"
+msgstr "نام %s تازه"
+
+#: wavira-core/src/Player/Assets.php:179
+msgid "Next track"
+msgstr "قطعهٔ بعدی"
+
+#: wavira-core/src/Rest/AbstractController.php:189
+#. translators: %s: entity name, e.g. "track".
+msgid "No %s found for the requested ID."
+msgstr "برای شناسهٔ درخواستی %s یافت نشد."
+
+#: wavira-core/src/Admin/DemoPage.php:107
+msgid "No audio or video files are imported."
+msgstr "هیچ فایل صوتی یا تصویری وارد نمی‌شود."
+
+#: wavira-core/src/Content/Taxonomies.php:102
+msgid "Noha"
+msgstr "نوحه"
+
+#: wavira-core/src/Content/PostTypes.php:179
+#. translators: %s: content type plural name.
+msgid "Nothing found in Trash."
+msgstr "چیزی در زبالهدان یافت نشد."
+
+#: wavira-core/src/Content/PostTypes.php:178
+#. translators: %s: content type plural name.
+msgid "Nothing found."
+msgstr "چیزی یافت نشد."
+
+#: wavira-core/src/Player/Assets.php:198
+#. translators: %s: track title.
+msgid "Now playing: %s"
+msgstr "در حال پخش: %s"
+
+#: wavira-core/src/Settings/SettingsSchema.php:104
+msgid "Offer audio downloads"
+msgstr "ارائهٔ دانلود صوتی"
+
+#: wavira-core/src/Player/Assets.php:201
+#. translators: 1: position in the queue, 2: queue length.
+msgid "Open the track page"
+msgstr "باز کردن صفحهٔ قطعه"
+
+#: wavira-core/src/Rest/AbstractController.php:117
+#: wavira-core/src/Rest/PlayerController.php:103
+msgid "Order direction."
+msgstr "جهت ترتیب."
+
+#: wavira-core/src/Player/Assets.php:178
+msgid "Pause"
+msgstr "توقف"
+
+#: wavira-core/src/Admin/DemoPage.php:121
+msgid "Persian demo (recommended): also sets the site language, the Tehran timezone, a Saturday week and Jalali dates."
+msgstr "نمایش فارسی (پیشنهادی): زبان سایت، منطقهٔ زمانی تهران، شروع هفته از شنبه و قالب تاریخ شمسی را هم تنظیم می‌کند."
+
+#: wavira-core/src/Player/Assets.php:177
+msgid "Play"
+msgstr "پخش"
+
+#: wavira-core/src/Player/Assets.php:190
+msgid "Play queue"
+msgstr "پخش صف"
+
+#: wavira-core/src/Player/Assets.php:204
+#. translators: %s: track title.
+msgid "Playback needs a tap on the play button first."
+msgstr "برای پخش، نخست دکمهٔ پخش را بزنید."
+
+#: wavira-core/wavira-core.php:119
+msgid "Plugin activation failed"
+msgstr "فعالسازی افزونه انجام نشد"
+
+#: wavira-core/src/Content/Taxonomies.php:103
+msgid "Podcast"
+msgstr "پادکست"
+
+#: wavira-core/src/Rest/DownloadController.php:54
+msgid "Post ID: a track, an album, a video or a cover/gallery image."
+msgstr "شناسهٔ نوشته: یک قطعه، یک آلبوم، یک ویدیو یا تصویر جلد/گالری."
+
+#: wavira-core/src/Player/Assets.php:180
+msgid "Previous track"
+msgstr "قطعهٔ قبلی"
+
+#: wavira-core/src/Rest/DownloadController.php:66
+msgid "Redirect to the file (default) instead of returning its URL as JSON."
+msgstr "هدایت به فایل (پیشفرض) بهجای بازگرداندن نشانی آن بهصورت JSON."
+
+#: wavira-core/src/Settings/SettingsSchema.php:58
+msgid "Related items per block"
+msgstr "موارد مرتبط در هر بخش"
+
+#: wavira-core/src/Content/Taxonomies.php:247
+msgid "Release year"
+msgstr "سال انتشار"
+
+#: wavira-core/src/Content/Taxonomies.php:246
+msgid "Release years"
+msgstr "سال‌های انتشار"
+
+#: wavira-core/src/Content/Taxonomies.php:101
+msgid "Remix"
+msgstr "ریمیکس"
+
+#: wavira-core/src/Content/PostTypes.php:187
+#. translators: %s: content type plural name.
+msgid "Remove cover image"
+msgstr "حذف تصویر جلد"
+
+#: wavira-core/src/Player/Assets.php:192
+#. translators: %s: track title.
+msgid "Remove from the queue: %s"
+msgstr "حذف از صف: %s"
+
+#: wavira-core/src/Player/Assets.php:203
+#. translators: %s: track title.
+msgid "Removed from the queue: %s"
+msgstr "از صف حذف شد: %s"
+
+#: wavira-core/src/Player/Assets.php:188
+msgid "Repeat all"
+msgstr "تکرار همه"
+
+#: wavira-core/src/Player/Assets.php:186
+msgid "Repeat mode"
+msgstr "حالت تکرار"
+
+#: wavira-core/src/Player/Assets.php:187
+msgid "Repeat off"
+msgstr "بدون تکرار"
+
+#: wavira-core/src/Player/Assets.php:189
+msgid "Repeat one"
+msgstr "تکرار یک قطعه"
+
+#: wavira-core/src/Admin/DemoPage.php:135
+msgid "Replace a demo that was imported before (only posts this importer created are removed)."
+msgstr "جایگزینی نمایشی که پیش‌تر وارد شده (فقط نوشته‌هایی که همین ابزار ساخته‌اند حذف می‌شوند)."
+
+#: wavira-core/src/Settings/SettingsSchema.php:109
+msgid "Require a logged-in user to download"
+msgstr "الزام ورود کاربر برای دانلود"
+
+#: wavira-core/src/Content/PostTypes.php:175
+#: wavira-core/src/Content/Taxonomies.php:269
+#. translators: %s: content type plural name.
+msgid "Search %s"
+msgstr "جستوجوی %s"
+
+#: wavira-core/src/Rest/SearchController.php:62
+#: wavira-core/src/Rest/SearchController.php:141
+msgid "Search term."
+msgstr "عبارت جستوجو."
+
+#: wavira-core/src/Player/Assets.php:181
+msgid "Seek"
+msgstr "جابهجایی در قطعه"
+
+#: wavira-core/src/Content/PostTypes.php:186
+#. translators: %s: content type plural name.
+msgid "Set cover image"
+msgstr "تعیین تصویر جلد"
+
+#: wavira-core/src/Settings/SettingsSchema.php:37
+msgid "Show the light/dark switch"
+msgstr "نمایش کلید روشن/تاریک"
+
+#: wavira-core/src/Settings/SettingsSchema.php:85
+msgid "Show the sticky player bar"
+msgstr "نمایش نوار چسبان پخشکننده"
+
+#: wavira-core/src/Player/Assets.php:185
+msgid "Shuffle"
+msgstr "پخش تصادفی"
+
+#: wavira-core/src/Content/Taxonomies.php:100
+msgid "Single"
+msgstr "تک‌آهنگ"
+
+#: wavira-core/src/Content/ArtistProfile.php:266
+msgid "Singles"
+msgstr "تک‌آهنگ‌ها"
+
+#: wavira-core/src/Demo/Installer.php:427
+msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
+msgstr "زبان سایت، منطقهٔ زمانی، نخستین روز هفته و قالب تاریخ روی پیش‌فرض‌های ایرانی تنظیم شد."
+
+#: wavira-core/src/Rest/AbstractController.php:111
+#: wavira-core/src/Rest/PlayerController.php:97
+msgid "Sort collection by field."
+msgstr "ترتیب مجموعه بر پایهٔ فیلد."
+
+#: wavira-core/src/Rest/PlayerController.php:77
+msgid "Source post ID for album, artist and related queues."
+msgstr "شناسهٔ نوشتهٔ مبدأ برای صف‌های آلبوم، هنرمند و موارد مرتبط."
+
+#: wavira-core/src/Settings/SettingsSchema.php:42
+msgid "Start in dark mode"
+msgstr "شروع در حالت تاریک"
+
+#: wavira-core/src/Content/ArtistProfile.php:196
+msgid "Telegram"
+msgstr "تلگرام"
+
+#: wavira-core/src/Admin/DemoPage.php:288
+#. translators: %s: error message.
+msgid "The demo content could not be imported: %s"
+msgstr "محتوای نمایشی وارد نشد: %s"
+
+#: wavira-core/src/Admin/DemoPage.php:291
+#. translators: %s: error message.
+msgid "The demo content could not be imported."
+msgstr "محتوای نمایشی وارد نشد."
+
+#: wavira-core/src/Admin/DemoPage.php:103
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
+msgstr "این نمایش یک سایت موسیقی فارسی کوچک و کامل است: یک هنرمند، یک آلبوم با پانزده قطعه (شامل یک ریمیکس)، یک تک‌آهنگ و یک موزیک‌ویدیو — همراه با متن ترانه، سبک، مدت و تاریخ شمسی."
+
+#: wavira-core/src/Rest/DownloadController.php:98
+#: wavira-core/src/Rest/DownloadController.php:117
+msgid "There is no downloadable file for this post."
+msgstr "فایل قابل دانلودی برای این نوشته موجود نیست."
+
+#: wavira-core/src/Player/Assets.php:196
+msgid "There is nothing to play here."
+msgstr "اینجا چیزی برای پخش نیست."
+
+#: wavira-core/src/Demo/Installer.php:488
+msgid "This is a sample page. Write what your visitors should know about the music, the artists and how to reach you."
+msgstr "این یک برگهٔ نمونه است. بنویسید که بازدیدکنندگان باید دربارهٔ موسیقی، هنرمندان و راه ارتباط با شما چه بدانند."
+
+#: wavira-core/src/Demo/Installer.php:483
+msgid "This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here."
+msgstr "این نخستین نوشتهٔ شماست. ویرایشش کنید، با خبرهای خودتان عوضش کنید یا پاکش کنید — صفحهٔ اصلی بخشی دارد که هر چه اینجا منتشر کنید نشان می‌دهد."
+
+#: wavira-core/src/Admin/DemoPage.php:281
+msgid "This site already has tracks, so nothing was imported. Tick the replace box to import the demo anyway."
+msgstr "این سایت از پیش قطعه دارد، پس چیزی وارد نشد. برای ورود نمایش، گزینهٔ جایگزینی را تیک بزنید."
+
+#: wavira-core/src/Player/Assets.php:195
+#. translators: %s: track title.
+msgid "This track could not be played."
+msgstr "این قطعه پخش نشد."
+
+#: wavira-core/src/Content/PostTypes.php:127
+msgid "Track"
+msgstr "قطعه"
+
+#: wavira-core/src/Player/Assets.php:200
+#. translators: 1: position in the queue, 2: queue length.
+msgid "Track %1$d of %2$d"
+msgstr "قطعهٔ %1$d از %2$d"
+
+#: wavira-core/src/Content/MetaValues.php:176
+#. translators: 1: minutes, 2: seconds, zero-padded.
+#, keep-latin
+msgctxt "track duration"
+msgid "%1$s:%2$s"
+msgstr "%1$s:%2$s"
+
+#: wavira-core/src/Rest/PlayerController.php:53
+msgid "Track post ID."
+msgstr "شناسهٔ نوشتهٔ قطعه."
+
+#: wavira-core/src/Content/PostTypes.php:126
+msgid "Tracks"
+msgstr "قطعه‌ها"
+
+#: wavira-core/src/Demo/Installer.php:75
+msgid "Tracks already exist — nothing was imported. Use force to import anyway."
+msgstr "قطعه‌ها از پیش وجود دارند — چیزی وارد نشد. برای ورود دوباره گزینهٔ جایگزینی را فعال کنید."
+
+#: wavira-core/src/Settings/SettingsSchema.php:51
+msgid "Tracks per archive page"
+msgstr "تعداد قطعه در هر صفحهٔ آرشیو"
+
+#: wavira-core/src/Demo/Installer.php:464
+msgid "Uncategorized"
+msgstr "دسته‌بندی‌نشده"
+
+#: wavira-core/src/Rest/ContentController.php:89
+#: wavira-core/src/Rest/ContentController.php:117
+msgid "Unique identifier for the object."
+msgstr "شناسهٔ یکتای شیء."
+
+#: wavira-core/src/Player/Assets.php:184
+msgid "Unmute"
+msgstr "باصدا"
+
+#: wavira-core/src/Content/Taxonomies.php:284
+#. translators: %s: taxonomy singular name.
+msgid "Update %s"
+msgstr "بهروزرسانی %s"
+
+#: wavira-core/src/Content/PostTypes.php:188
+msgid "Use as cover image"
+msgstr "استفاده بهعنوان تصویر جلد"
+
+#: wavira-core/src/Content/PostTypes.php:170
+#. translators: %s: content type singular name.
+msgid "View %s"
+msgstr "مشاهدهٔ %s"
+
+#: wavira-core/src/Player/Assets.php:182
+msgid "Volume"
+msgstr "بلندی صدا"
+
+#: wavira-core/wavira-core.php:96
+#. translators: 1: required PHP version, 2: required WordPress version.
+msgid "Wavira Core needs PHP %1$s+ and WordPress %2$s+ to run. Music features are disabled until the server meets these versions."
+msgstr "افزونهٔ واویرا کور برای اجرا به PHP %1$s+ و وردپرس %2$s+ نیاز دارد. تا زمانی که سرور این نسخه‌ها را برآورده نکند، امکانات موسیقی غیرفعال است."
+
+#: wavira-core/wavira-core.php:47
+#. translators: 1: required PHP version, 2: current PHP version.
+msgid "Wavira Core requires PHP %1$s or newer. This server runs PHP %2$s, so music features are disabled."
+msgstr "واویرا کور به PHP %1$s یا بالاتر نیاز دارد. این سرور PHP %2$s را اجرا میکند، بنابراین امکانات موسیقی غیرفعال است."
+
+#: wavira-core/wavira-core.php:118
+msgid "Wavira Core was deactivated: your server does not meet the minimum PHP or WordPress version."
+msgstr "واویرا کور غیرفعال شد: سرور شما کمترین نسخهٔ PHP یا وردپرس لازم را برآورده نمیکند."
+
+#: wavira-core/src/Admin/DemoPage.php:76
+#: wavira-core/src/Admin/DemoPage.php:77
+#: wavira-core/src/Admin/DemoPage.php:98
+msgid "Wavira demo content"
+msgstr "محتوای نمایشی واویرا"
+
+#: wavira-core/src/Settings/Settings.php:47
+msgid "Wavira settings"
+msgstr "تنظیمات واویرا"
+
+#: wavira-core/src/Demo/Installer.php:482
+msgid "Welcome to the music site"
+msgstr "به سایت موسیقی خوش آمدید"
+
+#: wavira-core/src/Rest/PlayerController.php:71
+msgid "What the queue is built from."
+msgstr "صف از چه چیزی ساخته میشود."
+
+#: wavira-core/src/Demo/Installer.php:435
+#. translators: %d: number of sample posts and pages.
+msgid "WordPress’s sample content (%d item(s)) now reads in the site’s language."
+msgstr "محتوای نمونهٔ وردپرس (%d مورد) اکنون به زبان سایت خوانده می‌شود."
+
+#: wavira-core/src/Content/ArtistProfile.php:272
+msgid "Works"
+msgstr "آثار"
+
+#: wavira-core/src/Content/ArtistProfile.php:200
+msgid "X (Twitter)"
+msgstr "ایکس (توییتر)"
+
+#: wavira-core/src/Admin/DemoPage.php:208
+msgid "You are not allowed to export this site."
+msgstr "شما اجازهٔ برون‌بری این سایت را ندارید."
+
+#: wavira-core/src/Admin/DemoPage.php:167
+msgid "You are not allowed to import demo content on this site."
+msgstr "شما اجازهٔ ورود محتوای نمایشی در این سایت را ندارید."
+
+#: wavira-core/src/Content/ArtistProfile.php:197
+msgid "YouTube"
+msgstr "یوتیوب"

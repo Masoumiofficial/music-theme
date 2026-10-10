@@ -1,0 +1,200 @@
+/*!
+ * Wavira — design tokens (layer 1 of 4).
+ *
+ * theme.json owns the block-editor palette, type scale, spacing scale, radii,
+ * shadows and motion. This layer adds the product tokens a Music site needs and
+ * — more importantly — implements dark mode in exactly one place.
+ *
+ * Dark mode strategy (ADR 0014): every colour in the product is consumed through
+ * the `--wp--preset--color--*` variables. Remapping those variables for the dark
+ * theme therefore restyles the theme CSS *and* every block that uses a preset,
+ * with no second stylesheet and no duplicated rules.
+ *
+ * The mode attribute lives on <html>: `light`, `dark`, or `auto` (follow the
+ * system). `auto` resolves in CSS through prefers-color-scheme, so the first
+ * paint is correct before any script runs.
+ *
+ * Colours must keep their WCAG 2.2 AA contrast in both modes; the pairs are
+ * machine-checked by tools/check-contrast.mjs (tools/lint.sh gate 7).
+ */
+
+:root {
+	/* Product tokens theme.json does not express. */
+	--wavira-header-height: 4.5rem;
+	/* Layout width, logo size and social icon size: the three settings the
+	   options panel changes most often, exposed as tokens so a site owner's
+	   value reaches every component without a second stylesheet (ADR 0020). */
+	--wavira-container: var(--wp--style--global--wide-size, 1200px);
+	--wavira-logo-width: 150px;
+	--wavira-social-size: 22px;
+	--wavira-social-gap: var(--wp--preset--spacing--30, 0.75rem);
+	--wavira-measure: 62ch;
+	--wavira-cover-ratio: 1 / 1;
+	--wavira-cover-radius: var(--wp--custom--radius--md, 12px);
+	--wavira-cover-shadow: var(--wp--preset--shadow--md, 0 4px 12px -2px rgb(0 0 0 / 12%));
+	--wavira-hairline: 1px solid var(--wp--preset--color--border, #d6d9e2);
+	--wavira-ring: 0 0 0 3px color-mix(in srgb, var(--wp--preset--color--primary, #5636d6) 35%, transparent);
+	--wavira-body-min: 360px;
+
+	/* Text on an accent-filled badge: both accents are bright, so both modes use
+	   near-black. In the dark palette that is `base`, in the light one `contrast`
+	   — expressed as a token so no component has to know the mode. */
+	--wavira-on-accent: var(--wp--preset--color--contrast);
+
+	/* Room reserved under the last template block for the fixed player bar. */
+	--wavira-player-space: var(--wp--custom--player--bar-space, 6rem);
+
+	/* ---- the glass material (0.15.0) ---------------------------------------
+	 * The chrome is translucent: a material is a tinted, blurred, slightly
+	 * saturated surface rather than a flat colour. Three rules keep it honest.
+	 *
+	 * 1. Text is drawn on the tint, and the tint is the palette's own colour —
+	 *    so the pair `check-contrast.mjs` asserts (contrast on base/surface) is
+	 *    the *worse* case over any backdrop, not the better one. The tint is
+	 *    never so thin that a photograph behind it decides the text's contrast.
+	 * 2. Every material has an opaque fallback, and it is one override rather
+	 *    than one per component: `@supports not (backdrop-filter: …)` and
+	 *    `prefers-reduced-transparency: reduce` — Apple's own accessibility
+	 *    setting — both redefine these four tokens, so a browser without blur
+	 *    and a visitor who asked for less transparency get a solid panel.
+	 * 3. The top highlight and the hairline are decoration: nothing depends on
+	 *    them to be legible, and controls keep their own borders (WCAG 1.4.11).
+	 */
+	--wavira-glass-blur: 20px;
+	--wavira-glass-saturate: 160%;
+	--wavira-glass-tint: 74%;
+	--wavira-glass-tint-soft: 58%;
+	--wavira-glass-filter: blur(var(--wavira-glass-blur)) saturate(var(--wavira-glass-saturate));
+	--wavira-glass-bg: color-mix(in srgb, var(--wp--preset--color--base) var(--wavira-glass-tint), transparent);
+	--wavira-glass-bg-soft: color-mix(in srgb, var(--wp--preset--color--base) var(--wavira-glass-tint-soft), transparent);
+	--wavira-glass-surface: color-mix(in srgb, var(--wp--preset--color--surface) var(--wavira-glass-tint), transparent);
+	--wavira-glass-border: color-mix(in srgb, var(--wp--preset--color--contrast) 12%, transparent);
+	--wavira-glass-highlight: color-mix(in srgb, #ffffff 42%, transparent);
+	--wavira-glass-shadow: var(--wp--preset--shadow--md, 0 4px 12px -2px rgb(0 0 0 / 12%));
+
+	color-scheme: light;
+}
+
+/* The material, once: components consume the tokens above, never the filter. */
+.wavira-glass {
+	background: var(--wavira-glass-bg);
+	backdrop-filter: var(--wavira-glass-filter);
+	border: 1px solid var(--wavira-glass-border);
+	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	:root {
+		--wavira-glass-filter: none;
+		--wavira-glass-bg: var(--wp--preset--color--base);
+		--wavira-glass-bg-soft: var(--wp--preset--color--surface);
+		--wavira-glass-surface: var(--wp--preset--color--surface);
+		--wavira-glass-highlight: transparent;
+	}
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+	:root {
+		--wavira-glass-filter: none;
+		--wavira-glass-bg: var(--wp--preset--color--base);
+		--wavira-glass-bg-soft: var(--wp--preset--color--surface);
+		--wavira-glass-surface: var(--wp--preset--color--surface);
+		--wavira-glass-highlight: transparent;
+	}
+}
+
+/* The settings panel can turn the material off: the same override, reached by a
+   body class instead of a media query, so the switch needs no second
+   stylesheet and no `!important` (ADR 0020). */
+body.wavira-no-glass {
+	--wavira-glass-filter: none;
+	--wavira-glass-bg: var(--wp--preset--color--base);
+	--wavira-glass-bg-soft: var(--wp--preset--color--surface);
+	--wavira-glass-surface: var(--wp--preset--color--surface);
+	--wavira-glass-highlight: transparent;
+}
+
+/* ---- dark mode --------------------------------------------------------- */
+
+[data-theme="dark"] {
+	--wp--preset--color--base: #0b0c10;
+	--wp--preset--color--surface: #16181f;
+	--wp--preset--color--contrast: #f5f6fa;
+	--wp--preset--color--muted: #b6bcca;
+	--wp--preset--color--border: #2c303b;
+	--wp--preset--color--primary: #b8a7ff;
+	--wp--preset--color--primary-dark: #cfc4ff;
+	--wp--preset--color--accent: #2fe3bd;
+	--wp--preset--color--danger: #ff9a90;
+
+	--wavira-cover-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+	--wavira-hairline: 1px solid var(--wp--preset--color--border, #2c303b);
+	--wavira-on-accent: var(--wp--preset--color--base);
+
+	/* Glass in the dark: a lighter top edge, a wider shadow, and a slightly
+	   thicker tint, because there is less light behind it to lift the surface. */
+	--wavira-glass-tint: 78%;
+	--wavira-glass-tint-soft: 62%;
+	--wavira-glass-border: color-mix(in srgb, var(--wp--preset--color--contrast) 14%, transparent);
+	--wavira-glass-highlight: color-mix(in srgb, #ffffff 16%, transparent);
+	--wavira-glass-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+
+	color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+	/* `auto` is the default and the only value that follows the system. */
+	[data-theme="auto"] {
+		--wp--preset--color--base: #0b0c10;
+		--wp--preset--color--surface: #16181f;
+		--wp--preset--color--contrast: #f5f6fa;
+		--wp--preset--color--muted: #b6bcca;
+		--wp--preset--color--border: #2c303b;
+		--wp--preset--color--primary: #b8a7ff;
+		--wp--preset--color--primary-dark: #cfc4ff;
+		--wp--preset--color--accent: #2fe3bd;
+		--wp--preset--color--danger: #ff9a90;
+
+		--wavira-cover-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+		--wavira-hairline: 1px solid var(--wp--preset--color--border, #2c303b);
+		--wavira-on-accent: var(--wp--preset--color--base);
+		--wavira-glass-tint: 78%;
+		--wavira-glass-tint-soft: 62%;
+		--wavira-glass-border: color-mix(in srgb, var(--wp--preset--color--contrast) 14%, transparent);
+		--wavira-glass-highlight: color-mix(in srgb, #ffffff 16%, transparent);
+		--wavira-glass-shadow: var(--wp--preset--shadow--lg, 0 16px 40px -12px rgb(0 0 0 / 55%));
+
+		color-scheme: dark;
+	}
+}
+
+/* ---- the component's token contract ------------------------------------ */
+
+/* The player ships neutral defaults (plugin CSS). The theme only points those
+   tokens at the palette, which is why the component follows dark mode without a
+   single duplicated selector (ADR 0002, ADR 0014). */
+.wavira-site-player,
+.wavira-player {
+	--wavira-player-bg: var(--wp--preset--color--base);
+	--wavira-player-surface: var(--wp--preset--color--surface);
+	--wavira-player-fg: var(--wp--preset--color--contrast);
+	--wavira-player-muted: var(--wp--preset--color--muted);
+	--wavira-player-accent: var(--wp--preset--color--primary);
+	--wavira-player-accent-fg: var(--wp--preset--color--base);
+	--wavira-player-border: var(--wp--preset--color--border);
+	--wavira-player-danger: var(--wp--preset--color--danger);
+	--wavira-player-focus: var(--wp--preset--color--primary-dark);
+	--wavira-player-radius: var(--wp--custom--radius--md, 12px);
+	--wavira-player-gap: var(--wp--preset--spacing--40, 1rem);
+	--wavira-player-shadow: var(--wp--preset--shadow--lg);
+}
+
+/* ---- motion ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--wp--custom--motion--fast: 0.01ms;
+		--wp--custom--motion--base: 0.01ms;
+		--wp--custom--motion--slow: 0.01ms;
+	}
+}

@@ -1,0 +1,99 @@
+/* Harness chrome only — never shipped, never part of the product stylesheet. */
+
+:root {
+	color-scheme: dark;
+	--chrome-bg: #12141a;
+	--chrome-panel: #1b1e26;
+	--chrome-fg: #e8eaf0;
+	--chrome-muted: #9aa1b1;
+	--chrome-line: #2c313c;
+	--chrome-accent: #8f7bff;
+	font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--chrome-bg);
+	color: var(--chrome-fg);
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.chrome-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.25rem;
+	align-items: center;
+	padding: 0.75rem 1rem;
+	border-block-end: 1px solid var(--chrome-line);
+	background: var(--chrome-panel);
+	position: sticky;
+	inset-block-start: 0;
+	z-index: 2;
+}
+
+.chrome-group {
+	display: flex;
+	gap: 0.35rem;
+	align-items: center;
+}
+
+.chrome-group > span:first-child {
+	color: var(--chrome-muted);
+	margin-inline-end: 0.35rem;
+}
+
+.chrome-bar button {
+	font: inherit;
+	color: inherit;
+	background: #232734;
+	border: 1px solid var(--chrome-line);
+	border-radius: 8px;
+	padding: 0.3rem 0.7rem;
+	cursor: pointer;
+}
+
+.chrome-bar button[aria-pressed="true"] {
+	border-color: var(--chrome-accent);
+	background: #2e2a4d;
+}
+
+.chrome-bar button:focus-visible {
+	outline: 2px solid var(--chrome-accent);
+	outline-offset: 2px;
+}
+
+.chrome-readout {
+	margin-inline-start: auto;
+	color: var(--chrome-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.chrome-stage {
+	padding: 1rem;
+	display: grid;
+	gap: 0.5rem;
+	justify-items: center;
+	overflow-x: auto;
+}
+
+.chrome-stage iframe {
+	inline-size: min(100%, 1440px);
+	block-size: 78vh;
+	border: 1px solid var(--chrome-line);
+	border-radius: 12px;
+	background: #fff;
+}
+
+.chrome-notes {
+	max-inline-size: 72ch;
+	color: var(--chrome-muted);
+}
+
+.chrome-notes strong {
+	color: var(--chrome-fg);
+}

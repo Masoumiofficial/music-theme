@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<ruleset name="Wavira">
+	<description>Coding standards for the Wavira theme and core plugin.</description>
+
+	<file>wavira</file>
+	<file>wavira-core</file>
+
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/assets/dist/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+	<arg name="parallel" value="8"/>
+
+	<!-- Baseline: WordPress Coding Standards. -->
+	<rule ref="WordPress-Core"/>
+	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress-Extra"/>
+
+	<!-- PHP compatibility with the declared floor (ADR 0007). -->
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Text domains must match the artifact (ADR 0008). -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="wavira"/>
+				<element value="wavira-core"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- File naming vs. PSR-4 (docs/ARCHITECTURE.md, ADR 0002).
+	     wavira-core/src/ is an autoloaded PSR-4 tree: every file is named exactly
+	     after the class it declares (CacheInvalidator.php => Wavira\Core\Support\CacheInvalidator),
+	     which the autoloader requires. WPCS 3.x runs its lowercase-hyphenated file name
+	     check unconditionally (strict_class_file_names only governs the extra class- prefix
+	     check), so the sniff is excluded for that one tree and enforced everywhere else
+	     (inc/, templates/, tools/, root files). Rationale and the verification that WPCS
+	     cannot express "PSR-4 file names" otherwise: docs/CODING-STANDARD.md P4. -->
+	<rule ref="WordPress.Files.FileName">
+		<properties>
+			<property name="strict_class_file_names" value="false"/>
+		</properties>
+		<exclude-pattern>*/wavira-core/src/*</exclude-pattern>
+	</rule>
+
+	<!-- Deliberate, documented relaxations. -->
+	<!-- The plugin uses PSR-4 autoloading with namespaced classes. -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="wavira"/>
+				<element value="Wavira"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- Rules from CODING-STANDARD.md that must never regress are enforced by tooling:
+	     no posts_per_page -1, no srcset disabling, no wp_is_mobile layout sniffing,
+	     no deprecated APIs. Those are checked by tools/lint.sh (grep gate) in CI. -->
+
+	<!-- Docblock asterisks must line up. WPCS enables this sniff in later releases and
+	     the CI gate installs the newest toolchain, so it is named here explicitly: the
+	     local pre-check and CI then agree on the same rule set. -->
+	<rule ref="Squiz.Commenting.DocCommentAlignment"/>
+
+	<rule ref="Generic.CodeAnalysis.UselessOverridingMethod"/>
+	<rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+</ruleset>

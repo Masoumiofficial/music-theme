@@ -1,0 +1,1006 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+    # A version tag is a release: the same archives this workflow verifies are
+    # attached to the GitHub release, so a version has one stable download URL.
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # PHP: syntax on the declared floor, behaviour on modern releases.
+  # ---------------------------------------------------------------------------
+  php-lint:
+    name: "PHP ${{ matrix.php }} syntax"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: Syntax check (theme + core plugin + tools)
+        run: |
+          set -euo pipefail
+          find wavira wavira-core tools -type f -name '*.php' -not -path '*/vendor/*' -not -path '*/assets/dist/*' -print0 \
+            | xargs -0 -r -n1 php -l
+          echo "PHP syntax OK on ${{ matrix.php }}"
+
+      - name: Exporter harness (WordPress-free)
+        # The three exporter behaviours WordPress cannot be asked about inside one
+        # process: a header warning that must not reach the caller, a second export
+        # in one request (Core fatals on it), and an empty export reported as a
+        # failure. Development-only file; see tools/README.md.
+        if: matrix.php == '8.2'
+        run: |
+          set -euo pipefail
+          for scenario in main foreign empty; do
+            echo "--- scenario: ${scenario}"
+            php tools/harness/export.php "${scenario}"
+          done
+
+  # ---------------------------------------------------------------------------
+  # WordPress Coding Standards + PHPCompatibilityWP (declared floor 7.4).
+  # ---------------------------------------------------------------------------
+  phpcs:
+    name: WPCS + PHP compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.json') }}
+          restore-keys: composer-
+
+      - name: Install dev tooling
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPCS
+        # Emits every violation as a GitHub annotation (file, line, column, rule)
+        # so the report is readable from the PR "Files changed" view and the
+        # Checks API — not only inside the raw job log.
+        run: |
+          set -uo pipefail
+          vendor/bin/phpcs --standard=phpcs.xml.dist --report=json -q > /tmp/phpcs.json || true
+          php -r '
+            $data = json_decode( (string) file_get_contents( "/tmp/phpcs.json" ), true );
+            if ( ! is_array( $data ) ) { fwrite( STDERR, "phpcs produced no JSON report\n" ); exit( 2 ); }
+            $total = (int) ( $data["totals"]["errors"] ?? 0 ) + (int) ( $data["totals"]["warnings"] ?? 0 );
+            $n     = 0;
+            foreach ( ( $data["files"] ?? [] ) as $file => $info ) {
+              foreach ( ( $info["messages"] ?? [] ) as $m ) {
+                $n++;
+                $line = (int) ( $m["line"] ?? 1 );
+                $col  = (int) ( $m["column"] ?? 1 );
+                $msg  = str_replace( ["\r", "\n", "::"], " ", (string) ( $m["message"] ?? "" ) );
+                $type = ( "ERROR" === ( $m["type"] ?? "" ) ) ? "error" : "warning";
+                echo "::{$type} file=" . $file . ",line=" . $line . ",col=" . $col . "::[" . ( $m["source"] ?? "phpcs" ) . "] " . $msg . "\n";
+              }
+            }
+            echo "PHPCS annotations emitted: {$n}; reported totals: {$total}\n";
+            if ( $total > 0 ) { exit( 1 ); }
+          '
+
+  # ---------------------------------------------------------------------------
+  # Runtime: the integration suite on a real WordPress install with a real
+  # database. Static analysis cannot prove that the data model registers, that
+  # the REST routes answer, or that counters and caches behave (docs/VERIFICATION.md).
+  # ---------------------------------------------------------------------------
+  wp-integration:
+    name: "WordPress integration (PHP ${{ matrix.php }})"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.2']
+    services:
+      # MariaDB keeps the server and the runner's default client in the same
+      # protocol family; MySQL 8's caching_sha2_password cannot be negotiated by
+      # the client the Ubuntu images ship (verified by a failing CI run).
+      database:
+        image: mariadb:10.11
+        env:
+          # Only the credentials are seeded on purpose: install-wp-tests.sh drops
+          # and creates the test database itself, and prompts interactively when
+          # the database already exists (fatal in CI, no TTY). Verified by run
+          # 37300269096: `MARIADB_DATABASE: wordpress_test` made the installer
+          # stop at 'Are you sure you want to proceed? [y/N]'.
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+          extensions: mysqli, mbstring, curl, dom, exif, fileinfo, iconv, openssl, simplexml, tokenizer, xml, xmlwriter, zip
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-integration-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-integration-
+
+      - name: Install dev tooling
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Build front-end assets
+        # The player bundle must exist so the suite verifies the real enqueue
+        # path (registered handle + inline settings), not only the fallback.
+        run: node tools/build.mjs
+
+      - name: Install database and subversion clients
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion default-mysql-client rsync
+
+      - name: Prepare database (annotated)
+        run: |
+          set -o pipefail
+          MYSQL="mysql -h 127.0.0.1 -uroot -proot"
+          {
+            echo "mysql client: $(mysql --version 2>&1)"
+            echo "ping: $(mysqladmin ping -h 127.0.0.1 -uroot -proot 2>&1)"
+            $MYSQL -e "CREATE DATABASE IF NOT EXISTS wavira_probe; DROP DATABASE wavira_probe;" 2>&1
+            echo "create/drop probe database ok"
+            # install-wp-tests.sh must create the test database itself; a service
+            # image that seeds it would trigger its interactive prompt.
+            $MYSQL -e "DROP DATABASE IF EXISTS wordpress_test;" 2>&1
+            echo "test database dropped if it existed"
+            $MYSQL -e "SHOW DATABASES;" 2>&1
+          } 2>&1 | tee /tmp/dbcheck.log
+          node tools/annotate-log.mjs /tmp/dbcheck.log dbcheck 12 warning
+
+      - name: Install the WordPress test library
+        run: |
+          set -euo pipefail
+          if mysql -h 127.0.0.1 -uroot -proot -e "SHOW DATABASES;" 2>/dev/null | grep -qx wordpress_test; then
+            echo "::error::wordpress_test existed before install — refusing to let the installer prompt interactively."
+            exit 1
+          fi
+          # stdin from /dev/null: if a prompt is ever reached the script fails fast
+          # instead of hanging on a missing TTY.
+          bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest < /dev/null 2>&1 | tee /tmp/install.log
+
+      - name: Record the WordPress version under test
+        # `install-wp-tests.sh … latest` resolves to whatever is released that
+        # day, so "Tested up to" in the headers and the docs has no evidence
+        # unless the version is written down where it can be quoted.
+        run: |
+          set -uo pipefail
+          VERSION="$(php -r 'require "/tmp/wordpress/wp-includes/version.php"; echo $wp_version;' 2>/dev/null || true)"
+          echo "::notice title=WordPress under test::PHP ${{ matrix.php }} — WordPress ${VERSION:-unknown}"
+          echo "WordPress under test: ${VERSION:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the integration suite
+        env:
+          WP_TESTS_DIR: /tmp/wordpress-tests-lib
+        run: |
+          # The exit status is recorded, not thrown, so the annotation steps below
+          # always run and the failure is readable from the checks API. The last
+          # step of the job turns a non-zero status into a failed job: a fatal
+          # error inside a test must not pass as green because the pipeline ended
+          # in `tee`.
+          set -o pipefail
+          if vendor/bin/phpunit --log-junit /tmp/junit.xml --testdox 2>&1 | tee /tmp/phpunit.log; then
+            echo 0 > /tmp/phpunit.exit
+          else
+            echo "${PIPESTATUS[0]:-1}" > /tmp/phpunit.exit
+          fi
+
+      - name: Report install log
+        if: always()
+        run: node tools/annotate-log.mjs /tmp/install.log install-wp-tests 30 warning
+
+      - name: Report PHPUnit log
+        if: always()
+        run: |
+          if [ -f /tmp/phpunit.log ]; then
+            node tools/annotate-log.mjs /tmp/phpunit.log phpunit 60
+          else
+            echo "::notice::No PHPUnit log — the suite did not run because an earlier step failed."
+          fi
+
+      - name: Annotate failures (readable without job logs)
+        if: always()
+        run: |
+          test -f /tmp/junit.xml || { echo "::error::PHPUnit produced no JUnit report — see the annotated log above."; exit 1; }
+          node tools/junit-annotate.mjs /tmp/junit.xml
+
+      - name: Fail the job if the suite did not pass
+        # Runs last so the annotations above are published first. A non-zero
+        # PHPUnit status means a failing test, a fatal error, or a suite that
+        # never finished — none of which is a green build.
+        if: always()
+        run: |
+          CODE="$(cat /tmp/phpunit.exit 2>/dev/null || echo missing)"
+          if [ "$CODE" != "0" ]; then
+            echo "::error::PHPUnit did not exit cleanly (exit ${CODE}) — see the annotated log above."
+            exit 1
+          fi
+          echo "PHPUnit exited 0."
+
+  # ---------------------------------------------------------------------------
+  # Assets & gates: JS syntax, JSON validity, CSS and contrast gates, PHP class
+  # references, legacy-echo gate, module boundaries, the real build and both
+  # DOM-free unit suites.
+  # ---------------------------------------------------------------------------
+  assets-and-gates:
+    name: JS, JSON, gates, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        # A real build (not --check) so the asset-size report below and the
+        # engine unit tests run against the artefact that ships.
+        run: node tools/build.mjs
+
+      - name: Full lint gate
+        run: bash tools/lint.sh
+
+      - name: Front-end unit tests (DOM-free)
+        # The same command `npm run test:js` runs: the player engine, the theme
+        # script, the Customizer preview, the settings screen, the renderer's and
+        # the catalogue's guard rails. A glob rather than a list, because a list
+        # in two places is a test file that runs in one of them — the Persian
+        # labels gate was written, tested and silently not run in CI for an hour.
+        run: node --test tests/js/*.test.mjs
+
+      - name: Bundle size report (gzipped)
+        run: |
+          set -euo pipefail
+          for file in wavira-core/assets/dist/core.js wavira/assets/dist/theme.js; do
+            [ -f "$file" ] || continue
+            printf '%s — %s raw, %s gzipped\n' "$file" "$(du -h "$file" | cut -f1)" "$(gzip -9 -c "$file" | wc -c | awk '{printf "%.1f KB", $1/1024}')"
+          done
+
+  # ---------------------------------------------------------------------------
+  # Rendered theme: a real WordPress, a real browser.
+  #
+  # `wavira/screenshot.png` is the one thing a marketplace requires that cannot
+  # be produced from source: it is a picture of the theme with content on it, and
+  # the authoring environment has no browser (docs/RELEASE-CANDIDATE.md §6,
+  # item 1; `node tools/package.mjs --strict` fails while it is missing). So the
+  # render happens here, where both a browser and WordPress exist: the Persian
+  # demo is seeded into a throwaway site, the site is served, and
+  # `tools/screenshot.mjs` captures the front page at 1200×900, two inner pages,
+  # a dark-mode home and an axe-core report.
+  #
+  # The screenshot is committed back to the branch when it changes, because the
+  # file has to be in the tree for the packages to carry it. A push made with
+  # GITHUB_TOKEN does not trigger workflows, so this cannot loop.
+  # ---------------------------------------------------------------------------
+  wp-render:
+    name: "Rendered theme (screenshot, axe)"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        # The packages ship the compiled bundles, and so does the render: the
+        # site must be the one a customer downloads.
+        run: node tools/build.mjs
+
+      - name: Install the MySQL client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq default-mysql-client
+
+      - name: Install WP-CLI
+        run: |
+          set -euo pipefail
+          curl -sSLo /tmp/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x /tmp/wp-cli.phar
+          php /tmp/wp-cli.phar --info
+
+      - name: Install WordPress
+        # Every command's output is captured and annotated: a job log is not
+        # readable from every environment, an annotation is.
+        run: |
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            mysql -h 127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS wavira_render;"
+            echo "--- wp core download"
+            # No `--locale=` here: that flag asks the translations API whether the
+            # requested locale has a core package *for this exact version*, and one
+            # WordPress release earlier it answered "the requested locale was not
+            # found". The site language is set after install instead, below.
+            wp core download
+            echo "--- wp config create"
+            wp config create --dbname=wavira_render --dbuser=root --dbpass=root --dbhost=127.0.0.1 --extra-php <<'PHP'
+          define( 'WP_DEBUG', true );
+          define( 'WP_DEBUG_LOG', '/tmp/site/debug.log' );
+          define( 'WP_DEBUG_DISPLAY', false );
+          PHP
+            echo "--- wp core install"
+            wp core install --url=http://127.0.0.1:8080 --title='واویرا موزیک' --admin_user=admin --admin_password=wavira-render-only --admin_email=render@example.test --skip-email
+            echo "--- wp core version"
+            wp core version
+            echo "--- the site language"
+            if wp language core install fa_IR --activate; then
+              echo "the fa_IR core language pack is installed"
+            else
+              echo "::warning title=Rendered theme::no fa_IR core language pack for this WordPress version — the front end is still Persian from the theme's and the plugin's own catalogues"
+              # WordPress refuses to store a locale it has no translation file for
+              # (`sanitize_option()` asks `get_available_languages()`), so an empty
+              # marker is what lets the locale stick; the theme's and the plugin's own
+              # `fa_IR.mo` files are what translate the product. This is the same
+              # order the theme's Persian setup uses, for the same reason.
+              mkdir -p /tmp/site/wp-content/languages
+              touch /tmp/site/wp-content/languages/fa_IR.mo
+              wp option update WPLANG fa_IR
+            fi
+            wp eval 'echo "locale: " . get_locale() . " | timezone: " . get_option( "timezone_string" ) . PHP_EOL;'
+          } 2>&1 | tee /tmp/install-site.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/install-site.log install-site 40 error
+          fi
+          exit "$status"
+
+      - name: Install the theme and the plugin from the working tree
+        run: |
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            rm -rf /tmp/site/wp-content/themes/wavira /tmp/site/wp-content/plugins/wavira-core
+            cp -a wavira /tmp/site/wp-content/themes/wavira
+            cp -a wavira-core /tmp/site/wp-content/plugins/wavira-core
+            wp plugin activate wavira-core
+            wp theme activate wavira
+            # The URL WordPress builds must be the URL the render is reached at.
+            # `wp core install --url=…` does not survive WP-CLI's own guess: it
+            # computes the site URL from the phar's location relative to `--path`,
+            # and `/tmp/site` minus `/tmp` is `/site`. Then `wp server`'s router
+            # rewrites the *host* of `option_siteurl` and keeps its path, so every
+            # URL the theme derives from `siteurl` — its stylesheet, its script,
+            # every uploaded cover — pointed at `/wp-content/…` under `/site/`,
+            # which is not a file on disk. The router hands a request for a file
+            # that is not there to `index.php`, so the stylesheet came back as the
+            # front page's `text/html`; a browser refuses a stylesheet with the
+            # wrong content type and drops every rule in it — which is what "the
+            # theme renders unstyled" had been all along. `option_home` *is* forced
+            # to the bare host, which is why the pages themselves answered 200 and
+            # nothing looked wrong.
+            echo "--- the site URL WP-CLI guessed"
+            wp option get home
+            wp option get siteurl
+            wp option update home 'http://127.0.0.1:8080'
+            wp option update siteurl 'http://127.0.0.1:8080'
+            echo "--- the site URL the render will use"
+            wp option get home
+            wp option get siteurl
+            wp option update permalink_structure '/%postname%/'
+            wp rewrite flush --hard
+            wp option update blogdescription 'پخش و انتشار موسیقی ایرانی'
+            echo "--- active theme and plugin"
+            wp theme list --status=active
+            wp plugin list --status=active
+          } 2>&1 | tee /tmp/install-product.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/install-product.log install-product 40 error
+          fi
+          exit "$status"
+
+      - name: Seed the Persian demo
+        run: |
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            wp wavira seed --force
+            echo "--- what the demo contains ---"
+            wp post list --post_type=wavira_album --fields=ID,post_title,post_name
+            wp post list --post_type=wavira_artist --fields=ID,post_title,post_name
+          } 2>&1 | tee /tmp/seed.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/seed.log seed 40 error
+          fi
+          exit "$status"
+
+      - name: Serve the site
+        run: |
+          {
+            set -euo pipefail
+            # PHP's built-in server answers one request at a time unless it is
+            # told how many workers to run, and a themed page is dozens of
+            # requests (the stylesheet, the script, the font, plus an image per
+            # card — 0.15.0's demo generates 23 media files, so the front page
+            # went from zero images to a screenful). One worker and a browser
+            # that opens six connections is a stall, and a stalled subresource is
+            # what turned into `Runtime.callFunctionOn timed out` in 0.15.0's
+            # first render. `wp server` passes the environment through to `php -S`.
+            export PHP_CLI_SERVER_WORKERS=8
+            echo "the built-in server runs ${PHP_CLI_SERVER_WORKERS} worker processes"
+            nohup php /tmp/wp-cli.phar server --host=127.0.0.1 --port=8080 --docroot=/tmp/site > /tmp/server.log 2>&1 &
+            for attempt in $(seq 1 30); do
+              if curl -fsS -o /dev/null http://127.0.0.1:8080/; then
+                echo "the site answered after ${attempt} attempt(s)"
+                curl -sS -o /tmp/home.html -w 'front page: HTTP %{http_code}, %{size_download} bytes\n' http://127.0.0.1:8080/
+                grep -o '<title>[^<]*</title>' /tmp/home.html | head -1 || true
+                # Whether the theme's own stylesheet reaches the browser is the
+                # difference between the theme and core's defaults, and the answer
+                # is in three places at once: the files on disk, the same files over
+                # HTTP, and what the page links to. Print all three before deciding.
+                echo "--- the theme's built assets on disk"
+                ls -la /tmp/site/wp-content/themes/wavira/assets/dist/ 2>&1 || echo "no assets/dist directory"
+                echo "--- the same assets over HTTP"
+                for asset in assets/dist/theme.css assets/dist/theme.js; do
+                  url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
+                  echo "${asset}: HTTP $(curl -s -o /dev/null -w '%{http_code}' "$url"), $(curl -s "$url" | wc -c) byte(s)"
+                done
+                echo "--- stylesheets and scripts the front page asks for"
+                grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12
+                # The claim that needs a rendered page rather than a catalogue: the
+                # front page carries the theme's *own* Persian headings, not only the
+                # Persian demo content, and it is the front-page template rather than
+                # the blog index that shipped in its place until 0.14.0 (ADR 0021).
+                # `tools/check-render.mjs` reads the expected strings from the shipped
+                # catalogue, so it fails when the page is English *and* when a heading
+                # loses its translation.
+                # `--origin`: every `wp-content` URL the page prints has to be the
+                # URL this origin serves. A site URL with a path in it
+                # (`http://127.0.0.1:8080/site`) makes the theme's own stylesheet
+                # unfetchable — the browser gets the front page as `text/html` and
+                # refuses it — and nothing in the HTML looks wrong.
+                node tools/check-render.mjs --page=/tmp/home.html --origin=http://127.0.0.1:8080
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "the site never answered on 127.0.0.1:8080"
+            cat /tmp/server.log
+            exit 1
+          } 2>&1 | tee /tmp/serve.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/serve.log serve 45 error --one
+          fi
+          exit "$status"
+
+      - name: Install the renderer
+        run: |
+          {
+            set -euo pipefail
+            npm install --no-save --fund=false --audit=false --prefix /tmp/render puppeteer-core axe-core
+            ls /tmp/render/node_modules | head -5
+          } 2>&1 | tee /tmp/renderer.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/renderer.log renderer 20 error
+          fi
+          exit "$status"
+
+      - name: Look before rendering (the browsers, and the demo pages)
+        # Diagnostics in their own step, with their own log: the renderer's log has
+        # to stay short, because a run carries a limited number of annotations and
+        # the Checks API returns only part of them — a failure at the end of a long
+        # log is a failure nobody reads (0.14.0).
+        run: |
+          {
+            set -euo pipefail
+            wp() { php /tmp/wp-cli.phar "$@" --path=/tmp/site; }
+            asset_failures=0
+
+            echo "--- browsers on this runner"
+            for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
+              path="$(command -v "$candidate" || true)"
+              if [ -n "$path" ]; then
+                echo "${candidate}: ${path} — $("$path" --version 2>&1 | head -1)"
+              else
+                echo "${candidate}: not found"
+              fi
+            done
+
+            ALBUM_SLUG="$(wp post list --post_type=wavira_album --posts_per_page=1 --field=post_name)"
+            ARTIST_SLUG="$(wp post list --post_type=wavira_artist --posts_per_page=1 --field=post_name)"
+            echo "--- the demo pages"
+            echo "album: /albums/${ALBUM_SLUG}/ | artist: /artists/${ARTIST_SLUG}/"
+
+            : > /tmp/extra-pages.txt
+            for pair in "album=/albums/${ALBUM_SLUG}/" "artist=/artists/${ARTIST_SLUG}/"; do
+              url="http://127.0.0.1:8080${pair#*=}"
+              status="$(curl -s -o "/tmp/${pair%%=*}.html" -w '%{http_code}' "$url")"
+              echo "${pair%%=*}: ${url} → HTTP ${status}"
+              if [ "$status" = "200" ]; then
+                # An absolute URL: `--page=album=/albums/…` reached Chrome as
+                # "Protocol error (Page.navigate): Cannot navigate to invalid URL".
+                echo "--page=${pair%%=*}=${url}" >> /tmp/extra-pages.txt
+              else
+                echo "the extra page ${pair%%=*} answered HTTP ${status} and was skipped"
+              fi
+            done
+
+            # The plugin's own catalogue has to be in effect on the front end, not
+            # only in `wp eval`: the artist page printed “Albums (۲)” — a plugin
+            # label — under Persian headings, and nothing noticed because the
+            # theme's catalogue is a different file.
+            echo "--- the plugin's section headings, on the rendered artist page"
+            node tools/check-fa-labels.mjs --page=/tmp/artist.html || asset_failures=1
+
+            # And the whole page, not only its headings: the product promises a
+            # Persian site, so a Latin word a visitor can read (in the text or in
+            # an alt, an aria-label or a placeholder) is a defect that names
+            # itself. Proper nouns are listed in the tool.
+            echo "--- the three rendered pages, in full"
+            persian_failures=0
+            for page in home album artist; do
+              node tools/check-persian.mjs --page="/tmp/${page}.html" || persian_failures=1
+            done
+
+            # What the front page's news section actually shows: WordPress's own
+            # sample content is the first thing a visitor reads on a fresh install,
+            # and the import is supposed to put it in the site's language.
+            #
+            # A step carries a limited number of annotations and a long message
+            # loses its middle, so the answers also go into the job summary — that
+            # one is readable through the Checks API (`output.summary`) however the
+            # annotations fall out.
+            {
+              echo "--- the posts the front page's news section can show"
+              wp post list --post_type=post --fields=ID,post_title,post_name,post_status
+              wp term list category --fields=term_id,name,slug
+
+              echo "--- what the site scope writes, if it ran"
+              echo "WPLANG=$(wp option get WPLANG 2>/dev/null); date_format=$(wp option get date_format); start_of_week=$(wp option get start_of_week); timezone=$(wp option get timezone_string)"
+
+              echo "--- what the importer's own lookup returns"
+              wp eval 'foreach ( array( "hello-world" => "post", "sample-page" => "page" ) as $slug => $type ) { $found = get_posts( array( "post_type" => $type, "name" => $slug, "posts_per_page" => 1, "post_status" => array( "publish", "draft", "pending", "private" ), "suppress_filters" => true ) ); echo $slug . ": " . ( $found ? $found[0]->post_title . " [" . $found[0]->post_name . "]" : "not found" ) . PHP_EOL; } $term = get_term_by( "slug", "uncategorized", "category" ); echo "uncategorized: " . ( $term ? $term->name : "not found by slug" ) . PHP_EOL;'
+
+              echo "--- calling it directly, which is what the seed is supposed to do"
+              wp eval 'try { $m = new ReflectionMethod( "Wavira\\Core\\Demo\\Installer", "translate_first_content" ); $m->setAccessible( true ); echo "translate_first_content() returned " . (int) $m->invoke( null ) . PHP_EOL; } catch ( Throwable $e ) { echo "threw " . get_class( $e ) . ": " . $e->getMessage() . PHP_EOL; }'
+
+              echo "--- and the result"
+              wp post list --post_type=post --fields=ID,post_title,post_name
+              wp term list category --fields=term_id,name,slug
+              echo "=== SAMPLE CONTENT: WPLANG=$(wp option get WPLANG 2>/dev/null); post=[$(wp post list --post_type=post --field=post_title | head -1)]; category=[$(wp term list category --field=name | head -1)]"
+            } > /tmp/first-content.log 2>&1
+            cat /tmp/first-content.log
+            {
+              echo "### What the front page's news section can show"
+              echo '```'
+              cat /tmp/first-content.log
+              echo '```'
+            } >> "${GITHUB_STEP_SUMMARY}"
+
+            if [ "${persian_failures}" != "0" ]; then
+              # One annotation, because a per-line report pushes the answers out
+              # of the step's annotation budget.
+              node tools/annotate-log.mjs /tmp/first-content.log first-content 100 error --one
+              asset_failures=1
+            fi
+
+            # What answers, not only how big it is. `curl | wc -c` said "38378
+            # bytes" for the stylesheet in 0.14.0 and the render was still
+            # unstyled: `wp server`'s router sends a request for a file that is
+            # not there to `index.php`, so a missing asset answers HTTP 200 with
+            # the front page's HTML, and a byte count cannot tell that from a
+            # stylesheet. A content type and the first bytes can, and the wrong
+            # answer fails the step: a browser refuses a stylesheet served as
+            # `text/html`, which is what "the theme is unstyled" looks like.
+            echo "--- the theme's own assets, over HTTP"
+            for asset in theme:assets/dist/theme.css theme:assets/dist/theme.js plugin:assets/dist/core.js plugin:assets/dist/player.css; do
+              where="${asset%%:*}"
+              asset="${asset#*:}"
+              if [ "${where}" = "plugin" ]; then
+                url="http://127.0.0.1:8080/wp-content/plugins/wavira-core/${asset}"
+                local_file="/tmp/site/wp-content/plugins/wavira-core/${asset}"
+              else
+                url="http://127.0.0.1:8080/wp-content/themes/wavira/${asset}"
+                local_file="/tmp/site/wp-content/themes/wavira/${asset}"
+              fi
+              IFS='|' read -r code type size < <( curl -sS -o "/tmp/asset-fetch.bin" \
+                -w '%{http_code}|%{content_type}|%{size_download}' "$url"; echo )
+              echo "${asset}: HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 40 /tmp/asset-fetch.bin | tr -d '\n')"
+              case "${asset}" in
+                *.css) expected_type='text/css' ;;
+                *)     expected_type='javascript' ;;
+              esac
+              if [ "${code}" != "200" ] || [ "${type#*${expected_type}}" = "${type}" ]; then
+                echo "::error file=${asset}::the theme's ${asset} did not come back as ${expected_type} (HTTP ${code}, ${type}) — a browser will refuse it and every page renders unstyled"
+                asset_failures=1
+              fi
+              if [ ! -s "${local_file}" ]; then
+                echo "::error file=${asset}::the theme's ${asset} is missing or empty in the installed theme — the build ran before the copy"
+                asset_failures=1
+              fi
+            done
+
+            # The player's engine is a *plugin* asset enqueued by the theme while
+            # the template renders, and a page can reference it without the file
+            # ever being there — or the other way round, which is what shipped:
+            # the mount points were on every page and the bundle was never
+            # registered, so the player was an empty `<div>`. Two questions, then:
+            # does the page reference it, and does what it references answer as
+            # JavaScript. A page with mounts and no engine fails here.
+            echo "--- the player bundle the front page asks for"
+            page="$(curl -sS http://127.0.0.1:8080/)"
+            mounts="$(printf '%s' "${page}" | grep -c 'data-wavira-player' || true)"
+            engine="$(printf '%s' "${page}" | grep -o 'wp-content/plugins/wavira-core/assets/dist/core\.js[^\"'"'"']*' | head -1 || true)"
+            echo "mount points on the front page: ${mounts}; engine: ${engine:-none}"
+            if [ "${mounts}" -gt 0 ] && [ -z "${engine}" ]; then
+              echo "::error::the front page mounts ${mounts} player(s) and never loads the engine (assets/dist/core.js) — every player on every page is an empty box"
+              asset_failures=1
+            fi
+
+            # One generated media file too: the demo's covers and photos come
+            # from `wp-content/uploads/`, the same static path as the stylesheet,
+            # and a screenshot full of broken images is as wrong as an unstyled
+            # one.
+            # `--field=guid` is the attachment's *page* (and for one attached to a
+            # video it is `/videos/<slug>/<name>/`, which 404s); the URL the theme
+            # prints is `wp_get_attachment_url()`, so that is what is checked.
+            image_url="$(wp eval '$ids = get_posts( array( "post_type" => "attachment", "post_mime_type" => "image", "posts_per_page" => 1, "fields" => "ids" ) ); foreach ( $ids as $id ) { echo (string) wp_get_attachment_url( $id ); }')"
+            echo "--- the uploads directory"
+            ls -la /tmp/site/wp-content/uploads/*/ 2>&1 | head -8 || echo "no uploads directory"
+            if [ -n "${image_url}" ]; then
+              IFS='|' read -r code type size < <( curl -sS -o /tmp/asset-image.bin \
+                -w '%{http_code}|%{content_type}|%{size_download}' "${image_url}"; echo )
+              echo "demo image ${image_url}: HTTP ${code}, ${type}, ${size} byte(s)"
+              if [ "${code}" != "200" ] || [ "${type#*image/}" = "${type}" ]; then
+                echo "::error::a demo image did not come back as an image (HTTP ${code}, ${type}) — the render would photograph broken pictures"
+                asset_failures=1
+              fi
+            else
+              echo "::error::no image attachment was found — the demo's media did not import"
+              asset_failures=1
+            fi
+
+            echo "--- what the front page asks the browser to load"
+            # `|| true`: no match is a result, not a failure, and with `pipefail`
+            # a bare grep would end the step (it did, 0.14.0).
+            { grep -oE "(href|src)=[\"'][^\"']*(css|js)[^\"']*[\"']" /tmp/home.html | head -12; } || true
+
+            # The check above asks whether the file *at that path* is CSS. This one
+            # asks whether the URL **the page itself prints** is CSS — the two
+            # differ exactly when the site URL carries a path (`/site`), and that
+            # difference is invisible to curl-by-hand and fatal in a browser: the
+            # router answers the missing path with the front page's `text/html`,
+            # and a browser refuses a stylesheet with the wrong content type.
+            # Core prints `<link … href='…'>` with single quotes.
+            page_css="$( grep -oE "href='[^']*assets/dist/theme\.css[^']*'" /tmp/home.html | head -1 | sed "s/^href='//; s/'$//" )"
+            if [ -z "${page_css}" ]; then
+              echo "::error::the front page does not link the theme stylesheet (assets/dist/theme.css) at all — it renders with core's defaults"
+              asset_failures=1
+            else
+              case "${page_css}" in
+                /*) page_css="http://127.0.0.1:8080${page_css}" ;;
+              esac
+              echo "the page's own stylesheet: ${page_css}"
+              IFS='|' read -r code type size < <( curl -sS -o /tmp/asset-page.bin \
+                -w '%{http_code}|%{content_type}|%{size_download}' "${page_css}"; echo )
+              echo "  → HTTP ${code}, ${type}, ${size} byte(s), first bytes: $(head -c 32 /tmp/asset-page.bin | tr -d '\n')"
+              if [ "${code}" != "200" ] || [ "${type#*text/css}" = "${type}" ]; then
+                echo "::error::the URL the front page prints for its stylesheet (${page_css}) did not come back as CSS (HTTP ${code}, ${type}) — the browser refuses it and every page renders unstyled"
+                asset_failures=1
+              fi
+            fi
+            if [ "${asset_failures}" != "0" ]; then
+              echo "the theme's own assets are not being served as assets; stopping before the render"
+              exit 1
+            fi
+
+
+            echo "--- the arguments the renderer will get"
+            cat /tmp/extra-pages.txt
+          } 2>&1 | tee /tmp/preflight.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/preflight.log preflight 20 error --one
+          fi
+          exit "$status"
+
+      - name: Render the screenshots and run axe
+        env:
+          NODE_PATH: /tmp/render/node_modules
+        run: |
+          {
+            set -euo pipefail
+            EXTRA_ARGS=()
+            while IFS= read -r line; do
+              [ -n "$line" ] && EXTRA_ARGS+=( "$line" )
+            done < /tmp/extra-pages.txt
+
+            node tools/screenshot.mjs \
+              --url=http://127.0.0.1:8080/ \
+              --out=wavira/screenshot.png \
+              --width=1200 --height=900 \
+              --colour=light \
+              --extra=docs/screenshots \
+              --axe=/tmp/wavira-axe.json \
+              "${EXTRA_ARGS[@]}"
+          } 2>&1 | tee /tmp/render.log
+          status="${PIPESTATUS[0]}"
+          if [ "$status" != "0" ]; then
+            node tools/annotate-log.mjs /tmp/render.log render 12 error --one
+          fi
+          exit "$status"
+
+      - name: Commit the theme screenshot when it changed
+        # On a branch, but never on a tag: a tag ref is a detached HEAD with no
+        # branch to commit to, and the tag run still gets the strict-packaging
+        # check below. A branch does commit the image, because the file has to be
+        # in the tree for the packages to carry it and for a review to see it —
+        # and while a push made with GITHUB_TOKEN triggers no workflows of its own,
+        # the next push re-runs everything with the screenshot in place (ADR 0022).
+        if: github.ref_type == 'branch'
+        run: |
+          set -euo pipefail
+          if [ ! -f wavira/screenshot.png ]; then
+            echo "::error::wavira/screenshot.png was not written"
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add wavira/screenshot.png docs/screenshots
+          if git diff --cached --quiet; then
+            echo "the committed screenshot is already what this render produces"
+            exit 0
+          fi
+          git commit -m "assets: render wavira/screenshot.png from the seeded demo (${GITHUB_SHA::7})"
+
+          # The branch can move while this job runs (a push during a render is
+          # normal), and a rejected push must not fail a job whose verification
+          # passed: rebase, retry once, and say so if it still will not go. Exit
+          # 128 with no message is what this replaced.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          if ! git push; then
+            echo "::warning title=Rendered theme::the screenshot commit could not be pushed (the branch moved during the run) — the next run will commit it"
+          fi
+
+      - name: What the render logged (PHP notices, if any)
+        if: always()
+        run: |
+          set -uo pipefail
+          if [ ! -s /tmp/site/debug.log ]; then
+            echo "no PHP notice was logged during the render"
+            exit 0
+          fi
+          echo "--- /tmp/site/debug.log ---"
+          tee /tmp/notices.log < /tmp/site/debug.log
+          # The render is the first time the product runs with WP_DEBUG on in a
+          # browser; a notice here is a finding, not a build break, until the
+          # list is empty and this becomes a gate.
+          node tools/annotate-log.mjs /tmp/notices.log notices 8 warning --one
+
+      - name: Accessibility gate (axe)
+        run: node tools/check-axe.mjs /tmp/wavira-axe.json --allow=color-contrast
+
+      - name: Strict packaging (the marketplace files exist now)
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs --strict | tee /tmp/strict.log
+          node tools/annotate-log.mjs /tmp/strict.log strict 20 notice
+
+      - name: Upload the rendered images and the axe report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wavira-rendered-theme
+          path: |
+            wavira/screenshot.png
+            docs/screenshots/*.png
+            /tmp/wavira-axe.json
+            /tmp/render.log
+          if-no-files-found: warn
+          retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # Release packages: the two uploadable artefacts and the bundle, plus the
+  # manifest that says what is inside them. Built on every push so a broken
+  # release tree is found on the commit that broke it, and uploaded so the
+  # package can be downloaded from the run instead of being rebuilt by hand.
+  # ---------------------------------------------------------------------------
+      - name: Say why the render failed
+        # The last word on a failed render, as one annotation: whatever the API
+        # returns, it returns the newest ones, and this step runs last.
+        if: failure()
+        run: |
+          if [ -f /tmp/render.log ]; then
+            node tools/annotate-log.mjs /tmp/render.log render-diagnosis 14 error --one
+          elif [ -f /tmp/preflight.log ]; then
+            node tools/annotate-log.mjs /tmp/preflight.log preflight-diagnosis 14 error --one
+          else
+            echo "::error title=Rendered theme::the render never started — no log was written"
+          fi
+
+  release-package:
+    name: Release packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        run: node tools/build.mjs
+
+      - name: Assemble the packages
+        # A fixed SOURCE_DATE_EPOCH makes the archives byte-identical between
+        # runs and machines; the tool rebuilds one archive on the spot and fails
+        # if the bytes differ.
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs | tee /tmp/package.log
+          node tools/annotate-log.mjs /tmp/package.log package 20 notice
+
+      - name: Name the artifact from the built version
+        id: meta
+        run: |
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: wavira-${{ steps.meta.outputs.version }}-packages
+          path: |
+            dist/*.zip
+            dist/manifest.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30
+
+  # ---------------------------------------------------------------------------
+  # Tagged releases: attach the built archives to the GitHub release.
+  #
+  # The asset upload has to happen on a runner: an upload is a POST to
+  # uploads.github.com, which a sandbox without that host cannot reach, and the
+  # release URL people download from is worth having automated anyway — it is
+  # the same build, byte for byte, that the jobs above verify.
+  # ---------------------------------------------------------------------------
+  release-assets:
+    name: Release assets
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build front-end assets
+        run: node tools/build.mjs
+
+      - name: Assemble the packages
+        run: |
+          set -euo pipefail
+          SOURCE_DATE_EPOCH=1767225600 node tools/package.mjs | tee /tmp/package.log
+          node tools/annotate-log.mjs /tmp/package.log package 20 notice
+
+      - name: Attach the archives to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # The release itself is created separately; if the tag arrived first,
+          # give the release a moment to appear rather than failing on a race.
+          for attempt in $(seq 1 30); do
+            if gh release view "$TAG" >/dev/null 2>&1; then break; fi
+            echo "release ${TAG} is not there yet (attempt ${attempt}/30)…"
+            sleep 10
+          done
+          gh release view "$TAG" >/dev/null
+          gh release upload "$TAG" dist/*.zip dist/SHA256SUMS dist/manifest.json --clobber
+
+          # A release that ends up with no files on it looks like a working
+          # download page until someone clicks a link, so check what actually
+          # landed instead of trusting the upload command's silence.
+          (
+            cd dist
+            ls *.zip SHA256SUMS manifest.json | sort
+          ) > /tmp/expected.txt
+          gh release view "$TAG" --json assets -q '.assets[].name' | sort > /tmp/attached.txt
+          missing=0
+          while IFS= read -r file; do
+            if ! grep -qxF "$file" /tmp/attached.txt; then
+              echo "::error::${file} was not attached to the release"
+              missing=1
+            fi
+          done < /tmp/expected.txt
+          if [ "$missing" != "0" ]; then
+            echo "attached: $(tr '\n' ' ' < /tmp/attached.txt)"
+            exit 1
+          fi
+
+          gh release view "$TAG" --json assets -q '.assets[] | "attached: " + .name + " (" + (.size | tostring) + " bytes)"'
+          gh release view "$TAG" --json url -q .url
+
+  # ---------------------------------------------------------------------------
+  # Repository hygiene: the legacy artifact must never be modified.
+  # ---------------------------------------------------------------------------
+  legacy-untouched:
+    name: Legacy artifact integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the audited legacy ZIP hash
+        run: |
+          set -euo pipefail
+          EXPECTED="a23269c2b92a3ba08721dba79a50f1dd"
+          ACTUAL="$(md5sum music-theme.zip | awk '{print $1}')"
+          if [ "$EXPECTED" != "$ACTUAL" ]; then
+            echo "::error::music-theme.zip changed (expected $EXPECTED, got $ACTUAL) — the audit baseline must stay immutable."
+            exit 1
+          fi
+          echo "Legacy artifact unchanged: $ACTUAL"

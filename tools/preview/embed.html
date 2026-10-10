@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fa-IR" dir="rtl" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>واویرا — مؤلفه‌ها (کارگاه توسعه)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="presets.css">
+<link rel="stylesheet" href="../../wavira/assets/css/tokens.css">
+<link rel="stylesheet" href="../../wavira/assets/css/base.css">
+<link rel="stylesheet" href="../../wavira/assets/css/components.css">
+<link rel="stylesheet" href="../../wavira/assets/css/utilities.css">
+<link rel="stylesheet" href="../../wavira-core/assets/css/player.css">
+</head>
+<body>
+
+<header class="wavira-header">
+	<div class="wavira-header__inner">
+		<a class="wavira-site-title" href="#main">واویرا</a>
+		<nav class="wavira-cluster" aria-label="ناوبری نمایشی">
+			<a href="#albums">آلبوم‌ها</a>
+			<a href="#tracks">قطعه‌ها</a>
+			<a href="#video">ویدیوها</a>
+			<a href="#genres">سبک‌ها</a>
+		</nav>
+		<button class="wavira-theme-toggle" type="button" data-wavira-theme-toggle>
+			<span class="wavira-theme-label" data-wavira-theme-label>پوستهٔ رنگ</span>
+		</button>
+	</div>
+</header>
+
+<main class="wavira-layout" id="main">
+
+	<section class="wavira-hero" aria-labelledby="hero-title">
+		<div class="wavira-hero__body">
+			<p class="wavira-hero__meta"><span class="wavira-chip">انتشار برگزیده</span> <span class="wavira-chip wavira-chip--accent">دادهٔ نمایشی</span></p>
+			<h1 id="hero-title">انتشار موسیقی، روی سایت خودتان</h1>
+			<p>این صفحه لایه‌های پوسته و موتور پخش‌کنندهٔ محصول را همان‌طور که ساخته شده‌اند نمایش می‌دهد. چیدمان، حالت‌های رنگ، راست‌به‌چپ و نقطه‌شکست‌ها واقعی‌اند؛ تنها منبع دادهٔ وردپرس جایگزین شده است.</p>
+			<p class="wavira-hero__actions">
+				<a class="wavira-signature" href="#tracks">به قطعه‌های نمایشی گوش بدهید</a>
+				<a href="#albums">آلبوم‌ها را ببینید</a>
+			</p>
+		</div>
+		<div class="wavira-hero__media">
+			<img src="/tools/preview/cover-1.svg" alt="جلد نمایشی آلبوم شب‌های تهران" width="400" height="400">
+		</div>
+	</section>
+
+	<section class="wavira-section" id="albums" aria-labelledby="albums-title">
+		<div class="wavira-section__head">
+			<h2 id="albums-title">آلبوم‌ها</h2>
+			<p class="wavira-text-center">سه کارت نمایشی، شبکهٔ سیال، فاصله‌گذاری منطقی.</p>
+		</div>
+		<div class="wavira-grid-auto">
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-1.svg" alt="جلد نمایشی آلبوم شب‌های تهران" width="400" height="400">
+				<h3><a href="#albums">شب‌های تهران</a></h3>
+				<p><span class="wavira-chip">پاپ رؤیایی</span> <span class="wavira-chip">۱۴۰۵</span></p>
+			</article>
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-2.svg" alt="جلد نمایشی آلبوم سفر شمال" width="400" height="400">
+				<h3><a href="#albums">سفر شمال</a></h3>
+				<p><span class="wavira-chip">راک تجربی</span> <span class="wavira-chip">۱۴۰۴</span></p>
+			</article>
+			<article class="wavira-surface wavira-stack">
+				<img src="/tools/preview/cover-3.svg" alt="جلد نمایشی آلبوم باران بهاری" width="400" height="400">
+				<h3><a href="#albums">باران بهاری</a></h3>
+				<p><span class="wavira-chip">امبینت</span> <span class="wavira-chip">۱۴۰۴</span></p>
+			</article>
+		</div>
+	</section>
+
+	<section class="wavira-section" id="tracks" aria-labelledby="tracks-title">
+		<div class="wavira-section__head">
+			<h2 id="tracks-title">قطعه‌ها</h2>
+			<p>همان نشانه‌گذاری‌ای که <code>[wavira_tracklist]</code> چاپ می‌کند، تا مسیر بدون جاوااسکریپت هم دیده شود.</p>
+		</div>
+		<ol class="wavira-tracklist">
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">۱</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">راه بارانی</a></span>
+				<span class="wavira-tracklist__duration">۰:۰۳</span>
+			</li>
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">۲</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">سکوت</a></span>
+				<span class="wavira-tracklist__duration">۰:۰۳</span>
+			</li>
+			<li class="wavira-tracklist__item">
+				<span class="wavira-tracklist__index" aria-hidden="true">۳</span>
+				<span class="wavira-tracklist__title"><a href="#tracks">پرواز</a></span>
+				<span class="wavira-tracklist__duration">۰:۰۳</span>
+			</li>
+		</ol>
+	</section>
+
+	<section class="wavira-section" id="video" aria-labelledby="video-title">
+		<div class="wavira-section__head">
+			<h2 id="video-title">ویدیوی موسیقی</h2>
+			<p><code>[wavira_video]</code> در این قاب، یک فایل میزبانی‌شده یا یک درج oEmbed را نمایش می‌دهد.</p>
+		</div>
+		<figure class="wavira-video-frame">
+			<img src="/tools/preview/cover-8.svg" alt="پوستر نمایشی ویدیو" loading="lazy" decoding="async" width="400" height="400">
+			<figcaption>پوستر نمایشی — قالب واقعی یک عنصر <code>&lt;video&gt;</code> یا یک درج بیرونی چاپ می‌کند.</figcaption>
+		</figure>
+	</section>
+
+	<section class="wavira-section" id="genres" aria-labelledby="genres-title">
+		<div class="wavira-section__head">
+			<h2 id="genres-title">سبک‌ها</h2>
+			<p>برچسب‌های تاکسونومی، با فاصلهٔ منطقی در کنار هم.</p>
+		</div>
+		<p class="wavira-cluster">
+			<a class="wavira-chip" href="#genres">پاپ رؤیایی</a>
+			<a class="wavira-chip" href="#genres">راک تجربی</a>
+			<a class="wavira-chip" href="#genres">امبینت</a>
+			<a class="wavira-chip" href="#genres">الکترونیک</a>
+			<a class="wavira-chip wavira-chip--accent" href="#genres">موسیقی سنتی</a>
+		</p>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="lyrics-title">
+		<div class="wavira-section__head">
+			<h2 id="lyrics-title">متن ترانه</h2>
+			<p>محتوای بلند از لایهٔ نثر با عرض محدود استفاده می‌کند.</p>
+		</div>
+		<div class="wavira-lyrics wavira-prose">
+			<p>یک مصرع نمایشی، در عرض خواندن متن.</p>
+			<p>مصرع نمایشی دوم — این قاب هرگز از <code>--wavira-measure</code> فراتر نمی‌رود.</p>
+		</div>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="artist-title">
+		<div class="wavira-section__head">
+			<h2 id="artist-title">پروفایل هنرمند (۰.۹.۰)</h2>
+			<p>بازتولید ایستای آنچه <code>wavira_get_artist()</code> از دادهٔ هنرمند چاپ می‌کند: تصویر، نقل‌قول، برچسب‌های شبکه‌های اجتماعی، شمارها، آثار گروه‌بندی‌شده بر پایهٔ نوع و گالری تصاویر پیوست. رندرکننده‌ها با مجموعه‌آزمون PHP پوشش داده شده‌اند؛ این بخش برای داوری ظاهر آن‌ها در مرورگر واقعی، در هر دو جهت و هر دو حالت رنگ است.</p>
+		</div>
+		<div class="wavira-artist">
+			<section class="wavira-artist__profile">
+				<figure class="wavira-artist__avatar">
+					<img class="wavira-artist__portrait" src="/tools/preview/cover-6.svg" alt="" loading="lazy" decoding="async" width="400" height="400">
+				</figure>
+				<div class="wavira-artist__intro">
+					<h1 class="wavira-artist__name">آرمان راد</h1>
+					<p class="wavira-artist__quote wavira-measure">یک جملهٔ کوتاه دربارهٔ هنرمند.</p>
+					<ul class="wavira-artist__socials">
+						<li class="wavira-artist__social"><a class="wavira-chip" href="#artist-title" rel="me nofollow noopener external">اینستاگرام<span class="wavira-visually-hidden">(در زبانهٔ تازه باز می‌شود)</span></a></li>
+						<li class="wavira-artist__social"><a class="wavira-chip" href="#artist-title" rel="me nofollow noopener external">تلگرام<span class="wavira-visually-hidden">(در زبانهٔ تازه باز می‌شود)</span></a></li>
+						<li class="wavira-artist__social"><a class="wavira-chip" href="#artist-title" rel="me nofollow noopener external">یوتیوب<span class="wavira-visually-hidden">(در زبانهٔ تازه باز می‌شود)</span></a></li>
+						<li class="wavira-artist__social"><a class="wavira-chip" href="#artist-title" rel="me nofollow noopener external">آپارات<span class="wavira-visually-hidden">(در زبانهٔ تازه باز می‌شود)</span></a></li>
+					</ul>
+					<dl class="wavira-artist__counts">
+						<div class="wavira-artist__count"><dt>آلبوم</dt><dd>۳</dd></div>
+						<div class="wavira-artist__count"><dt>تک‌آهنگ</dt><dd>۶</dd></div>
+						<div class="wavira-artist__count"><dt>ویدیو</dt><dd>۲</dd></div>
+						<div class="wavira-artist__count"><dt>تصویر</dt><dd>۳</dd></div>
+					</dl>
+				</div>
+			</section>
+			<section class="wavira-artist__bio wavira-prose wavira-measure">
+				<p>زندگی‌نامهٔ نمایشی، که از مسیر پردازش محتوای وردپرس چاپ می‌شود؛ چون یک زندگی‌نامه می‌تواند پاراگراف، فهرست و بلوک داشته باشد — و در عرض خواندن متن می‌نشیند تا متن بلند خوانا بماند.</p>
+			</section>
+			<section class="wavira-section wavira-artist__works">
+				<div class="wavira-section__head"><h2>آلبوم‌ها (۳)</h2><a class="wavira-section__more" href="#albums">مشاهدهٔ همه</a></div>
+				<ul class="wavira-cards">
+					<li class="wavira-cards__item">
+						<article class="wavira-card wavira-card--work">
+							<figure class="wavira-card__media"><a class="wavira-card__cover" href="#albums" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-1.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+							<div class="wavira-card__body">
+								<p class="wavira-card__kicker"><a class="wavira-chip" href="#genres">پاپ رؤیایی</a></p>
+								<h3 class="wavira-card__title"><a class="wavira-card__link" href="#albums">شب‌های تهران</a></h3>
+								<p class="wavira-card__subtitle">۱۴۰۵ &middot; ۸ قطعه</p>
+								<p class="wavira-card__meta"><time datetime="2026-01-01T10:00:00+00:00">۱۱ دی ۱۴۰۴</time></p>
+							</div>
+						</article>
+					</li>
+					<li class="wavira-cards__item">
+						<article class="wavira-card wavira-card--work">
+							<figure class="wavira-card__media"><a class="wavira-card__cover" href="#albums" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-2.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+							<div class="wavira-card__body">
+								<p class="wavira-card__kicker"><a class="wavira-chip" href="#genres">راک تجربی</a></p>
+								<h3 class="wavira-card__title"><a class="wavira-card__link" href="#albums">سفر شمال</a></h3>
+								<p class="wavira-card__subtitle">۱۴۰۴ &middot; ۱۰ قطعه</p>
+								<p class="wavira-card__meta"><time datetime="2025-06-12T10:00:00+00:00">۲۲ خرداد ۱۴۰۴</time></p>
+							</div>
+						</article>
+					</li>
+					<li class="wavira-cards__item">
+						<article class="wavira-card wavira-card--work">
+							<figure class="wavira-card__media"><a class="wavira-card__cover" href="#albums" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-3.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+							<div class="wavira-card__body">
+								<p class="wavira-card__kicker"><a class="wavira-chip" href="#genres">امبینت</a></p>
+								<h3 class="wavira-card__title"><a class="wavira-card__link" href="#albums">باران بهاری</a></h3>
+								<p class="wavira-card__subtitle">۱۴۰۴ &middot; ۶ قطعه</p>
+							</div>
+						</article>
+					</li>
+				</ul>
+			</section>
+			<section class="wavira-section wavira-artist__works">
+				<div class="wavira-section__head"><h2>ویدیوها (۲)</h2></div>
+				<ul class="wavira-cards">
+					<li class="wavira-cards__item">
+						<article class="wavira-card wavira-card--work">
+							<figure class="wavira-card__media"><a class="wavira-card__cover" href="#video" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-8.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+							<div class="wavira-card__body">
+								<h3 class="wavira-card__title"><a class="wavira-card__link" href="#video">اجرای زندهٔ نمایشی</a></h3>
+								<p class="wavira-card__subtitle">۳:۴۲</p>
+							</div>
+						</article>
+					</li>
+				</ul>
+			</section>
+			<section class="wavira-section wavira-gallery">
+				<div class="wavira-section__head"><h2>تصاویر</h2></div>
+				<ul class="wavira-gallery__items wavira-gallery__items--3">
+					<li class="wavira-gallery__item"><figure class="wavira-gallery__figure"><img class="wavira-gallery__image" src="/tools/preview/cover-4.svg" alt="تصویر نمایشی از اجرای روی صحنه" loading="lazy" decoding="async" width="400" height="400"><figcaption class="wavira-gallery__caption">روی صحنه</figcaption></figure></li>
+					<li class="wavira-gallery__item"><figure class="wavira-gallery__figure"><img class="wavira-gallery__image" src="/tools/preview/cover-5.svg" alt="تصویر نمایشی از استودیو" loading="lazy" decoding="async" width="400" height="400"><figcaption class="wavira-gallery__caption">در استودیو</figcaption></figure></li>
+					<li class="wavira-gallery__item"><figure class="wavira-gallery__figure"><img class="wavira-gallery__image" src="/tools/preview/cover-7.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></figure></li>
+				</ul>
+			</section>
+		</div>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="news-title">
+		<div class="wavira-section__head">
+			<h2 id="news-title">اخبار موسیقی (۰.۹.۰)</h2>
+			<p>خوراک خبری همان‌گونه که بلوک <code>wavira/news</code> چاپ می‌کند: برچسب دسته‌ها بر روی مؤلفهٔ کارت مشترک. قالب‌های وبلاگ همین کارت‌ها را از مسیر حلقهٔ پرس‌وجوی هستهٔ وردپرس رندر می‌کنند، پس صفحه‌بندی، خوراک‌ها و عنوان آرشیو کار هسته است.</p>
+		</div>
+		<div class="wavira-news__filters">
+			<p class="wavira-cluster wavira-news__categories">
+				<a class="wavira-chip" href="#news-title">کنسرت‌ها</a> <a class="wavira-chip" href="#news-title">گفت‌وگوها</a> <a class="wavira-chip" href="#news-title">انتشارها</a>
+			</p>
+		</div>
+		<div class="wavira-news wavira-news--cols-3">
+			<ul class="wavira-news__list">
+				<li class="wavira-news__item">
+					<article class="wavira-card wavira-card--news">
+						<figure class="wavira-card__media"><a class="wavira-card__cover" href="#news-title" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-1.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+						<div class="wavira-card__body">
+							<p class="wavira-card__kicker"><a class="wavira-chip" href="#news-title">کنسرت‌ها</a></p>
+							<h3 class="wavira-card__title"><a class="wavira-card__link" href="#news-title">اعلام کنسرت</a></h3>
+							<p class="wavira-card__excerpt">فروش بلیت از روز شنبه آغاز می‌شود.</p>
+							<p class="wavira-card__meta"><time datetime="2026-01-05T10:00:00+00:00">۱۵ دی ۱۴۰۴</time></p>
+						</div>
+					</article>
+				</li>
+				<li class="wavira-news__item">
+					<article class="wavira-card wavira-card--news">
+						<figure class="wavira-card__media"><a class="wavira-card__cover" href="#news-title" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-2.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+						<div class="wavira-card__body">
+							<p class="wavira-card__kicker"><a class="wavira-chip" href="#news-title">گفت‌وگوها</a></p>
+							<h3 class="wavira-card__title"><a class="wavira-card__link" href="#news-title">گفت‌وگو در استودیو</a></h3>
+							<p class="wavira-card__excerpt">تهیه‌کننده از آلبوم تازه و توری که در پی آن می‌آید می‌گوید.</p>
+							<p class="wavira-card__meta"><time datetime="2026-01-03T10:00:00+00:00">۱۳ دی ۱۴۰۴</time></p>
+						</div>
+					</article>
+				</li>
+				<li class="wavira-news__item">
+					<article class="wavira-card wavira-card--news">
+						<figure class="wavira-card__media"><a class="wavira-card__cover" href="#news-title" tabindex="-1" aria-hidden="true"><img class="wavira-card__image" src="/tools/preview/cover-3.svg" alt="" loading="lazy" decoding="async" width="400" height="400"></a></figure>
+						<div class="wavira-card__body">
+							<p class="wavira-card__kicker"><a class="wavira-chip" href="#news-title">انتشارها</a></p>
+							<h3 class="wavira-card__title"><a class="wavira-card__link" href="#news-title">تک‌آهنگ تازه منتشر شد</a></h3>
+							<p class="wavira-card__excerpt">نخستین تک‌آهنگ از آلبوم پیش‌رو، همراه با دانلود ۳۲۰ کیلوبیت.</p>
+							<p class="wavira-card__meta"><time datetime="2026-01-02T10:00:00+00:00">۱۲ دی ۱۴۰۴</time></p>
+						</div>
+					</article>
+				</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="wavira-section" aria-labelledby="fallback-title">
+		<div class="wavira-section__head">
+			<h2 id="fallback-title">مسیر جایگزین بدون جاوااسکریپت</h2>
+			<p>دقیقاً همان نشانه‌گذاری‌ای که <code>wavira_player_fallback()</code> درون یک نقطهٔ اتصال چاپ می‌کند — موتور آن را هنگام تحویل گرفتن حذف می‌کند، پس این نسخه عمداً دیدنی مانده است.</p>
+		</div>
+		<div class="wavira-surface wavira-stack">
+			<audio class="wavira-player__fallback" controls preload="none" src="/tools/preview/tone-330.wav">راه بارانی</audio>
+			<p class="wavira-player__fallback-link"><a href="#tracks">باز کردن صفحهٔ راه بارانی</a></p>
+		</div>
+	</section>
+
+</main>
+
+<footer class="wavira-footer">
+	<div class="wavira-footer__legal">
+		<p>کارگاه توسعهٔ <strong>واویرا موزیک</strong> · طراح و نویسنده: اتحاد وردپرس · <a href="https://etehadwp.com/">etehadwp.com</a></p>
+	</div>
+</footer>
+
+<div class="wavira-site-player">
+	<div class="wavira-player wavira-player--sticky"
+		data-wavira-player="1"
+		data-context="tracks"
+		data-id="0"
+		data-slug=""
+		data-limit="4"
+		data-orderby="date"
+		data-order="desc"
+		data-has-track="1"
+		data-track="101">
+		<audio class="wavira-player__fallback" controls preload="none" src="/tools/preview/tone-294.wav">راه بارانی</audio>
+		<p class="wavira-player__fallback-link"><a href="#tracks">باز کردن صفحهٔ راه بارانی</a></p>
+	</div>
+</div>
+
+<script src="embed.js" defer></script>
+<script src="../../wavira/assets/js/index.js" defer></script>
+<script src="../../wavira-core/assets/js/index.js" defer></script>
+</body>
+</html>
