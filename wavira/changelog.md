@@ -133,6 +133,26 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   should have written (`قطعهها` → `قطعه‌ها`), and a suffix left attached after
   the seven letters that never join forward (ا، د، ذ، ر، ز، ژ، و) is left alone,
   because there is nothing to separate.
+- **The banner is as wide as the window.** The hero was a rounded glass card
+  centred inside the content column: the markup called it a banner, the render
+  was a card. The front page takes the banner out of the page container and
+  gives it a container of its own, so the name, the tagline and the button span
+  the full width and still line up with the sections below
+  (`templates/front-page.html`, `assets/css/components.css`).
+- **Two sections stopped promising what they cannot deliver.** «تماشا» printed
+  an empty section under a video with no file and no embed — the demo fabricates
+  no media (ADR 0010) — and «مشاهدهٔ همه» on the news section linked to the page
+  the visitor was already on whenever no posts page is set. The heading and the
+  link ask the same question as the block beside them now, and print nothing
+  when the answer is nothing (`patterns/hidden-heading-watch.php`,
+  `patterns/hidden-heading-music-news.php`).
+- **Two blocks of consecutive assignments broke the coding standard.** The
+  tracklist row's play control and the card's download control mixed `=` and
+  `.=` on neighbouring lines; the equals sign of a `.=` sits one column further
+  right, so every line after it read as misaligned and the `WPCS + PHP
+  compatibility` job failed the branch. A blank line ends the block
+  (`inc/markup.php`, `inc/cards.php`).
+
 ### Changed — 0.15.0
 
 - **File sizes and qualities are translated, not concatenated**: `%s KB` / `%s MB` (theme) and `%d kbps` /

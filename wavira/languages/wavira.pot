@@ -14,7 +14,7 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: wavira/inc/markup.php:288
+#: wavira/inc/markup.php:289
 #. translators: 1: genre name, 2: number of published items.
 msgid "%1$s (%2$d)"
 msgstr ""
@@ -478,7 +478,7 @@ msgid "Dismiss"
 msgstr ""
 
 #: wavira/inc/downloads.php:53
-#: wavira/inc/markup.php:150
+#: wavira/inc/markup.php:151
 msgid "Download"
 msgstr ""
 
@@ -827,7 +827,7 @@ msgstr ""
 msgid "Search music…"
 msgstr ""
 
-#: wavira/patterns/hidden-heading-watch.php:16
+#: wavira/patterns/hidden-heading-watch.php:26
 msgctxt "section heading above a music video"
 msgid "Watch"
 msgstr ""
@@ -1046,12 +1046,12 @@ msgstr ""
 #: wavira/inc/artists.php:215
 #: wavira/patterns/hidden-heading-latest-albums.php:21
 #: wavira/patterns/hidden-heading-latest-tracks.php:21
-#: wavira/patterns/hidden-heading-music-news.php:29
+#: wavira/patterns/hidden-heading-music-news.php:37
 #: wavira/patterns/hidden-heading-music-videos.php:21
 msgid "View all"
 msgstr ""
 
-#: wavira/inc/markup.php:222
+#: wavira/inc/markup.php:223
 msgid "Watch the video"
 msgstr ""
 

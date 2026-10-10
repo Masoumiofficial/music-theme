@@ -135,6 +135,7 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 			if ( $args['show_play'] && function_exists( 'wavira_card_action_icon' ) ) {
 				/* translators: %s: the name of the track being played. */
 				$play_label = sprintf( __( 'Play: %s', 'wavira' ), (string) $row['title'] );
+
 				$html .= '<span class="wavira-tracklist__play">';
 				$html .= '<a class="wavira-card__action wavira-card__action--play"';
 				$html .= ' href="' . esc_url( (string) $row['permalink'] ) . '"';

@@ -139,8 +139,9 @@ function wavira_card_actions( $post_id, $post_type ) {
 
 		if ( '' !== $url ) {
 			/* translators: %s: the track, album or video being downloaded. */
-			$label   = sprintf( __( 'Download: %s', 'wavira' ), $title );
-			$actions .= sprintf(
+				$label = sprintf( __( 'Download: %s', 'wavira' ), $title );
+
+				$actions .= sprintf(
 				'<a class="wavira-card__action wavira-card__action--download" href="%s" download aria-label="%s">%s</a>',
 				esc_url( $url ),
 				esc_attr( $label ),

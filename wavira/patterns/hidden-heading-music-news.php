@@ -23,10 +23,19 @@ defined( 'ABSPATH' ) || exit;
 <!-- /wp:heading -->
 <?php
 $wavira_posts_page = absint( get_option( 'page_for_posts' ) );
-$wavira_news_url   = $wavira_posts_page > 0 ? get_permalink( $wavira_posts_page ) : home_url( '/' );
+$wavira_news_url   = '';
+
+// The only page that lists every post is the one the owner chose for it. When
+// there is none — and when the visitor is already on it — the honest link is
+// no link: «مشاهدهٔ همه» that leads back here is a promise the site cannot keep.
+if ( $wavira_posts_page > 0 && ! is_home() ) {
+	$wavira_news_url = (string) get_permalink( $wavira_posts_page );
+}
 ?>
+<?php if ( '' !== $wavira_news_url ) : ?>
 <!-- wp:paragraph {"className":"wavira-section__more"} -->
 <p class="wavira-section__more"><a href="<?php echo esc_url( $wavira_news_url ); ?>"><?php echo esc_html__( 'View all', 'wavira' ); ?></a></p>
 <!-- /wp:paragraph -->
+<?php endif; ?>
 </div>
 <!-- /wp:group -->

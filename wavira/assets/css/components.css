@@ -1199,22 +1199,24 @@ body.wavira-no-player {
 /* ---- banner ------------------------------------------------------------- */
 
 /*
- * The front page's heading: the site's own name, set large, on a panel of the
- * site's glass. No photograph is asked for — a theme that only looks right once
+ * The front page's opening: the site's own name, set large, across the whole
+ * width of the window — the one band on the page that is not inside the
+ * container, because a hero that stops short of the edges is a card, not a
+ * cover. No photograph is asked for: a theme that only looks right once
  * somebody has art-directed it is a theme that looks unfinished out of the box.
+ * The name, the tagline and the button sit in a centred container of their own,
+ * so the type still lines up with everything below it.
  */
 
 .wavira-banner {
 	margin-block-end: var(--wp--preset--spacing--60, 2.5rem);
-	padding: clamp(2.5rem, 7vw, 5.5rem) var(--wp--preset--spacing--50, 1.5rem);
-	border: 1px solid var(--wavira-glass-border);
-	border-radius: var(--wp--custom--radius--lg, 20px);
+	padding: clamp(3rem, 9vw, 7rem) var(--wp--preset--spacing--50, 1.5rem);
+	border-block-end: var(--wavira-hairline);
 	background:
-		radial-gradient(120% 130% at 100% 0%, color-mix(in srgb, var(--wp--preset--color--accent) 14%, transparent), transparent 62%),
-		radial-gradient(90% 120% at 0% 100%, color-mix(in srgb, var(--wp--preset--color--primary) 12%, transparent), transparent 58%),
+		radial-gradient(95% 130% at 88% 0%, color-mix(in srgb, var(--wp--preset--color--accent) 16%, transparent), transparent 64%),
+		radial-gradient(80% 120% at 6% 100%, color-mix(in srgb, var(--wp--preset--color--primary) 14%, transparent), transparent 60%),
 		var(--wavira-glass-surface);
 	backdrop-filter: var(--wavira-glass-filter);
-	box-shadow: var(--wavira-glass-shadow), inset 0 1px 0 0 var(--wavira-glass-highlight);
 	text-align: center;
 }
 
@@ -1223,6 +1225,9 @@ body.wavira-no-player {
 	flex-direction: column;
 	align-items: center;
 	gap: var(--wp--preset--spacing--30, 0.75rem);
+	inline-size: 100%;
+	max-inline-size: var(--wavira-container, var(--wp--style--global--wide-size, 1200px));
+	margin-inline: auto;
 }
 
 /* The site name is the page heading here, so it is set like one. */
