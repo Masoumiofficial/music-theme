@@ -521,10 +521,10 @@ final class Installer {
 
 		$page_id = wp_insert_post(
 			array(
-				'post_type'    => 'page',
-				'post_title'   => $title,
-				'post_status'  => 'publish',
-				'post_name'    => $slug,
+				'post_type'   => 'page',
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_name'   => $slug,
 			),
 			true
 		);
