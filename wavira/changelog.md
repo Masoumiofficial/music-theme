@@ -152,6 +152,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   all. The heading pattern asks where it is and takes level one on the archive,
   level two everywhere else, which is also where it stops offering a link to
   the page you are on (`patterns/hidden-heading-music-news.php`).
+- **Every card in every grid offers something.** The video cards were the only
+  ones with nothing on them: a video has no queue, so it was given no play
+  control, and the demo has no video file, so it had no download either. The
+  control is there now and it opens the video — «تماشا: نام ویدیو» — because a
+  video is watched on its own page rather than in the player bar
+  (`inc/cards.php`).
 - **Two blocks of consecutive assignments broke the coding standard.** The
   tracklist row's play control and the card's download control mixed `=` and
   `.=` on neighbouring lines; the equals sign of a `.=` sits one column further

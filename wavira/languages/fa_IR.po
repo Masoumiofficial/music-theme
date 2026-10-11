@@ -1,11 +1,11 @@
 msgid ""
-msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-10 13:25+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
+msgstr "Project-Id-Version: wavira 0.15.0\nReport-Msgid-Bugs-To: https://etehadwp.com/\nPOT-Creation-Date: 2026-10-05\nPO-Revision-Date: 2026-10-11 09:48+0000\nLast-Translator: Etehad WP <https://etehadwp.com/>\nLanguage-Team: Persian (Iran) — Etehad WP\nLanguage: fa_IR\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n > 1);\nX-Domain: wavira\n"
 
 #: wavira/inc/artists.php:131
 msgid "(opens in a new tab)"
 msgstr "(در زبانهٔ جدید باز می‌شود)"
 
-#: wavira/inc/markup.php:279
+#: wavira/inc/markup.php:289
 #. translators: 1: genre name, 2: number of published items.
 #, keep-latin
 msgid "%1$s (%2$d)"
@@ -471,7 +471,7 @@ msgid "Dismiss"
 msgstr "نادیده گرفتن"
 
 #: wavira/inc/downloads.php:53
-#: wavira/inc/markup.php:141
+#: wavira/inc/markup.php:151
 msgid "Download"
 msgstr "دانلود"
 
@@ -496,7 +496,7 @@ msgstr "دانلود ویدیو"
 msgid "Download wavira-core"
 msgstr "دانلود wavira-core"
 
-#: wavira/inc/cards.php:133
+#: wavira/inc/cards.php:148
 #. translators: %s: the track, album or video being downloaded.
 msgid "Download: %s"
 msgstr "دانلود: %s"
@@ -547,7 +547,7 @@ msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr "— همهٔ حقوق محفوظ است."
 
-#: wavira/inc/options.php:1008
+#: wavira/inc/options.php:970
 msgid "Footer menu"
 msgstr "منوی پاورقی"
 
@@ -571,7 +571,7 @@ msgstr "برچسب‌های سبک، پرکاربردترین در ابتدا."
 msgid "Header"
 msgstr "سربرگ"
 
-#: wavira/patterns/hidden-heading-music-news.php:22
+#: wavira/patterns/hidden-heading-music-news.php:40
 msgctxt "heading above the news feed"
 msgid "Music news"
 msgstr "اخبار موسیقی"
@@ -699,11 +699,11 @@ msgstr "هنوز خبری منتشر نشده است. نخستین خبر را �
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr "هنوز تصویری نیست. آن‌ها را از کتابخانهٔ رسانهٔ همین نوشته بارگذاری کنید."
 
-#: wavira/blocks/tracklist/render.php:67
+#: wavira/blocks/tracklist/render.php:71
 msgid "No published tracks in this album yet."
 msgstr "هنوز قطعهٔ منتشرشدهای در این آلبوم نیست."
 
-#: wavira/blocks/tracklist/render.php:66
+#: wavira/blocks/tracklist/render.php:70
 msgid "No published tracks yet."
 msgstr "قطعهٔ منتشرشده‌ای هنوز وجود ندارد."
 
@@ -769,9 +769,9 @@ msgstr "تصاویر"
 msgid "Photos attached to an artist."
 msgstr "تصاویر پیوست‌شده به یک هنرمند."
 
-#: wavira/inc/cards.php:111
-#: wavira/inc/markup.php:133
-#. translators: %s: the track, album or artist being played.
+#: wavira/inc/cards.php:114
+#: wavira/inc/markup.php:137
+#. translators: %s: the track, album, artist or video being played.
 msgid "Play: %s"
 msgstr "پخش: %s"
 
@@ -787,7 +787,7 @@ msgstr "پخشکننده برای آلبوم، هنرمند یا صف سبک."
 msgid "Preload the bundled font"
 msgstr "پیش‌بارگذاری فونت همراه قالب"
 
-#: wavira/inc/options.php:1006
+#: wavira/inc/options.php:968
 msgid "Primary menu"
 msgstr "منوی اصلی"
 
@@ -820,7 +820,7 @@ msgstr "دکمهٔ جست‌وجو در سربرگ"
 msgid "Search music…"
 msgstr "جست‌وجوی موسیقی…"
 
-#: wavira/patterns/hidden-heading-watch.php:16
+#: wavira/patterns/hidden-heading-watch.php:26
 msgctxt "section heading above a music video"
 msgid "Watch"
 msgstr "تماشا"
@@ -1039,14 +1039,19 @@ msgstr "ویدیو"
 #: wavira/inc/artists.php:215
 #: wavira/patterns/hidden-heading-latest-albums.php:21
 #: wavira/patterns/hidden-heading-latest-tracks.php:21
-#: wavira/patterns/hidden-heading-music-news.php:25
+#: wavira/patterns/hidden-heading-music-news.php:44
 #: wavira/patterns/hidden-heading-music-videos.php:21
 msgid "View all"
 msgstr "مشاهدهٔ همه"
 
-#: wavira/inc/markup.php:213
+#: wavira/inc/markup.php:223
 msgid "Watch the video"
 msgstr "تماشای ویدیو"
+
+#: wavira/inc/cards.php:119
+#. translators: %s: the video being opened.
+msgid "Watch: %s"
+msgstr "تماشا: %s"
 
 #: wavira/inc/site-defaults.php:227
 msgid "Wavira"

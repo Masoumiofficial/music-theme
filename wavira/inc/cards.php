@@ -28,8 +28,10 @@ defined( 'ABSPATH' ) || exit;
  * What a card of each music type offers, and how it is played.
  *
  * `context` is one of the engine's queue contexts (see the player block); an
- * empty context means «this type is not playable», which a video is not — a
- * video opens on its own page.
+ * empty context means «this type has no queue», which a video has none of.
+ * `play` says what the control does: `track` plays this one post, `context`
+ * plays the queue of the album or the artist, `link` opens the post — a video
+ * is watched on its own page, not in the bar — and `false` offers nothing.
  *
  * @return array<string, array{context: string, play: bool, download: bool}>
  */
@@ -52,7 +54,7 @@ function wavira_card_action_map() {
 		),
 		'wavira_video'  => array(
 			'context'  => '',
-			'play'     => false,
+			'play'     => 'link',
 			'download' => true,
 		),
 	);
@@ -107,17 +109,21 @@ function wavira_card_actions( $post_id, $post_type ) {
 	$title   = get_the_title( $post_id );
 	$actions = '';
 
-	if ( ! empty( $rules['play'] ) && '' !== $rules['context'] ) {
-		/* translators: %s: the track, album or artist being played. */
-		$label = sprintf( __( 'Play: %s', 'wavira' ), $title );
+	if ( ! empty( $rules['play'] ) ) {
+		/* translators: %s: the track, album, artist or video being played. */
+		$label           = sprintf( __( 'Play: %s', 'wavira' ), $title );
+		$play_attributes = '';
 
-		if ( 'track' === $rules['play'] ) {
+		if ( 'link' === $rules['play'] ) {
+			/* translators: %s: the video being opened. */
+			$label = sprintf( __( 'Watch: %s', 'wavira' ), $title );
+		} elseif ( 'track' === $rules['play'] ) {
 			$play_attributes = sprintf(
 				'data-wavira-play="%d" data-wavira-context="%s"',
 				$post_id,
 				esc_attr( $rules['context'] )
 			);
-		} else {
+		} elseif ( '' !== $rules['context'] ) {
 			$play_attributes = sprintf(
 				'data-wavira-play-context="%s" data-wavira-play-id="%d"',
 				esc_attr( $rules['context'] ),

@@ -503,7 +503,7 @@ msgstr ""
 msgid "Download wavira-core"
 msgstr ""
 
-#: wavira/inc/cards.php:142
+#: wavira/inc/cards.php:148
 #. translators: %s: the track, album or video being downloaded.
 msgid "Download: %s"
 msgstr ""
@@ -776,9 +776,9 @@ msgstr ""
 msgid "Photos attached to an artist."
 msgstr ""
 
-#: wavira/inc/cards.php:112
+#: wavira/inc/cards.php:114
 #: wavira/inc/markup.php:137
-#. translators: %s: the track, album or artist being played.
+#. translators: %s: the track, album, artist or video being played.
 msgid "Play: %s"
 msgstr ""
 
@@ -1053,6 +1053,11 @@ msgstr ""
 
 #: wavira/inc/markup.php:223
 msgid "Watch the video"
+msgstr ""
+
+#: wavira/inc/cards.php:119
+#. translators: %s: the video being opened.
+msgid "Watch: %s"
 msgstr ""
 
 #: wavira/inc/site-defaults.php:227
