@@ -154,8 +154,8 @@ Authoritative model lives in `docs/DATA-MODEL.md` (produced in phase 0.3.0). Sum
 | Filter | `wavira_core_artist_profile`, `wavira_core_news_items` | 0.9.0 ✅ |
 | Function | `wavira_core_date_style()`, `wavira_core_date_label()`, `wavira_core_digits()` | 0.10.1 ✅ |
 | Filter | `wavira_core_date_style`, `wavira_core_date_format`, `wavira_core_date_label` | 0.10.1 ✅ |
-| Block | `wavira/artist-profile`, `wavira/artist-gallery`, `wavira/news` (+ `wavira/tracklist`, `player`, `video`, `genre-chips`) | 0.7.0 / 0.9.0 ✅ |
-| Shortcode | `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]` (+ the 0.7.0 set) | 0.9.0 ✅ |
+| Block | `wavira/artist-profile`, `wavira/artist-gallery`, `wavira/news` (+ `wavira/tracklist`, `player`, `video`, `genre-chips`, `related`) | 0.7.0 / 0.9.0 / 0.15.0 ✅ |
+| Shortcode | `[wavira_artist]`, `[wavira_gallery]`, `[wavira_news]`, `[wavira_related]` (+ the 0.7.0 set) | 0.9.0 / 0.15.0 ✅ |
 | Function | `wavira_core_is_active()`, `wavira_core_get_setting()`, `wavira_core_related_posts()` (plugin `public-api.php`) | 0.4.0 ✅ |
 | Function | `wavira_core_track_playback()`, `wavira_core_enqueue_player()` (plugin `public-api.php`) | 0.5.0 ✅ |
 | Function | `wavira_player_mount()` (theme `inc/player.php`) — prints a mount point + no-JS `<audio>` fallback | 0.5.0 ✅ |

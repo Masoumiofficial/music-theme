@@ -31,5 +31,6 @@ require_once WAVIRA_THEME_DIR . 'inc/assets.php';
 require_once WAVIRA_THEME_DIR . 'inc/player.php';
 require_once WAVIRA_THEME_DIR . 'inc/artists.php';
 require_once WAVIRA_THEME_DIR . 'inc/news.php';
+require_once WAVIRA_THEME_DIR . 'inc/related.php';
 require_once WAVIRA_THEME_DIR . 'inc/shortcodes.php';
 require_once WAVIRA_THEME_DIR . 'inc/blocks.php';

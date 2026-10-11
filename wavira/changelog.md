@@ -62,6 +62,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **The download labels read Persian end to end.** Size digits use Persian
   numerals too, and «کیلوبیت‌برثانیه» carries the نیم‌فاصله.
 
+- **A single page answers “what do I play next?”.** The track, album and video
+  singles end with a related section: the cards the plugin scores highest — a
+  shared genre, the same artist, the same album — and each card is the card every
+  other grid in the theme uses, so it carries the title, the artist the work is
+  credited to, a Persian date and its own play and download controls. The heading
+  belongs to the block rather than to the template on purpose: a catalogue of one
+  legitimately has nothing related, and a heading a visitor can read with nothing
+  under it is a worse defect than no section, so an empty result prints nothing
+  at all, heading included. The section is a dynamic block (`wavira/related`) and
+  a shortcode (`[wavira_related]`), so it can sit inside an article as well as
+  below one (`wavira/inc/related.php`, `wavira/blocks/related/`,
+  `wavira/inc/shortcodes.php`, `tests/test-related.php`).
+
 ### Fixed — 0.15.0
 
 - **The player is not an empty box any more.** Two defects, one cause each: the

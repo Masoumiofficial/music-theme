@@ -218,3 +218,38 @@ function wavira_news_shortcode( $atts = array() ) {
 	);
 }
 add_shortcode( 'wavira_news', 'wavira_news_shortcode' );
+
+/**
+ * Print the items related to the post being viewed.
+ *
+ * The same cards the single templates show at the foot of the page: whatever
+ * the plugin scores as related to this track, album, artist or video. A site
+ * owner can therefore put the section inside an article, not only below it.
+ *
+ * @param array<string, mixed>|string $atts `id` (`current` or a post ID), `count`, `title`.
+ * @return string Markup, empty string when there is nothing related.
+ */
+function wavira_related_shortcode( $atts = array() ) {
+	$atts = shortcode_atts(
+		array(
+			'id'    => 'current',
+			'count' => '6',
+			'title' => '',
+		),
+		$atts,
+		'wavira_related'
+	);
+
+	if ( ! function_exists( 'wavira_get_related' ) ) {
+		return '';
+	}
+
+	return wavira_get_related(
+		array(
+			'post_id' => function_exists( 'wavira_shortcode_post_id' ) ? wavira_shortcode_post_id( $atts['id'] ) : 0,
+			'limit'   => absint( $atts['count'] ),
+			'title'   => (string) $atts['title'],
+		)
+	);
+}
+add_shortcode( 'wavira_related', 'wavira_related_shortcode' );

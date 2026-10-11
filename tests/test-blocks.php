@@ -40,7 +40,7 @@ class Test_Blocks extends Wavira_Test_Case {
 			define( 'WAVIRA_THEME_VERSION', '0.10.0-test' );
 		}
 
-		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'cards', 'assets', 'player', 'artists', 'news', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
+		foreach ( array( 'helpers', 'options', 'site-defaults', 'customizer', 'markup', 'cards', 'assets', 'player', 'artists', 'news', 'related', 'shortcodes', 'downloads', 'blocks' ) as $file ) {
 			$path = WAVIRA_THEME_DIR . 'inc/' . $file . '.php';
 
 			if ( file_exists( $path ) ) {

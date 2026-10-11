@@ -134,6 +134,11 @@ msgctxt "block description"
 msgid "An artist: portrait, biography, social channels, counts, their albums, singles and music videos, and their photo gallery."
 msgstr "یک هنرمند: تصویر، زندگی‌نامه، شبکه‌های اجتماعی، شمار آثار، آلبوم‌ها، تک‌آهنگ‌ها، موزیک‌ویدیوها و گالری تصاویر."
 
+#: wavira/blocks/related/block.json
+msgctxt "block description"
+msgid "Cards for the items related to the post being viewed: a shared genre, the same artist or the same album."
+msgstr "کارت‌هایی برای مطالب مرتبط با نوشتهٔ جاری: سبک مشترک، هنرمند یکسان یا آلبوم یکسان."
+
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block description"
 msgid "Linked genre terms as chips, most used first."
@@ -287,6 +292,16 @@ msgctxt "block keyword"
 msgid "queue"
 msgstr "صف پخش"
 
+#: wavira/blocks/related/block.json
+msgctxt "block keyword"
+msgid "related"
+msgstr "مرتبط"
+
+#: wavira/blocks/related/block.json
+msgctxt "block keyword"
+msgid "similar"
+msgstr "مشابه"
+
 #: wavira/blocks/artist-profile/block.json
 msgctxt "block keyword"
 msgid "singer"
@@ -357,6 +372,11 @@ msgstr "موزیکویدیو"
 msgctxt "block title"
 msgid "Photo gallery"
 msgstr "گالری تصاویر"
+
+#: wavira/blocks/related/block.json
+msgctxt "block title"
+msgid "Related music"
+msgstr "موسیقی مرتبط"
 
 #: wavira/inc/options.php:292
 msgid "Bold (700)"
@@ -629,6 +649,10 @@ msgstr "اینستاگرام"
 msgid "Install the plugin (Upload Plugin)"
 msgstr "نصب افزونه (بارگذاری افزونه)"
 
+#: wavira/inc/blocks.php:72
+msgid "Items related to this post, as cards."
+msgstr "مطالب مرتبط با این نوشته، در قالب کارت."
+
 #: wavira/inc/customizer.php:286
 msgid "Keeps the header at the top while the page scrolls."
 msgstr "سربرگ را هنگام پیمایش صفحه در بالا نگه می‌دارد."
@@ -766,8 +790,8 @@ msgid "Photos"
 msgstr "تصاویر"
 
 #: wavira/inc/blocks.php:68
-msgid "Photos attached to an artist."
-msgstr "تصاویر پیوست‌شده به یک هنرمند."
+msgid "Photos attached to this post: artist, release or video."
+msgstr "تصاویر پیوست‌شده به این نوشته: هنرمند، آلبوم یا ویدیو."
 
 #: wavira/inc/cards.php:114
 #: wavira/inc/markup.php:137

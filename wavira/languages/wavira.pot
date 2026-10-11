@@ -141,6 +141,11 @@ msgctxt "block description"
 msgid "An artist: portrait, biography, social channels, counts, their albums, singles and music videos, and their photo gallery."
 msgstr ""
 
+#: wavira/blocks/related/block.json
+msgctxt "block description"
+msgid "Cards for the items related to the post being viewed: a shared genre, the same artist or the same album."
+msgstr ""
+
 #: wavira/blocks/genre-chips/block.json
 msgctxt "block description"
 msgid "Linked genre terms as chips, most used first."
@@ -253,6 +258,7 @@ msgstr ""
 #: wavira/blocks/genre-chips/block.json
 #: wavira/blocks/news/block.json
 #: wavira/blocks/player/block.json
+#: wavira/blocks/related/block.json
 #: wavira/blocks/tracklist/block.json
 #: wavira/blocks/video/block.json
 msgctxt "block keyword"
@@ -292,6 +298,16 @@ msgstr ""
 #: wavira/blocks/player/block.json
 msgctxt "block keyword"
 msgid "queue"
+msgstr ""
+
+#: wavira/blocks/related/block.json
+msgctxt "block keyword"
+msgid "related"
+msgstr ""
+
+#: wavira/blocks/related/block.json
+msgctxt "block keyword"
+msgid "similar"
 msgstr ""
 
 #: wavira/blocks/artist-profile/block.json
@@ -363,6 +379,11 @@ msgstr ""
 #: wavira/blocks/artist-gallery/block.json
 msgctxt "block title"
 msgid "Photo gallery"
+msgstr ""
+
+#: wavira/blocks/related/block.json
+msgctxt "block title"
+msgid "Related music"
 msgstr ""
 
 #: wavira/inc/options.php:292
@@ -636,6 +657,10 @@ msgstr ""
 msgid "Install the plugin (Upload Plugin)"
 msgstr ""
 
+#: wavira/inc/blocks.php:72
+msgid "Items related to this post, as cards."
+msgstr ""
+
 #: wavira/inc/customizer.php:286
 msgid "Keeps the header at the top while the page scrolls."
 msgstr ""
@@ -684,6 +709,7 @@ msgctxt "message of the 404 template"
 msgid "The page you were looking for does not exist. Try a search, or browse the latest releases."
 msgstr ""
 
+#: wavira/blocks/related/render.php:46
 #: wavira/patterns/album-grid.php:29
 #: wavira/patterns/hidden-no-results.php:20
 msgctxt "message shown when a query returns no posts"
@@ -773,7 +799,7 @@ msgid "Photos"
 msgstr ""
 
 #: wavira/inc/blocks.php:68
-msgid "Photos attached to an artist."
+msgid "Photos attached to this post: artist, release or video."
 msgstr ""
 
 #: wavira/inc/cards.php:114

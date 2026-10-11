@@ -100,6 +100,8 @@
 	register( 'wavira/artist-gallery', __( 'Photos attached to this post: artist, release or video.', 'wavira' ) );
 
 	register( 'wavira/news', __( 'The newest news posts as cards.', 'wavira' ) );
+
+	register( 'wavira/related', __( 'Items related to this post, as cards.', 'wavira' ) );
 } )(
 	window.wp.blocks,
 	window.wp.element,
