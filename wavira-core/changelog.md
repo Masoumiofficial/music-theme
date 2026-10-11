@@ -31,6 +31,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   photos, the track audio in two qualities, the album masters) and counted in the import report
   (`report['media']`), which the CLI and the admin notice both print. **23 files on a fresh install**, and
   nothing is fetched from a third party.
+- **The demo gives the news an address of its own.** The front page is the
+  theme's own template, so the posts archive had no URL at all: `page_for_posts`
+  only means something when the front page is a static page, and a fresh
+  WordPress install shows posts on the front page instead. Without both, the
+  theme's «مشاهدهٔ همه» above the news section led back to the page the visitor
+  was already on and the template that lists posts was unreachable. The
+  installer now creates a «خانه» page and an «اخبار» page, makes the front page
+  static and points `page_for_posts` at the news — and leaves both alone when
+  the owner has already chosen them. `Installer::ensure_news_page()`.
 
 ### Fixed — 0.15.0
 

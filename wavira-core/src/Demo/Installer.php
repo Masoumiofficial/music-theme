@@ -439,6 +439,8 @@ final class Installer {
 			__( 'Site locale, timezone, first day of the week and date format were set to the Iranian defaults.', 'wavira-core' ),
 		);
 
+		$notices = array_merge( $notices, self::ensure_news_page() );
+
 		$first = self::translate_first_content();
 
 		if ( $first > 0 ) {
@@ -450,6 +452,84 @@ final class Installer {
 		}
 
 		return $notices;
+	}
+
+	/**
+	 * Give the news an address of its own.
+	 *
+	 * The front page is the theme's own template, so the posts archive has no
+	 * URL until the site says which page is which: `page_for_posts` only means
+	 * anything when the front page is a static page, and a fresh WordPress
+	 * install shows posts on the front page instead. Without both, the news
+	 * section of the front page offers a «مشاهدهٔ همه» that leads back to
+	 * itself, and the template that lists posts is unreachable.
+	 *
+	 * Bounded like the rest of the installer: a site that has already chosen a
+	 * page for either slot keeps it.
+	 *
+	 * @return string[] Notices for the report.
+	 */
+	private static function ensure_news_page(): array {
+		if ( 'page' === (string) get_option( 'show_on_front' ) && absint( get_option( 'page_for_posts' ) ) > 0 ) {
+			return array();
+		}
+
+		$front_id = absint( get_option( 'page_on_front' ) );
+
+		if ( $front_id < 1 ) {
+			$front_id = self::ensure_page( __( 'Home', 'wavira-core' ) );
+		}
+
+		$news_id = self::ensure_page( __( 'News', 'wavira-core' ) );
+
+		// Two different pages are what makes the pair mean anything; anything
+		// less is left as it was rather than half-set.
+		if ( $front_id < 1 || $news_id < 1 || $front_id === $news_id ) {
+			return array();
+		}
+
+		update_option( 'show_on_front', 'page' );
+		update_option( 'page_on_front', $front_id );
+		update_option( 'page_for_posts', $news_id );
+
+		return array(
+			__( 'The news have a page of their own: the front page is static now, and the posts are listed at their own address.', 'wavira-core' ),
+		);
+	}
+
+	/**
+	 * One published page by title, reused when a page of that name exists.
+	 *
+	 * @param string $title Page title. WordPress derives the slug from it, so
+	 *                      the lookup matches what a second import would find.
+	 * @return int Page ID, or 0 when WordPress refused to create it.
+	 */
+	private static function ensure_page( string $title ): int {
+		$slug  = sanitize_title( $title );
+		$found = get_posts(
+			array(
+				'post_type'      => 'page',
+				'name'           => $slug,
+				'posts_per_page' => 1,
+				'post_status'    => array( 'publish', 'draft', 'private' ),
+			)
+		);
+
+		if ( isset( $found[0] ) && $found[0] instanceof WP_Post ) {
+			return (int) $found[0]->ID;
+		}
+
+		$page_id = wp_insert_post(
+			array(
+				'post_type'    => 'page',
+				'post_title'   => $title,
+				'post_status'  => 'publish',
+				'post_name'    => $slug,
+			),
+			true
+		);
+
+		return is_wp_error( $page_id ) ? 0 : (int) $page_id;
 	}
 
 	/**

@@ -146,6 +146,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   link ask the same question as the block beside them now, and print nothing
   when the answer is nothing (`patterns/hidden-heading-watch.php`,
   `patterns/hidden-heading-music-news.php`).
+- **The news archive has a first-level heading.** The page that lists posts is
+  `is_home()` and not `is_archive()`, so core's query-title block prints
+  nothing there: the archive shipped with a section heading and no `<h1>` at
+  all. The heading pattern asks where it is and takes level one on the archive,
+  level two everywhere else, which is also where it stops offering a link to
+  the page you are on (`patterns/hidden-heading-music-news.php`).
 - **Two blocks of consecutive assignments broke the coding standard.** The
   tracklist row's play control and the card's download control mixed `=` and
   `.=` on neighbouring lines; the equals sign of a `.=` sits one column further

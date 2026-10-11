@@ -578,7 +578,7 @@ msgstr ""
 msgid "Header"
 msgstr ""
 
-#: wavira/patterns/hidden-heading-music-news.php:22
+#: wavira/patterns/hidden-heading-music-news.php:40
 msgctxt "heading above the news feed"
 msgid "Music news"
 msgstr ""
@@ -1046,7 +1046,7 @@ msgstr ""
 #: wavira/inc/artists.php:215
 #: wavira/patterns/hidden-heading-latest-albums.php:21
 #: wavira/patterns/hidden-heading-latest-tracks.php:21
-#: wavira/patterns/hidden-heading-music-news.php:37
+#: wavira/patterns/hidden-heading-music-news.php:44
 #: wavira/patterns/hidden-heading-music-videos.php:21
 msgid "View all"
 msgstr ""
