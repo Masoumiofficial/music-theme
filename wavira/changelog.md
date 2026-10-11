@@ -77,6 +77,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed — 0.15.0
 
+- **The search page did not search.** `search.html` ran a query of its own —
+  `postType: wavira_track`, `inherit: false` — so every query string answered
+  with the same newest tracks: «پرواز» and «zzzznothing» returned identical
+  pages, and `query-no-results` could never fire. The query now inherits the
+  search it is on. A hit lists whatever matched — tracks, albums, artists,
+  videos and news posts — with the play and download controls every other card
+  carries, and a miss says so in Persian: «چیزی با «…» مطابق نبود. واژهٔ دیگری
+  را امتحان کنید یا تازه‌ترین آثار را ببینید.» (`wavira/templates/search.html`,
+  `wavira/patterns/hidden-search-no-results.php`).
+- **The search page spoke English, twice over.** Its heading came from core's
+  `query-title` block and its form from a bare `wp:search`, and a core string is
+  English on every site whose core language files have not been fetched — a
+  fresh install, a Playground, a site that has not run its translation update.
+  Both are patterns now, reading the theme's own catalogue: «نتایج جستجو برای:
+  «…»» as the page's `h1` and a form labelled «جست‌وجو» with the placeholder
+  «جست‌وجوی موسیقی…» (`wavira/patterns/hidden-search-title.php`,
+  `wavira/patterns/hidden-search-form.php`, `wavira/inc/markup.php`).
+- **Every search form on the site was labelled in English.** The pattern that
+  prints the core search block escaped its attribute JSON with `esc_attr()`,
+  which turns each `"` into `&quot;` — so the block parser found a delimiter it
+  could not read, dropped every attribute and rendered the block with its
+  defaults: the label «Search», an empty placeholder and a text button instead
+  of an icon. The JSON is now encoded with `wp_json_encode()`, the encoder a
+  block delimiter actually expects, and the header's form reads «جست‌وجو» on
+  every page it appears on — the 404 template uses the same pattern now, where
+  it used to print a bare `wp:search` (`wavira/patterns/hidden-header-search.php`,
+  `wavira/patterns/hidden-search-form.php`, `wavira/templates/404.html`).
+
 - **The player is not an empty box any more.** Two defects, one cause each: the
   engine's handle was registered on `wp_enqueue_scripts`, which fires inside
   `<head>`, while a block theme renders its template *before* it — so the mount

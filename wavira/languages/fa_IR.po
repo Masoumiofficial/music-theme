@@ -735,6 +735,14 @@ msgstr "قطعهٔ منتشرشده‌ای هنوز وجود ندارد."
 msgid "Not now"
 msgstr "اکنون نه"
 
+#: wavira/patterns/hidden-search-no-results.php:24
+msgid "Nothing matched your search. Try another word, or browse the latest releases."
+msgstr "چیزی با جستجوی شما مطابق نبود. واژهٔ دیگری را امتحان کنید یا تازه‌ترین آثار را ببینید."
+
+#: wavira/patterns/hidden-search-no-results.php:27
+msgid "Nothing matched “%s”. Try another word, or browse the latest releases."
+msgstr "چیزی با «%s» مطابق نبود. واژهٔ دیگری را امتحان کنید یا تازه‌ترین آثار را ببینید."
+
 #: wavira/blocks/download/render.php:45
 msgid "Nothing to download yet: add an audio file to this track, an album file, a hosted video, or a cover image."
 msgstr "هنوز چیزی برای دانلود نیست: به این قطعه فایل صوتی، به آلبوم فایل مادر، به ویدیو فایل میزبانی‌شده یا تصویر جلد اضافه کنید."
@@ -843,6 +851,14 @@ msgstr "دکمهٔ جست‌وجو در سربرگ"
 #: wavira/patterns/hidden-header-search.php:25
 msgid "Search music…"
 msgstr "جست‌وجوی موسیقی…"
+
+#: wavira/patterns/hidden-search-title.php:28
+msgid "Search results"
+msgstr "نتایج جستجو"
+
+#: wavira/patterns/hidden-search-title.php:31
+msgid "Search results for: “%s”"
+msgstr "نتایج جستجو برای: «%s»"
 
 #: wavira/patterns/hidden-heading-watch.php:26
 msgctxt "section heading above a music video"

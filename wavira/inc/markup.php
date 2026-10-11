@@ -547,3 +547,39 @@ if ( ! function_exists( 'wavira_get_section_head' ) ) {
 		return $html . '</div>';
 	}
 }
+
+if ( ! function_exists( 'wavira_search_block_attrs' ) ) {
+	/**
+	 * Attributes of the core search block, in the site's own language.
+	 *
+	 * The core block prints its label, placeholder and button text from its own
+	 * catalogue, which a site without core's language packs — a fresh install, a
+	 * Playground, a site whose translation files have not been fetched yet —
+	 * shows in English. This theme ships Persian in the repository, so the three
+	 * strings come from the theme's catalogue and the block is Persian wherever
+	 * it appears, in the header or on a search page (ADR 0015).
+	 *
+	 * @param array<string, mixed> $args {
+	 *     Optional. Overrides merged over the defaults.
+	 *
+	 *     @type string $className Extra classes for the block.
+	 * }
+	 * @return array<string, mixed> Block attributes, ready for `wp_json_encode()`.
+	 */
+	function wavira_search_block_attrs( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'className' => '',
+			)
+		);
+
+		return array(
+			'label'         => __( 'Search', 'wavira' ),
+			'placeholder'   => __( 'Search music…', 'wavira' ),
+			'buttonText'    => __( 'Search', 'wavira' ),
+			'buttonUseIcon' => true,
+			'className'     => (string) $args['className'],
+		);
+	}
+}

@@ -744,6 +744,15 @@ msgstr ""
 msgid "Not now"
 msgstr ""
 
+#: wavira/patterns/hidden-search-no-results.php:27
+#. translators: %s: the search term that matched nothing.
+msgid "Nothing matched “%s”. Try another word, or browse the latest releases."
+msgstr ""
+
+#: wavira/patterns/hidden-search-no-results.php:24
+msgid "Nothing matched your search. Try another word, or browse the latest releases."
+msgstr ""
+
 #: wavira/blocks/download/render.php:45
 msgid "Nothing to download yet: add an audio file to this track, an album file, a hosted video, or a cover image."
 msgstr ""
@@ -840,8 +849,8 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: wavira/patterns/hidden-header-search.php:24
-#: wavira/patterns/hidden-header-search.php:26
+#: wavira/inc/markup.php:578
+#: wavira/inc/markup.php:580
 msgid "Search"
 msgstr ""
 
@@ -849,8 +858,17 @@ msgstr ""
 msgid "Search button in the header"
 msgstr ""
 
-#: wavira/patterns/hidden-header-search.php:25
+#: wavira/inc/markup.php:579
 msgid "Search music…"
+msgstr ""
+
+#: wavira/patterns/hidden-search-title.php:28
+msgid "Search results"
+msgstr ""
+
+#: wavira/patterns/hidden-search-title.php:31
+#. translators: %s: the search term the visitor typed.
+msgid "Search results for: “%s”"
 msgstr ""
 
 #: wavira/patterns/hidden-heading-watch.php:26
