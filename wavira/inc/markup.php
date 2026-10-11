@@ -291,7 +291,15 @@ if ( ! function_exists( 'wavira_get_genre_chips' ) ) {
 				wavira_core_digits( (int) $term->count )
 			) : $term->name;
 
-			$html .= '<a class="wavira-chip" href="' . esc_url( (string) get_term_link( $term ) ) . '">' . esc_html( $label ) . '</a> ';
+			// The genre being viewed is marked, so a row of chips says where
+			// the visitor is and not only where they could go.
+			$current = is_tax( 'wavira_genre', (int) $term->term_id );
+			$class   = $current ? 'wavira-chip wavira-chip--accent' : 'wavira-chip';
+			$aria    = $current ? ' aria-current="page"' : '';
+
+			$html .= '<a class="' . esc_attr( $class ) . '"'
+				. ' href="' . esc_url( (string) get_term_link( $term ) ) . '"'
+				. $aria . '>' . esc_html( $label ) . '</a> ';
 		}
 
 		return trim( $html ) . '</p>';

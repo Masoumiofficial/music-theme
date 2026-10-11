@@ -727,6 +727,20 @@ final class Installer {
 				$args['menu-item-type']      = 'taxonomy';
 				$args['menu-item-object']    = (string) $item['object'];
 				$args['menu-item-object-id'] = $term_id;
+			} elseif ( 'posts' === $item['type'] ) {
+				$posts_page = absint( get_option( 'page_for_posts' ) );
+
+				// The page that lists the posts is the site's choice, not the
+				// demo's — and it may not exist at all. A menu item with no
+				// destination is a link to the page you are already on, so it
+				// is left out instead.
+				if ( $posts_page < 1 ) {
+					continue;
+				}
+
+				$args['menu-item-type']      = 'post_type';
+				$args['menu-item-object']    = 'page';
+				$args['menu-item-object-id'] = $posts_page;
 			} else {
 				$args['menu-item-type'] = 'custom';
 				$args['menu-item-url']  = (string) $item['url'];

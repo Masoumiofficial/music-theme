@@ -161,6 +161,14 @@ final class Fixtures {
 						'label'  => 'ویدیوها',
 						'object' => PostTypes::VIDEO,
 					),
+					// The news, last: «posts» is not a post type archive but the
+					// page the site lists its posts on, which the installer
+					// creates in its site step. When there is none, the item is
+					// left out rather than pointing at nothing.
+					array(
+						'type'  => 'posts',
+						'label' => 'اخبار',
+					),
 					// No «سبک‌ها» (styles): a taxonomy has no archive of its own and
 				// only a term has a page, so a menu item for it is a link with no
 				// destination. The genres are on the releases, where a visitor can

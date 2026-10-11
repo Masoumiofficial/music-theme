@@ -158,6 +158,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   control is there now and it opens the video — «تماشا: نام ویدیو» — because a
   video is watched on its own page rather than in the player bar
   (`inc/cards.php`).
+- **The archives can be browsed by genre.** A track archive was a grid and
+  nothing else: to narrow it you had to know the URL of a genre. The «genre
+  chips» block — which existed and was only offered as a pattern — now sits
+  under the title of the track archive and of a genre page, and the genre a
+  visitor is looking at is marked with `aria-current="page"` and the accent
+  chip, so the row says where they are and not only where they could go
+  (`templates/archive-wavira_track.html`, `templates/taxonomy-wavira_genre.html`,
+  `inc/markup.php`).
 - **Two blocks of consecutive assignments broke the coding standard.** The
   tracklist row's play control and the card's download control mixed `=` and
   `.=` on neighbouring lines; the equals sign of a `.=` sits one column further

@@ -113,7 +113,7 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:212
+#: wavira-core/src/Demo/Fixtures.php:220
 msgid "Demo Album"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Demo album audio"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:206
+#: wavira-core/src/Demo/Fixtures.php:214
 msgid "Demo Artist"
 msgstr ""
 
@@ -150,15 +150,15 @@ msgstr ""
 msgid "Demo gallery photo %d"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:185
+#: wavira-core/src/Demo/Fixtures.php:193
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:221
+#: wavira-core/src/Demo/Fixtures.php:229
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:192
+#: wavira-core/src/Demo/Fixtures.php:200
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -209,11 +209,11 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:207
+#: wavira-core/src/Demo/Fixtures.php:215
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:184
+#: wavira-core/src/Demo/Fixtures.php:192
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 

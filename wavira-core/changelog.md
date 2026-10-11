@@ -40,6 +40,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   installer now creates a «خانه» page and an «اخبار» page, makes the front page
   static and points `page_for_posts` at the news — and leaves both alone when
   the owner has already chosen them. `Installer::ensure_news_page()`.
+- **The demo menu links to the news.** The menu listed the four music archives
+  and nothing else, so the page the front page's «مشاهدهٔ همه» pointed at was
+  reachable only from there. The catalogue gained a «اخبار» item of a new kind —
+  `posts`, the page the site lists its posts on, resolved from `page_for_posts`
+  rather than from a slug, so it survives a rename and is left out entirely when
+  the site has no such page (`Demo\Fixtures`, `Installer::create_primary_menu()`).
 
 ### Fixed — 0.15.0
 
