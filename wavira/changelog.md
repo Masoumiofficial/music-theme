@@ -3,6 +3,39 @@
 All notable changes to the theme are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Settings → Wavira settings has a new look.** A hero with the version and the
+  two main actions, pill-shaped tabs, one card per section with a field grid
+  (two columns on wide screens, one on phones), on/off switches for every
+  checkbox, and a save bar that stays at the bottom while you scroll. The
+  fields, their names and the save path are the same: the Customizer and the
+  screen still share one schema.
+- **Five new settings** (all in the schema, so the Customizer gets them too):
+  reading width (`measure`), frosted-glass blur (`glass_blur`), header height
+  (`header_height`), *Reduce motion everywhere* (`reduce_motion`, which overrides
+  the visitor's device setting), and *Download cards on music pages*
+  (`show_downloads`, in a new *Music pages* section).
+- **Home page status and setup.** The *Language and Persian setup* tab reports
+  whether a front page is chosen. With "A static page" selected but no page
+  picked, WordPress shows the blog listing instead of the designed home page;
+  the status card says so. One nonced button creates an empty *Home* and an
+  empty *News* page when they are missing, reuses pages that already have those
+  titles, and sets Settings → Reading. Pages that are already chosen are kept.
+
+### Fixed
+
+- A switch that is on by default, switched off, and then switched back on was
+  kept off: the saved `false` was treated as "not stored". The default is now
+  removed as it should be.
+
+### Unchanged
+
+- `front-page.html` and the seeded home content are untouched. Version stays at
+  0.16.0 until a release is cut.
+
 ## [0.16.0] — 2026-10-12
 
 ### Changed — 0.16.0

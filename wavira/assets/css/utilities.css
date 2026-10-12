@@ -115,3 +115,20 @@
 		background: none;
 	}
 }
+
+/* Settings → Appearance → "Reduce motion everywhere". The body class is set by
+   wavira_option_body_classes(), so the switch means the same thing on every
+   visitor's device, whatever prefers-reduced-motion says. The selectors are
+   written to outrank component and :hover rules (the [class] term adds a
+   class-level weight) instead of using !important, which the theme forbids. */
+body.wavira-reduce-motion *,
+body.wavira-reduce-motion [class],
+body.wavira-reduce-motion [class]::before,
+body.wavira-reduce-motion [class]::after {
+	animation-delay: 0s;
+	animation-duration: 0.01ms;
+	animation-iteration-count: 1;
+	transition-delay: 0s;
+	transition-duration: 0.01ms;
+	scroll-behavior: auto;
+}

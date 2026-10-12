@@ -51,6 +51,13 @@ const TARGETS = [
 		files: [join(ROOT, 'wavira/assets/js/admin.js')],
 	},
 	{
+		// The settings screen's stylesheet: one file, loaded on that screen only,
+		// so it is a separate target and never part of the front-end bundle.
+		name: 'settings screen CSS',
+		outFile: join(ROOT, 'wavira/assets/dist/admin.css'),
+		files: [join(ROOT, 'wavira/assets/admin/screen.css')],
+	},
+	{
 		name: 'core CSS',
 		sourceDir: join(ROOT, 'wavira-core/assets/css'),
 		outFile: join(ROOT, 'wavira-core/assets/dist/player.css'),

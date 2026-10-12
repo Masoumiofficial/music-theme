@@ -137,6 +137,22 @@ function wavira_options_schema(): array {
 			'label'   => __( 'Player bar on every page', 'wavira' ),
 		),
 
+		'header_height'     => array(
+			'default' => 72,
+			'type'    => 'int',
+			'min'     => 56,
+			'max'     => 120,
+			'step'    => 2,
+			'control' => 'number',
+			'section' => 'header',
+			'label'   => __( 'Header height (px)', 'wavira' ),
+			'transport' => 'postMessage',
+			'live'    => array(
+				'css'  => '--wavira-header-height',
+				'unit' => 'px',
+			),
+		),
+
 		// -------------------------------------------------------------- appearance.
 		'colour_mode'       => array(
 			'default' => 'auto',
@@ -242,6 +258,44 @@ function wavira_options_schema(): array {
 				'mode'  => 'bool-class',
 				'class' => 'wavira-no-glass',
 			),
+		),
+
+		'measure'           => array(
+			'default' => 62,
+			'type'    => 'int',
+			'min'     => 40,
+			'max'     => 90,
+			'step'    => 1,
+			'control' => 'number',
+			'section' => 'appearance',
+			'label'   => __( 'Reading width (characters per line)', 'wavira' ),
+			'transport' => 'postMessage',
+			'live'    => array(
+				'css'  => '--wavira-measure',
+				'unit' => 'ch',
+			),
+		),
+		'glass_blur'        => array(
+			'default' => 20,
+			'type'    => 'int',
+			'min'     => 0,
+			'max'     => 40,
+			'step'    => 1,
+			'control' => 'number',
+			'section' => 'appearance',
+			'label'   => __( 'Frosted-glass blur (px)', 'wavira' ),
+			'transport' => 'postMessage',
+			'live'    => array(
+				'css'  => '--wavira-glass-blur',
+				'unit' => 'px',
+			),
+		),
+		'reduce_motion'     => array(
+			'default' => false,
+			'type'    => 'bool',
+			'control' => 'checkbox',
+			'section' => 'appearance',
+			'label'   => __( 'Reduce motion everywhere', 'wavira' ),
 		),
 
 		// ---------------------------------------------------------------- typography.
@@ -358,6 +412,15 @@ function wavira_options_schema(): array {
 			'control' => 'checkbox',
 			'section' => 'social',
 			'label'   => __( 'Open social links in a new tab', 'wavira' ),
+		),
+
+		// ------------------------------------------------------------------- music.
+		'show_downloads'    => array(
+			'default' => true,
+			'type'    => 'bool',
+			'control' => 'checkbox',
+			'section' => 'music',
+			'label'   => __( 'Download cards on music pages', 'wavira' ),
 		),
 
 		// -------------------------------------------------------------------- texts.
@@ -840,6 +903,10 @@ function wavira_option_body_classes( $classes ) {
 
 	if ( ! wavira_option( 'show_theme_toggle' ) ) {
 		$classes[] = 'wavira-no-toggle';
+	}
+
+	if ( wavira_option( 'reduce_motion' ) ) {
+		$classes[] = 'wavira-reduce-motion';
 	}
 
 	$weight = (string) wavira_option( 'heading_weight' );

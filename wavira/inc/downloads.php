@@ -103,6 +103,12 @@ if ( ! function_exists( 'wavira_get_download' ) ) {
 	function wavira_get_download( $post_id, $variant = 'button', $quality = 0, $label = '', $sizes = false ) {
 		$post_id = absint( $post_id );
 
+		// The settings screen's switch: off hides every download card, and the
+		// files are left where they are.
+		if ( function_exists( 'wavira_option' ) && ! wavira_option( 'show_downloads', true ) ) {
+			return '';
+		}
+
 		if ( $post_id < 1 || ! function_exists( 'wavira_core_download_qualities' ) ) {
 			return '';
 		}

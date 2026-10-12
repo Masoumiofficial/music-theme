@@ -148,6 +148,7 @@ const ARTIFACTS = [
 			'assets/dist/theme.js',
 			'assets/dist/customizer.js',
 			'assets/dist/admin.js',
+			'assets/dist/admin.css',
 			'assets/fonts/vazirmatn/vazirmatn-variable.woff2',
 			'assets/fonts/vazirmatn/OFL.txt',
 		],

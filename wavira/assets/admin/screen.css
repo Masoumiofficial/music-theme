@@ -1,0 +1,625 @@
+/*!
+ * Wavira — the settings screen's stylesheet (Appearance → Wavira settings).
+ *
+ * Loaded on that screen only (wavira/inc/admin-panel.php). It restyles WordPress's
+ * own admin components rather than replacing them: the tabs are still
+ * `.nav-tab`, the inputs are still `.regular-text` and `.small-text`, and the
+ * save button is still `submit_button()`. So the screen keeps working — and
+ * keeps its focus styles and high-contrast behaviour — if this file is absent.
+ *
+ * Built into assets/dist/admin.css by tools/build.mjs. Keep it to the screen:
+ * nothing here may touch the front end or the Customizer.
+ */
+
+/* ------------------------------------------------------------- tokens. */
+
+.wavira-admin {
+	--wv-ink: #111827;
+	--wv-muted: #5b6475;
+	--wv-line: #dcdfe6;
+	--wv-card: #ffffff;
+	--wv-page: #f5f6fa;
+	--wv-violet: #6d28d9;
+	--wv-violet-ink: #4c1d95;
+	--wv-teal: #0f9d8a;
+	--wv-amber: #d97706;
+	--wv-radius: 14px;
+	--wv-shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 6px 18px rgba(17, 24, 39, 0.05);
+
+	color: var(--wv-ink);
+	max-width: 1180px;
+}
+
+/* ---------------------------------------------------------------- hero. */
+
+.wavira-admin__hero {
+	position: relative;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 20px 32px;
+	padding: 28px 32px 30px;
+	margin: 12px 0 18px;
+	border-radius: 18px;
+	overflow: hidden;
+	color: #f4f1ff;
+	background:
+		radial-gradient(900px 260px at 100% -10%, rgba(45, 212, 191, 0.28), transparent 60%),
+		radial-gradient(700px 240px at -5% 120%, rgba(168, 85, 247, 0.35), transparent 60%),
+		linear-gradient(135deg, #1b1340 0%, #2a1563 55%, #123f4a 100%);
+	box-shadow: 0 14px 40px rgba(27, 19, 64, 0.28);
+}
+
+.wavira-admin__copy {
+	position: relative;
+	z-index: 1;
+	flex: 1 1 360px;
+	min-width: 0;
+}
+
+.wavira-admin__eyebrow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin: 0 0 8px;
+}
+
+.wavira-admin__badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #1b1340;
+	background: linear-gradient(90deg, #5eead4, #c4b5fd);
+}
+
+.wavira-admin__version {
+	font-size: 13px;
+	color: rgba(244, 241, 255, 0.72);
+}
+
+.wavira-admin .wavira-admin__hero h1 {
+	margin: 0 0 10px;
+	padding: 0;
+	font-size: 32px;
+	line-height: 1.2;
+	font-weight: 800;
+	color: #ffffff;
+}
+
+.wavira-admin__lede {
+	max-width: 62ch;
+	margin: 0;
+	font-size: 14.5px;
+	line-height: 1.75;
+	color: rgba(244, 241, 255, 0.82);
+}
+
+.wavira-admin__actions {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.wavira-admin .button-hero {
+	border: 0;
+	padding: 0 18px;
+	min-height: 40px;
+	line-height: 38px;
+	border-radius: 999px;
+	color: #1b1340;
+	background: linear-gradient(90deg, #5eead4, #a5f3fc);
+	box-shadow: 0 6px 18px rgba(94, 234, 212, 0.25);
+}
+
+.wavira-admin .button-hero:hover,
+.wavira-admin .button-hero:focus {
+	color: #1b1340;
+	background: linear-gradient(90deg, #99f6e4, #cffafe);
+}
+
+.wavira-admin .button-hero-ghost {
+	min-height: 40px;
+	line-height: 38px;
+	padding: 0 18px;
+	border-radius: 999px;
+	color: #f4f1ff;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	box-shadow: none;
+}
+
+.wavira-admin .button-hero-ghost:hover,
+.wavira-admin .button-hero-ghost:focus {
+	color: #ffffff;
+	background: rgba(255, 255, 255, 0.16);
+	border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* The equaliser: twelve bars, decorative only, still under reduced motion. */
+.wavira-admin__equaliser {
+	position: absolute;
+	inset-inline-end: 28px;
+	inset-block-start: 22px;
+	display: flex;
+	align-items: flex-end;
+	gap: 5px;
+	height: 56px;
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.wavira-admin__equaliser span {
+	display: block;
+	width: 5px;
+	height: 100%;
+	border-radius: 3px;
+	background: linear-gradient(180deg, #5eead4, #a78bfa);
+	transform-origin: bottom;
+	animation: wavira-admin-eq 1.4s ease-in-out infinite alternate;
+}
+
+.wavira-admin__equaliser span:nth-child(odd) { animation-duration: 1.1s; }
+.wavira-admin__equaliser span:nth-child(3n)  { animation-duration: 1.7s; }
+.wavira-admin__equaliser span:nth-child(1)  { animation-delay: -0.2s; }
+.wavira-admin__equaliser span:nth-child(2)  { animation-delay: -0.9s; }
+.wavira-admin__equaliser span:nth-child(3)  { animation-delay: -0.5s; }
+.wavira-admin__equaliser span:nth-child(4)  { animation-delay: -1.2s; }
+.wavira-admin__equaliser span:nth-child(5)  { animation-delay: -0.7s; }
+.wavira-admin__equaliser span:nth-child(6)  { animation-delay: -0.3s; }
+.wavira-admin__equaliser span:nth-child(7)  { animation-delay: -1.0s; }
+.wavira-admin__equaliser span:nth-child(8)  { animation-delay: -0.6s; }
+.wavira-admin__equaliser span:nth-child(9)  { animation-delay: -1.3s; }
+.wavira-admin__equaliser span:nth-child(10) { animation-delay: -0.4s; }
+.wavira-admin__equaliser span:nth-child(11) { animation-delay: -0.8s; }
+.wavira-admin__equaliser span:nth-child(12) { animation-delay: -1.1s; }
+
+@keyframes wavira-admin-eq {
+	from { transform: scaleY(0.18); }
+	to   { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wavira-admin__equaliser span {
+		animation: none;
+		transform: scaleY(0.6);
+	}
+}
+
+/* ----------------------------------------------------------------- tabs. */
+
+.wavira-admin .wavira-admin__tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding: 6px;
+	margin: 0 0 18px;
+	border: 1px solid var(--wv-line);
+	border-radius: 999px;
+	background: var(--wv-card);
+	box-shadow: var(--wv-shadow);
+}
+
+.wavira-admin .wavira-admin__tabs .nav-tab {
+	float: none;
+	margin: 0;
+	padding: 7px 16px;
+	border: 0;
+	border-radius: 999px;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--wv-muted);
+	background: transparent;
+	line-height: 1.4;
+}
+
+.wavira-admin .wavira-admin__tabs .nav-tab:hover,
+.wavira-admin .wavira-admin__tabs .nav-tab:focus {
+	color: var(--wv-violet-ink);
+	background: #f1ecff;
+}
+
+.wavira-admin .wavira-admin__tabs .nav-tab-active,
+.wavira-admin .wavira-admin__tabs .nav-tab-active:hover,
+.wavira-admin .wavira-admin__tabs .nav-tab-active:focus {
+	color: #ffffff;
+	background: linear-gradient(90deg, var(--wv-violet), #7c3aed);
+	box-shadow: 0 4px 12px rgba(109, 40, 217, 0.28);
+}
+
+/* ---------------------------------------------------------------- panels. */
+
+.wavira-admin__panel {
+	margin: 0 0 18px;
+	padding: 24px 26px 26px;
+	border: 1px solid var(--wv-line);
+	border-radius: var(--wv-radius);
+	background: var(--wv-card);
+	box-shadow: var(--wv-shadow);
+}
+
+.wavira-admin__panel-head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 6px;
+}
+
+.wavira-admin__panel-head::before {
+	content: "";
+	flex: 0 0 4px;
+	height: 22px;
+	border-radius: 4px;
+	background: linear-gradient(180deg, var(--wv-violet), var(--wv-teal));
+}
+
+.wavira-admin .wavira-admin__panel h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--wv-ink);
+}
+
+.wavira-admin__panel-intro {
+	max-width: 74ch;
+	margin: 0 0 22px;
+	color: var(--wv-muted);
+	font-size: 13.5px;
+	line-height: 1.75;
+}
+
+.wavira-admin__panel-intro > p {
+	margin: 0 0 8px;
+}
+
+.wavira-admin__intro-text {
+	max-width: 74ch;
+	margin: 0 0 16px;
+	color: var(--wv-muted);
+	font-size: 13.5px;
+	line-height: 1.75;
+}
+
+/* ----------------------------------------------------------------- fields. */
+
+.wavira-admin__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+	gap: 18px 26px;
+}
+
+.wavira-field {
+	min-width: 0;
+	padding: 14px 16px 14px;
+	border: 1px solid #eceef3;
+	border-radius: 12px;
+	background: #fbfbfd;
+}
+
+.wavira-field--wide {
+	grid-column: 1 / -1;
+}
+
+.wavira-field__head label {
+	display: block;
+	margin: 0 0 8px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--wv-ink);
+}
+
+.wavira-field__control {
+	min-width: 0;
+}
+
+.wavira-field__control input[type="text"],
+.wavira-field__control input[type="url"],
+.wavira-field__control input[type="number"],
+.wavira-field__control select,
+.wavira-field__control textarea {
+	max-width: 100%;
+	border-color: #cfd4de;
+	border-radius: 9px;
+	box-shadow: none;
+}
+
+.wavira-field__control input.regular-text,
+.wavira-field__control input.large-text,
+.wavira-field__control textarea.large-text,
+.wavira-field__control select {
+	width: 100%;
+}
+
+.wavira-field__control input.small-text,
+.wavira-field__control input.wavira-input-number {
+	width: 9em;
+	max-width: 100%;
+}
+
+.wavira-field__control input:focus,
+.wavira-field__control select:focus,
+.wavira-field__control textarea:focus {
+	border-color: var(--wv-violet);
+	box-shadow: 0 0 0 1px var(--wv-violet);
+}
+
+.wavira-field .wavira-field__help {
+	margin: 8px 0 0;
+	font-size: 12.5px;
+	line-height: 1.65;
+	color: var(--wv-muted);
+}
+
+/* The switch: a real checkbox, so keyboard and screen readers work unchanged. */
+.wavira-switch {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-height: 32px;
+	margin: 0;
+	cursor: pointer;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--wv-ink);
+}
+
+.wavira-switch input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	margin: 0;
+}
+
+.wavira-switch__track {
+	position: relative;
+	flex: 0 0 auto;
+	width: 46px;
+	height: 26px;
+	border-radius: 999px;
+	background: #c9ced9;
+	transition: background-color 0.18s ease;
+}
+
+.wavira-switch__thumb {
+	position: absolute;
+	top: 3px;
+	inset-inline-start: 3px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #ffffff;
+	box-shadow: 0 1px 3px rgba(17, 24, 39, 0.3);
+	transition: transform 0.18s ease;
+}
+
+.wavira-switch input:checked + .wavira-switch__track {
+	background: linear-gradient(90deg, var(--wv-violet), var(--wv-teal));
+}
+
+.wavira-switch input:checked + .wavira-switch__track .wavira-switch__thumb {
+	transform: translateX(20px);
+}
+
+[dir="rtl"] .wavira-switch input:checked + .wavira-switch__track .wavira-switch__thumb {
+	transform: translateX(-20px);
+}
+
+.wavira-switch input:focus-visible + .wavira-switch__track {
+	outline: 2px solid var(--wv-violet);
+	outline-offset: 3px;
+}
+
+/* A switch field is shorter than a text field: keep its box light. */
+.wavira-field--checkbox {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.wavira-colour {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+}
+
+.wavira-colour input[type="color"] {
+	width: 44px;
+	height: 36px;
+	padding: 2px;
+	border: 1px solid #cfd4de;
+	border-radius: 9px;
+	background: #ffffff;
+	cursor: pointer;
+}
+
+.wavira-colour input[type="text"] {
+	flex: 1 1 200px;
+	max-width: 100%;
+}
+
+.wavira-media {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 14px;
+}
+
+.wavira-media__preview img {
+	display: block;
+	max-width: 180px;
+	height: auto;
+	border-radius: 10px;
+	box-shadow: var(--wv-shadow);
+}
+
+.wavira-media__buttons {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 14px;
+}
+
+/* ---------------------------------------------------------- save bar. */
+
+.wavira-admin__savebar {
+	position: sticky;
+	bottom: 0;
+	z-index: 5;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px 18px;
+	margin: 0 0 24px;
+	padding: 14px 18px;
+	border: 1px solid var(--wv-line);
+	border-radius: 14px;
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(8px);
+	box-shadow: 0 -4px 20px rgba(17, 24, 39, 0.08);
+}
+
+.wavira-admin__savebar .submit {
+	margin: 0;
+	padding: 0;
+}
+
+.wavira-admin__savebar .button.large {
+	min-height: 40px;
+	padding: 0 22px;
+	border: 0;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--wv-violet), #7c3aed);
+	box-shadow: 0 6px 16px rgba(109, 40, 217, 0.25);
+}
+
+.wavira-admin__savebar .button.large:hover,
+.wavira-admin__savebar .button.large:focus {
+	background: linear-gradient(90deg, #5b21b6, var(--wv-violet));
+}
+
+.wavira-admin__savehint {
+	font-size: 13px;
+	color: var(--wv-muted);
+}
+
+/* ------------------------------------------------------ home status. */
+
+.wavira-admin__checks {
+	display: grid;
+	gap: 10px;
+	margin: 0 0 18px;
+	padding: 0;
+	list-style: none;
+}
+
+.wavira-admin__check {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0;
+	padding: 12px 14px;
+	border: 1px solid var(--wv-line);
+	border-radius: 12px;
+	background: #fbfbfd;
+}
+
+.wavira-admin__check-mark {
+	display: inline-flex;
+	flex: 0 0 26px;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	font-size: 14px;
+	font-weight: 800;
+	color: #ffffff;
+}
+
+.wavira-admin__check.is-ok .wavira-admin__check-mark { background: var(--wv-teal); }
+.wavira-admin__check.is-warn .wavira-admin__check-mark { background: var(--wv-amber); }
+.wavira-admin__check.is-warn { border-color: #f5d7a6; background: #fffaf2; }
+
+.wavira-admin__check-text {
+	display: grid;
+	gap: 2px;
+	min-width: 0;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--wv-muted);
+}
+
+.wavira-admin__check-text strong {
+	color: var(--wv-ink);
+}
+
+.wavira-admin__panel--home .notice.inline {
+	margin: 0 0 16px;
+}
+
+/* ----------------------------------------------------- small screens. */
+
+@media screen and (max-width: 782px) {
+	.wavira-admin__hero {
+		padding: 22px 20px 24px;
+		border-radius: 14px;
+	}
+
+	.wavira-admin .wavira-admin__hero h1 {
+		font-size: 26px;
+	}
+
+	.wavira-admin__equaliser {
+		display: none;
+	}
+
+	.wavira-admin__actions {
+		width: 100%;
+	}
+
+	.wavira-admin .wavira-admin__tabs {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		border-radius: 14px;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.wavira-admin .wavira-admin__tabs .nav-tab {
+		flex: 0 0 auto;
+		white-space: nowrap;
+	}
+
+	.wavira-admin__panel {
+		padding: 18px 16px 20px;
+	}
+
+	.wavira-admin__grid {
+		grid-template-columns: 1fr;
+	}
+
+	.wavira-admin__savebar {
+		bottom: 0;
+		margin-inline: -4px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.wavira-admin__actions .button {
+		flex: 1 1 100%;
+		text-align: center;
+	}
+
+	.wavira-colour input[type="text"] {
+		flex-basis: 100%;
+	}
+}

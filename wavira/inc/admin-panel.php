@@ -175,56 +175,90 @@ function wavira_admin_panel_render(): void {
 	$tabs   = wavira_admin_panel_tabs();
 	$tab    = wavira_admin_panel_current_tab();
 	$custom = add_query_arg( 'autofocus[panel]', 'wavira', admin_url( 'customize.php' ) );
+	$title  = (string) ( wavira_customize_sections()[ $tab ]['title'] ?? '' );
 
 	?>
-	<div class="wrap">
-		<h1><?php esc_html_e( 'Wavira settings', 'wavira' ); ?></h1>
+	<div class="wrap wavira-admin">
+		<hr class="wp-header-end" />
 
-		<p class="description">
-			<?php esc_html_e( 'Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer.', 'wavira' ); ?>
-		</p>
+		<header class="wavira-admin__hero">
+			<div class="wavira-admin__copy">
+				<p class="wavira-admin__eyebrow">
+					<span class="wavira-admin__badge">Wavira</span>
+					<span class="wavira-admin__version"><?php echo esc_html( sprintf( /* translators: %s: theme version number. */ __( 'Version %s', 'wavira' ), WAVIRA_THEME_VERSION ) ); ?></span>
+				</p>
+				<h1><?php esc_html_e( 'Wavira settings', 'wavira' ); ?></h1>
+				<p class="wavira-admin__lede">
+					<?php esc_html_e( 'Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer.', 'wavira' ); ?>
+				</p>
+			</div>
 
-		<p>
-			<a class="button" href="<?php echo esc_url( $custom ); ?>">
-				<?php esc_html_e( 'Live preview in the Customizer', 'wavira' ); ?>
-			</a>
-		</p>
+			<div class="wavira-admin__actions">
+				<a class="button button-primary button-hero" href="<?php echo esc_url( $custom ); ?>">
+					<?php esc_html_e( 'Live preview in the Customizer', 'wavira' ); ?>
+				</a>
+				<a class="button button-hero-ghost" href="<?php echo esc_url( home_url( '/' ) ); ?>" target="_blank" rel="noopener">
+					<?php esc_html_e( 'View the site', 'wavira' ); ?>
+				</a>
+			</div>
 
-		<nav class="nav-tab-wrapper">
-			<?php foreach ( $tabs as $slug => $title ) : ?>
+			<div class="wavira-admin__equaliser" aria-hidden="true">
+				<span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+			</div>
+		</header>
+
+		<nav class="nav-tab-wrapper wavira-admin__tabs">
+			<?php foreach ( $tabs as $slug => $tab_title ) : ?>
 				<a
 					class="nav-tab<?php echo $slug === $tab ? ' nav-tab-active' : ''; ?>"
 					href="<?php echo esc_url( wavira_admin_panel_url( (string) $slug ) ); ?>"
+					<?php echo $slug === $tab ? 'aria-current="page"' : ''; ?>
 				>
-					<?php echo esc_html( $title ); ?>
+					<?php echo esc_html( $tab_title ); ?>
 				</a>
 			<?php endforeach; ?>
 		</nav>
 
 		<?php if ( 'demo' === $tab ) : ?>
-			<?php wavira_admin_panel_demo_tab(); ?>
+			<div class="wavira-admin__panel">
+				<?php wavira_admin_panel_demo_tab(); ?>
+			</div>
 		<?php elseif ( ! wavira_admin_panel_tab_has_fields( $tab ) ) : ?>
-			<?php
-			// A section with no settings of its own ("Language and Persian
-			// setup"): its description is the whole tab, and a form with an
-			// empty table and a Save button would be furniture for nothing.
-			wavira_admin_panel_section_intro( $tab );
-			?>
+			<div class="wavira-admin__panel">
+				<div class="wavira-admin__panel-head">
+					<h2><?php echo esc_html( $title ); ?></h2>
+				</div>
+				<div class="wavira-admin__panel-intro">
+					<?php wavira_admin_panel_section_intro( $tab ); ?>
+				</div>
+			</div>
+
+			<?php if ( 'site' === $tab ) : ?>
+				<?php wavira_admin_panel_home_card(); ?>
+			<?php endif; ?>
 		<?php else : ?>
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="wavira-admin__form">
 				<input type="hidden" name="action" value="wavira_save_settings" />
 				<input type="hidden" name="tab" value="<?php echo esc_attr( $tab ); ?>" />
 				<?php wp_nonce_field( 'wavira_save_settings' ); ?>
 
-				<?php wavira_admin_panel_section_intro( $tab ); ?>
+				<div class="wavira-admin__panel">
+					<div class="wavira-admin__panel-head">
+						<h2><?php echo esc_html( $title ); ?></h2>
+					</div>
+					<div class="wavira-admin__panel-intro">
+						<?php wavira_admin_panel_section_intro( $tab ); ?>
+					</div>
 
-				<table class="form-table" role="presentation">
-					<tbody>
-					<?php wavira_admin_panel_fields( $tab ); ?>
-					</tbody>
-				</table>
+					<div class="wavira-admin__grid">
+						<?php wavira_admin_panel_fields( $tab ); ?>
+					</div>
+				</div>
 
-				<?php submit_button( __( 'Save changes', 'wavira' ) ); ?>
+				<div class="wavira-admin__savebar">
+					<?php submit_button( __( 'Save changes', 'wavira' ), 'primary large', 'submit', false ); ?>
+					<span class="wavira-admin__savehint"><?php esc_html_e( 'Only the fields on this tab are saved.', 'wavira' ); ?></span>
+				</div>
 			</form>
 		<?php endif; ?>
 	</div>
@@ -296,178 +330,180 @@ function wavira_admin_panel_field( string $key, array $field ): void {
 	$value   = wavira_option( $key );
 	$help    = wavira_customize_descriptions();
 	$text    = isset( $help[ $key ] ) ? (string) $help[ $key ] : '';
+	$wide    = in_array( $control, array( 'textarea', 'code', 'media' ), true );
 
 	?>
-	<tr>
-		<th scope="row">
-			<label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $label ); ?></label>
-		</th>
-		<td>
-			<?php
-			switch ( $control ) {
-				case 'checkbox':
-					?>
-					<label for="<?php echo esc_attr( $id ); ?>">
+	<div class="wavira-field wavira-field--<?php echo esc_attr( sanitize_html_class( $control ) ); ?><?php echo $wide ? ' wavira-field--wide' : ''; ?>">
+		<?php if ( 'checkbox' === $control ) : ?>
+			<label class="wavira-switch" for="<?php echo esc_attr( $id ); ?>">
+				<input
+					type="checkbox"
+					id="<?php echo esc_attr( $id ); ?>"
+					name="<?php echo esc_attr( $name ); ?>"
+					value="1"
+					<?php checked( (bool) $value ); ?>
+				/>
+				<span class="wavira-switch__track" aria-hidden="true"><span class="wavira-switch__thumb"></span></span>
+				<span class="wavira-switch__text"><?php echo esc_html( $label ); ?></span>
+			</label>
+		<?php else : ?>
+			<div class="wavira-field__head">
+				<label for="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $label ); ?></label>
+			</div>
+			<div class="wavira-field__control">
+				<?php
+				switch ( $control ) {
+					case 'number':
+						?>
 						<input
-							type="checkbox"
+							type="number"
+							class="small-text wavira-input-number"
 							id="<?php echo esc_attr( $id ); ?>"
 							name="<?php echo esc_attr( $name ); ?>"
-							value="1"
-							<?php checked( (bool) $value ); ?>
-						/>
-						<?php esc_html_e( 'Enabled', 'wavira' ); ?>
-					</label>
-					<?php
-					break;
-
-				case 'number':
-					?>
-					<input
-						type="number"
-						class="small-text"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						value="<?php echo esc_attr( (string) $value ); ?>"
-						<?php
-						foreach ( array( 'min', 'max', 'step' ) as $attribute ) {
-							if ( isset( $field[ $attribute ] ) ) {
-								echo esc_attr( $attribute ) . '="' . esc_attr( (string) $field[ $attribute ] ) . '" ';
-							}
-						}
-						?>
-					/>
-					<?php
-					break;
-
-				case 'select':
-					$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : array();
-					?>
-					<select id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>">
-						<?php foreach ( $choices as $choice => $choice_label ) : ?>
-							<option value="<?php echo esc_attr( (string) $choice ); ?>" <?php selected( (string) $choice, (string) $value ); ?>>
-								<?php echo esc_html( (string) $choice_label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<?php
-					break;
-
-				case 'color':
-					?>
-					<input
-						type="text"
-						class="regular-text code"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						value="<?php echo esc_attr( (string) $value ); ?>"
-						placeholder="#000000"
-						data-wavira-colour-text
-					/>
-					<input
-						type="color"
-						value="<?php echo esc_attr( '' === (string) $value ? '#000000' : (string) $value ); ?>"
-						data-wavira-colour-picker
-						data-target="<?php echo esc_attr( $id ); ?>"
-						aria-label="<?php esc_attr_e( 'Colour picker', 'wavira' ); ?>"
-					/>
-					<button type="button" class="button-link" data-wavira-colour-clear data-target="<?php echo esc_attr( $id ); ?>">
-						<?php esc_html_e( 'Clear (use the theme colour)', 'wavira' ); ?>
-					</button>
-					<?php
-					break;
-
-				case 'media':
-					$attachment = absint( $value );
-					?>
-					<input
-						type="hidden"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						value="<?php echo esc_attr( (string) $attachment ); ?>"
-						data-wavira-media-input
-					/>
-					<div data-wavira-media>
-						<div data-wavira-media-preview>
+							value="<?php echo esc_attr( (string) $value ); ?>"
 							<?php
-							if ( $attachment > 0 ) {
-								// Core built this markup from the attachment id; it is safe by construction.
-								echo wp_get_attachment_image( $attachment, 'medium' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+							foreach ( array( 'min', 'max', 'step' ) as $attribute ) {
+								if ( isset( $field[ $attribute ] ) ) {
+									echo esc_attr( $attribute ) . '="' . esc_attr( (string) $field[ $attribute ] ) . '" ';
+								}
 							}
 							?>
+						/>
+						<?php
+						break;
+
+					case 'select':
+						$choices = isset( $field['choices'] ) && is_array( $field['choices'] ) ? $field['choices'] : array();
+						?>
+						<select id="<?php echo esc_attr( $id ); ?>" name="<?php echo esc_attr( $name ); ?>">
+							<?php foreach ( $choices as $choice => $choice_label ) : ?>
+								<option value="<?php echo esc_attr( (string) $choice ); ?>" <?php selected( (string) $choice, (string) $value ); ?>>
+									<?php echo esc_html( (string) $choice_label ); ?>
+								</option>
+							<?php endforeach; ?>
+						</select>
+						<?php
+						break;
+
+					case 'color':
+						?>
+						<div class="wavira-colour">
+							<input
+								type="color"
+								value="<?php echo esc_attr( '' === (string) $value ? '#000000' : (string) $value ); ?>"
+								data-wavira-colour-picker
+								data-target="<?php echo esc_attr( $id ); ?>"
+								aria-label="<?php esc_attr_e( 'Colour picker', 'wavira' ); ?>"
+							/>
+							<input
+								type="text"
+								class="regular-text code"
+								id="<?php echo esc_attr( $id ); ?>"
+								name="<?php echo esc_attr( $name ); ?>"
+								value="<?php echo esc_attr( (string) $value ); ?>"
+								placeholder="#000000"
+								data-wavira-colour-text
+							/>
+							<button type="button" class="button-link" data-wavira-colour-clear data-target="<?php echo esc_attr( $id ); ?>">
+								<?php esc_html_e( 'Clear (use the theme colour)', 'wavira' ); ?>
+							</button>
 						</div>
-						<p>
-							<button type="button" class="button" data-wavira-media-select data-target="<?php echo esc_attr( $id ); ?>">
-								<?php esc_html_e( 'Choose image', 'wavira' ); ?>
-							</button>
-							<button type="button" class="button-link" data-wavira-media-remove data-target="<?php echo esc_attr( $id ); ?>">
-								<?php esc_html_e( 'Remove', 'wavira' ); ?>
-							</button>
-						</p>
-					</div>
-					<?php
-					break;
+						<?php
+						break;
 
-				case 'textarea':
-					?>
-					<textarea
-						rows="3"
-						class="large-text"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-					><?php echo esc_textarea( (string) $value ); ?></textarea>
-					<?php
-					break;
+					case 'media':
+						$attachment = absint( $value );
+						?>
+						<input
+							type="hidden"
+							id="<?php echo esc_attr( $id ); ?>"
+							name="<?php echo esc_attr( $name ); ?>"
+							value="<?php echo esc_attr( (string) $attachment ); ?>"
+							data-wavira-media-input
+						/>
+						<div class="wavira-media" data-wavira-media>
+							<div class="wavira-media__preview" data-wavira-media-preview>
+								<?php
+								if ( $attachment > 0 ) {
+									// Core built this markup from the attachment id; it is safe by construction.
+									echo wp_get_attachment_image( $attachment, 'medium' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+								}
+								?>
+							</div>
+							<div class="wavira-media__buttons">
+								<button type="button" class="button" data-wavira-media-select data-target="<?php echo esc_attr( $id ); ?>">
+									<?php esc_html_e( 'Choose image', 'wavira' ); ?>
+								</button>
+								<button type="button" class="button-link" data-wavira-media-remove data-target="<?php echo esc_attr( $id ); ?>">
+									<?php esc_html_e( 'Remove', 'wavira' ); ?>
+								</button>
+							</div>
+						</div>
+						<?php
+						break;
 
-				case 'code':
-					?>
-					<textarea
-						rows="8"
-						class="large-text code"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						spellcheck="false"
-					><?php echo esc_textarea( (string) $value ); ?></textarea>
-					<?php
-					break;
+					case 'textarea':
+						?>
+						<textarea
+							rows="3"
+							class="large-text"
+							id="<?php echo esc_attr( $id ); ?>"
+							name="<?php echo esc_attr( $name ); ?>"
+						><?php echo esc_textarea( (string) $value ); ?></textarea>
+						<?php
+						break;
 
-				case 'url':
-					?>
-					<input
-						type="url"
-						class="regular-text code"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						value="<?php echo esc_attr( (string) $value ); ?>"
-						placeholder="https://"
-					/>
-					<?php
-					break;
+					case 'code':
+						?>
+						<textarea
+							rows="8"
+							class="large-text code"
+							id="<?php echo esc_attr( $id ); ?>"
+							name="<?php echo esc_attr( $name ); ?>"
+							spellcheck="false"
+						><?php echo esc_textarea( (string) $value ); ?></textarea>
+						<?php
+						break;
 
-				default:
-					?>
-					<input
-						type="text"
-						class="regular-text"
-						id="<?php echo esc_attr( $id ); ?>"
-						name="<?php echo esc_attr( $name ); ?>"
-						value="<?php echo esc_attr( (string) $value ); ?>"
-					/>
-					<?php
-					break;
-			}
-			?>
+					case 'url':
+						?>
+						<input
+							type="url"
+							class="regular-text code"
+							id="<?php echo esc_attr( $id ); ?>"
+							name="<?php echo esc_attr( $name ); ?>"
+							value="<?php echo esc_attr( (string) $value ); ?>"
+							placeholder="https://"
+						/>
+						<?php
+						break;
 
-			<?php if ( '' !== $text ) : ?>
-				<p class="description"><?php echo esc_html( $text ); ?></p>
-			<?php endif; ?>
+					default:
+						?>
+						<input
+							type="text"
+							class="regular-text"
+							id="<?php echo esc_attr( $id ); ?>"
+							name="<?php echo esc_attr( $name ); ?>"
+							value="<?php echo esc_attr( (string) $value ); ?>"
+						/>
+						<?php
+						break;
+				}
+				?>
+			</div>
+		<?php endif; ?>
 
-			<?php if ( 'media' === $control ) : ?>
-				<p class="description">
-					<?php esc_html_e( 'Optional. A logo for dark mode; leave it empty to keep using the logo above in both modes.', 'wavira' ); ?>
-				</p>
-			<?php endif; ?>
-		</td>
-	</tr>
+		<?php if ( '' !== $text ) : ?>
+			<p class="wavira-field__help description"><?php echo esc_html( $text ); ?></p>
+		<?php endif; ?>
+
+		<?php if ( 'media' === $control ) : ?>
+			<p class="wavira-field__help description">
+				<?php esc_html_e( 'Optional. A logo for dark mode; leave it empty to keep using the logo above in both modes.', 'wavira' ); ?>
+			</p>
+		<?php endif; ?>
+	</div>
 	<?php
 }
 
@@ -601,7 +637,9 @@ function wavira_admin_panel_apply( string $tab, array $post ): int {
 		$name    = 'wavira_' . $key;
 
 		if ( $value === $default ) {
-			if ( false !== get_theme_mod( $name, false ) ) {
+			// A stored `false` is a real value (a switch that is off while its default is
+			// on), so "is it stored?" has to ask for null, not for false.
+			if ( null !== get_theme_mod( $name, null ) ) {
 				remove_theme_mod( $name );
 				++$changed;
 			}
@@ -681,6 +719,12 @@ add_action( 'admin_notices', 'wavira_admin_panel_notice' );
 function wavira_admin_panel_assets( string $hook_suffix ): void {
 	if ( 'appearance_page_' . wavira_admin_panel_slug() !== $hook_suffix ) {
 		return;
+	}
+
+	$style = 'assets/dist/admin.css';
+
+	if ( file_exists( WAVIRA_THEME_DIR . $style ) ) {
+		wp_enqueue_style( 'wavira-admin-screen', WAVIRA_THEME_URI . $style, array(), wavira_asset_version( $style ) );
 	}
 
 	$script = 'assets/dist/admin.js';
@@ -797,3 +841,84 @@ function wavira_admin_panel_activated_dismiss(): void {
 	exit;
 }
 add_action( 'admin_post_wavira_activated_dismiss', 'wavira_admin_panel_activated_dismiss' );
+
+/**
+ * The home-page card on the settings screen: the state, and one button that sets it.
+ *
+ * @return void
+ */
+function wavira_admin_panel_home_card(): void {
+	$status = wavira_home_status();
+	$core   = function_exists( 'wavira_core_is_active' ) && wavira_core_is_active();
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- a read-only flag that only chooses which notice to print.
+	$flag = isset( $_GET['wavira-home'] ) ? sanitize_key( wp_unslash( (string) $_GET['wavira-home'] ) ) : '';
+
+	$front_title = $status['static'] ? get_the_title( $status['front'] ) : '';
+	$posts_title = wavira_is_published_page( $status['posts'] ) ? get_the_title( $status['posts'] ) : '';
+
+	$checks = array(
+		array(
+			'ok'     => $status['static'],
+			'label'  => __( 'Front page', 'wavira' ),
+			'detail' => $status['static']
+				/* translators: %s: the title of the page that is the front page. */
+				? sprintf( __( 'The page “%s” is the front page, so the designed home page is shown.', 'wavira' ), $front_title )
+				: __( 'No page is chosen. Visitors see the blog listing instead of the designed home page.', 'wavira' ),
+		),
+		array(
+			'ok'     => '' !== $posts_title,
+			'label'  => __( 'Posts page', 'wavira' ),
+			'detail' => '' !== $posts_title
+				/* translators: %s: the title of the page that lists the posts. */
+				? sprintf( __( 'The posts are listed on “%s”.', 'wavira' ), $posts_title )
+				: __( 'Not set. The posts have no page of their own yet.', 'wavira' ),
+		),
+		array(
+			'ok'     => $core,
+			'label'  => __( 'Wavira Core', 'wavira' ),
+			'detail' => $core
+				? __( 'Active. The music content types, the player and the download cards are available.', 'wavira' )
+				: __( 'Not active. Install and activate Wavira Core for the albums, tracks and videos.', 'wavira' ),
+		),
+	);
+
+	?>
+	<div class="wavira-admin__panel wavira-admin__panel--home">
+		<div class="wavira-admin__panel-head">
+			<h2><?php esc_html_e( 'Home page', 'wavira' ); ?></h2>
+		</div>
+
+		<?php if ( 'done' === $flag ) : ?>
+			<div class="notice notice-success inline"><p><?php esc_html_e( 'Done. The home page and the posts page are set under Settings → Reading.', 'wavira' ); ?></p></div>
+		<?php elseif ( 'failed' === $flag ) : ?>
+			<div class="notice notice-error inline"><p><?php esc_html_e( 'The pages could not be created. Check Pages, then try again.', 'wavira' ); ?></p></div>
+		<?php endif; ?>
+
+		<p class="wavira-admin__intro-text">
+			<?php esc_html_e( 'The designed front page is used when a page is chosen as the front page. The button below creates an empty “Home” page and an empty “News” page if they are missing, and sets them under Settings → Reading. Your other pages are not touched.', 'wavira' ); ?>
+		</p>
+
+		<ul class="wavira-admin__checks">
+			<?php foreach ( $checks as $check ) : ?>
+				<li class="wavira-admin__check<?php echo $check['ok'] ? ' is-ok' : ' is-warn'; ?>">
+					<span class="wavira-admin__check-mark" aria-hidden="true"><?php echo $check['ok'] ? '✓' : '!'; ?></span>
+					<span class="wavira-admin__check-text">
+						<strong><?php echo esc_html( $check['label'] ); ?></strong>
+						<span><?php echo esc_html( $check['detail'] ); ?></span>
+					</span>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+
+		<p>
+			<a class="button button-primary" href="<?php echo esc_url( wavira_home_setup_url() ); ?>">
+				<?php esc_html_e( 'Set the home and posts pages', 'wavira' ); ?>
+			</a>
+			<a class="button" href="<?php echo esc_url( admin_url( 'options-reading.php' ) ); ?>">
+				<?php esc_html_e( 'Open Settings → Reading', 'wavira' ); ?>
+			</a>
+		</p>
+	</div>
+	<?php
+}

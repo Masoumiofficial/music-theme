@@ -34,47 +34,51 @@ msgstr ""
 msgid "%s MB"
 msgstr ""
 
-#: wavira/inc/customizer.php:300
+#: wavira/inc/customizer.php:310
 msgid "A CSS font stack, for example: \"IRANSans\", Tahoma, sans-serif. Used only when “Custom stack” is selected."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:495
+#: wavira/inc/admin-panel.php:531
 msgid "A demo pointing at files that do not exist would break the player on the first click. Add your own media and the player picks it up."
 msgstr ""
 
-#: wavira/inc/customizer.php:112
+#: wavira/inc/customizer.php:117
 msgid "A filled field prints its icon in the footer. An empty field prints nothing at all — no dead links."
 msgstr ""
 
-#: wavira/inc/customizer.php:306
+#: wavira/inc/customizer.php:316
 msgid "A line of your own in the footer, for a licence note or a request. The design credit stays: attribution is part of the licence."
 msgstr ""
 
-#: wavira/inc/customizer.php:288
+#: wavira/inc/customizer.php:293
 msgid "A slim bar above the header, for a tour announcement or a release note."
 msgstr ""
 
-#: wavira/inc/customizer.php:307
+#: wavira/inc/customizer.php:317
 msgid "A small button that returns to the top of a long page. It is skipped for visitors who prefer reduced motion."
 msgstr ""
 
-#: wavira/inc/options.php:158
+#: wavira/inc/options.php:174
 msgid "Accent colour"
 msgstr ""
 
-#: wavira/inc/options.php:385
+#: wavira/inc/admin-panel.php:881
+msgid "Active. The music content types, the player and the download cards are available."
+msgstr ""
+
+#: wavira/inc/options.php:448
 msgid "Additional CSS"
 msgstr ""
 
-#: wavira/inc/customizer.php:121
+#: wavira/inc/customizer.php:126
 msgid "Additional CSS is loaded after the theme stylesheet, exactly like the Customizer’s own field, and it is printed without a build step."
 msgstr ""
 
-#: wavira/inc/customizer.php:287
+#: wavira/inc/customizer.php:292
 msgid "Adds the WordPress search block to the header."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:522
+#: wavira/inc/admin-panel.php:558
 msgid "After installing and activating it, come back to this tab: the import button appears here and on Tools → Wavira demo content."
 msgstr ""
 
@@ -98,7 +102,7 @@ msgstr ""
 msgid "Appearance"
 msgstr ""
 
-#: wavira/inc/customizer.php:292
+#: wavira/inc/customizer.php:297
 msgid "Applies to a first visit. A visitor who uses the toggle keeps their own choice."
 msgstr ""
 
@@ -106,7 +110,7 @@ msgstr ""
 msgid "Auto"
 msgstr ""
 
-#: wavira/inc/options.php:148
+#: wavira/inc/options.php:164
 msgid "Auto (follow the device)"
 msgstr ""
 
@@ -114,11 +118,11 @@ msgstr ""
 msgid "Back to top"
 msgstr ""
 
-#: wavira/inc/options.php:376
+#: wavira/inc/options.php:439
 msgid "Back-to-top button"
 msgstr ""
 
-#: wavira/inc/options.php:275
+#: wavira/inc/options.php:329
 msgid "Base text size (px)"
 msgstr ""
 
@@ -361,7 +365,7 @@ msgctxt "block title"
 msgid "Photo gallery"
 msgstr ""
 
-#: wavira/inc/options.php:292
+#: wavira/inc/options.php:346
 msgid "Bold (700)"
 msgstr ""
 
@@ -370,7 +374,7 @@ msgctxt "button label in the featured album pattern"
 msgid "Browse all albums"
 msgstr ""
 
-#: wavira/inc/customizer.php:297
+#: wavira/inc/customizer.php:307
 msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
 msgstr ""
 
@@ -378,12 +382,12 @@ msgstr ""
 msgid "Choose an artist for this block, or open it on an artist page."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:400
-#: wavira/inc/admin-panel.php:704
+#: wavira/inc/admin-panel.php:435
+#: wavira/inc/admin-panel.php:748
 msgid "Choose image"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:374
+#: wavira/inc/admin-panel.php:408
 msgid "Clear (use the theme colour)"
 msgstr ""
 
@@ -391,11 +395,11 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: wavira/inc/options.php:146
+#: wavira/inc/options.php:162
 msgid "Colour mode for a first visit"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:371
+#: wavira/inc/admin-panel.php:396
 msgid "Colour picker"
 msgstr ""
 
@@ -412,11 +416,11 @@ msgstr ""
 msgid "Colours and sizes are emitted as CSS variables, so every block follows them — including the blocks you add later."
 msgstr ""
 
-#: wavira/inc/options.php:170
+#: wavira/inc/options.php:186
 msgid "Content width (px)"
 msgstr ""
 
-#: wavira/inc/options.php:185
+#: wavira/inc/options.php:201
 msgid "Corner radius (px)"
 msgstr ""
 
@@ -425,37 +429,37 @@ msgctxt "credit label before the author link"
 msgid "Design and development:"
 msgstr ""
 
-#: wavira/inc/customizer.php:308
+#: wavira/inc/customizer.php:318
 msgid "CSS of your own, printed after the theme stylesheet. HTML tags and comments are stripped; a closing style tag would end the block."
 msgstr ""
 
-#: wavira/inc/options.php:265
+#: wavira/inc/options.php:319
 msgid "Custom font stack"
 msgstr ""
 
-#: wavira/inc/options.php:257
+#: wavira/inc/options.php:311
 msgid "Custom stack"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:766
+#: wavira/inc/admin-panel.php:810
 msgid "Customize"
 msgstr ""
 
 #: wavira/inc/assets.php:62
-#: wavira/inc/options.php:150
+#: wavira/inc/options.php:166
 msgid "Dark"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:487
+#: wavira/inc/admin-panel.php:523
 msgid "Demo content"
 msgstr ""
 
-#: wavira/inc/customizer.php:165
+#: wavira/inc/customizer.php:170
 msgid "Demo content (a Persian artist, an album, tracks, a video and a menu):"
 msgstr ""
 
 #: wavira/inc/admin-panel.php:104
-#: wavira/inc/admin-panel.php:769
+#: wavira/inc/admin-panel.php:813
 msgid "Demo import"
 msgstr ""
 
@@ -464,13 +468,21 @@ msgctxt "description in the catalogue player pattern"
 msgid "Play straight through the catalogue — shuffle, repeat and the queue are in the player."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:772
+#: wavira/inc/admin-panel.php:816
 msgid "Dismiss"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:893
+msgid "Done. The home page and the posts page are set under Settings → Reading."
 msgstr ""
 
 #: wavira/inc/downloads.php:64
 #: wavira/inc/markup.php:99
 msgid "Download"
+msgstr ""
+
+#: wavira/inc/options.php:423
+msgid "Download cards on music pages"
 msgstr ""
 
 #: wavira/inc/downloads.php:55
@@ -490,44 +502,41 @@ msgstr ""
 msgid "Download the video"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:518
+#: wavira/inc/admin-panel.php:554
 msgid "Download wavira-core"
 msgstr ""
 
-#: wavira/inc/customizer.php:305
+#: wavira/inc/customizer.php:315
 msgid "Each new tab gets rel=\"noopener\" — the browser cannot hand the tab to the linked page."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:318
-msgid "Enabled"
-msgstr ""
-
-#: wavira/inc/customizer.php:301
+#: wavira/inc/customizer.php:311
 msgid "Every block size in the theme is relative to this, so the whole page scales together."
 msgstr ""
 
-#: wavira/inc/customizer.php:141
+#: wavira/inc/customizer.php:146
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links and footer text. Music content, the player engine and the migration tool belong to the Wavira Core plugin and keep working if you switch themes."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:184
+#: wavira/inc/admin-panel.php:192
+#. translators: %s: theme version number.
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer."
 msgstr ""
 
-#: wavira/inc/options.php:293
+#: wavira/inc/options.php:347
 msgid "Extra bold (800)"
 msgstr ""
 
-#: wavira/inc/options.php:338
-#: wavira/inc/options.php:667
+#: wavira/inc/options.php:392
+#: wavira/inc/options.php:730
 msgid "Facebook"
 msgstr ""
 
-#: wavira/inc/customizer.php:169
+#: wavira/inc/customizer.php:174
 msgid "Find the plugin"
 msgstr ""
 
-#: wavira/inc/options.php:253
+#: wavira/inc/options.php:307
 msgid "Font"
 msgstr ""
 
@@ -540,7 +549,7 @@ msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr ""
 
-#: wavira/inc/options.php:1008
+#: wavira/inc/options.php:1075
 msgid "Footer menu"
 msgstr ""
 
@@ -548,11 +557,19 @@ msgstr ""
 msgid "Footer navigation"
 msgstr ""
 
-#: wavira/inc/options.php:369
+#: wavira/inc/options.php:432
 msgid "Footer note"
 msgstr ""
 
-#: wavira/inc/options.php:236
+#: wavira/inc/admin-panel.php:863
+msgid "Front page"
+msgstr ""
+
+#: wavira/inc/options.php:286
+msgid "Frosted-glass blur (px)"
+msgstr ""
+
+#: wavira/inc/options.php:252
 msgid "Frosted-glass panels"
 msgstr ""
 
@@ -562,6 +579,10 @@ msgstr ""
 
 #: wavira/inc/customizer.php:97
 msgid "Header"
+msgstr ""
+
+#: wavira/inc/options.php:148
+msgid "Header height (px)"
 msgstr ""
 
 #: wavira/patterns/hidden-heading-music-news.php:20
@@ -589,23 +610,36 @@ msgctxt "heading of the genre chips pattern"
 msgid "Browse by genre"
 msgstr ""
 
-#: wavira/inc/options.php:287
+#: wavira/inc/options.php:341
 msgid "Heading weight"
 msgstr ""
 
-#: wavira/inc/customizer.php:284
+#: wavira/inc/customizer.php:289
 msgid "Hide it when the logo already contains the site name; search engines still read the title."
 msgstr ""
 
-#: wavira/inc/customizer.php:298
+#: wavira/inc/customizer.php:308
 msgid "Hides the button only; the visitor’s device preference keeps working."
 msgstr ""
 
-#: wavira/inc/options.php:348
-msgid "Icon size (px)"
+#: wavira/inc/site-defaults.php:326
+#: wavira/inc/site-defaults.php:334
+msgid "Home"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:889
+msgid "Home page"
 msgstr ""
 
 #: wavira/inc/customizer.php:304
+msgid "How strongly frosted panels blur what is behind them. It has no effect while the frosted-glass switch is off."
+msgstr ""
+
+#: wavira/inc/options.php:402
+msgid "Icon size (px)"
+msgstr ""
+
+#: wavira/inc/customizer.php:314
 msgid "Icon size in the footer row."
 msgstr ""
 
@@ -613,16 +647,16 @@ msgstr ""
 msgid "Identity and logo"
 msgstr ""
 
-#: wavira/inc/options.php:310
-#: wavira/inc/options.php:651
+#: wavira/inc/options.php:364
+#: wavira/inc/options.php:714
 msgid "Instagram"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:515
+#: wavira/inc/admin-panel.php:551
 msgid "Install the plugin (Upload Plugin)"
 msgstr ""
 
-#: wavira/inc/customizer.php:286
+#: wavira/inc/customizer.php:291
 msgid "Keeps the header at the top while the page scrolls."
 msgstr ""
 
@@ -635,19 +669,19 @@ msgid "Legal links (license, privacy)"
 msgstr ""
 
 #: wavira/inc/assets.php:61
-#: wavira/inc/options.php:149
+#: wavira/inc/options.php:165
 msgid "Light"
 msgstr ""
 
-#: wavira/inc/options.php:224
+#: wavira/inc/options.php:240
 msgid "Light/dark toggle button"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:189
+#: wavira/inc/admin-panel.php:198
 msgid "Live preview in the Customizer"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:256
+#: wavira/inc/admin-panel.php:290
 msgid "logo"
 msgstr ""
 
@@ -659,8 +693,8 @@ msgstr ""
 msgid "Logo width (px)"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:534
-#: wavira/inc/customizer.php:160
+#: wavira/inc/admin-panel.php:570
+#: wavira/inc/customizer.php:165
 #: wavira/inc/site-defaults.php:237
 msgid "Make the site Persian"
 msgstr ""
@@ -676,7 +710,16 @@ msgctxt "message shown when a query returns no posts"
 msgid "Nothing published here yet."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:494
+#: wavira/inc/customizer.php:111
+msgid "Music pages"
+msgstr ""
+
+#: wavira/inc/site-defaults.php:342
+#: wavira/inc/site-defaults.php:350
+msgid "News"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:530
 msgid "No audio or video files are imported."
 msgstr ""
 
@@ -688,6 +731,11 @@ msgstr ""
 msgid "No news posts yet. Publish one and it appears here."
 msgstr ""
 
+#: wavira/inc/admin-panel.php:867
+#. translators: %s: the title of the page that is the front page.
+msgid "No page is chosen. Visitors see the blog listing instead of the designed home page."
+msgstr ""
+
 #: wavira/blocks/artist-gallery/render.php:65
 msgid "No photos yet. Upload them from this post’s media library."
 msgstr ""
@@ -696,20 +744,33 @@ msgstr ""
 msgid "No published tracks in this album yet."
 msgstr ""
 
+#: wavira/inc/admin-panel.php:882
+msgid "Not active. Install and activate Wavira Core for the albums, tracks and videos."
+msgstr ""
+
 #: wavira/inc/site-defaults.php:239
 msgid "Not now"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:875
+#. translators: %s: the title of the page that lists the posts.
+msgid "Not set. The posts have no page of their own yet."
 msgstr ""
 
 #: wavira/blocks/download/render.php:45
 msgid "Nothing to download yet: add an audio file to this track, an album file, a hosted video, or a cover image."
 msgstr ""
 
-#: wavira/inc/customizer.php:296
+#: wavira/inc/customizer.php:301
 msgid "Off gives a flat, editorial look."
 msgstr ""
 
-#: wavira/inc/customizer.php:291
+#: wavira/inc/customizer.php:296
 msgid "Off removes the player bar and its reserved space from every template. The per-page players (tracklists, the player block) are not affected."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:260
+msgid "Only the fields on this tab are saved."
 msgstr ""
 
 #: wavira/inc/player.php:138
@@ -717,27 +778,31 @@ msgstr ""
 msgid "Open %s"
 msgstr ""
 
-#: wavira/inc/options.php:360
+#: wavira/inc/admin-panel.php:919
+msgid "Open Settings → Reading"
+msgstr ""
+
+#: wavira/inc/options.php:414
 msgid "Open social links in a new tab"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:501
+#: wavira/inc/admin-panel.php:537
 msgid "Open Tools → Wavira demo content"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:466
+#: wavira/inc/admin-panel.php:503
 msgid "Optional. A logo for dark mode; leave it empty to keep using the logo above in both modes."
 msgstr ""
 
-#: wavira/inc/customizer.php:283
+#: wavira/inc/customizer.php:288
 msgid "Optional. Shown instead of the logo above when dark mode is active — including on the automatic setting, which follows the device."
 msgstr ""
 
-#: wavira/inc/customizer.php:290
+#: wavira/inc/customizer.php:295
 msgid "Optional. Where the announcement bar links to."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:526
+#: wavira/inc/admin-panel.php:562
 msgid "Persian setup"
 msgstr ""
 
@@ -766,11 +831,15 @@ msgstr ""
 msgid "Player for an album, artist or genre queue."
 msgstr ""
 
-#: wavira/inc/options.php:301
+#: wavira/inc/admin-panel.php:871
+msgid "Posts page"
+msgstr ""
+
+#: wavira/inc/options.php:355
 msgid "Preload the bundled font"
 msgstr ""
 
-#: wavira/inc/options.php:1006
+#: wavira/inc/options.php:1073
 msgid "Primary menu"
 msgstr ""
 
@@ -782,11 +851,19 @@ msgstr ""
 msgid "Profile, works and photos of an artist."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:403
+#: wavira/inc/options.php:271
+msgid "Reading width (characters per line)"
+msgstr ""
+
+#: wavira/inc/options.php:298
+msgid "Reduce motion everywhere"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:438
 msgid "Remove"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:227
+#: wavira/inc/admin-panel.php:259
 msgid "Save changes"
 msgstr ""
 
@@ -838,15 +915,19 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr ""
 
-#: wavira/inc/options.php:291
+#: wavira/inc/options.php:345
 msgid "Semi bold (600)"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:665
+#: wavira/inc/admin-panel.php:916
+msgid "Set the home and posts pages"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:703
 msgid "Settings saved."
 msgstr ""
 
-#: wavira/inc/options.php:197
+#: wavira/inc/options.php:213
 msgid "Shadow on cards and covers"
 msgstr ""
 
@@ -858,15 +939,19 @@ msgstr ""
 msgid "Show the tagline"
 msgstr ""
 
-#: wavira/inc/customizer.php:289
+#: wavira/inc/customizer.php:294
 msgid "Shown in the announcement bar. Leave empty to keep the bar for the link only."
+msgstr ""
+
+#: wavira/inc/customizer.php:306
+msgid "Shows the download cards on track and album pages when a file exists. The files stay where they are."
 msgstr ""
 
 #: wavira/inc/artists.php:141
 msgid "Single"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:258
+#: wavira/inc/admin-panel.php:292
 msgid "site icon"
 msgstr ""
 
@@ -874,15 +959,15 @@ msgstr ""
 msgid "Site language, timezone, week start and date format were set to the Iranian defaults."
 msgstr ""
 
-#: wavira/inc/options.php:212
+#: wavira/inc/options.php:228
 msgid "Smallest card width (rem)"
 msgstr ""
 
-#: wavira/inc/customizer.php:111
+#: wavira/inc/customizer.php:116
 msgid "Social networks"
 msgstr ""
 
-#: wavira/inc/customizer.php:303
+#: wavira/inc/customizer.php:313
 msgid "Starts the font download with the document, which removes the swap on the first screen. Turn it off if you replace the font and keep this setting."
 msgstr ""
 
@@ -890,16 +975,20 @@ msgstr ""
 msgid "Sticky header"
 msgstr ""
 
-#: wavira/inc/options.php:256
+#: wavira/inc/customizer.php:112
+msgid "Switches for the track, album and video pages. The files themselves are managed by Wavira Core."
+msgstr ""
+
+#: wavira/inc/options.php:310
 msgid "System fonts (no font file)"
 msgstr ""
 
-#: wavira/inc/options.php:317
-#: wavira/inc/options.php:655
+#: wavira/inc/options.php:371
+#: wavira/inc/options.php:718
 msgid "Telegram"
 msgstr ""
 
-#: wavira/inc/customizer.php:116
+#: wavira/inc/customizer.php:121
 msgid "Texts and footer"
 msgstr ""
 
@@ -907,24 +996,45 @@ msgstr ""
 msgid "The browser tab icon (favicon) and the app icon on phones."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:490
+#: wavira/inc/admin-panel.php:526
 msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:899
+msgid "The designed front page is used when a page is chosen as the front page. The button below creates an empty “Home” page and an empty “News” page if they are missing, and sets them under Settings → Reading. Your other pages are not touched."
 msgstr ""
 
 #: wavira/inc/customizer.php:98
 msgid "The header is a template part: reorder it and add blocks in the Site Editor. These switches control what the theme prints around your own blocks."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:505
+#: wavira/inc/customizer.php:302
+msgid "The height of the header bar, in pixels."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:541
 msgid "The import and the removal are on that screen, both behind the same capability check and nonce. Removing the demo deletes only the posts it created, never your own content."
 msgstr ""
 
-#: wavira/inc/customizer.php:282
+#: wavira/inc/customizer.php:303
+msgid "The longest line of running text, counted in characters. Narrower reads more calmly; wider fits more on screen."
+msgstr ""
+
+#: wavira/inc/customizer.php:287
 msgid "The maximum width of the logo. The logo keeps its own proportions on smaller screens."
 msgstr ""
 
 #: wavira/inc/blocks.php:70
 msgid "The newest news posts as cards."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:866
+#. translators: %s: the title of the page that is the front page.
+msgid "The page “%s” is the front page, so the designed home page is shown."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:895
+msgid "The pages could not be created. Check Pages, then try again."
 msgstr ""
 
 #: wavira/inc/site-defaults.php:230
@@ -943,27 +1053,32 @@ msgstr ""
 msgid "The Persian translation of WordPress itself was installed."
 msgstr ""
 
+#: wavira/inc/admin-panel.php:874
+#. translators: %s: the title of the page that lists the posts.
+msgid "The posts are listed on “%s”."
+msgstr ""
+
 #: wavira/inc/site-defaults.php:236
 msgid "The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:255
+#: wavira/inc/admin-panel.php:289
 msgid "The site logo and the site icon are WordPress’ own settings, so they keep working if you switch themes. They are one click away:"
 msgstr ""
 
-#: wavira/inc/customizer.php:285
+#: wavira/inc/customizer.php:290
 msgid "The tagline is set in Settings → General."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:529
+#: wavira/inc/admin-panel.php:565
 msgid "The theme and the plugin are Persian on any locale. The WordPress dashboard is not, until the site language changes — one nonced action sets the site language, the timezone, the week start and the Persian date format, and reports what it could not do."
 msgstr ""
 
-#: wavira/inc/customizer.php:158
+#: wavira/inc/customizer.php:163
 msgid "The theme and the plugin ship their own Persian translations, so the music interface is Persian on any locale. A site whose language is not Persian yet also needs WordPress itself in Persian — this link sets the site language, the timezone and the Persian date format in one step."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:759
+#: wavira/inc/admin-panel.php:803
 msgid "The theme settings are under Appearance → Wavira settings, the live preview is in the Customizer, and the demo content is one click away."
 msgstr ""
 
@@ -971,7 +1086,7 @@ msgstr ""
 msgid "The video of this post: file, embed or link."
 msgstr ""
 
-#: wavira/inc/customizer.php:294
+#: wavira/inc/customizer.php:299
 msgid "The width of the site layout on wide screens."
 msgstr ""
 
@@ -983,11 +1098,11 @@ msgstr ""
 msgid "This post has no video source yet."
 msgstr ""
 
-#: wavira/inc/customizer.php:120
+#: wavira/inc/customizer.php:125
 msgid "Tools"
 msgstr ""
 
-#: wavira/inc/customizer.php:166
+#: wavira/inc/customizer.php:171
 msgid "Tools → Wavira demo content"
 msgstr ""
 
@@ -995,28 +1110,37 @@ msgstr ""
 msgid "Tracklist of the album chosen in the sidebar."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:705
+#: wavira/inc/customizer.php:305
+msgid "Turns off transitions and animations on every page, whatever the visitor’s device asks for."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:749
 msgid "Use this image"
 msgstr ""
 
-#: wavira/inc/customizer.php:295
+#: wavira/inc/customizer.php:300
 msgid "Used by covers, cards, buttons and inputs."
 msgstr ""
 
-#: wavira/inc/customizer.php:293
+#: wavira/inc/customizer.php:298
 msgid "Used for buttons, links and highlights. Each mode has one colour field, so dark mode is not forgotten: check the contrast against both backgrounds."
 msgstr ""
 
-#: wavira/inc/options.php:255
+#: wavira/inc/options.php:309
 msgid "Vazirmatn (bundled, recommended for Persian)"
 msgstr ""
 
-#: wavira/inc/customizer.php:302
+#: wavira/inc/customizer.php:312
 msgid "Vazirmatn is a variable font, so every weight renders without a second file."
 msgstr ""
 
-#: wavira/inc/customizer.php:299
+#: wavira/inc/customizer.php:309
 msgid "Vazirmatn is bundled in the theme: no request leaves the site, and Persian letterforms are complete. A custom stack must not point at a remote font file."
+msgstr ""
+
+#: wavira/inc/admin-panel.php:188
+#. translators: %s: theme version number.
+msgid "Version %s"
 msgstr ""
 
 #: wavira/inc/artists.php:142
@@ -1027,6 +1151,10 @@ msgstr ""
 msgid "View all"
 msgstr ""
 
+#: wavira/inc/admin-panel.php:201
+msgid "View the site"
+msgstr ""
+
 #: wavira/inc/markup.php:171
 msgid "Watch the video"
 msgstr ""
@@ -1035,15 +1163,20 @@ msgstr ""
 msgid "Wavira"
 msgstr ""
 
-#: wavira/inc/admin-panel.php:510
+#: wavira/inc/admin-panel.php:879
+#. translators: %s: the title of the page that lists the posts.
+msgid "Wavira Core"
+msgstr ""
+
+#: wavira/inc/admin-panel.php:546
 msgid "Wavira Core is not active, so there is nothing on this site to import into yet. The plugin provides the music content types, the player and the demo importer; the theme renders what exists and keeps working without it."
 msgstr ""
 
-#: wavira/inc/customizer.php:168
+#: wavira/inc/customizer.php:173
 msgid "Wavira Core is not active: install and activate it to get the music content types, the player and the demo content. The theme renders what exists and stays functional either way."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:758
+#: wavira/inc/admin-panel.php:802
 msgid "Wavira is active."
 msgstr ""
 
@@ -1053,31 +1186,36 @@ msgstr ""
 
 #: wavira/inc/admin-panel.php:70
 #: wavira/inc/admin-panel.php:71
-#: wavira/inc/admin-panel.php:181
-#: wavira/inc/admin-panel.php:763
+#: wavira/inc/admin-panel.php:190
+#: wavira/inc/admin-panel.php:807
 #: wavira/inc/customizer.php:38
+#. translators: %s: theme version number.
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira/inc/options.php:331
-#: wavira/inc/options.php:663
+#: wavira/inc/options.php:385
+#: wavira/inc/options.php:726
 msgid "X (Twitter)"
+msgstr ""
+
+#: wavira/inc/site-defaults.php:378
+msgid "You are not allowed to change the reading settings."
 msgstr ""
 
 #: wavira/inc/site-defaults.php:131
 msgid "You are not allowed to change the site language."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:626
+#: wavira/inc/admin-panel.php:664
 msgid "You are not allowed to change the theme settings."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:787
+#: wavira/inc/admin-panel.php:831
 #: wavira/inc/site-defaults.php:154
 msgid "You are not allowed to change this."
 msgstr ""
 
-#: wavira/inc/options.php:324
-#: wavira/inc/options.php:659
+#: wavira/inc/options.php:378
+#: wavira/inc/options.php:722
 msgid "YouTube"
 msgstr ""

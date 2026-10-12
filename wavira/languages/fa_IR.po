@@ -491,10 +491,6 @@ msgstr "دانلود wavira-core"
 msgid "Each new tab gets rel=\"noopener\" — the browser cannot hand the tab to the linked page."
 msgstr "هر زبانهٔ جدید rel=\"noopener\" می‌گیرد — مرورگر نمی‌تواند زبانه را به صفحهٔ مقصد بسپارد."
 
-#: wavira/inc/admin-panel.php:318
-msgid "Enabled"
-msgstr "فعال"
-
 #: wavira/inc/customizer.php:301
 msgid "Every block size in the theme is relative to this, so the whole page scales together."
 msgstr "همهٔ اندازه‌های بلوک‌ها در قالب نسبی‌اند، پس کل صفحه با هم بزرگ و کوچک می‌شود."
@@ -1074,3 +1070,143 @@ msgstr "شما اجازهٔ این کار را ندارید."
 #: wavira/inc/options.php:659
 msgid "YouTube"
 msgstr "یوتیوب"
+
+#: wavira/inc/admin-panel.php:877
+msgid "Active. The music content types, the player and the download cards are available."
+msgstr "فعال است. نوع‌های محتوای موسیقی، پخش‌کننده و کارت‌های دانلود در دسترس‌اند."
+
+#: wavira/inc/admin-panel.php:889
+msgid "Done. The home page and the posts page are set under Settings → Reading."
+msgstr "انجام شد. صفحهٔ خانه و صفحهٔ نوشته‌ها در تنظیمات → خواندن تنظیم شدند."
+
+#: wavira/inc/options.php:420
+msgid "Download cards on music pages"
+msgstr "کارت‌های دانلود در صفحه‌های موسیقی"
+
+#: wavira/inc/admin-panel.php:859
+msgid "Front page"
+msgstr "صفحهٔ نخست"
+
+#: wavira/inc/options.php:284
+msgid "Frosted-glass blur (px)"
+msgstr "محوشدگی شیشه‌ای (پیکسل)"
+
+#: wavira/inc/options.php:148
+msgid "Header height (px)"
+msgstr "ارتفاع سرصفحه (پیکسل)"
+
+#: wavira/inc/site-defaults.php:326
+#: wavira/inc/site-defaults.php:334
+msgid "Home"
+msgstr "خانه"
+
+#: wavira/inc/admin-panel.php:885
+msgid "Home page"
+msgstr "صفحهٔ خانه"
+
+#: wavira/inc/customizer.php:304
+msgid "How strongly frosted panels blur what is behind them. It has no effect while the frosted-glass switch is off."
+msgstr "میزان محو شدن پس‌زمینهٔ پشت پنل‌های شیشه‌ای. وقتی کلید شیشه‌ای خاموش است، اثری ندارد."
+
+#: wavira/inc/customizer.php:111
+msgid "Music pages"
+msgstr "صفحه‌های موسیقی"
+
+#: wavira/inc/site-defaults.php:342
+#: wavira/inc/site-defaults.php:350
+msgid "News"
+msgstr "اخبار"
+
+#: wavira/inc/admin-panel.php:863
+#. translators: %s: the title of the page that is the front page.
+msgid "No page is chosen. Visitors see the blog listing instead of the designed home page."
+msgstr "هیچ صفحه‌ای انتخاب نشده است. بازدیدکنندگان به‌جای صفحهٔ خانهٔ طراحی‌شده، فهرست نوشته‌ها را می‌بینند."
+
+#: wavira/inc/admin-panel.php:878
+msgid "Not active. Install and activate Wavira Core for the albums, tracks and videos."
+msgstr "فعال نیست. برای آلبوم‌ها، قطعه‌ها و ویدیوها، افزونهٔ Wavira Core را نصب و فعال کنید."
+
+#: wavira/inc/admin-panel.php:871
+#. translators: %s: the title of the page that lists the posts.
+msgid "Not set. The posts have no page of their own yet."
+msgstr "تنظیم نشده است. نوشته‌ها هنوز صفحهٔ مستقل ندارند."
+
+#: wavira/inc/admin-panel.php:258
+msgid "Only the fields on this tab are saved."
+msgstr "فقط فیلدهای همین برگه ذخیره می‌شوند."
+
+#: wavira/inc/admin-panel.php:915
+msgid "Open Settings → Reading"
+msgstr "باز کردن تنظیمات → خواندن"
+
+#: wavira/inc/admin-panel.php:867
+msgid "Posts page"
+msgstr "صفحهٔ نوشته‌ها"
+
+#: wavira/inc/options.php:270
+msgid "Reading width (characters per line)"
+msgstr "عرض خواندن (تعداد نویسه در هر خط)"
+
+#: wavira/inc/options.php:295
+msgid "Reduce motion everywhere"
+msgstr "کاهش حرکت در همه‌جا"
+
+#: wavira/inc/admin-panel.php:912
+msgid "Set the home and posts pages"
+msgstr "تنظیم صفحهٔ خانه و صفحهٔ نوشته‌ها"
+
+#: wavira/inc/customizer.php:306
+msgid "Shows the download cards on track and album pages when a file exists. The files stay where they are."
+msgstr "کارت‌های دانلود را در صفحهٔ قطعه و آلبوم، وقتی فایلی وجود داشته باشد، نشان می‌دهد. فایل‌ها سر جای خودشان می‌مانند."
+
+#: wavira/inc/customizer.php:112
+msgid "Switches for the track, album and video pages. The files themselves are managed by Wavira Core."
+msgstr "کلیدهای صفحه‌های قطعه، آلبوم و ویدیو. خود فایل‌ها را Wavira Core مدیریت می‌کند."
+
+#: wavira/inc/admin-panel.php:895
+msgid "The designed front page is used when a page is chosen as the front page. The button below creates an empty “Home” page and an empty “News” page if they are missing, and sets them under Settings → Reading. Your other pages are not touched."
+msgstr "صفحهٔ خانهٔ طراحی‌شده وقتی استفاده می‌شود که یک صفحه به‌عنوان صفحهٔ نخست انتخاب شده باشد. دکمهٔ زیر، در صورت نبودن، یک صفحهٔ خالی «خانه» و یک صفحهٔ خالی «اخبار» می‌سازد و آن‌ها را در تنظیمات → خواندن تنظیم می‌کند. بقیهٔ صفحه‌های شما تغییر نمی‌کنند."
+
+#: wavira/inc/customizer.php:302
+msgid "The height of the header bar, in pixels."
+msgstr "ارتفاع نوار سرصفحه، بر حسب پیکسل."
+
+#: wavira/inc/customizer.php:303
+msgid "The longest line of running text, counted in characters. Narrower reads more calmly; wider fits more on screen."
+msgstr "بلندترین خط متن جاری، بر حسب نویسه. عرض کمتر خواندن آرام‌تری دارد؛ عرض بیشتر، روی صفحه جای بیشتری می‌گیرد."
+
+#: wavira/inc/admin-panel.php:862
+#. translators: %s: the title of the page that is the front page.
+msgid "The page “%s” is the front page, so the designed home page is shown."
+msgstr "صفحهٔ «%s» صفحهٔ نخست است، بنابراین صفحهٔ خانهٔ طراحی‌شده نشان داده می‌شود."
+
+#: wavira/inc/admin-panel.php:891
+msgid "The pages could not be created. Check Pages, then try again."
+msgstr "صفحه‌ها ساخته نشدند. بخش صفحه‌ها را بررسی کنید و دوباره تلاش کنید."
+
+#: wavira/inc/admin-panel.php:870
+#. translators: %s: the title of the page that lists the posts.
+msgid "The posts are listed on “%s”."
+msgstr "نوشته‌ها در صفحهٔ «%s» فهرست می‌شوند."
+
+#: wavira/inc/customizer.php:305
+msgid "Turns off transitions and animations on every page, whatever the visitor’s device asks for."
+msgstr "انتقال‌ها و انیمیشن‌ها را در همهٔ صفحه‌ها خاموش می‌کند، هر چه تنظیم دستگاه بازدیدکننده بخواهد."
+
+#: wavira/inc/admin-panel.php:186
+#. translators: %s: theme version number.
+msgid "Version %s"
+msgstr "نسخهٔ %s"
+
+#: wavira/inc/admin-panel.php:199
+msgid "View the site"
+msgstr "مشاهدهٔ سایت"
+
+#: wavira/inc/admin-panel.php:875
+#. translators: %s: the title of the page that lists the posts.
+msgid "Wavira Core"
+msgstr "هستهٔ واویرا"
+
+#: wavira/inc/site-defaults.php:378
+msgid "You are not allowed to change the reading settings."
+msgstr "شما اجازهٔ تغییر تنظیمات خواندن را ندارید."

@@ -107,6 +107,11 @@ function wavira_customize_sections(): array {
 			'title'    => __( 'Fonts and typography', 'wavira' ),
 			'priority' => 40,
 		),
+		'music'      => array(
+			'title'       => __( 'Music pages', 'wavira' ),
+			'description' => __( 'Switches for the track, album and video pages. The files themselves are managed by Wavira Core.', 'wavira' ),
+			'priority'    => 45,
+		),
 		'social'     => array(
 			'title'       => __( 'Social networks', 'wavira' ),
 			'description' => __( 'A filled field prints its icon in the footer. An empty field prints nothing at all — no dead links.', 'wavira' ),
@@ -294,6 +299,11 @@ function wavira_customize_descriptions(): array {
 		'container_width'   => __( 'The width of the site layout on wide screens.', 'wavira' ),
 		'radius'            => __( 'Used by covers, cards, buttons and inputs.', 'wavira' ),
 		'card_shadow'       => __( 'Off gives a flat, editorial look.', 'wavira' ),
+		'header_height'     => __( 'The height of the header bar, in pixels.', 'wavira' ),
+		'measure'           => __( 'The longest line of running text, counted in characters. Narrower reads more calmly; wider fits more on screen.', 'wavira' ),
+		'glass_blur'        => __( 'How strongly frosted panels blur what is behind them. It has no effect while the frosted-glass switch is off.', 'wavira' ),
+		'reduce_motion'     => __( 'Turns off transitions and animations on every page, whatever the visitor’s device asks for.', 'wavira' ),
+		'show_downloads'    => __( 'Shows the download cards on track and album pages when a file exists. The files stay where they are.', 'wavira' ),
 		'card_min_width'    => __( 'Cards wrap into as many columns as fit. A larger number means fewer, bigger cards.', 'wavira' ),
 		'show_theme_toggle' => __( 'Hides the button only; the visitor’s device preference keeps working.', 'wavira' ),
 		'font_family'       => __( 'Vazirmatn is bundled in the theme: no request leaves the site, and Persian letterforms are complete. A custom stack must not point at a remote font file.', 'wavira' ),

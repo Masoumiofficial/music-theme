@@ -242,3 +242,147 @@ function wavira_persian_admin_notice(): void {
 	echo '</p></div>';
 }
 add_action( 'admin_notices', 'wavira_persian_admin_notice' );
+
+/**
+ * The nonced URL that sets the home and news pages under Settings → Reading.
+ *
+ * @return string
+ */
+function wavira_home_setup_url(): string {
+	return wp_nonce_url( admin_url( 'admin-post.php?action=wavira_home_setup' ), 'wavira_home_setup' );
+}
+
+/**
+ * Whether a post id is a published page, and which one.
+ *
+ * @param int $post_id Candidate page id.
+ * @return bool
+ */
+function wavira_is_published_page( int $post_id ): bool {
+	return $post_id > 0 && 'page' === get_post_type( $post_id ) && 'publish' === get_post_status( $post_id );
+}
+
+/**
+ * Find a published page by its exact title, or return 0.
+ *
+ * Used so that the setup button reuses a page the site already has (a "خانه"
+ * page made by hand) instead of creating a second one with the same name.
+ *
+ * @param string $title Page title.
+ * @return int Page id, 0 when there is none.
+ */
+function wavira_find_page_by_title( string $title ): int {
+	$query = new WP_Query(
+		array(
+			'post_type'              => 'page',
+			'post_status'            => 'publish',
+			'title'                  => $title,
+			'posts_per_page'         => 1,
+			'fields'                 => 'ids',
+			'no_found_rows'          => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	return empty( $query->posts ) ? 0 : (int) $query->posts[0];
+}
+
+/**
+ * The home page's state, for the settings screen.
+ *
+ * `static` is true only when WordPress shows a real page as the front page. The
+ * designed front page (`front-page.html`) is used either way; what changes is
+ * whether a page is chosen. With "A static page" selected and no page picked,
+ * WordPress falls back to the blog listing instead.
+ *
+ * @return array{static: bool, front: int, posts: int}
+ */
+function wavira_home_status(): array {
+	$front = (int) get_option( 'page_on_front' );
+	$posts = (int) get_option( 'page_for_posts' );
+
+	return array(
+		'static' => 'page' === get_option( 'show_on_front' ) && wavira_is_published_page( $front ),
+		'front'  => $front,
+		'posts'  => $posts,
+	);
+}
+
+/**
+ * Create the home and news pages if they are missing, and set Settings → Reading.
+ *
+ * A page that is already chosen and published is kept as it is, and so is the
+ * content of every page. The home page is created empty on purpose: the designed
+ * front page comes from the theme's template, not from the page's text.
+ *
+ * @return bool True when both pages are set.
+ */
+function wavira_setup_home_pages(): bool {
+	$front = (int) get_option( 'page_on_front' );
+	$posts = (int) get_option( 'page_for_posts' );
+
+	if ( ! wavira_is_published_page( $front ) ) {
+		$front = wavira_find_page_by_title( __( 'Home', 'wavira' ) );
+	}
+
+	if ( ! wavira_is_published_page( $front ) ) {
+		$front = (int) wp_insert_post(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => __( 'Home', 'wavira' ),
+				'post_content' => '',
+			),
+			true
+		);
+	}
+
+	if ( ! wavira_is_published_page( $posts ) || $posts === $front ) {
+		$posts = wavira_find_page_by_title( __( 'News', 'wavira' ) );
+	}
+
+	if ( ! wavira_is_published_page( $posts ) || $posts === $front ) {
+		$posts = (int) wp_insert_post(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => __( 'News', 'wavira' ),
+				'post_content' => '',
+			),
+			true
+		);
+	}
+
+	if ( ! wavira_is_published_page( $front ) || ! wavira_is_published_page( $posts ) || $front === $posts ) {
+		return false;
+	}
+
+	update_option( 'show_on_front', 'page' );
+	update_option( 'page_on_front', $front );
+	update_option( 'page_for_posts', $posts );
+
+	return true;
+}
+
+/**
+ * Handle the settings screen's home-page button.
+ *
+ * It changes Settings → Reading, which is a site-wide setting, so the capability
+ * is `manage_options`, the same one WordPress asks for on that screen.
+ *
+ * @return void
+ */
+function wavira_handle_home_setup(): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You are not allowed to change the reading settings.', 'wavira' ), 403 );
+	}
+
+	check_admin_referer( 'wavira_home_setup' );
+
+	$done = wavira_setup_home_pages();
+
+	wp_safe_redirect( add_query_arg( 'wavira-home', $done ? 'done' : 'failed', wavira_admin_panel_url( 'site' ) ) );
+	exit;
+}
+add_action( 'admin_post_wavira_home_setup', 'wavira_handle_home_setup' );
