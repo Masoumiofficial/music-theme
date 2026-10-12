@@ -1,0 +1,152 @@
+/*!
+ * Wavira — block editor styles.
+ *
+ * Loaded with add_editor_style() so the editor shows what the front end shows:
+ * the same presets, the same cover ratio, the same chips. The editor is an iframe
+ * with the theme's presets, so every rule consumes the same custom properties as
+ * the front-end CSS (ADR 0014).
+ *
+ * This file is not part of the layered build: the editor loads it directly, and it
+ * must stay small because it is re-parsed on every editor load.
+ */
+
+.editor-styles-wrapper {
+	background-color: var(--wp--preset--color--base);
+	color: var(--wp--preset--color--contrast);
+	font-family: var(--wp--preset--font-family--body, system-ui, sans-serif);
+	line-height: 1.7;
+}
+
+.editor-styles-wrapper .wp-block-post-featured-image img,
+.editor-styles-wrapper .wp-block-image img {
+	border-radius: var(--wp--custom--radius--md, 12px);
+}
+
+.editor-styles-wrapper .wp-block-post-terms a,
+.editor-styles-wrapper .wavira-chip {
+	display: inline-block;
+	padding: 0.125rem 0.625rem;
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--pill, 999px);
+	background: var(--wp--preset--color--surface);
+	color: var(--wp--preset--color--contrast);
+	text-decoration: none;
+}
+
+.editor-styles-wrapper .wavira-hero {
+	display: grid;
+	gap: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+@media (min-width: 768px) {
+	.editor-styles-wrapper .wavira-hero {
+		grid-template-columns: minmax(12rem, 20rem) minmax(0, 1fr);
+		align-items: end;
+	}
+}
+
+.editor-styles-wrapper .wavira-surface {
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--lg, 20px);
+	background: var(--wp--preset--color--surface);
+	padding: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+/* Shortcodes render as their output on the front end and as a placeholder here;
+   make the placeholder legible instead of invisible. */
+.editor-styles-wrapper .wp-block-shortcode {
+	border: 1px dashed var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--sm, 6px);
+	padding: 0.5rem 0.75rem;
+	color: var(--wp--preset--color--muted);
+	font-family: var(--wp--preset--font-family--mono, monospace);
+	font-size: 0.875rem;
+}
+
+/* ---- dynamic block previews -------------------------------------------- */
+
+/* The block's own wrapper carries .wavira-block (editor.js adds it through
+   useBlockProps), so the preview sits in the same box as the front end. */
+.editor-styles-wrapper .wavira-block {
+	min-block-size: 1px;
+}
+
+.editor-styles-wrapper .wavira-block-hint {
+	margin-block: 0 0.5rem;
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+}
+
+.editor-styles-wrapper .wavira-block-placeholder {
+	margin-block: 0;
+	padding: var(--wp--preset--spacing--40, 1rem);
+	border: 1px dashed var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	color: var(--wp--preset--color--muted);
+}
+
+/* ---- artist and news surfaces ------------------------------------------ */
+
+/* The editor loads this file plus theme.json, not the layered stylesheets, so
+   the components a block preview contains need their shape here as well. Only
+   structure and tokens: colours come from the shared presets, which is why the
+   editor stays in sync with light/dark without a second palette. */
+.editor-styles-wrapper .wavira-card {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid var(--wp--preset--color--border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wp--preset--color--surface);
+}
+
+.editor-styles-wrapper .wavira-card__media img {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+}
+
+.editor-styles-wrapper .wavira-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+}
+
+.editor-styles-wrapper .wavira-cards,
+.editor-styles-wrapper .wavira-news__list,
+.editor-styles-wrapper .wavira-gallery__items {
+	display: grid;
+	gap: var(--wp--preset--spacing--40, 1rem);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+}
+
+.editor-styles-wrapper .wavira-artist__profile {
+	display: grid;
+	gap: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+.editor-styles-wrapper .wavira-artist__avatar {
+	display: grid;
+	place-items: center;
+	margin: 0;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wp--preset--color--surface);
+}
+
+.editor-styles-wrapper .wavira-artist__avatar--placeholder svg {
+	inline-size: 45%;
+	block-size: auto;
+}
+
+.editor-styles-wrapper .wavira-gallery__image {
+	display: block;
+	inline-size: 100%;
+	aspect-ratio: 1 / 1;
+	border-radius: var(--wp--custom--radius--md, 12px);
+	object-fit: cover;
+}

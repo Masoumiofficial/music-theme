@@ -1,0 +1,117 @@
+/*!
+ * Wavira — utilities (4 of 4).
+ *
+ * A deliberately small set: layout helpers a block template needs, long-form
+ * typography for lyrics and editorial pages, and print behaviour. Every utility
+ * is single-purpose and prefixed, so nothing here can be mistaken for a
+ * component.
+ */
+
+/* ---- visibility -------------------------------------------------------- */
+
+.wavira-hide {
+	display: none;
+}
+
+@media (max-width: 781px) {
+	.wavira-hide-mobile {
+		display: none;
+	}
+}
+
+@media (min-width: 782px) {
+	.wavira-hide-desktop {
+		display: none;
+	}
+}
+
+/* ---- layout ------------------------------------------------------------ */
+
+.wavira-flow > * + * {
+	margin-block-start: var(--wavira-flow-gap, 1rem);
+}
+
+.wavira-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wavira-stack-gap, 1rem);
+}
+
+.wavira-cluster {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wavira-cluster-gap, 0.5rem);
+	align-items: center;
+}
+
+.wavira-grid-auto {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--wavira-grid-min, 14rem), 1fr));
+	gap: var(--wavira-grid-gap, 1.5rem);
+}
+
+.wavira-measure {
+	max-inline-size: var(--wavira-measure);
+}
+
+.wavira-text-center {
+	text-align: center;
+}
+
+.wavira-surface {
+	border: var(--wavira-hairline);
+	border-radius: var(--wp--custom--radius--lg, 20px);
+	background: var(--wp--preset--color--surface);
+	padding: var(--wp--preset--spacing--50, 1.5rem);
+}
+
+/* ---- long-form content (lyrics, biography, license pages) --------------- */
+
+.wavira-prose {
+	max-inline-size: var(--wavira-measure);
+}
+
+.wavira-prose > * + * {
+	margin-block-start: 1em;
+}
+
+.wavira-prose h2 {
+	margin-block-start: 2em;
+}
+
+.wavira-prose ul,
+.wavira-prose ol {
+	padding-inline-start: 1.5rem;
+}
+
+.wavira-prose img {
+	border-radius: var(--wavira-cover-radius);
+}
+
+/* Lyrics keep their line breaks from the editor without allowing HTML. */
+.wavira-lyrics {
+	white-space: pre-line;
+}
+
+/* Mobile-first screens start at 360 px (PERFORMANCE-AUDIT §3, ADR 0009): this
+   keeps wide tables scrollable instead of breaking the layout. */
+.wavira-scroll-x {
+	overflow-x: auto;
+	overscroll-behavior-inline: contain;
+}
+
+/* ---- print ------------------------------------------------------------- */
+
+@media print {
+	.wavira-header,
+	.wavira-footer,
+	.wavira-site-player,
+	.wavira-hide {
+		display: none;
+	}
+
+	.wavira-surface {
+		border: 1px solid #000;
+		background: none;
+	}
+}

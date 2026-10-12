@@ -1,0 +1,28 @@
+# --- Node / tooling ---
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# --- Composer (dev tooling only; no runtime dependency) ---
+/vendor/
+composer.lock
+
+# --- Build output ---
+dist/*
+!dist/.gitkeep
+# A copy of dist/ for handing the archives over (same reason: generated, never committed).
+/delivery/
+wavira/assets/dist/
+wavira-core/assets/dist/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# --- Local environment ---
+.env
+.env.*
+*.log

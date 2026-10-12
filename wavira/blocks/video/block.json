@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/video",
+	"title": "Music video",
+	"category": "wavira-music",
+	"description": "The video of a video post: a hosted file, an embed, or a link when the provider cannot be embedded.",
+	"keywords": [
+		"video",
+		"clip",
+		"embed",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"videoId": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

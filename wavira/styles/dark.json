@@ -1,0 +1,93 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"title": "Dark",
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "base",
+					"color": "#0b0c10",
+					"name": "Base"
+				},
+				{
+					"slug": "surface",
+					"color": "#16181f",
+					"name": "Surface"
+				},
+				{
+					"slug": "contrast",
+					"color": "#f5f6fa",
+					"name": "Contrast"
+				},
+				{
+					"slug": "muted",
+					"color": "#b6bcca",
+					"name": "Muted text"
+				},
+				{
+					"slug": "border",
+					"color": "#2c303b",
+					"name": "Border"
+				},
+				{
+					"slug": "primary",
+					"color": "#b8a7ff",
+					"name": "Primary"
+				},
+				{
+					"slug": "primary-dark",
+					"color": "#cfc4ff",
+					"name": "Primary light"
+				},
+				{
+					"slug": "accent",
+					"color": "#2fe3bd",
+					"name": "Accent"
+				},
+				{
+					"slug": "danger",
+					"color": "#ff9a90",
+					"name": "Danger"
+				}
+			]
+		},
+		"custom": {
+			"radius": {
+				"sm": "6px",
+				"md": "12px",
+				"lg": "20px",
+				"pill": "999px"
+			},
+			"motion": {
+				"fast": "120ms",
+				"base": "200ms",
+				"slow": "320ms",
+				"easing": "cubic-bezier(0.22, 0.61, 0.36, 1)"
+			},
+			"player": {
+				"barHeight": "72px",
+				"miniHeight": "56px",
+				"barSpace": "6rem"
+			}
+		}
+	},
+	"styles": {
+		"color": {
+			"background": "var(--wp--preset--color--base)",
+			"text": "var(--wp--preset--color--contrast)"
+		},
+		"elements": {
+			"link": {
+				"color": {
+					"text": "var(--wp--preset--color--primary)"
+				},
+				":hover": {
+					"color": {
+						"text": "var(--wp--preset--color--primary-dark)"
+					}
+				}
+			}
+		}
+	}
+}

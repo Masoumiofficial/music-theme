@@ -1,0 +1,42 @@
+{
+	"name": "wavira/wavira-music",
+	"description": "Wavira — WordPress music-publishing ecosystem (theme + core plugin). Development tooling only; the product has no Composer runtime dependency.",
+	"type": "wordpress-theme",
+	"license": "GPL-2.0-or-later",
+	"keywords": ["wordpress", "theme", "plugin", "music", "audio", "player"],
+	"homepage": "https://etehadwp.com/",
+	"authors": [
+		{
+			"name": "Etehad WP (اتحاد وردپرس)",
+			"homepage": "https://etehadwp.com/"
+		}
+	],
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"php-parallel-lint/php-parallel-lint": "^1.4",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpunit/phpunit": "^9.6",
+		"wp-coding-standards/wpcs": "^3.1",
+		"yoast/phpunit-polyfills": "^2.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"sort-packages": true
+	},
+	"scripts": {
+		"lint": "parallel-lint --exclude vendor --exclude node_modules wavira wavira-core",
+		"phpcs": "phpcs",
+		"phpcbf": "phpcbf",
+		"test": "phpunit",
+		"test:install": "bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest",
+		"check": [
+			"@lint",
+			"@phpcs"
+		]
+	}
+}

@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/artist-gallery",
+	"title": "Photo gallery",
+	"category": "wavira-music",
+	"description": "Photos attached to the post being viewed: an artist, a release or a video.",
+	"keywords": [
+		"artist",
+		"gallery",
+		"photos",
+		"images",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"artistId": {
+			"type": "number",
+			"default": 0
+		},
+		"limit": {
+			"type": "number",
+			"default": 12
+		},
+		"columns": {
+			"type": "number",
+			"default": 3
+		},
+		"heading": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

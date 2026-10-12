@@ -1,0 +1,26 @@
+/*
+Theme Name: Wavira Music
+Theme URI: https://etehadwp.com/
+Author: Etehad WP (اتحاد وردپرس)
+Author URI: https://etehadwp.com/
+Description: Premium WordPress music-publishing theme. Presentation layer for the Wavira music ecosystem — music content, playback and REST data are provided by the Wavira Core plugin.
+Version: 0.15.0
+Requires at least: 6.6
+Tested up to: 7.1
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: wavira
+Tags: music, rtl-language-support, translation-ready, block-styles, wide-blocks, custom-colors, accessibility-ready
+*/
+
+/*
+ * This file is intentionally almost empty.
+ *
+ * The compiled front-end stylesheet of this theme lives in:
+ *   assets/dist/theme.css   (built from assets/css/*.css — see tools/README.md)
+ * and is enqueued by inc/assets.php only when it exists, so an un-built
+ * checkout never produces a 404 request.
+ *
+ * WordPress requires the theme header above to stay in this file.
+ */

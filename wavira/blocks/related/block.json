@@ -1,0 +1,31 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/related",
+	"title": "Related music",
+	"category": "wavira-music",
+	"description": "Cards for the items related to the post being viewed: a shared genre, the same artist or the same album.",
+	"keywords": [
+		"related",
+		"similar",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"limit": {
+			"type": "number",
+			"default": 6
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

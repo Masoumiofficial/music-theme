@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/tracklist",
+	"title": "Album tracklist",
+	"category": "wavira-music",
+	"description": "The ordered, linked tracklist of an album, or the newest tracks on the site. Renders nothing when there is nothing to list.",
+	"keywords": [
+		"album",
+		"tracks",
+		"tracklist",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"albumId": {
+			"type": "number",
+			"default": 0
+		},
+		"showDuration": {
+			"type": "boolean",
+			"default": true
+		},
+		"showSubtitle": {
+			"type": "boolean",
+			"default": true
+		},
+		"showDownload": {
+			"type": "boolean",
+			"default": true
+		},
+		"source": {
+			"type": "string",
+			"default": "album",
+			"enum": [
+				"album",
+				"latest"
+			]
+		},
+		"limit": {
+			"type": "number",
+			"default": 6
+		},
+		"showPlay": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php",
+	"usesContext": [
+		"postId"
+	]
+}

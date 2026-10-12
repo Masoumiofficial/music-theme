@@ -1,0 +1,583 @@
+<?php
+/**
+ * Artist profile surfaces: header, biography, social channels, works, gallery.
+ *
+ * Persian music sites are artist-first: the artist page is where a listener
+ * lands from a search result and it must answer "who is this, what did they
+ * release, where do I follow them" without scrolling through a blog post. This
+ * file renders that page from the payload the core plugin builds
+ * (`wavira_core_artist_profile()`), so the music model stays in the plugin and a
+ * theme switch keeps the profile working (ARCHITECTURE §1).
+ *
+ * The payload is read once per request per artist, not once per helper: the
+ * profile block asks for the header, the works and the gallery, and each of them
+ * would otherwise repeat the same queries (PERFORMANCE-AUDIT P1).
+ *
+ * @package Wavira\Theme
+ * @since   0.9.0
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+if ( ! function_exists( 'wavira_artist_data' ) ) {
+	/**
+	 * The artist payload for this request, resolved and cached once.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      `limit`, `gallery_limit`, `sections`.
+	 * @return array<string, mixed> Empty array when the artist cannot be resolved.
+	 */
+	function wavira_artist_data( $artist_id, $args = array() ) {
+		static $cache = array();
+
+		$artist_id = absint( $artist_id );
+
+		if ( $artist_id < 1 || ! function_exists( 'wavira_core_artist_profile' ) ) {
+			return array();
+		}
+
+		$key = $artist_id . ':' . md5( (string) wp_json_encode( (array) $args ) );
+
+		if ( ! isset( $cache[ $key ] ) ) {
+			$cache[ $key ] = (array) wavira_core_artist_profile( $artist_id, (array) $args );
+		}
+
+		return $cache[ $key ];
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_avatar' ) ) {
+	/**
+	 * Artist portrait, with a music placeholder when there is no image.
+	 *
+	 * A profile without a portrait is the normal state on a new site; an empty
+	 * grey square looks broken, so the fallback is an inline, currentColor SVG.
+	 *
+	 * @param array<string, mixed> $artist Artist payload.
+	 * @return string Markup, never empty.
+	 */
+	function wavira_get_artist_avatar( $artist ) {
+		$avatar = isset( $artist['avatar'] ) ? (array) $artist['avatar'] : array();
+		$image  = wavira_get_image( $avatar, 'wavira-cover', 'wavira-artist__portrait' );
+
+		if ( '' !== $image ) {
+			return '<figure class="wavira-artist__avatar">' . $image . '</figure>';
+		}
+
+		$icon = function_exists( 'wavira_icon' ) ? wavira_icon( 'music' ) : '';
+
+		if ( '' === $icon ) {
+			return '';
+		}
+
+		return '<figure class="wavira-artist__avatar wavira-artist__avatar--placeholder" aria-hidden="true">' . $icon . '</figure>';
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_profile' ) ) {
+	/**
+	 * Artist header and biography.
+	 *
+	 * @param array<string, mixed> $artist Artist payload.
+	 * @param array<string, mixed> $args   `show_bio`, `show_socials`, `show_counts`, `show_quote`.
+	 * @return string Markup, empty string when there is nothing to show.
+	 */
+	function wavira_get_artist_profile( $artist, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'show_bio'     => true,
+				'show_socials' => true,
+				'show_counts'  => true,
+				'show_quote'   => true,
+			)
+		);
+
+		$name = isset( $artist['name'] ) ? (string) $artist['name'] : '';
+
+		if ( '' === $name ) {
+			return '';
+		}
+
+		$socials = isset( $artist['socials'] ) ? (array) $artist['socials'] : array();
+		$counts  = isset( $artist['counts'] ) ? (array) $artist['counts'] : array();
+		$quote   = isset( $artist['context'] ) ? (string) $artist['context'] : '';
+		$bio     = isset( $artist['biography'] ) ? (string) $artist['biography'] : '';
+
+		$html = '<section class="wavira-artist__profile">';
+
+		$html .= wavira_get_artist_avatar( $artist );
+		$html .= '<div class="wavira-artist__intro">';
+		$html .= '<h1 class="wavira-artist__name">' . esc_html( $name ) . '</h1>';
+
+		if ( $args['show_quote'] && '' !== $quote ) {
+			$html .= '<p class="wavira-artist__quote wavira-measure">' . esc_html( $quote ) . '</p>';
+		}
+
+		if ( $args['show_socials'] && array() !== $socials ) {
+			$html .= '<ul class="wavira-artist__socials">';
+
+			foreach ( $socials as $social ) {
+				$label = isset( $social['label'] ) ? (string) $social['label'] : '';
+				$url   = isset( $social['url'] ) ? (string) $social['url'] : '';
+
+				if ( '' === $label || '' === $url ) {
+					continue;
+				}
+
+				$html .= '<li class="wavira-artist__social">';
+				$html .= '<a class="wavira-chip" href="' . esc_url( $url ) . '" rel="me nofollow noopener external">';
+				$html .= esc_html( $label );
+				$html .= '<span class="wavira-visually-hidden">' . esc_html__( '(opens in a new tab)', 'wavira' ) . '</span>';
+				$html .= '</a></li>';
+			}
+
+			$html .= '</ul>';
+		}
+
+		if ( $args['show_counts'] && array() !== $counts ) {
+			$labels = array(
+				'albums'  => __( 'Album', 'wavira' ),
+				'tracks'  => __( 'Single', 'wavira' ),
+				'videos'  => __( 'Video', 'wavira' ),
+				'gallery' => __( 'Photo', 'wavira' ),
+			);
+
+			$html .= '<dl class="wavira-artist__counts">';
+
+			foreach ( $labels as $key => $label ) {
+				$count = isset( $counts[ $key ] ) ? (int) $counts[ $key ] : 0;
+
+				if ( $count < 1 ) {
+					continue;
+				}
+
+				$html .= '<div class="wavira-artist__count">';
+				$html .= '<dt>' . esc_html( $label ) . '</dt>';
+				$html .= '<dd>' . esc_html( wavira_core_digits( number_format_i18n( $count ) ) ) . '</dd>';
+				$html .= '</div>';
+			}
+
+			$html .= '</dl>';
+		}
+
+		$html .= '</div></section>';
+
+		if ( $args['show_bio'] && '' !== trim( $bio ) ) {
+			$html .= '<section class="wavira-artist__bio wavira-prose wavira-measure">';
+			$html .= wp_kses_post( $bio );
+			$html .= '</section>';
+		}
+
+		return $html;
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_works' ) ) {
+	/**
+	 * The artist's works, grouped by type, each group with its own heading.
+	 *
+	 * A group with nothing in it prints nothing at all — an empty "Videos"
+	 * heading is worse than no heading — and a group shows a "view all" link when
+	 * the artist has more items than the group displays.
+	 *
+	 * @param array<string, mixed> $artist Artist payload.
+	 * @return string Markup, empty string when the artist has no published work.
+	 */
+	function wavira_get_artist_works( $artist ) {
+		$sections = isset( $artist['sections'] ) ? (array) $artist['sections'] : array();
+
+		if ( array() === $sections ) {
+			return '';
+		}
+
+		$html = '';
+
+		foreach ( $sections as $section ) {
+			$section = (array) $section;
+			$items   = isset( $section['items'] ) ? (array) $section['items'] : array();
+
+			if ( array() === $items ) {
+				continue;
+			}
+
+			$label   = isset( $section['label'] ) ? (string) $section['label'] : '';
+			$count   = isset( $section['count'] ) ? (int) $section['count'] : count( $items );
+			$more    = isset( $section['more'] ) ? (string) $section['more'] : '';
+			$heading = sprintf(
+				/* translators: 1: section name, 2: number of items in that section, formatted for the locale. */
+				__( '%1$s (%2$s)', 'wavira' ),
+				$label,
+				wavira_core_digits( number_format_i18n( $count ) )
+			);
+
+			$html .= '<section class="wavira-section wavira-artist__works">';
+			$html .= wavira_get_section_head( $heading, $count > count( $items ) ? $more : '', __( 'View all', 'wavira' ) );
+			$html .= '<ul class="wavira-cards">';
+
+			foreach ( $items as $item ) {
+				$item  = (array) $item;
+				$image = isset( $item['cover'] ) ? (array) $item['cover'] : array();
+
+				$html .= '<li class="wavira-cards__item">';
+				$html .= wavira_get_card(
+					array(
+						'id'         => isset( $item['id'] ) ? absint( $item['id'] ) : 0,
+						'type'       => isset( $item['type'] ) ? (string) $item['type'] : '',
+						'title'      => isset( $item['title'] ) ? (string) $item['title'] : '',
+						'permalink'  => isset( $item['permalink'] ) ? (string) $item['permalink'] : '',
+						'subtitle'   => isset( $item['subtitle'] ) ? (string) $item['subtitle'] : '',
+						'date'       => isset( $item['date'] ) ? (int) $item['date'] : 0,
+						'date_label' => isset( $item['date_label'] ) ? (string) $item['date_label'] : '',
+						'kicker'     => isset( $item['genres'] ) ? (array) $item['genres'] : array(),
+						'image'      => $image,
+						'class'      => 'wavira-card--work',
+					)
+				);
+				$html .= '</li>';
+			}
+
+			$html .= '</ul></section>';
+		}
+
+		return $html;
+	}
+}
+
+if ( ! function_exists( 'wavira_get_photos' ) ) {
+	/**
+	 * Photos attached to any post: an artist, an album, a music video.
+	 *
+	 * The artist page had the only gallery in the product, and a release page with
+	 * artwork, back covers and studio photos had nowhere to show them. Attachments
+	 * are WordPress's own gallery — upload from the post's screen and the file is
+	 * attached to it — so this asks the same question for every post type instead
+	 * of inventing a second gallery meta (ADR 0024).
+	 *
+	 * @param int                  $post_id Post ID.
+	 * @param array<string, mixed> $args    `limit` (int), `columns` (2–4).
+	 * @return array<int, array<string, mixed>> Each: id, url, alt, caption.
+	 */
+	function wavira_get_photos( $post_id, $args = array() ) {
+		$args    = wp_parse_args( $args, array( 'limit' => 12 ) );
+		$post_id = absint( $post_id );
+
+		if ( $post_id < 1 ) {
+			return array();
+		}
+
+		$attachments = get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'post_parent'    => $post_id,
+				'post_mime_type' => 'image',
+				'posts_per_page' => (int) max( 1, min( 24, (int) $args['limit'] ) ),
+				'orderby'        => 'menu_order date',
+				'order'          => 'ASC',
+				'no_found_rows'  => true,
+			)
+		);
+
+		$photos = array();
+
+		foreach ( $attachments as $attachment ) {
+			$photos[] = array(
+				'id'      => (int) $attachment->ID,
+				'url'     => (string) wp_get_attachment_image_url( $attachment->ID, 'full' ),
+				'alt'     => (string) get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+				'caption' => (string) wp_get_attachment_caption( $attachment->ID ),
+			);
+		}
+
+		return $photos;
+	}
+}
+
+if ( ! function_exists( 'wavira_get_photo_gallery' ) ) {
+	/**
+	 * The gallery markup for a set of photos.
+	 *
+	 * One renderer for every gallery in the product, so a photo looks the same
+	 * wherever it is shown and the lightbox hook is in one place (ADR 0024).
+	 *
+	 * @param array<int, array<string, mixed>> $images Photos: id, url, alt, caption.
+	 * @param array<string, mixed>             $args   `columns` (2–4), `heading` (string).
+	 * @return string Markup, empty string when there are no photos.
+	 */
+	function wavira_get_photo_gallery( $images, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
+
+		if ( array() === $images ) {
+			return '';
+		}
+
+		$columns = (int) max( 2, min( 4, (int) $args['columns'] ) );
+
+		$html = '<section class="wavira-section wavira-gallery">';
+
+		// An empty heading is not an empty `<h2>`: a template that supplies its
+		// own section heading as a pattern (which is how every other section in
+		// this theme gets one) says “no heading here”.
+		if ( '' !== (string) $args['heading'] ) {
+			$html .= wavira_get_section_head( (string) $args['heading'] );
+		}
+		$html .= '<ul class="wavira-gallery__items wavira-gallery__items--' . esc_attr( (string) $columns ) . '">';
+
+		foreach ( $images as $image ) {
+			$image   = (array) $image;
+			$markup  = wavira_get_image( $image, 'wavira-cover-sm', 'wavira-gallery__image' );
+			$caption = isset( $image['caption'] ) ? (string) $image['caption'] : '';
+			$id      = isset( $image['id'] ) ? absint( $image['id'] ) : 0;
+
+			if ( '' === $markup ) {
+				continue;
+			}
+
+			$html .= '<li class="wavira-gallery__item"><figure class="wavira-gallery__figure">';
+
+			// The photo opens at full size and can be saved, because a gallery a
+			// visitor cannot open is a wall of thumbnails. `assets/js/index.js`
+			// upgrades the same link to a dialog when the browser has `<dialog>`;
+			// without JavaScript it stays a link to the picture.
+			$full = $id > 0
+				? (string) wp_get_attachment_image_url( $id, 'full' )
+				: (string) ( $image['url'] ?? '' );
+
+			if ( '' !== $full ) {
+				$html .= sprintf(
+					'<a class="wavira-gallery__link" href="%s" data-wavira-lightbox%s>',
+					esc_url( $full ),
+					'' !== $caption ? ' data-caption="' . esc_attr( $caption ) . '"' : ''
+				);
+			}
+
+			$html .= $markup;
+
+			if ( '' !== $full ) {
+				$html .= '</a>';
+
+				$download = wavira_get_download( $id, 'link', 0, __( 'Download the image', 'wavira' ) );
+
+				if ( '' !== $download ) {
+					$html .= '<span class="wavira-gallery__download">' . $download . '</span>';
+				}
+			}
+
+			// A captionless image gets no empty figcaption: the alt text carries
+			// the meaning and an empty element carries nothing.
+			if ( '' !== $caption ) {
+				$html .= '<figcaption class="wavira-gallery__caption">' . esc_html( $caption ) . '</figcaption>';
+			}
+
+			$html .= '</figure></li>';
+		}
+
+		return $html . '</ul></section>';
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_gallery' ) ) {
+	/**
+	 * Artist photo gallery: images attached to the artist post.
+	 *
+	 * The payload comes from the plugin (it knows the artist model); the markup
+	 * comes from `wavira_get_photo_gallery()` so an artist photo and an album photo
+	 * are the same component.
+	 *
+	 * @param array<string, mixed> $artist Artist payload.
+	 * @param array<string, mixed> $args   `columns` (2–4), `heading` (string;
+	 *                                     empty for a section that has its own).
+	 * @return string Markup, empty string when the artist has no photos.
+	 */
+	function wavira_get_artist_gallery( $artist, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
+
+		$images = isset( $artist['gallery'] ) ? (array) $artist['gallery'] : array();
+
+		return wavira_get_photo_gallery(
+			$images,
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'wavira_get_post_gallery' ) ) {
+	/**
+	 * The gallery of the post being viewed.
+	 *
+	 * @param int                  $post_id Post ID.
+	 * @param array<string, mixed> $args    `limit`, `columns`, `heading`.
+	 * @return string Markup, empty string when the post has no photos.
+	 */
+	function wavira_get_post_gallery( $post_id, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'limit'   => 12,
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
+
+		return wavira_get_photo_gallery(
+			wavira_get_photos( (int) $post_id, array( 'limit' => (int) $args['limit'] ) ),
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist' ) ) {
+	/**
+	 * The complete artist page: profile, biography, works and gallery.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      Block or shortcode arguments.
+	 * @return string Markup, empty string when the artist cannot be resolved.
+	 */
+	function wavira_get_artist( $artist_id, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'sections'      => array( 'albums', 'tracks', 'videos' ),
+				'limit'         => 6,
+				'gallery_limit' => 8,
+				'columns'       => 3,
+				'show_bio'      => true,
+				'show_socials'  => true,
+				'show_counts'   => true,
+				'show_quote'    => true,
+				'show_works'    => true,
+				'show_gallery'  => true,
+			)
+		);
+
+		$artist = wavira_artist_data(
+			(int) $artist_id,
+			array(
+				'limit'         => (int) $args['limit'],
+				'gallery_limit' => (int) $args['gallery_limit'],
+				'sections'      => (array) $args['sections'],
+			)
+		);
+
+		if ( array() === $artist ) {
+			return '';
+		}
+
+		$html = '<div class="wavira-artist">';
+
+		$html .= wavira_get_artist_profile(
+			$artist,
+			array(
+				'show_bio'     => (bool) $args['show_bio'],
+				'show_socials' => (bool) $args['show_socials'],
+				'show_counts'  => (bool) $args['show_counts'],
+				'show_quote'   => (bool) $args['show_quote'],
+			)
+		);
+
+		if ( $args['show_works'] ) {
+			$html .= wavira_get_artist_works( $artist );
+		}
+
+		if ( $args['show_gallery'] ) {
+			$html .= wavira_get_artist_gallery( $artist, array( 'columns' => (int) $args['columns'] ) );
+		}
+
+		return $html . '</div>';
+	}
+}
+
+if ( ! function_exists( 'wavira_get_artist_gallery_only' ) ) {
+	/**
+	 * Just the gallery, for a page that places the profile and the photos apart.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      `limit`, `columns`, `heading`.
+	 * @return string Markup.
+	 */
+	function wavira_get_artist_gallery_only( $artist_id, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'limit'   => 12,
+				'columns' => 3,
+				'heading' => __( 'Photos', 'wavira' ),
+			)
+		);
+
+		$artist = wavira_artist_data(
+			(int) $artist_id,
+			array(
+				'limit'         => 1,
+				'gallery_limit' => (int) $args['limit'],
+				'sections'      => array(),
+			)
+		);
+
+		if ( array() === $artist ) {
+			return '';
+		}
+
+		return wavira_get_artist_gallery(
+			$artist,
+			array(
+				'columns' => (int) $args['columns'],
+				'heading' => (string) $args['heading'],
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'wavira_artist' ) ) {
+	/**
+	 * Print the complete artist page markup.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      See `wavira_get_artist()`.
+	 * @return void
+	 */
+	function wavira_artist( $artist_id, $args = array() ) {
+		$markup = wavira_get_artist( $artist_id, $args );
+
+		if ( '' !== $markup ) {
+			echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped field by field inside the artist helpers; the biography is passed through wp_kses_post().
+		}
+	}
+}
+
+if ( ! function_exists( 'wavira_artist_gallery' ) ) {
+	/**
+	 * Print the artist gallery markup.
+	 *
+	 * @param int                  $artist_id Artist post ID.
+	 * @param array<string, mixed> $args      See `wavira_get_artist_gallery_only()`.
+	 * @return void
+	 */
+	function wavira_artist_gallery( $artist_id, $args = array() ) {
+		$markup = wavira_get_artist_gallery_only( $artist_id, $args );
+
+		if ( '' !== $markup ) {
+			echo $markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped field by field inside wavira_get_artist_gallery().
+		}
+	}
+}

@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "wavira/genre-chips",
+	"title": "Genre chips",
+	"category": "wavira-music",
+	"description": "Linked genre terms as chips, most used first.",
+	"keywords": [
+		"genre",
+		"terms",
+		"chips",
+		"taxonomy",
+		"music"
+	],
+	"textdomain": "wavira",
+	"attributes": {
+		"limit": {
+			"type": "number",
+			"default": 12
+		},
+		"orderby": {
+			"type": "string",
+			"default": "count",
+			"enum": [
+				"count",
+				"name",
+				"slug",
+				"term_id"
+			]
+		},
+		"order": {
+			"type": "string",
+			"default": "DESC",
+			"enum": [
+				"ASC",
+				"DESC"
+			]
+		},
+		"showCount": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"render": "file:./render.php"
+}
