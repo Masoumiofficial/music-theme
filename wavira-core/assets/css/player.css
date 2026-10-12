@@ -389,8 +389,11 @@
 		padding: calc(var(--wavira-player-gap) * 1.25);
 	}
 
+	/* Stays wrapping: with nowrap the transport, the time and the “open” link
+	   could not shrink together, and at 768–1023px the row ran 260px past the
+	   viewport (measured on the track page). The row wraps instead. */
 	.wavira-player__inner {
-		flex-wrap: nowrap;
+		flex-wrap: wrap;
 	}
 
 	.wavira-player__controls {

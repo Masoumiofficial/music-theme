@@ -3,6 +3,33 @@
 All notable changes to the theme are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.16.0] — 2026-10-12
+
+### Changed — 0.16.0
+
+- **The download links are cards, not a text list.** Where a page offers a
+  file in several qualities (a track's 128 and 320 kbps, an album's masters, an
+  artist's downloads), each quality is now its own box: the action on top, the
+  quality large (`320 kbps`), the file size under it and an arrow that says
+  “download”. Two qualities sit side by side from the tablet width up and stack
+  on a phone. The markup is the same list the plugin always produced — each
+  card is a link to `wavira/v1/download/{id}` — with three inner elements for the
+  label, the quality and the size (`wavira/inc/downloads.php`,
+  `wavira/assets/css/components.css`). Reduced-motion and coarse-pointer users
+  get no lift and a 44px target.
+
+### Fixed — 0.16.0
+
+- **The header fits a phone.** Below 782px the title, the menu and the theme
+  switch were one non-wrapping row, so at 360px the page was 17px wider than the
+  screen on every template and the title wrapped to three lines. The header now
+  wraps: the title and menu on the first line, the search on a full-width second
+  line (`wavira/assets/css/components.css`).
+- **The player bar fits a tablet.** From 768px the player row was `nowrap`, so the
+  track and album pages were 263px (768px) and 31px (1024px) wider than the
+  viewport, pushing the “Open the track page” link off screen. The row wraps
+  now (`wavira-core/assets/css/player.css`).
+
 ## [Unreleased]
 
 ### Added — 0.15.0

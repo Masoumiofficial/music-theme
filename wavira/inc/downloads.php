@@ -14,6 +14,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
+if ( ! function_exists( 'wavira_download_icon' ) ) {
+	/**
+	 * The arrow drawn at the end of a download card: decorative, so hidden from assistive tech.
+	 *
+	 * @return string SVG markup.
+	 */
+	function wavira_download_icon() {
+		return '<svg class="wavira-download__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v9.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42L11 13.59V4a1 1 0 0 1 1-1zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1z"/></svg>';
+	}
+}
+
 if ( ! function_exists( 'wavira_download_qualities' ) ) {
 	/**
 	 * The qualities a post can be downloaded in.
@@ -121,21 +132,26 @@ if ( ! function_exists( 'wavira_get_download' ) ) {
 					$item_label = wavira_core_digits( $item_label );
 				}
 
-				$suffix = '' !== $item_label ? ' <span class="wavira-download__meta">' . esc_html( $item_label ) . '</span>' : '';
+				// Each quality is a card: the action, the quality and the size on their own lines.
+				$card = '<span class="wavira-download__label">' . esc_html( $label ) . '</span>';
+
+				if ( '' !== $item_label ) {
+					$card .= '<span class="wavira-download__meta wavira-download__quality">' . esc_html( $item_label ) . '</span>';
+				}
 
 				if ( $sizes ) {
 					$size = wavira_download_size_label( wavira_download_file_size( $post_id, (int) $item['quality'], $type ) );
 
 					if ( '' !== $size ) {
-						$suffix .= ' <span class="wavira-download__meta">' . esc_html( $size ) . '</span>';
+						$card .= '<span class="wavira-download__meta wavira-download__size">' . esc_html( $size ) . '</span>';
 					}
 				}
 
 				$items .= sprintf(
 					'<li class="wavira-download__item"><a class="wavira-download__link" href="%s" download>%s%s</a></li>',
 					esc_url( $url ),
-					esc_html( $label ),
-					$suffix // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built above from esc_html() pieces.
+					$card, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built above from esc_html() pieces.
+					wavira_download_icon() // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a constant SVG.
 				);
 			}
 

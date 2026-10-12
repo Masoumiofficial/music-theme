@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0-or-later licence.
 msgid ""
 msgstr ""
-"Project-Id-Version: wavira 0.15.0\n"
+"Project-Id-Version: wavira 0.16.0\n"
 "Report-Msgid-Bugs-To: https://etehadwp.com/\n"
 "POT-Creation-Date: 2026-10-05\n"
 "MIME-Version: 1.0\n"
@@ -24,12 +24,12 @@ msgstr ""
 msgid "%1$s (%2$s)"
 msgstr ""
 
-#: wavira/inc/downloads.php:77
+#: wavira/inc/downloads.php:88
 #. translators: %s: file size in kilobytes.
 msgid "%s KB"
 msgstr ""
 
-#: wavira/inc/downloads.php:73
+#: wavira/inc/downloads.php:84
 #. translators: %s: file size in megabytes.
 msgid "%s MB"
 msgstr ""
@@ -468,25 +468,25 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: wavira/inc/downloads.php:53
+#: wavira/inc/downloads.php:64
 #: wavira/inc/markup.php:99
 msgid "Download"
 msgstr ""
 
-#: wavira/inc/downloads.php:44
+#: wavira/inc/downloads.php:55
 msgid "Download the album"
 msgstr ""
 
 #: wavira/inc/artists.php:364
-#: wavira/inc/downloads.php:48
+#: wavira/inc/downloads.php:59
 msgid "Download the image"
 msgstr ""
 
-#: wavira/inc/downloads.php:50
+#: wavira/inc/downloads.php:61
 msgid "Download the track"
 msgstr ""
 
-#: wavira/inc/downloads.php:46
+#: wavira/inc/downloads.php:57
 msgid "Download the video"
 msgstr ""
 
