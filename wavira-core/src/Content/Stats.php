@@ -282,7 +282,7 @@ final class Stats {
 			array(
 				'post_type'              => array( PostTypes::TRACK, PostTypes::ALBUM, PostTypes::VIDEO ),
 				'post_status'            => 'publish',
-				'posts_per_page'         => 300,
+				'posts_per_page'         => 100,
 				'fields'                 => 'ids',
 				'no_found_rows'          => true,
 				'update_post_term_cache' => false,

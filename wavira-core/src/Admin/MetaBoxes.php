@@ -545,7 +545,7 @@ final class MetaBoxes implements Registrable {
 			array(
 				'post_type'              => $post_type,
 				'post_status'            => 'publish',
-				'posts_per_page'         => 200,
+				'posts_per_page'         => 100,
 				'orderby'                => 'title',
 				'order'                  => 'ASC',
 				'no_found_rows'          => true,
