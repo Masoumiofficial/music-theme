@@ -20,6 +20,13 @@
  *   7. the declared font — every `fontFace` in theme.json points at a file that
  *      ships with the theme, asks for `font-display: swap`, keeps Vazirmatn as
  *      the primary family, and travels with its OFL text (ADR 0010).
+ *   8. narrow screens — no box is *fixed* wider than 320px, the narrowest screen
+ *      the product supports, and no grid track demands more than that. A fixed
+ *      width does not shrink on a small phone, it overflows: the content is
+ *      still there, just off the screen and unreachable, and it reads as a
+ *      layout the theme got wrong rather than a device nobody thought about.
+ *      Widths are declared with `max-inline-size` and `auto-fit` grids, which
+ *      shrink by construction.
  *
  * Usage:
  *   node tools/check-css.mjs          # check, exit 1 on a violation
@@ -291,6 +298,52 @@ if ( ! existsSync( THEME_JS ) ) {
 	}
 
 	notes.push( `font faces: ${ faces.length } declared, ${ fontFiles } file(s) present` );
+}
+
+// --------------------------------------------------------- 8. narrow screens
+// The narrowest screen the product supports is 320 CSS pixels (iPhone SE, the
+// Galaxy A series, and a browser window dragged narrow). A declaration that sets
+// a bare width — `inline-size`, `min-inline-size`, `flex-basis`, `width` — wider
+// than that, or a grid track that will not go below it, cannot shrink: it is
+// clipped or it pushes a scrollbar onto the whole page. `max-inline-size` is the
+// same intention expressed so the box shrinks, which is why the rule allows it.
+const NARROWEST = 320;
+const FIXED_WIDTH = /^\s*(?:min-inline-size|inline-size|flex-basis|min-width|width)\s*:\s*([^;{}]+);/gm;
+const FIXED_TRACK = /minmax\(\s*([0-9.]+)(px|rem|em)/g;
+
+/** The length a declaration asks for, in CSS pixels, or 0 when it is not fixed. */
+function fixedWidth( value ) {
+	const match = value.match( /^\s*([0-9.]+)(px|rem|em)\s*$/ );
+
+	if ( ! match ) {
+		return 0;
+	}
+
+	return parseFloat( match[ 1 ] ) * ( 'px' === match[ 2 ] ? 1 : 16 );
+}
+
+for ( const { name, css } of files ) {
+	// Media-query preludes name breakpoints, not boxes: they are not declarations.
+	const body = strip( css ).replace( /@media[^{]*\{/g, '' );
+	const tooWide = [];
+
+	for ( const match of body.matchAll( FIXED_WIDTH ) ) {
+		if ( fixedWidth( match[ 1 ] ) > NARROWEST ) {
+			tooWide.push( match[ 0 ].trim() );
+		}
+	}
+
+	for ( const match of body.matchAll( FIXED_TRACK ) ) {
+		const pixels = parseFloat( match[ 1 ] ) * ( 'px' === match[ 2 ] ? 1 : 16 );
+
+		if ( pixels > NARROWEST ) {
+			tooWide.push( `minmax(${ match[ 1 ] }${ match[ 2 ] }, …)` );
+		}
+	}
+
+	if ( tooWide.length ) {
+		problems.push( `${ name }: fixed width wider than ${ NARROWEST }px (${ tooWide.join( ', ' ) }) — a box that cannot shrink overflows a small phone; use max-inline-size or an auto-fit track` );
+	}
 }
 
 for ( const line of notes ) {

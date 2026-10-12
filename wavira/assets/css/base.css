@@ -239,7 +239,14 @@ label {
 .wp-site-blocks {
 	display: flex;
 	flex-direction: column;
+	/* The page is at least a screen tall so a short page's footer sits at the
+	   bottom rather than halfway up it. `100vh` is the *large* viewport on a
+	   phone — taller than what the visitor can see while the browser's toolbar
+	   is showing — which is one scrollbar's worth of nothing on every short
+	   page. `svh` is the same promise measured against the small viewport, and
+	   it is a second declaration only where a browser understands it. */
 	min-block-size: 100vh;
+	min-block-size: 100svh;
 }
 
 .wp-site-blocks > main {

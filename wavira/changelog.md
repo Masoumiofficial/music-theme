@@ -7,6 +7,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added — 0.15.0
 
+- **A box that cannot shrink is a box that overflows.** The stylesheets were read
+  rule by rule for the two audiences this product actually has — a Persian reader
+  and a visitor on a small phone — and the rules came out clean: no physical
+  property anywhere (`left`, `right`, `margin-left`, `text-align: left`), only
+  `min-width` media queries, `max-inline-size: 100%` on media, `overflow-wrap`
+  set on the body and the player. What the audit could not leave behind was a
+  guarantee, so `tools/check-css.mjs` has an eighth rule: no fixed
+  `inline-size`/`flex-basis`/`width` above 320px, and no grid track that will not
+  go below it. A fixed width does not shrink on a small phone, it overflows —
+  and the part that is off-screen is unreachable. The page's minimum height
+  became `100svh` behind `100vh`, so a short page still ends at the bottom of
+  the screen without the mobile toolbar's worth of extra scroll
+  (`tools/check-css.mjs`, `wavira/assets/css/base.css`).
+
+
 - **The chrome is a material, not a flat colour.** The header, the sticky player
   bar, the cards, the chips, the mobile menu, the lightbox's close button and the
   back-to-top button are frosted glass: a tinted, blurred, slightly saturated
