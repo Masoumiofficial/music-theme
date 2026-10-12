@@ -130,6 +130,8 @@ final class Installer {
 			update_post_meta( $release_id, MetaSchema::ARTIST, $report['artist'] );
 			update_post_meta( $release_id, MetaSchema::ALBUM_TYPE, (string) $release['type'] );
 			update_post_meta( $release_id, MetaSchema::RELEASE_DATE, (string) $release['release_date'] );
+			update_post_meta( $release_id, MetaSchema::VIEWS_OFFSET, 3400 + ( $release_index * 850 ) );
+			update_post_meta( $release_id, MetaSchema::LIKES_OFFSET, 240 + ( $release_index * 65 ) );
 
 			self::attach_term( $release_id, Taxonomies::GENRE, (string) $release['genre'] );
 
@@ -167,6 +169,19 @@ final class Installer {
 				update_post_meta( $track_id, MetaSchema::DURATION, (int) $track['duration'] );
 				update_post_meta( $track_id, MetaSchema::LYRICS, (string) $track['lyrics'] );
 				update_post_meta( $track_id, MetaSchema::RELEASE_DATE, (string) $track['date'] );
+				update_post_meta( $track_id, MetaSchema::VIEWS_OFFSET, 1200 + ( $index * 340 ) + ( $release_index * 210 ) );
+				update_post_meta( $track_id, MetaSchema::LIKES_OFFSET, 85 + ( $index * 24 ) + ( $release_index * 15 ) );
+
+				if ( 'podcast' === (string) ( $track['kind'] ?? 'music' ) ) {
+					update_post_meta( $track_id, MetaSchema::EPISODE, 1 );
+					update_post_meta(
+						$track_id,
+						MetaSchema::CHAPTERS,
+						$english
+							? "00:00 Intro\n00:02 Studio Conversation\n00:04 Outro"
+							: "00:00 مقدمه و معرفی\n00:02 گفت‌وگوی استودیویی\n00:04 جمع‌بندی و پایان"
+					);
+				}
 
 				if ( ! empty( $track['featured'] ) ) {
 					update_post_meta( $track_id, MetaSchema::FEATURED, true );

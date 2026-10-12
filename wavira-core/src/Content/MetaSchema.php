@@ -63,7 +63,16 @@ final class MetaSchema {
 	public const VIDEO_480    = 'wavira_video_480';
 	public const VIDEO_720    = 'wavira_video_720';
 	public const VIDEO_1080   = 'wavira_video_1080';
+	public const VIDEO_2160   = 'wavira_video_2160';
 	public const VIDEO_POSTER = 'wavira_video_poster';
+
+	/* Engagement & Podcast ------------------------------------------------------- */
+	public const VIEWS        = 'wavira_views';
+	public const VIEWS_OFFSET = 'wavira_views_offset';
+	public const LIKES        = 'wavira_likes';
+	public const LIKES_OFFSET = 'wavira_likes_offset';
+	public const EPISODE      = 'wavira_episode';
+	public const CHAPTERS     = 'wavira_chapters';
 
 	/* Artist --------------------------------------------------------------------- */
 	public const ARTIST_IMAGE     = 'wavira_artist_image';
@@ -302,10 +311,49 @@ final class MetaSchema {
 				'sanitize' => 'url',
 				'entities' => $video,
 			),
+			self::VIDEO_2160         => array(
+				'type'     => 'string',
+				'sanitize' => 'url',
+				'entities' => $video,
+			),
 			self::VIDEO_POSTER       => array(
 				'type'     => 'integer',
 				'sanitize' => 'id',
 				'entities' => $video,
+			),
+
+			/* Engagement & Podcast ---------------------------------------------- */
+			self::VIEWS              => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => array_merge( $track, $album, $video, $artist ),
+				'rest'     => false,
+			),
+			self::VIEWS_OFFSET       => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => array_merge( $track, $album, $video, $artist ),
+			),
+			self::LIKES              => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => array_merge( $track, $album, $video, $artist ),
+				'rest'     => false,
+			),
+			self::LIKES_OFFSET       => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => array_merge( $track, $album, $video, $artist ),
+			),
+			self::EPISODE            => array(
+				'type'     => 'integer',
+				'sanitize' => 'int',
+				'entities' => $track,
+			),
+			self::CHAPTERS           => array(
+				'type'     => 'string',
+				'sanitize' => 'html',
+				'entities' => $track,
 			),
 
 			/* Artist ------------------------------------------------------------ */

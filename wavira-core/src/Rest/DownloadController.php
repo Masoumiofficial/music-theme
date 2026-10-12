@@ -60,7 +60,7 @@ final class DownloadController extends AbstractController {
 							'description' => __( 'Audio bitrate in kbps or video height in pixels. Omit to use the best available.', 'wavira-core' ),
 							'type'        => 'integer',
 							'default'     => 0,
-							'enum'        => array( 0, 128, 320, 480, 720, 1080 ),
+							'enum'        => array( 0, 128, 320, 480, 720, 1080, 2160 ),
 						),
 						'redirect' => array(
 							'description' => __( 'Redirect to the file (default) instead of returning its URL as JSON.', 'wavira-core' ),

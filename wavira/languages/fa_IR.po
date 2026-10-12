@@ -1143,3 +1143,69 @@ msgstr "شما اجازهٔ این کار را ندارید."
 #: wavira/inc/options.php:659
 msgid "YouTube"
 msgstr "یوتیوب"
+
+msgid "Views:"
+msgstr "بازدید:"
+
+msgid "Like"
+msgstr "پسندیدن"
+
+msgid "Chapters & timestamps"
+msgstr "بخش‌ها و زمان‌بندی"
+
+msgid "Track navigation"
+msgstr "ناوبری آهنگ‌ها"
+
+msgid "Previous track"
+msgstr "آهنگ پیشین"
+
+msgid "Next track"
+msgstr "آهنگ بعدی"
+
+msgid "Track"
+msgstr "آهنگ"
+
+msgid "Music video"
+msgstr "موزیک‌ویدیو"
+
+msgid "Play now"
+msgstr "پخش آنلاین"
+
+msgid "Play album"
+msgstr "پخش آلبوم"
+
+msgid "View details"
+msgstr "مشاهدهٔ جزئیات"
+
+msgid "Previous slide"
+msgstr "اسلاید پیشین"
+
+msgid "Next slide"
+msgstr "اسلاید بعدی"
+
+msgid "Weekly"
+msgstr "هفته"
+
+msgid "Monthly"
+msgstr "ماه"
+
+msgid "Yearly"
+msgstr "سال"
+
+msgid "All time"
+msgstr "همهٔ زمان‌ها"
+
+msgid "Top artists"
+msgstr "برترین هنرمندان"
+
+msgid "Top artists time range"
+msgstr "بازهٔ زمانی برترین هنرمندان"
+
+msgid "%1$s works · %2$s views"
+msgstr "%1$s اثر · %2$s بازدید"
+
+msgid "Featured content slider in the front-page banner"
+msgstr "اسلایدر آثار ویژه در بنر صفحهٔ نخست"
+
+msgid "Top artists ranking section on the front page"
+msgstr "بخش رتبه‌بندی برترین هنرمندان در صفحهٔ نخست"

@@ -252,7 +252,7 @@
 			order.push( preferred );
 		}
 
-		order = order.concat( [ '320', '128', 'external' ] );
+		order = order.concat( [ 'external', '320', '128' ] );
 
 		for ( var i = 0; i < order.length; i++ ) {
 			var candidate = sources[ order[ i ] ];

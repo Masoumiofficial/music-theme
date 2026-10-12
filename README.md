@@ -66,7 +66,7 @@ and survive. Deactivate the plugin and the theme still renders a clean post/page
 | `docs/ARCHITECTURE.md` | **Target architecture** (binding) |
 | `docs/CODING-STANDARD.md` | Enforceable rules (PHP/JS/CSS/i18n/security/perf) |
 | `docs/DECISIONS.md` + `docs/adr/` | Architecture decision records |
-| `docs/DATA-MODEL.md` | **Authoritative music data model** (entities, 46 meta keys, settings, REST, services) |
+| `docs/DATA-MODEL.md` | **Authoritative music data model** (entities, 53 meta keys, settings, REST, services) |
 | `docs/VERIFICATION.md` | **Per-claim evidence log** (what is VERIFIED vs. still open) |
 | `docs/ARTIST-AND-NEWS.md` | Artist profiles and the music-news section (the 0.9.0 surfaces) |
 | `docs/SEO-AND-PERF.md` | Music structured data, SEO cooperation and the performance budget (0.10.0) |
@@ -115,7 +115,7 @@ existing database makes the vendored installer ask for confirmation — drop it 
 Inside WordPress, two WP-CLI commands verify the install:
 
 ```bash
-wp wavira verify           # post types, taxonomies, 46 meta keys, settings, REST routes, counters
+wp wavira verify           # post types, taxonomies, 53 meta keys, settings, REST routes, counters
 wp wavira seed [--force]   # Persian demo + Iranian defaults; --english for the neutral fixture
 wp wavira migrate --detect # what a legacy site holds (read-only)
 wp wavira migrate --dry-run # the full migration plan, writing nothing
@@ -139,7 +139,7 @@ licence text must be inside the package (ADR 0019). CI builds and uploads the pa
 
 | Surface | Detail |
 | --- | --- |
-| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` and `wavira_kind` (single · remix · noha · podcast, always on) plus optional mood/language/label/year; 46 registered meta keys; one typed settings option with 17 keys. |
+| Content | CPTs `wavira_artist`, `wavira_album`, `wavira_track`, `wavira_video`; taxonomies `wavira_genre` and `wavira_kind` (single · remix · noha · podcast, always on) plus optional mood/language/label/year; 53 registered meta keys; one typed settings option with 17 keys. |
 | REST | `wavira/v1`: typed collections for each entity with pagination headers, `/genres`, `/search`, `/search/suggest`, `/{type}/{id}/related`, `/download/{id}`. |
 | Downloads | Authorization chain (site setting → per-track opt-out → optional login → filter) and atomic counters. Delivery is a redirect to the file: **authorization and accounting, never DRM** (ADR 0013). |
 | Player | Framework-free engine in `wavira-core/assets/js/index.js`: one state machine per instance, its own `<audio>`, queue + shuffle + repeat (off/all/one), Media Session metadata and action handlers, documented keyboard map, ARIA state and live regions, `localStorage` preferences (`wavira.player.*`). Mounted by `wavira_player_mount()` in the theme, with a native `<audio>` fallback when JavaScript is unavailable. |

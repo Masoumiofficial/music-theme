@@ -52,6 +52,8 @@ function wavira_asset_version( $relative ) {
 function wavira_theme_settings() {
 	$settings = array(
 		'storageKey' => 'wavira.theme',
+		'restUrl'    => function_exists( 'rest_url' ) ? esc_url_raw( rest_url( 'wavira/v1/' ) ) : '',
+		'nonce'      => function_exists( 'wp_create_nonce' ) ? wp_create_nonce( 'wp_rest' ) : '',
 		// The mode a first visit starts in (ADR 0020). A visitor who uses the
 		// toggle keeps their own choice — this is only the fallback when nothing
 		// is stored yet.

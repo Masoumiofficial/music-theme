@@ -557,4 +557,31 @@ class Test_Player extends Wavira_Test_Case {
 		$this->assertStringNotContainsString( 'file://', $encoded );
 		$this->assertStringNotContainsString( WAVIRA_CORE_DIR, $encoded );
 	}
+
+	/**
+	 * Podcast chapters are parsed cleanly and an independent stream URL wins for online playback.
+	 *
+	 * @return void
+	 */
+	public function test_podcast_chapters_and_independent_stream_priority() {
+		$ids = $this->seed_track(
+			array(
+				MetaSchema::AUDIO_EXTERNAL => 'https://stream.example.com/live-podcast.mp3',
+				MetaSchema::EPISODE        => 7,
+				MetaSchema::CHAPTERS       => "00:00 Intro\n01:30 - Main Topic\n01:02:15 Outro",
+			)
+		);
+
+		$payload = Payload::for_track( $ids['track'] );
+
+		$this->assertSame( 0, $payload['preferred'], 'external stream URL takes priority over download qualities' );
+		$this->assertSame( 'https://stream.example.com/live-podcast.mp3', $payload['sources']['external'] );
+		$this->assertSame( 7, $payload['episode'] );
+		$this->assertCount( 3, $payload['chapters'] );
+		$this->assertSame( 0, $payload['chapters'][0]['time'] );
+		$this->assertSame( 'Intro', $payload['chapters'][0]['title'] );
+		$this->assertSame( 90, $payload['chapters'][1]['time'] );
+		$this->assertSame( 'Main Topic', $payload['chapters'][1]['title'] );
+		$this->assertSame( 3735, $payload['chapters'][2]['time'] );
+	}
 }

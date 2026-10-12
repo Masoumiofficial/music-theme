@@ -152,14 +152,14 @@ function wavira_player_fallback( $track_id, $playback ) {
  * @return string Empty string when the track has no playable source.
  */
 function wavira_player_preferred_source( $sources ) {
+	if ( ! empty( $sources['external'] ) ) {
+		return (string) $sources['external'];
+	}
+
 	foreach ( array( 320, 128 ) as $quality ) {
 		if ( ! empty( $sources[ $quality ] ) ) {
 			return (string) $sources[ $quality ];
 		}
-	}
-
-	if ( ! empty( $sources['external'] ) ) {
-		return (string) $sources['external'];
 	}
 
 	return '';

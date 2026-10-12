@@ -71,6 +71,8 @@ final class Payload {
 			'album'          => $album,
 			'cover'          => $cover,
 			'genres'         => Terms::genres( $post_id ),
+			'episode'        => MetaValues::int( $post_id, MetaSchema::EPISODE ),
+			'chapters'       => self::chapters( $post_id ),
 			'sources'        => $sources,
 			'preferred'      => self::preferred_quality( $sources ),
 			'media_session'  => self::media_session( $title, $artist, $album, $cover ),
@@ -119,10 +121,18 @@ final class Payload {
 	/**
 	 * Preferred quality for a source map.
 	 *
+	 * When an independent online playback URL (`external`) is present, returns 0
+	 * so the player streams from `external` while download links continue to use
+	 * the 320 / 128 files.
+	 *
 	 * @param array<int|string, string> $sources Source map.
-	 * @return int 320 or 128 when available, 0 when only an external source exists.
+	 * @return int 320 or 128 when available, 0 when an external stream is preferred.
 	 */
 	private static function preferred_quality( array $sources ): int {
+		if ( isset( $sources['external'] ) && '' !== (string) $sources['external'] ) {
+			return 0;
+		}
+
 		foreach ( array( self::PREFERRED_QUALITY, 128 ) as $quality ) {
 			if ( isset( $sources[ $quality ] ) ) {
 				return (int) $quality;
@@ -130,6 +140,50 @@ final class Payload {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Parse timestamped chapters (`00:00 Title` or `01:23:45 - Title`) of a track.
+	 *
+	 * @param int $post_id Track post ID.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function chapters( int $post_id ): array {
+		$raw = trim( wp_strip_all_tags( MetaValues::html( $post_id, MetaSchema::CHAPTERS ) ) );
+
+		if ( '' === $raw ) {
+			return array();
+		}
+
+		$rows = array();
+
+		foreach ( preg_split( '/\r\n|\r|\n/', $raw ) as $line ) {
+			$line = trim( (string) $line );
+
+			if ( '' === $line ) {
+				continue;
+			}
+
+			if ( ! preg_match( '/^(?:(\d{1,2}):)?(\d{1,2}):(\d{2})\s*(?:[-–—|]\s*)?(.+)$/u', $line, $m ) ) {
+				continue;
+			}
+
+			$hours   = '' !== $m[1] ? (int) $m[1] : 0;
+			$minutes = (int) $m[2];
+			$seconds = (int) $m[3];
+			$time    = ( $hours * 3600 ) + ( $minutes * 60 ) + $seconds;
+			$label   = $hours > 0
+				? sprintf( '%d:%02d:%02d', $hours, $minutes, $seconds )
+				: sprintf( '%02d:%02d', $minutes, $seconds );
+
+			$rows[] = array(
+				'time'  => $time,
+				'label' => $label,
+				'title' => sanitize_text_field( $m[4] ),
+			);
+		}
+
+		return $rows;
 	}
 
 	/**

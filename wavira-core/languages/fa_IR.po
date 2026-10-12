@@ -754,3 +754,183 @@ msgstr "شما اجازهٔ ورود محتوای نمایشی در این سا�
 #: wavira-core/src/Content/ArtistProfile.php:197
 msgid "YouTube"
 msgstr "یوتیوب"
+
+msgid "Track, Stream, Download & Podcast Details"
+msgstr "مشخصات آهنگ، پخش آنلاین، دانلود و پادکست"
+
+msgid "Album, Tracklist & ZIP Download Details"
+msgstr "مشخصات آلبوم، فهرست قطعات و دانلود یکجای آلبوم"
+
+msgid "Music Video Stream & Multi-Quality Downloads"
+msgstr "پخش آنلاین و دانلود چندکیفیتی موزیک‌ویدیو"
+
+msgid "Artist Profile & Social Channels"
+msgstr "پروفایل هنرمند و شبکه‌های اجتماعی"
+
+msgid "Views, Likes & Admin Counter Offsets"
+msgstr "بازدیدها، پسندها و تنظیم شمارندهٔ مدیریت"
+
+msgid "Primary artist"
+msgstr "هنرمند اصلی"
+
+msgid "Featured artist IDs (comma-separated)"
+msgstr "شناسه‌های هنرمندان مهمان (جداشده با ویرگول)"
+
+msgid "Credit display line (optional override)"
+msgstr "عنوان نمایشی هنرمندان (اختیاری)"
+
+msgid "Parent album"
+msgstr "آلبوم مادر"
+
+msgid "Subtitle / short note"
+msgstr "زیرعنوان یا توضیح کوتاه"
+
+msgid "Online playback stream URL (independent from downloads)"
+msgstr "لینک پخش آنلاین (مستقل از لینک‌های دانلود)"
+
+msgid "When filled, the online player streams from this URL; when empty, it falls back to the 320 or 128 kbps file below."
+msgstr "در صورت تکمیل، پخش‌کنندهٔ آنلاین از این لینک استفاده می‌کند؛ در صورت خالی بودن، به فایل ۳۲۰ یا ۱۲۸ در زیر برمی‌گردد."
+
+msgid "Download URL — 320 kbps (MP3)"
+msgstr "لینک دانلود کیفیت ۳۲۰ (MP3)"
+
+msgid "File size 320 (bytes, optional):"
+msgstr "حجم فایل ۳۲۰ (بایت، اختیاری):"
+
+msgid "Download URL — 128 kbps (MP3)"
+msgstr "لینک دانلود کیفیت ۱۲۸ (MP3)"
+
+msgid "File size 128 (bytes, optional):"
+msgstr "حجم فایل ۱۲۸ (بایت، اختیاری):"
+
+msgid "Duration (seconds)"
+msgstr "مدت زمان (ثانیه)"
+
+msgid "Release date (YYYY-MM-DD):"
+msgstr "تاریخ انتشار (YYYY-MM-DD):"
+
+msgid "Track flags"
+msgstr "وضعیت و نشان‌های آهنگ"
+
+msgid "Offer download buttons when files exist"
+msgstr "نمایش دکمه‌های دانلود در صورت وجود فایل"
+
+msgid "Featured in Hero / Spotlight"
+msgstr "نمایش در بخش ویژه و اسلایدر"
+
+msgid "Include in front-page player queue"
+msgstr "افزودن به صف پخش‌کنندهٔ صفحهٔ نخست"
+
+msgid "Explicit content badge"
+msgstr "نشان محتوای بزرگسال"
+
+msgid "Podcast episode number (optional)"
+msgstr "شمارهٔ قسمت پادکست (اختیاری)"
+
+msgid "Podcast / Mix timestamped tracklist (one per line, e.g. 00:00 Intro)"
+msgstr "فهرست زمان‌بندی پادکست یا میکس (هر خط یک زمان، مانند 00:00 شروع)"
+
+msgid "Lyrics / extra notes"
+msgstr "متن ترانه و توضیحات تکمیلی"
+
+msgid "Credit display line"
+msgstr "عنوان نمایشی هنرمند"
+
+msgid "Release type"
+msgstr "نوع انتشار"
+
+msgid "EP"
+msgstr "آلبوم کوتاه"
+
+msgid "Compilation"
+msgstr "گردآوری‌شده"
+
+msgid "Ordered tracklist (track IDs in playing order)"
+msgstr "فهرست مرتب قطعات آلبوم (شناسهٔ آهنگ‌ها به ترتیب پخش)"
+
+msgid "Enter published track IDs separated by commas in the exact album order."
+msgstr "شناسه‌های آهنگ‌های منتشرشده را به ترتیب دقیق آلبوم و با ویرگول وارد کنید."
+
+msgid "Full album ZIP download — 320 kbps"
+msgstr "لینک دانلود یکجای آلبوم — کیفیت ۳۲۰"
+
+msgid "Full album ZIP download — 128 kbps"
+msgstr "لینک دانلود یکجای آلبوم — کیفیت ۱۲۸"
+
+msgid "Album flags"
+msgstr "وضعیت آلبوم"
+
+msgid "Offer album download buttons when files exist"
+msgstr "نمایش دکمه‌های دانلود آلبوم در صورت وجود فایل"
+
+msgid "Related album"
+msgstr "آلبوم مرتبط"
+
+msgid "Online playback source"
+msgstr "منبع پخش آنلاین ویدیو"
+
+msgid "Direct hosted video file (MP4 / WebM)"
+msgstr "فایل ویدیویی مستقیم (MP4)"
+
+msgid "Vimeo"
+msgstr "ویمیو"
+
+msgid "Other external provider"
+msgstr "سایر سرویس‌های بیرونی"
+
+msgid "Online stream / embed URL"
+msgstr "لینک پخش آنلاین یا امبد ویدیو"
+
+msgid "Download URL — 4K (2160p)"
+msgstr "لینک دانلود ویدیو — کیفیت ۲۱۶۰"
+
+msgid "Download URL — Full HD (1080p)"
+msgstr "لینک دانلود ویدیو — کیفیت ۱۰۸۰"
+
+msgid "Download URL — HD (720p)"
+msgstr "لینک دانلود ویدیو — کیفیت ۷۲۰"
+
+msgid "Download URL — SD (480p)"
+msgstr "لینک دانلود ویدیو — کیفیت ۴۸۰"
+
+msgid "Video flags"
+msgstr "وضعیت موزیک‌ویدیو"
+
+msgid "Offer video download buttons when files exist"
+msgstr "نمایش دکمه‌های دانلود ویدیو در صورت وجود فایل"
+
+msgid "Verification"
+msgstr "تأیید هویت"
+
+msgid "Verified artist badge"
+msgstr "نشان هنرمند رسمی و تأییدشده"
+
+msgid "Country / Origin"
+msgstr "کشور یا خاستگاه"
+
+msgid "Official website"
+msgstr "وب‌سایت رسمی"
+
+msgid "Related artist IDs (comma-separated)"
+msgstr "شناسه‌های هنرمندان مشابه (جداشده با ویرگول)"
+
+msgid "Recorded views:"
+msgstr "بازدیدهای ثبت‌شده:"
+
+msgid "Public total:"
+msgstr "مجموع نمایشی:"
+
+msgid "Admin views offset:"
+msgstr "افزودنی دستی بازدید توسط مدیر:"
+
+msgid "Recorded likes:"
+msgstr "پسندهای ثبت‌شده:"
+
+msgid "Admin likes offset:"
+msgstr "افزودنی دستی پسند توسط مدیر:"
+
+msgid "— None —"
+msgstr "— هیچ‌کدام —"
+
+msgid "Music item not found."
+msgstr "مورد موسیقایی یافت نشد."

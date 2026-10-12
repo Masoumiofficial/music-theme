@@ -262,8 +262,22 @@ if ( ! function_exists( 'wavira_core_video_source' ) ) {
 			$poster_id = (int) get_post_thumbnail_id( $post );
 		}
 
-		$poster = $poster_id > 0 ? (string) wp_get_attachment_image_url( $poster_id, 'wavira-cover-lg' ) : '';
+		$poster   = $poster_id > 0 ? (string) wp_get_attachment_image_url( $poster_id, 'wavira-cover-lg' ) : '';
+		$external = \Wavira\Core\Content\MetaValues::url( $post->ID, \Wavira\Core\Content\MetaSchema::VIDEO_URL );
+		$source   = \Wavira\Core\Content\MetaValues::text( $post->ID, \Wavira\Core\Content\MetaSchema::VIDEO_SOURCE );
+
+		if ( '' !== $external ) {
+			$is_direct_file = 'self' === $source || 1 === preg_match( '/\.(?:mp4|webm|ogg|mov|m4v)(?:[?#].*)?$/i', $external );
+
+			return array(
+				'kind'   => $is_direct_file ? 'file' : 'embed',
+				'url'    => $external,
+				'poster' => $poster,
+			);
+		}
+
 		$hosted = array(
+			2160 => \Wavira\Core\Content\MetaSchema::VIDEO_2160,
 			1080 => \Wavira\Core\Content\MetaSchema::VIDEO_1080,
 			720  => \Wavira\Core\Content\MetaSchema::VIDEO_720,
 			480  => \Wavira\Core\Content\MetaSchema::VIDEO_480,
@@ -279,16 +293,6 @@ if ( ! function_exists( 'wavira_core_video_source' ) ) {
 					'poster' => $poster,
 				);
 			}
-		}
-
-		$external = \Wavira\Core\Content\MetaValues::url( $post->ID, \Wavira\Core\Content\MetaSchema::VIDEO_URL );
-
-		if ( '' !== $external ) {
-			return array(
-				'kind'   => 'embed',
-				'url'    => $external,
-				'poster' => $poster,
-			);
 		}
 
 		return $empty;
@@ -562,5 +566,70 @@ if ( ! function_exists( 'wavira_core_apply_persian_defaults' ) ) {
 			'ok'      => true,
 			'notices' => $notices,
 		);
+	}
+}
+
+if ( ! function_exists( 'wavira_core_post_stats' ) ) {
+	/**
+	 * Engagement breakdown (views, likes, downloads, offsets) for one music post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array<string, mixed>
+	 */
+	function wavira_core_post_stats( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Stats' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\Stats::breakdown( absint( $post_id ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_record_view' ) ) {
+	/**
+	 * Record a rate-limited view or play start for one music post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return int Updated public view count.
+	 */
+	function wavira_core_record_view( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Stats' ) ) {
+			return 0;
+		}
+
+		return (int) \Wavira\Core\Content\Stats::record_view( absint( $post_id ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_top_artists' ) ) {
+	/**
+	 * Ranked Top Artists for a time period (`week`, `month`, `year`, `all`).
+	 *
+	 * @param string $period `week`, `month`, `year`, or `all`.
+	 * @param int    $limit  Maximum number of artists.
+	 * @return array<int, array<string, mixed>>
+	 */
+	function wavira_core_top_artists( $period = 'all', $limit = 8 ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Stats' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\Stats::top_artists( (string) $period, absint( $limit ) );
+	}
+}
+
+if ( ! function_exists( 'wavira_core_podcast_chapters' ) ) {
+	/**
+	 * Parsed timestamped chapters of a podcast or long-form track.
+	 *
+	 * @param int $post_id Track post ID.
+	 * @return array<int, array<string, mixed>>
+	 */
+	function wavira_core_podcast_chapters( $post_id ) {
+		if ( ! class_exists( 'Wavira\\Core\\Player\\Payload' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Player\Payload::chapters( absint( $post_id ) );
 	}
 }

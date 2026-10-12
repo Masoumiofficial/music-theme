@@ -53,7 +53,7 @@ final class Sources {
 			case self::ALBUM:
 				return array( 320, 128 );
 			case self::VIDEO:
-				return array( 1080, 720, 480 );
+				return array( 2160, 1080, 720, 480 );
 			default:
 				return array( 0 );
 		}
@@ -80,6 +80,7 @@ final class Sources {
 				480  => MetaSchema::VIDEO_480,
 				720  => MetaSchema::VIDEO_720,
 				1080 => MetaSchema::VIDEO_1080,
+				2160 => MetaSchema::VIDEO_2160,
 			),
 		);
 

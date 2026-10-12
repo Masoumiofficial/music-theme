@@ -151,7 +151,21 @@ if ( ! function_exists( 'wavira_get_tracklist' ) ) {
 				$download = wavira_get_download( (int) $row['id'], 'link', 0, __( 'Download', 'wavira' ) );
 
 				if ( '' !== $download ) {
-					$html .= '<span class="wavira-tracklist__download">' . $download . '</span>';
+					$qualities = function_exists( 'wavira_download_qualities' ) ? wavira_download_qualities( (int) $row['id'] ) : array();
+					$q_links   = '';
+
+					if ( count( $qualities ) > 1 ) {
+						foreach ( $qualities as $q ) {
+							$q_num   = isset( $q['quality'] ) ? (int) $q['quality'] : 0;
+							$q_label = $q_num > 0 ? wavira_core_digits( $q_num ) : '';
+
+							if ( $q_num > 0 && '' !== $q_label ) {
+								$q_links .= ' ' . wavira_get_download( (int) $row['id'], 'link', $q_num, $q_label );
+							}
+						}
+					}
+
+					$html .= '<span class="wavira-tracklist__download">' . $download . $q_links . '</span>';
 				}
 			}
 

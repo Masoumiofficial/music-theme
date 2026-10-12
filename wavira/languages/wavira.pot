@@ -14,7 +14,7 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
-#: wavira/inc/markup.php:289
+#: wavira/inc/markup.php:303
 #. translators: 1: genre name, 2: number of published items.
 msgid "%1$s (%2$d)"
 msgstr ""
@@ -22,6 +22,11 @@ msgstr ""
 #: wavira/inc/artists.php:209
 #. translators: 1: section name, 2: number of items in that section, formatted for the locale.
 msgid "%1$s (%2$s)"
+msgstr ""
+
+#: wavira/inc/hooks.php:337
+#. translators: 1: number of works, 2: number of views.
+msgid "%1$s works · %2$s views"
 msgstr ""
 
 #: wavira/inc/downloads.php:77
@@ -58,11 +63,11 @@ msgstr ""
 msgid "A small button that returns to the top of a long page. It is skipped for visitors who prefer reduced motion."
 msgstr ""
 
-#: wavira/inc/options.php:158
+#: wavira/inc/options.php:172
 msgid "Accent colour"
 msgstr ""
 
-#: wavira/inc/options.php:385
+#: wavira/inc/options.php:399
 msgid "Additional CSS"
 msgstr ""
 
@@ -79,7 +84,12 @@ msgid "After installing and activating it, come back to this tab: the import but
 msgstr ""
 
 #: wavira/inc/artists.php:140
+#: wavira/inc/hooks.php:193
 msgid "Album"
+msgstr ""
+
+#: wavira/inc/hooks.php:279
+msgid "All time"
 msgstr ""
 
 #: wavira/inc/blocks.php:58
@@ -106,11 +116,11 @@ msgstr ""
 msgid "Applies to a first visit. A visitor who uses the toggle keeps their own choice."
 msgstr ""
 
-#: wavira/inc/assets.php:63
+#: wavira/inc/assets.php:65
 msgid "Auto"
 msgstr ""
 
-#: wavira/inc/options.php:148
+#: wavira/inc/options.php:162
 msgid "Auto (follow the device)"
 msgstr ""
 
@@ -118,11 +128,11 @@ msgstr ""
 msgid "Back to top"
 msgstr ""
 
-#: wavira/inc/options.php:376
+#: wavira/inc/options.php:390
 msgid "Back-to-top button"
 msgstr ""
 
-#: wavira/inc/options.php:275
+#: wavira/inc/options.php:289
 msgid "Base text size (px)"
 msgstr ""
 
@@ -386,7 +396,7 @@ msgctxt "block title"
 msgid "Related music"
 msgstr ""
 
-#: wavira/inc/options.php:292
+#: wavira/inc/options.php:306
 msgid "Bold (700)"
 msgstr ""
 
@@ -404,6 +414,10 @@ msgstr ""
 msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
 msgstr ""
 
+#: wavira/inc/hooks.php:109
+msgid "Chapters & timestamps"
+msgstr ""
+
 #: wavira/blocks/artist-profile/render.php:51
 msgid "Choose an artist for this block, or open it on an artist page."
 msgstr ""
@@ -417,11 +431,11 @@ msgstr ""
 msgid "Clear (use the theme colour)"
 msgstr ""
 
-#: wavira/inc/assets.php:68
+#: wavira/inc/assets.php:70
 msgid "Close"
 msgstr ""
 
-#: wavira/inc/options.php:146
+#: wavira/inc/options.php:160
 msgid "Colour mode for a first visit"
 msgstr ""
 
@@ -429,7 +443,7 @@ msgstr ""
 msgid "Colour picker"
 msgstr ""
 
-#: wavira/inc/assets.php:60
+#: wavira/inc/assets.php:62
 msgid "Colour theme"
 msgstr ""
 
@@ -442,11 +456,11 @@ msgstr ""
 msgid "Colours and sizes are emitted as CSS variables, so every block follows them — including the blocks you add later."
 msgstr ""
 
-#: wavira/inc/options.php:170
+#: wavira/inc/options.php:184
 msgid "Content width (px)"
 msgstr ""
 
-#: wavira/inc/options.php:185
+#: wavira/inc/options.php:199
 msgid "Corner radius (px)"
 msgstr ""
 
@@ -459,11 +473,11 @@ msgstr ""
 msgid "CSS of your own, printed after the theme stylesheet. HTML tags and comments are stripped; a closing style tag would end the block."
 msgstr ""
 
-#: wavira/inc/options.php:265
+#: wavira/inc/options.php:279
 msgid "Custom font stack"
 msgstr ""
 
-#: wavira/inc/options.php:257
+#: wavira/inc/options.php:271
 msgid "Custom stack"
 msgstr ""
 
@@ -471,8 +485,8 @@ msgstr ""
 msgid "Customize"
 msgstr ""
 
-#: wavira/inc/assets.php:62
-#: wavira/inc/options.php:150
+#: wavira/inc/assets.php:64
+#: wavira/inc/options.php:164
 msgid "Dark"
 msgstr ""
 
@@ -549,20 +563,24 @@ msgstr ""
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links, footer text — and the demo content. Changes here are saved immediately; the live preview is in the Customizer."
 msgstr ""
 
-#: wavira/inc/options.php:293
+#: wavira/inc/options.php:307
 msgid "Extra bold (800)"
 msgstr ""
 
-#: wavira/inc/options.php:338
-#: wavira/inc/options.php:667
+#: wavira/inc/options.php:352
+#: wavira/inc/options.php:681
 msgid "Facebook"
+msgstr ""
+
+#: wavira/inc/options.php:144
+msgid "Featured content slider in the front-page banner"
 msgstr ""
 
 #: wavira/inc/customizer.php:169
 msgid "Find the plugin"
 msgstr ""
 
-#: wavira/inc/options.php:253
+#: wavira/inc/options.php:267
 msgid "Font"
 msgstr ""
 
@@ -575,7 +593,7 @@ msgctxt "footer legal line after the copyright year"
 msgid "— all rights reserved."
 msgstr ""
 
-#: wavira/inc/options.php:970
+#: wavira/inc/options.php:984
 msgid "Footer menu"
 msgstr ""
 
@@ -583,11 +601,11 @@ msgstr ""
 msgid "Footer navigation"
 msgstr ""
 
-#: wavira/inc/options.php:369
+#: wavira/inc/options.php:383
 msgid "Footer note"
 msgstr ""
 
-#: wavira/inc/options.php:236
+#: wavira/inc/options.php:250
 msgid "Frosted-glass panels"
 msgstr ""
 
@@ -624,7 +642,7 @@ msgctxt "heading of the genre chips pattern"
 msgid "Browse by genre"
 msgstr ""
 
-#: wavira/inc/options.php:287
+#: wavira/inc/options.php:301
 msgid "Heading weight"
 msgstr ""
 
@@ -636,7 +654,7 @@ msgstr ""
 msgid "Hides the button only; the visitor’s device preference keeps working."
 msgstr ""
 
-#: wavira/inc/options.php:348
+#: wavira/inc/options.php:362
 msgid "Icon size (px)"
 msgstr ""
 
@@ -648,8 +666,8 @@ msgstr ""
 msgid "Identity and logo"
 msgstr ""
 
-#: wavira/inc/options.php:310
-#: wavira/inc/options.php:651
+#: wavira/inc/options.php:324
+#: wavira/inc/options.php:665
 msgid "Instagram"
 msgstr ""
 
@@ -673,13 +691,17 @@ msgstr ""
 msgid "Legal links (license, privacy)"
 msgstr ""
 
-#: wavira/inc/assets.php:61
-#: wavira/inc/options.php:149
+#: wavira/inc/assets.php:63
+#: wavira/inc/options.php:163
 msgid "Light"
 msgstr ""
 
-#: wavira/inc/options.php:224
+#: wavira/inc/options.php:238
 msgid "Light/dark toggle button"
+msgstr ""
+
+#: wavira/inc/hooks.php:99
+msgid "Like"
 msgstr ""
 
 #: wavira/inc/admin-panel.php:189
@@ -714,6 +736,22 @@ msgstr ""
 #: wavira/patterns/hidden-no-results.php:20
 msgctxt "message shown when a query returns no posts"
 msgid "Nothing published here yet."
+msgstr ""
+
+#: wavira/inc/hooks.php:277
+msgid "Monthly"
+msgstr ""
+
+#: wavira/inc/hooks.php:194
+msgid "Music video"
+msgstr ""
+
+#: wavira/inc/hooks.php:252
+msgid "Next slide"
+msgstr ""
+
+#: wavira/inc/hooks.php:149
+msgid "Next track"
 msgstr ""
 
 #: wavira/inc/admin-panel.php:494
@@ -770,7 +808,7 @@ msgstr ""
 msgid "Open %s"
 msgstr ""
 
-#: wavira/inc/options.php:360
+#: wavira/inc/options.php:374
 msgid "Open social links in a new tab"
 msgstr ""
 
@@ -795,7 +833,7 @@ msgid "Persian setup"
 msgstr ""
 
 #: wavira/inc/artists.php:143
-#: wavira/inc/assets.php:67
+#: wavira/inc/assets.php:69
 msgid "Photo"
 msgstr ""
 
@@ -809,6 +847,14 @@ msgstr ""
 
 #: wavira/inc/blocks.php:68
 msgid "Photos attached to this post: artist, release or video."
+msgstr ""
+
+#: wavira/inc/hooks.php:240
+msgid "Play album"
+msgstr ""
+
+#: wavira/inc/hooks.php:238
+msgid "Play now"
 msgstr ""
 
 #: wavira/inc/cards.php:114
@@ -825,11 +871,19 @@ msgstr ""
 msgid "Player for an album, artist or genre queue."
 msgstr ""
 
-#: wavira/inc/options.php:301
+#: wavira/inc/options.php:315
 msgid "Preload the bundled font"
 msgstr ""
 
-#: wavira/inc/options.php:968
+#: wavira/inc/hooks.php:251
+msgid "Previous slide"
+msgstr ""
+
+#: wavira/inc/hooks.php:142
+msgid "Previous track"
+msgstr ""
+
+#: wavira/inc/options.php:982
 msgid "Primary menu"
 msgstr ""
 
@@ -849,8 +903,8 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: wavira/inc/markup.php:578
-#: wavira/inc/markup.php:580
+#: wavira/inc/markup.php:592
+#: wavira/inc/markup.php:594
 msgid "Search"
 msgstr ""
 
@@ -858,7 +912,7 @@ msgstr ""
 msgid "Search button in the header"
 msgstr ""
 
-#: wavira/inc/markup.php:579
+#: wavira/inc/markup.php:593
 msgid "Search music…"
 msgstr ""
 
@@ -906,7 +960,7 @@ msgctxt "section heading on the home template"
 msgid "Music videos"
 msgstr ""
 
-#: wavira/inc/options.php:291
+#: wavira/inc/options.php:305
 msgid "Semi bold (600)"
 msgstr ""
 
@@ -914,7 +968,7 @@ msgstr ""
 msgid "Settings saved."
 msgstr ""
 
-#: wavira/inc/options.php:197
+#: wavira/inc/options.php:211
 msgid "Shadow on cards and covers"
 msgstr ""
 
@@ -942,7 +996,7 @@ msgstr ""
 msgid "Site language, timezone, week start and date format were set to the Iranian defaults."
 msgstr ""
 
-#: wavira/inc/options.php:212
+#: wavira/inc/options.php:226
 msgid "Smallest card width (rem)"
 msgstr ""
 
@@ -958,12 +1012,12 @@ msgstr ""
 msgid "Sticky header"
 msgstr ""
 
-#: wavira/inc/options.php:256
+#: wavira/inc/options.php:270
 msgid "System fonts (no font file)"
 msgstr ""
 
-#: wavira/inc/options.php:317
-#: wavira/inc/options.php:655
+#: wavira/inc/options.php:331
+#: wavira/inc/options.php:669
 msgid "Telegram"
 msgstr ""
 
@@ -1059,6 +1113,26 @@ msgstr ""
 msgid "Tools → Wavira demo content"
 msgstr ""
 
+#: wavira/inc/hooks.php:290
+msgid "Top artists"
+msgstr ""
+
+#: wavira/inc/options.php:151
+msgid "Top artists ranking section on the front page"
+msgstr ""
+
+#: wavira/inc/hooks.php:291
+msgid "Top artists time range"
+msgstr ""
+
+#: wavira/inc/hooks.php:192
+msgid "Track"
+msgstr ""
+
+#: wavira/inc/hooks.php:138
+msgid "Track navigation"
+msgstr ""
+
 #: wavira/inc/admin-panel.php:705
 msgid "Use this image"
 msgstr ""
@@ -1071,7 +1145,7 @@ msgstr ""
 msgid "Used for buttons, links and highlights. Each mode has one colour field, so dark mode is not forgotten: check the contrast against both backgrounds."
 msgstr ""
 
-#: wavira/inc/options.php:255
+#: wavira/inc/options.php:269
 msgid "Vazirmatn (bundled, recommended for Persian)"
 msgstr ""
 
@@ -1095,7 +1169,15 @@ msgstr ""
 msgid "View all"
 msgstr ""
 
-#: wavira/inc/markup.php:223
+#: wavira/inc/hooks.php:243
+msgid "View details"
+msgstr ""
+
+#: wavira/inc/hooks.php:91
+msgid "Views:"
+msgstr ""
+
+#: wavira/inc/markup.php:237
 msgid "Watch the video"
 msgstr ""
 
@@ -1132,9 +1214,17 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira/inc/options.php:331
-#: wavira/inc/options.php:663
+#: wavira/inc/hooks.php:276
+msgid "Weekly"
+msgstr ""
+
+#: wavira/inc/options.php:345
+#: wavira/inc/options.php:677
 msgid "X (Twitter)"
+msgstr ""
+
+#: wavira/inc/hooks.php:278
+msgid "Yearly"
 msgstr ""
 
 #: wavira/inc/site-defaults.php:131
@@ -1150,7 +1240,7 @@ msgstr ""
 msgid "You are not allowed to change this."
 msgstr ""
 
-#: wavira/inc/options.php:324
-#: wavira/inc/options.php:659
+#: wavira/inc/options.php:338
+#: wavira/inc/options.php:673
 msgid "YouTube"
 msgstr ""

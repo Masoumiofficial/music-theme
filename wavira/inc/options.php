@@ -129,12 +129,26 @@ function wavira_options_schema(): array {
 			'section' => 'header',
 			'label'   => __( 'Announcement link', 'wavira' ),
 		),
-		'player_bar'        => array(
+		'player_bar'          => array(
 			'default' => true,
 			'type'    => 'bool',
 			'control' => 'checkbox',
 			'section' => 'header',
 			'label'   => __( 'Player bar on every page', 'wavira' ),
+		),
+		'hero_slider'         => array(
+			'default' => true,
+			'type'    => 'bool',
+			'control' => 'checkbox',
+			'section' => 'header',
+			'label'   => __( 'Featured content slider in the front-page banner', 'wavira' ),
+		),
+		'top_artists_section' => array(
+			'default' => true,
+			'type'    => 'bool',
+			'control' => 'checkbox',
+			'section' => 'appearance',
+			'label'   => __( 'Top artists ranking section on the front page', 'wavira' ),
 		),
 
 		// -------------------------------------------------------------- appearance.

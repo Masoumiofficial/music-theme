@@ -216,4 +216,56 @@ class Test_Downloads extends Wavira_Test_Case {
 
 		$this->assertSame( array( array( $track_id, 128, 1 ) ), $seen );
 	}
+
+	/**
+	 * Video 4K (2160p) downloads, engagement counters and Top Artists rankings work end to end.
+	 *
+	 * @return void
+	 */
+	public function test_video_2160p_and_engagement_stats_and_top_artists() {
+		$artist_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_artist',
+				'post_status' => 'publish',
+				'post_title'  => 'Ranked Artist',
+			)
+		);
+
+		$video_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_video',
+				'post_status' => 'publish',
+				'post_title'  => '4K Music Video',
+			)
+		);
+
+		update_post_meta( $video_id, MetaSchema::ARTIST, $artist_id );
+		update_post_meta( $video_id, MetaSchema::VIDEO_2160, 'https://example.com/video-2160.mp4' );
+		update_post_meta( $video_id, MetaSchema::VIDEO_1080, 'https://example.com/video-1080.mp4' );
+
+		$qualities = wavira_core_download_qualities( $video_id );
+		$this->assertSame( array( 2160, 1080 ), array_column( $qualities, 'quality' ) );
+
+		update_post_meta( $video_id, MetaSchema::VIEWS_OFFSET, 500 );
+		update_post_meta( $video_id, MetaSchema::LIKES_OFFSET, 40 );
+
+		$view_res = $this->dispatch( '/wavira/v1/stats/' . $video_id . '/view', array( 'token' => 'force' ), 'POST' );
+		$this->assertSame( 200, $view_res->get_status() );
+		$this->assertSame( 501, $view_res->get_data()['views'] );
+		$this->assertSame( 1, $view_res->get_data()['recorded_views'] );
+
+		$like_res = $this->dispatch( '/wavira/v1/stats/' . $video_id . '/like', array( 'token' => 'guest-a' ), 'POST' );
+		$this->assertSame( 200, $like_res->get_status() );
+		$this->assertTrue( $like_res->get_data()['liked'] );
+		$this->assertSame( 41, $like_res->get_data()['likes'] );
+
+		$unlike_res = $this->dispatch( '/wavira/v1/stats/' . $video_id . '/like', array( 'token' => 'guest-a' ), 'POST' );
+		$this->assertFalse( $unlike_res->get_data()['liked'] );
+		$this->assertSame( 40, $unlike_res->get_data()['likes'] );
+
+		$top_res = $this->dispatch( '/wavira/v1/artists/top', array( 'period' => 'week', 'limit' => 5 ) );
+		$this->assertSame( 200, $top_res->get_status() );
+		$this->assertGreaterThanOrEqual( 1, $top_res->get_data()['count'] );
+		$this->assertSame( $artist_id, $top_res->get_data()['items'][0]['id'] );
+	}
 }

@@ -33,7 +33,7 @@ abstract class Wavira_Test_Case extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Dispatch one GET request against the product API.
+	 * Dispatch one request against the product API.
 	 *
 	 * Parameters are set on the request object. A query string appended to the
 	 * route string is not parsed by `WP_REST_Request`, so the route itself would
@@ -41,10 +41,11 @@ abstract class Wavira_Test_Case extends WP_UnitTestCase {
 	 *
 	 * @param string               $route  Route path.
 	 * @param array<string, mixed> $params Query parameters.
+	 * @param string               $method HTTP method (`GET`, `POST`, etc.).
 	 * @return WP_REST_Response|WP_HTTP_Response
 	 */
-	protected function dispatch( string $route, array $params = array() ) {
-		$request = new WP_REST_Request( 'GET', $route );
+	protected function dispatch( string $route, array $params = array(), string $method = 'GET' ) {
+		$request = new WP_REST_Request( $method, $route );
 
 		foreach ( $params as $key => $value ) {
 			$request->set_param( $key, $value );

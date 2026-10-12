@@ -612,6 +612,119 @@
 	}
 
 	/**
+	 * Wire likes, podcast chapter seeking, Top Artists tabs and the Hero slider.
+	 *
+	 * @param {Object} doc Document.
+	 * @return {void}
+	 */
+	function initInteractiveSurfaces( doc ) {
+		if ( ! doc || 'function' !== typeof doc.addEventListener ) {
+			return;
+		}
+
+		doc.addEventListener( 'click', function ( event ) {
+			var target = event.target;
+
+			if ( ! target || 'function' !== typeof target.closest ) {
+				return;
+			}
+
+			var likeBtn = target.closest( '[data-wavira-like]' );
+
+			if ( likeBtn ) {
+				event.preventDefault();
+				var postId = parseInt( likeBtn.getAttribute( 'data-wavira-like' ), 10 );
+				var cfg = global.waviraThemeSettings || {};
+
+				if ( postId > 0 && cfg.restUrl && 'function' === typeof global.fetch ) {
+					var headers = { 'Content-Type': 'application/json' };
+					if ( cfg.nonce ) {
+						headers[ 'X-WP-Nonce' ] = cfg.nonce;
+					}
+					global.fetch( cfg.restUrl + 'stats/' + postId + '/like', {
+						method: 'POST',
+						headers: headers,
+						credentials: 'same-origin'
+					} ).then( function ( res ) {
+						return res.json();
+					} ).then( function ( data ) {
+						if ( data && 'boolean' === typeof data.liked ) {
+							likeBtn.classList.toggle( 'is-liked', data.liked );
+							likeBtn.setAttribute( 'aria-pressed', data.liked ? 'true' : 'false' );
+							var countNode = likeBtn.querySelector( '[data-wavira-like-count]' );
+							if ( countNode && data.likes_label ) {
+								countNode.textContent = data.likes_label;
+							}
+						}
+					} ).catch( function () {} );
+				}
+				return;
+			}
+
+			var seekBtn = target.closest( '[data-wavira-seek]' );
+
+			if ( seekBtn ) {
+				event.preventDefault();
+				var sec = parseInt( seekBtn.getAttribute( 'data-wavira-seek' ), 10 );
+				var audio = doc.querySelector( 'audio' );
+				if ( audio && ! isNaN( sec ) ) {
+					try {
+						audio.currentTime = sec;
+						audio.play();
+					} catch ( err ) {}
+				}
+				return;
+			}
+
+			var tabBtn = target.closest( '[data-wavira-period-tab]' );
+
+			if ( tabBtn ) {
+				event.preventDefault();
+				var period = tabBtn.getAttribute( 'data-wavira-period-tab' );
+				var section = tabBtn.closest( '[data-wavira-top-artists]' );
+
+				if ( section && period ) {
+					Array.prototype.forEach.call( section.querySelectorAll( '[data-wavira-period-tab]' ), function ( btn ) {
+						var active = btn.getAttribute( 'data-wavira-period-tab' ) === period;
+						btn.classList.toggle( 'is-active', active );
+						btn.setAttribute( 'aria-selected', active ? 'true' : 'false' );
+					} );
+					Array.prototype.forEach.call( section.querySelectorAll( '[data-wavira-period-panel]' ), function ( panel ) {
+						panel.hidden = panel.getAttribute( 'data-wavira-period-panel' ) !== period;
+					} );
+				}
+				return;
+			}
+
+			var sliderBtn = target.closest( '[data-wavira-slider-prev], [data-wavira-slider-next]' );
+
+			if ( sliderBtn ) {
+				event.preventDefault();
+				var slider = sliderBtn.closest( '[data-wavira-slider]' );
+				if ( ! slider ) {
+					return;
+				}
+				var slides = slider.querySelectorAll( '[data-wavira-slide]' );
+				if ( slides.length < 2 ) {
+					return;
+				}
+				var current = 0;
+				for ( var i = 0; i < slides.length; i++ ) {
+					if ( slides[ i ].classList.contains( 'is-active' ) ) {
+						current = i;
+						break;
+					}
+				}
+				var step = sliderBtn.hasAttribute( 'data-wavira-slider-prev' ) ? -1 : 1;
+				var nextIdx = ( current + step + slides.length ) % slides.length;
+				for ( var j = 0; j < slides.length; j++ ) {
+					slides[ j ].classList.toggle( 'is-active', j === nextIdx );
+				}
+			}
+		} );
+	}
+
+	/**
 	 * Start everything that needs a document.
 	 *
 	 * @param {Object} doc     Document.
@@ -628,6 +741,7 @@
 		initCardPlayback( doc );
 		initBackToTop( doc );
 		initLightbox( doc );
+		initInteractiveSurfaces( doc );
 
 		return controller;
 	}
