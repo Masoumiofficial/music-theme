@@ -1,0 +1,22 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "Wavira — Persian music preview",
+		"author": "Wavira",
+		"description": "The Wavira theme and the Wavira Core plugin, mounted from the working tree, with the Persian demo imported."
+	},
+	"steps": [
+		{
+			"step": "activatePlugin",
+			"pluginPath": "wavira-core/wavira-core.php"
+		},
+		{
+			"step": "activateTheme",
+			"themeFolderName": "wavira"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; update_option( 'WPLANG', 'fa_IR' ); switch_to_locale( 'fa_IR' ); load_textdomain( 'wavira-core', WP_PLUGIN_DIR . '/wavira-core/languages/fa_IR.mo' ); load_textdomain( 'wavira', get_template_directory() . '/languages/fa_IR.mo' ); $res = \\Wavira\\Core\\Demo\\Installer::install( array( 'site' => true ) ); global $wp_rewrite; $wp_rewrite->set_permalink_structure( '/%postname%/' ); $wp_rewrite->init(); $wp_rewrite->flush_rules( true ); echo 'SEEDED: ' . wp_json_encode( $res['tracks'] ) . ' tracks, ' . wp_json_encode( $res['releases'] ) . ' releases, ' . wp_json_encode( $res['media'] ) . ' files';"
+		}
+	]
+}

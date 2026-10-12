@@ -83,7 +83,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   with no albums prints the no-results pattern instead of an empty grid
   (`wavira/templates/page.html`).
 
+- **The download panel is a panel now.** The `list` shape of `wavira/download` — the one
+  the track, album and video templates use — was a line of underlined links, which made
+  the one deliberate action on the page read like an aside. It is a row of glass cards
+  instead: one per quality, each with the quality («۳۲۰ کیلوبیت‌برثانیه»), the file size
+  when the block asks for it, and a download icon next to «دانلود». It renders with
+  **one** quality too, instead of falling through to the button: the shape is the
+  template's decision, and a release whose only file is 128 kbps deserves the same card
+  as a release with two. Each card carries a name built from the release and the quality
+  («دانلود باران بهاری — ۳۲۰ کیلوبیت‌برثانیه») — a screen reader's link list used to show
+  two entries both called «دانلود» with nothing to tell them apart — and the visible word
+  still leads that name, so a voice-control visitor can say it and reach the card they
+  meant (WCAG 2.5.3) (`wavira/inc/downloads.php`, `wavira/assets/css/components.css`,
+  `wavira/templates/single-wavira_video.html`).
+
 ### Fixed — 0.15.0
+
+- **A Persian site was read left to right.** WordPress takes the text direction from the
+  *language pack*, not from the language code: a site set to `fa_IR` without WordPress's
+  own Persian translation printed `<html lang="fa-IR">` with no `dir`. Every Persian line
+  on every page was laid out right to left in reading order and left to right on screen —
+  and the theme looked translated while it happened. It was invisible from inside the
+  theme, because a sandbox with the language pack installed sets the attribute for you.
+  `wavira_language_attributes()` now states the direction itself for the locales the
+  theme knows are right-to-left (`wavira_rtl_locales()`, filterable), adds the attribute
+  only when WordPress did not, and never touches wp-admin — where the interface language
+  is the administrator's business, not the theme's. `tools/check-persian.mjs` fails a
+  Persian page whose `<html>` is not right-to-left, so the defect cannot come back
+  unnoticed (`wavira/inc/site-defaults.php`, `tests/test-theme-options.php`,
+  `tests/js/check-persian.test.mjs`).
 
 - **An article ends by offering the next one.** A news post showed its title,
   its cover and its text, and nothing else: no date beside a category, no way
