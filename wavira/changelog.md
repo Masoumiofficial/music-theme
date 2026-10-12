@@ -3,7 +3,7 @@
 All notable changes to the theme are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.17.0] — 2026-10-12
 
 ### Added
 
@@ -33,8 +33,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Unchanged
 
-- `front-page.html` and the seeded home content are untouched. Version stays at
-  0.16.0 until a release is cut.
+- `front-page.html` and the seeded home content are untouched.
 
 ## [0.16.0] — 2026-10-12
 
