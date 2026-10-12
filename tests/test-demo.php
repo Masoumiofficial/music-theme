@@ -143,6 +143,17 @@ class Test_Demo extends Wavira_Test_Case {
 		$this->assertContains( 'music', $kinds );
 
 		$this->assertSame( 'other', (string) get_post_meta( (int) $report['video'], MetaSchema::VIDEO_SOURCE, true ), 'the demo video does not pretend to be a file it does not have' );
+
+		$this->assertSame( 3, count( $report['news'] ), 'an «اخبار» page with no posts is an empty section' );
+
+		foreach ( $report['news'] as $article ) {
+			$this->assertSame( 'post', get_post_type( (int) $article ), 'news is ordinary posts' );
+			$this->assertSame( 'publish', get_post_status( (int) $article ) );
+			$this->assertNotSame( '', (string) get_post_field( 'post_excerpt', (int) $article ), 'the news card prints an excerpt' );
+			$this->assertNotSame( array(), wp_get_post_terms( (int) $article, 'category', array( 'fields' => 'slugs' ) ), 'a demo news post has a category' );
+		}
+
+		$this->assertSame( '1', (string) get_post_meta( (int) $report['news'][0], Installer::MARKER, true ), 'the importer can replace what it wrote' );
 	}
 
 	/**

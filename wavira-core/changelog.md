@@ -47,6 +47,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   rather than from a slug, so it survives a rename and is left out entirely when
   the site has no such page (`Demo\Fixtures`, `Installer::create_primary_menu()`).
 
+- **The demo ships news.** The catalogue had an artist, two releases, five tracks
+  and a video — and the «اخبار» page, the front page's news section and the menu
+  item that leads to them listed nothing but the sample post WordPress installs.
+  A buyer's first look at the product had an empty section where the product
+  promises a working one. `Fixtures::persian()` now carries three Persian news
+  posts in two categories (تازه‌ها، گزارش), each with an excerpt, a date and a
+  generated image, and `Fixtures::english()` the same three in the neutral
+  fixture. They are ordinary posts — because that is what news is — carrying the
+  same marker as the music, so a forced import replaces them and still leaves the
+  posts the owner wrote alone. `Exporter::demo_types()` lists `post` too, so the
+  WXR path can carry the news out of a site as well as into one
+  (`Demo\Fixtures`, `Demo\Installer`, `Demo\Placeholders`, `Demo\Exporter`).
+
 ### Fixed — 0.15.0
 
 - **The demo menu's Home link is a path, not an absolute URL.** It was the one

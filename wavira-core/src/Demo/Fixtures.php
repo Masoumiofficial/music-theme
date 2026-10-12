@@ -119,6 +119,33 @@ final class Fixtures {
 				'title' => 'اجرای زندهٔ نمایشی',
 				'date'  => '2026-02-01',
 			),
+			// The news is ordinary posts, because that is what news is: a demo
+			// whose «اخبار» page lists nothing but the sample post WordPress
+			// installs has an empty section where the product promises a working
+			// one. Fictional, like the rest of the catalogue (ADR 0010).
+			'news'     => array(
+				array(
+					'title'    => 'آلبوم «شب‌های تهران» منتشر شد',
+					'excerpt'  => 'چهار قطعهٔ تازه با صدای آرمان راد، از امروز برای شنیدن و دانلود در دسترس است.',
+					'content'  => "آلبوم «شب‌های تهران» با چهار قطعه منتشر شد: «راه بارانی»، «سکوت»، «پرواز» و یک نسخهٔ ریمیکس از قطعهٔ نخست.\n\nضبط این آلبوم از پاییز در یک استودیوی کوچک در تهران آغاز شد و هر قطعه در چند برداشت پی‌درپی کامل شده است.\n\nاین متن نمایشی است؛ آن را با خبر واقعی خودتان جایگزین کنید.",
+					'date'     => '2025-12-20',
+					'category' => 'تازه‌ها',
+				),
+				array(
+					'title'    => 'پشت صحنهٔ ضبط «پرواز»',
+					'excerpt'  => 'گفت‌وگویی کوتاه دربارهٔ ساخت قطعه‌ای که بیش از دو ماه زمان برد.',
+					'content'  => "«پرواز» از یک زمزمهٔ ساده شروع شد: دو واژه روی یک نت، که بعدتر به بخش اصلی ترانه تبدیل شد.\n\nدر این گزارش کوتاه از انتخاب سازها، از برداشت‌هایی که کنار گذاشته شد و از روزی می‌خوانید که گروه تصمیم گرفت قطعه را دوباره از اول ضبط کند.\n\nاین متن نمایشی است؛ آن را با گزارش واقعی خودتان جایگزین کنید.",
+					'date'     => '2026-01-05',
+					'category' => 'گزارش',
+				),
+				array(
+					'title'    => 'برنامهٔ اجراهای زمستان',
+					'excerpt'  => 'سه اجرای زنده در تهران و یک اجرا در اصفهان؛ برنامهٔ کامل در این خبر.',
+					'content'  => "اجراهای زمستان اعلام شد: سه شب در تهران و یک شب در اصفهان، با همان گروهی که آلبوم را ضبط کرده است.\n\nترتیب قطعه‌ها در هر شب متفاوت خواهد بود و برنامهٔ هر شب یک هفته پیش از اجرا منتشر می‌شود.\n\nاین متن نمایشی است؛ آن را با خبر واقعی خودتان جایگزین کنید.",
+					'date'     => '2026-02-10',
+					'category' => 'تازه‌ها',
+				),
+			),
 			'site'     => array(
 				'locale'      => 'fa_IR',
 				'timezone'    => 'Asia/Tehran',
@@ -209,6 +236,22 @@ final class Fixtures {
 			);
 		}
 
+		$news = array();
+
+		for ( $index = 1; $index <= 3; $index++ ) {
+			$news[] = array(
+				'title'    => sprintf(
+					/* translators: %d: demo news post number. */
+					__( 'Demo News %d', 'wavira-core' ),
+					$index
+				),
+				'excerpt'  => __( 'Generated demo excerpt — replace this text.', 'wavira-core' ),
+				'content'  => __( 'Generated demo news post. Replace with real content.', 'wavira-core' ),
+				'date'     => '2026-01-1' . $index,
+				'category' => __( 'Demo News', 'wavira-core' ),
+			);
+		}
+
 		return array(
 			'artist'   => array(
 				'title'   => __( 'Demo Artist', 'wavira-core' ),
@@ -229,6 +272,7 @@ final class Fixtures {
 				'title' => __( 'Demo Music Video', 'wavira-core' ),
 				'date'  => '2026-01-15',
 			),
+			'news'     => $news,
 			'site'     => array(
 				'locale'      => 'en_US',
 				'timezone'    => 'UTC',

@@ -631,6 +631,26 @@ msgctxt "track duration"
 msgid "%1$s:%2$s"
 msgstr "%1$s:%2$s"
 
+#: wavira-core/src/Demo/Fixtures.php:251
+msgid "Demo News"
+msgstr "اخبار نمونه"
+
+#: wavira-core/src/Demo/Fixtures.php:245
+msgid "Demo News %d"
+msgstr "خبر نمونهٔ %d"
+
+#: wavira-core/src/Demo/Installer.php:229
+msgid "Demo news image"
+msgstr "تصویر نمونهٔ خبر"
+
+#: wavira-core/src/Demo/Fixtures.php:248
+msgid "Generated demo excerpt — replace this text."
+msgstr "خلاصهٔ نمایشی — این متن را جایگزین کنید."
+
+#: wavira-core/src/Demo/Fixtures.php:249
+msgid "Generated demo news post. Replace with real content."
+msgstr "خبر نمایشی. آن را با محتوای واقعی جایگزین کنید."
+
 #: wavira-core/src/Rest/PlayerController.php:53
 msgid "Track post ID."
 msgstr "شناسهٔ نوشتهٔ قطعه."

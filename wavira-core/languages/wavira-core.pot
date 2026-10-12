@@ -39,7 +39,7 @@ msgstr ""
 msgid "A genre queue needs a genre slug."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:579
+#: wavira-core/src/Demo/Installer.php:614
 msgid "About the site"
 msgstr ""
 
@@ -113,19 +113,19 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:220
+#: wavira-core/src/Demo/Fixtures.php:263
 msgid "Demo Album"
 msgstr ""
 
-#: wavira-core/src/Demo/Placeholders.php:181
+#: wavira-core/src/Demo/Placeholders.php:188
 msgid "Demo album audio"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:214
+#: wavira-core/src/Demo/Fixtures.php:257
 msgid "Demo Artist"
 msgstr ""
 
-#: wavira-core/src/Demo/Placeholders.php:128
+#: wavira-core/src/Demo/Placeholders.php:135
 msgid "Demo audio file"
 msgstr ""
 
@@ -136,29 +136,41 @@ msgid_plural "Demo content imported: %1$d releases, %2$d tracks and %3$d generat
 msgstr[0] ""
 msgstr[1] ""
 
-#: wavira-core/src/Demo/Placeholders.php:56
-#: wavira-core/src/Demo/Placeholders.php:62
+#: wavira-core/src/Demo/Placeholders.php:61
 msgid "Demo cover art"
 msgstr ""
 
-#: wavira-core/src/Demo/Placeholders.php:87
+#: wavira-core/src/Demo/Placeholders.php:94
 msgid "Demo gallery photo"
 msgstr ""
 
-#: wavira-core/src/Demo/Placeholders.php:97
+#: wavira-core/src/Demo/Placeholders.php:104
 #. translators: %d: photo number in the demo gallery.
 msgid "Demo gallery photo %d"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:193
+#: wavira-core/src/Demo/Fixtures.php:220
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:229
+#: wavira-core/src/Demo/Fixtures.php:272
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:200
+#: wavira-core/src/Demo/Fixtures.php:251
+msgid "Demo News"
+msgstr ""
+
+#: wavira-core/src/Demo/Fixtures.php:245
+#. translators: %d: demo news post number.
+msgid "Demo News %d"
+msgstr ""
+
+#: wavira-core/src/Demo/Installer.php:232
+msgid "Demo news image"
+msgstr ""
+
+#: wavira-core/src/Demo/Fixtures.php:227
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -209,12 +221,22 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:215
+#: wavira-core/src/Demo/Fixtures.php:258
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:192
+#: wavira-core/src/Demo/Fixtures.php:248
+#. translators: %d: demo news post number.
+msgid "Generated demo excerpt — replace this text."
+msgstr ""
+
+#: wavira-core/src/Demo/Fixtures.php:219
 msgid "Generated demo lyrics — replace this text."
+msgstr ""
+
+#: wavira-core/src/Demo/Fixtures.php:249
+#. translators: %d: demo news post number.
+msgid "Generated demo news post. Replace with real content."
 msgstr ""
 
 #: wavira-core/src/Content/Taxonomies.php:202
@@ -233,7 +255,7 @@ msgstr ""
 msgid "Global social profile URLs"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:480
+#: wavira-core/src/Demo/Installer.php:508
 msgid "Home"
 msgstr ""
 
@@ -357,7 +379,7 @@ msgstr ""
 msgid "New %s name"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:483
+#: wavira-core/src/Demo/Installer.php:511
 msgid "News"
 msgstr ""
 
@@ -543,7 +565,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:439
+#: wavira-core/src/Demo/Installer.php:467
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 
@@ -578,7 +600,7 @@ msgstr ""
 msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:496
+#: wavira-core/src/Demo/Installer.php:524
 msgid "The news have a page of their own: the front page is static now, and the posts are listed at their own address."
 msgstr ""
 
@@ -591,11 +613,11 @@ msgstr ""
 msgid "There is nothing to play here."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:580
+#: wavira-core/src/Demo/Installer.php:615
 msgid "This is a sample page. Write what your visitors should know about the music, the artists and how to reach you."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:575
+#: wavira-core/src/Demo/Installer.php:604
 msgid "This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here."
 msgstr ""
 
@@ -631,7 +653,7 @@ msgstr ""
 msgid "Tracks"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:87
+#: wavira-core/src/Demo/Installer.php:88
 msgid "Tracks already exist — nothing was imported. Use force to import anyway."
 msgstr ""
 
@@ -639,7 +661,7 @@ msgstr ""
 msgid "Tracks per archive page"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:556
+#: wavira-core/src/Demo/Installer.php:584
 msgid "Uncategorized"
 msgstr ""
 
@@ -694,7 +716,7 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:574
+#: wavira-core/src/Demo/Installer.php:603
 msgid "Welcome to the music site"
 msgstr ""
 
@@ -702,7 +724,7 @@ msgstr ""
 msgid "What the queue is built from."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:449
+#: wavira-core/src/Demo/Installer.php:477
 #. translators: %d: number of sample posts and pages.
 msgid "WordPress’s sample content (%d item(s)) now reads in the site’s language."
 msgstr ""

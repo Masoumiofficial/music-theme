@@ -212,6 +212,6 @@ final class Exporter {
 	 * @return string[]
 	 */
 	public static function demo_types(): array {
-		return array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO );
+		return array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO, 'post' );
 	}
 }

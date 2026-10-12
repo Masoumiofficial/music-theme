@@ -76,6 +76,7 @@ final class Installer {
 			'releases' => array(),
 			'tracks'   => array(),
 			'video'    => 0,
+			'news'     => array(),
 			'menu'     => 0,
 			'replaced' => 0,
 			'media'    => 0,
@@ -210,9 +211,29 @@ final class Installer {
 
 		// The video has a poster so the section is not an empty box; there is no
 		// video *file*, and the block says so plainly instead of pointing at a
-		// file that is not there (see docs/DEMO-CONTENT.md).
+		// file that is not there (see docs/adr/0024-generated-demo-media.md).
 		if ( Placeholders::cover( $report['video'], self::palette( 3 ), (string) $demo['video']['title'], 960 ) > 0 ) {
 			++$report['media'];
+		}
+
+		// The news is ordinary posts, because that is what news is. They carry
+		// the same marker as the music, so a forced import replaces them and
+		// still leaves the posts the owner wrote alone — an «اخبار» page that
+		// lists nothing but the sample post WordPress installs is an empty
+		// section where the product promises a working one.
+		foreach ( $demo['news'] as $index => $article ) {
+			$post_id = self::insert_demo_post( 'post', $article );
+
+			// Not appended: WordPress puts a new post in the site's default
+			// category, and a news card that reads «دسته‌بندی‌نشده» next to
+			// «تازه‌ها» says the demo was never finished.
+			self::attach_term( $post_id, 'category', (string) $article['category'], false );
+
+			if ( Placeholders::cover( $post_id, self::palette( 5 + $index ), (string) $article['title'], 800, __( 'Demo news image', 'wavira-core' ) ) > 0 ) {
+				++$report['media'];
+			}
+
+			$report['news'][] = $post_id;
 		}
 
 		if ( ! $english && $site ) {
@@ -285,6 +306,7 @@ final class Installer {
 				'post_type'    => $post_type,
 				'post_title'   => (string) ( $data['title'] ?? '' ),
 				'post_content' => (string) ( $data['content'] ?? '' ),
+				'post_excerpt' => (string) ( $data['excerpt'] ?? '' ),
 				'post_status'  => 'publish',
 				'post_date'    => (string) ( $data['date'] ?? '' ),
 				'menu_order'   => (int) ( $data['menu_order'] ?? 0 ),
@@ -317,7 +339,7 @@ final class Installer {
 	 */
 	private static function remove_previous( string $fixture ): int {
 		$deleted = 0;
-		$types   = array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO );
+		$types   = array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO, 'post' );
 
 		// The generated attachments go first, and separately: a forced import
 		// that deleted its titles and left twenty-three files in the uploads
@@ -367,9 +389,15 @@ final class Installer {
 	 * @param int    $post_id  Post ID.
 	 * @param string $taxonomy Taxonomy name.
 	 * @param string $name     Term name.
+	 * @param bool   $append   Add the term to the post's terms (default) or make
+	 *                         it the only one. A new post is already in the
+	 *                         site's default category, so a demo news post
+	 *                         replaces it rather than joining it — otherwise
+	 *                         every card reads «دسته‌بندی‌نشده» beside its own
+	 *                         category.
 	 * @return void
 	 */
-	private static function attach_term( int $post_id, string $taxonomy, string $name ): void {
+	private static function attach_term( int $post_id, string $taxonomy, string $name, bool $append = true ): void {
 		if ( '' === $name || ! taxonomy_exists( $taxonomy ) ) {
 			return;
 		}
@@ -384,7 +412,7 @@ final class Installer {
 			return;
 		}
 
-		wp_set_object_terms( $post_id, array( (int) $term['term_id'] ), $taxonomy, true );
+		wp_set_object_terms( $post_id, array( (int) $term['term_id'] ), $taxonomy, $append );
 	}
 
 	/**
@@ -569,48 +597,73 @@ final class Installer {
 		}
 
 		$samples = array(
-			'hello-world' => array(
+			array(
+				'slug'    => 'hello-world',
 				'type'    => 'post',
 				'title'   => __( 'Welcome to the music site', 'wavira-core' ),
 				'content' => __( 'This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here.', 'wavira-core' ),
+				// Core dates it at install time, which makes it the newest post
+				// on the site and puts a placeholder at the head of the news
+				// section, above the demo's own news. Dated behind the
+				// catalogue, it still teaches what it has to teach.
+				'date'    => '2025-10-15',
 			),
-			'sample-page' => array(
+			array(
+				'slug'    => 'sample-page',
 				'type'    => 'page',
 				'title'   => __( 'About the site', 'wavira-core' ),
 				'content' => __( 'This is a sample page. Write what your visitors should know about the music, the artists and how to reach you.', 'wavira-core' ),
 			),
 		);
 
-		foreach ( $samples as $slug => $sample ) {
-			// A direct `post_name` lookup rather than `get_page_by_path()`: the
-			// helper is built for hierarchical post types, and the sample post is
-			// not one.
-			$found = get_posts(
-				array(
-					'post_type'        => (string) $sample['type'],
-					'name'             => $slug,
-					'posts_per_page'   => 1,
-					'post_status'      => array( 'publish', 'draft', 'pending', 'private' ),
-					'suppress_filters' => true,
-				)
-			);
+		foreach ( $samples as $sample ) {
+			$title = (string) $sample['title'];
 
-			$post = $found ? $found[0] : null;
+			// Core's slug, then the one this function writes when it translates
+			// the post: a second import has to be able to find its own work, or
+			// the sample content is translated once and never touched again —
+			// and the date above is never applied at all.
+			$slugs = array_unique( array( (string) $sample['slug'], sanitize_title( $title ) ) );
+			$post  = null;
+
+			foreach ( $slugs as $slug ) {
+				// A direct `post_name` lookup rather than `get_page_by_path()`:
+				// the helper is built for hierarchical post types, and the
+				// sample post is not one.
+				$found = get_posts(
+					array(
+						'post_type'        => (string) $sample['type'],
+						'name'             => $slug,
+						'posts_per_page'   => 1,
+						'post_status'      => array( 'publish', 'draft', 'pending', 'private' ),
+						'suppress_filters' => true,
+					)
+				);
+
+				if ( isset( $found[0] ) && $found[0] instanceof WP_Post ) {
+					$post = $found[0];
+					break;
+				}
+			}
 
 			if ( ! $post instanceof WP_Post ) {
 				continue;
 			}
 
-			$title = (string) $sample['title'];
-
-			wp_update_post(
-				array(
-					'ID'           => (int) $post->ID,
-					'post_title'   => $title,
-					'post_content' => (string) $sample['content'],
-					'post_name'    => sanitize_title( $title ),
-				)
+			$update = array(
+				'ID'           => (int) $post->ID,
+				'post_title'   => $title,
+				'post_content' => (string) $sample['content'],
+				'post_name'    => sanitize_title( $title ),
 			);
+
+			// Only the sample post carries a date: a post that predates the
+			// demo belongs behind it, and the sample page has no order to keep.
+			if ( '' !== (string) ( $sample['date'] ?? '' ) ) {
+				$update['post_date'] = (string) $sample['date'];
+			}
+
+			wp_update_post( $update );
 			++$changed;
 		}
 

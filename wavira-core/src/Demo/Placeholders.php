@@ -43,23 +43,30 @@ final class Placeholders {
 	 * @param array  $palette Two RGB triples: start and end colour.
 	 * @param string $seed    Text used to vary the pattern between covers.
 	 * @param int    $size    Square edge in pixels.
+	 * @param string $alt     Alternative text for the image. Empty means the
+	 *                        caller has nothing better to say and the default
+	 *                        «تصویر جلد نمونه» is used.
 	 * @return int Attachment ID, 0 on failure.
 	 */
-	public static function cover( int $post_id, array $palette, string $seed, int $size = 800 ): int {
+	public static function cover( int $post_id, array $palette, string $seed, int $size = 800, string $alt = '' ): int {
 		$png = self::png( $size, $size, $palette, $seed );
 
 		if ( '' === $png ) {
 			return 0;
 		}
 
+		// One generator for every cover the demo needs, and the alt text is the
+		// caller's to name: «تصویر جلد نمونه» is the truth of a release and a
+		// lie on a news post, where the image is a news image.
+		$alt  = '' === $alt ? __( 'Demo cover art', 'wavira-core' ) : $alt;
 		$name = sprintf( 'wavira-demo-cover-%d.png', $post_id );
-		$id   = self::store( $png, $name, 'image/png', true, $post_id, __( 'Demo cover art', 'wavira-core' ) );
+		$id   = self::store( $png, $name, 'image/png', true, $post_id, $alt );
 
 		if ( $id < 1 ) {
 			return 0;
 		}
 
-		self::make_alt( $id, __( 'Demo cover art', 'wavira-core' ) );
+		self::make_alt( $id, $alt );
 
 		set_post_thumbnail( $post_id, $id );
 

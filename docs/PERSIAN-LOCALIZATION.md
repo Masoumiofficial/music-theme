@@ -104,10 +104,14 @@ wp wavira seed --no-site        # content only: no options, no menu
 wp wavira seed --force          # seed again even though tracks exist
 ```
 
-The seeded demo is one artist (آرمان راد), two releases — an album (شبهای تهران، ۲۰۰۵-۱۲-۲۰ →
-۲۹ آذر ۱۴۰۴) and a single (باران بهاری) — four tracks with generated Persian lyrics, three genres
-(پاپ رؤیایی، راک تجربی، امبینت) and a live video. No audio file and no image is seeded: a fabricated
-media URL that 404s is worse than no URL, and the demo's artwork/playback live in `tools/preview/`.
+The seeded demo is one artist (آرمان راد), two releases — an album (شب‌های تهران، ۲۰۲۵-۱۲-۲۰ →
+۲۹ آذر ۱۴۰۴) and a single (باران بهاری) — five tracks with generated Persian lyrics (one of them a
+remix, which is a kind of its own), three genres (پاپ رؤیایی، راک تجربی، امبینت), a live video, six
+gallery photos and three news posts in two categories (تازه‌ها، گزارش). Every file it needs is
+generated on the spot — covers, a poster, a short tone per track and per album, a photo set — so
+play and download work on a fresh install and nothing points at a URL that can 404 (ADR 0024). The
+one thing it does not invent is a video file: the video post carries a poster and says plainly that
+the performance is elsewhere.
 
 ## 4. Persian numerals
 
