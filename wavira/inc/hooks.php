@@ -99,6 +99,20 @@ function wavira_get_engagement_bar( $post_id ) {
 	$html .= '<span class="wavira-engagement__label">' . esc_html__( 'Like', 'wavira' ) . '</span> ';
 	$html .= '<strong class="wavira-engagement__count" data-wavira-like-count="' . $post_id . '">' . esc_html( $likes_label ) . '</strong>';
 	$html .= '</button>';
+
+	if ( 'wavira_track' === get_post_type( $post_id ) ) {
+		$html .= '<div class="wavira-longform-bar" data-wavira-longform="' . $post_id . '">';
+		$html .= '<button type="button" class="wavira-longform-bar__btn" data-wavira-skip="-15">';
+		$html .= esc_html__( '15s back', 'wavira' ) . '</button>';
+		$html .= '<button type="button" class="wavira-longform-bar__btn" data-wavira-skip="30">';
+		$html .= esc_html__( '30s forward', 'wavira' ) . '</button>';
+		$html .= '<button type="button" class="wavira-longform-bar__btn" data-wavira-speed="1">';
+		$html .= esc_html__( 'Playback speed:', 'wavira' ) . ' <strong data-wavira-speed-label>' . esc_html( wavira_core_digits( '×1' ) ) . '</strong></button>';
+		$html .= '<button type="button" class="wavira-longform-bar__btn" data-wavira-resume="' . $post_id . '" hidden>';
+		$html .= esc_html__( 'Resume from last stop', 'wavira' ) . '</button>';
+		$html .= '</div>';
+	}
+
 	$html .= '</div>';
 
 	if ( 'wavira_track' === get_post_type( $post_id ) && function_exists( 'wavira_core_podcast_chapters' ) ) {
@@ -349,6 +363,97 @@ function wavira_get_top_artists_section() {
 }
 
 /**
+ * Ranked Top Albums section with Weekly / Monthly / Yearly / All-Time tabs.
+ *
+ * @return string Escaped HTML markup.
+ */
+function wavira_get_top_albums_section() {
+	if ( ! function_exists( 'wavira_core_top_albums' ) ) {
+		return '';
+	}
+
+	if ( function_exists( 'wavira_option' ) && ! wavira_option( 'top_artists', true ) ) {
+		return '';
+	}
+
+	$periods = array(
+		'week'  => __( 'Weekly', 'wavira' ),
+		'month' => __( 'Monthly', 'wavira' ),
+		'year'  => __( 'Yearly', 'wavira' ),
+		'all'   => __( 'All time', 'wavira' ),
+	);
+
+	$all_albums = wavira_core_top_albums( 'all', 6 );
+
+	if ( array() === $all_albums ) {
+		return '';
+	}
+
+	$html  = '<div class="wp-block-group wavira-section wavira-top-artists wavira-top-albums" data-wavira-top-artists data-wavira-top-albums>';
+	$html .= '<div class="wavira-section__head wavira-top-artists__head">';
+	$html .= '<h2>' . esc_html__( 'Top albums', 'wavira' ) . '</h2>';
+	$html .= '<div class="wavira-top-artists__tabs" role="tablist" aria-label="' . esc_attr__( 'Top albums time range', 'wavira' ) . '">';
+
+	$first = true;
+	foreach ( $periods as $slug => $label ) {
+		$active = $first ? ' is-active' : '';
+		$html  .= '<button type="button" role="tab" class="wavira-top-artists__tab' . $active . '"';
+		$html  .= ' aria-selected="' . ( $first ? 'true' : 'false' ) . '"';
+		$html  .= ' data-wavira-period-tab="' . esc_attr( $slug ) . '">';
+		$html  .= esc_html( $label ) . '</button>';
+		$first  = false;
+	}
+
+	$html .= '</div></div>';
+
+	$first = true;
+	foreach ( array_keys( $periods ) as $slug ) {
+		$rows   = 'all' === $slug ? $all_albums : wavira_core_top_albums( $slug, 6 );
+		$hidden = $first ? '' : ' hidden';
+		$html  .= '<div class="wavira-top-artists__panel" role="tabpanel" data-wavira-period-panel="' . esc_attr( $slug ) . '"' . $hidden . '>';
+		$html  .= '<ol class="wavira-top-artists__grid">';
+
+		foreach ( $rows as $album ) {
+			$alb_id       = isset( $album['id'] ) ? absint( $album['id'] ) : 0;
+			$title        = isset( $album['title'] ) ? (string) $album['title'] : '';
+			$artist       = isset( $album['artist'] ) ? (string) $album['artist'] : '';
+			$permalink    = isset( $album['permalink'] ) ? (string) $album['permalink'] : '';
+			$rank_label   = isset( $album['rank_label'] ) ? (string) $album['rank_label'] : '';
+			$views_label  = isset( $album['views_label'] ) ? (string) $album['views_label'] : '';
+			$tracks_label = isset( $album['tracks_label'] ) ? (string) $album['tracks_label'] : '';
+			$cover        = isset( $album['cover'] ) && is_array( $album['cover'] ) ? $album['cover'] : array();
+
+			if ( '' === $title ) {
+				continue;
+			}
+
+			$html .= '<li class="wavira-top-artists__card" data-wavira-card data-wavira-post="' . $alb_id . '" data-wavira-kind="wavira_album">';
+			$html .= '<span class="wavira-top-artists__rank" aria-hidden="true">' . esc_html( $rank_label ) . '</span>';
+
+			if ( ! empty( $cover['url'] ) ) {
+				$html .= '<a class="wavira-top-artists__avatar" href="' . esc_url( $permalink ) . '" tabindex="-1" aria-hidden="true">';
+				$html .= '<img src="' . esc_url( (string) $cover['url'] ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" />';
+				$html .= '</a>';
+			}
+
+			$html .= '<div class="wavira-top-artists__info">';
+			$html .= '<h3 class="wavira-top-artists__name"><a href="' . esc_url( $permalink ) . '">' . esc_html( $title ) . '</a></h3>';
+			$html .= '<p class="wavira-top-artists__meta">';
+			/* translators: 1: artist name, 2: number of tracks, 3: number of views. */
+			$html .= esc_html( sprintf( __( '%1$s · %2$s tracks · %3$s views', 'wavira' ), $artist, $tracks_label, $views_label ) );
+			$html .= '</p></div></li>';
+		}
+
+		$html .= '</ol></div>';
+		$first = false;
+	}
+
+	$html .= '</div>';
+
+	return $html;
+}
+
+/**
  * Inject the Hero Slider, Top Artists section and singular Engagement Bar.
  *
  * @param string               $block_content Rendered block HTML.
@@ -369,7 +474,7 @@ function wavira_inject_dynamic_surfaces( $block_content, $block ) {
 		}
 
 		if ( false !== strpos( $class, 'wavira-section--tracklist' ) ) {
-			return $block_content . wavira_get_top_artists_section();
+			return $block_content . wavira_get_top_artists_section() . wavira_get_top_albums_section();
 		}
 	}
 

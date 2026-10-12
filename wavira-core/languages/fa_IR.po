@@ -934,3 +934,10 @@ msgstr "— هیچ‌کدام —"
 
 msgid "Music item not found."
 msgstr "مورد موسیقایی یافت نشد."
+
+msgid "Reset recorded counters to zero"
+msgstr "بازنشانی شمارندهٔ ثبت‌شده به صفر"
+
+msgid "Last admin adjustment: %s"
+msgstr "آخرین ویرایش مدیریتی: %s"
+

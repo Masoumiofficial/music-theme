@@ -618,6 +618,23 @@ if ( ! function_exists( 'wavira_core_top_artists' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_core_top_albums' ) ) {
+	/**
+	 * Ranked Top Albums for a time period (`week`, `month`, `year`, `all`).
+	 *
+	 * @param string $period `week`, `month`, `year`, or `all`.
+	 * @param int    $limit  Maximum number of albums.
+	 * @return array<int, array<string, mixed>>
+	 */
+	function wavira_core_top_albums( $period = 'all', $limit = 6 ) {
+		if ( ! class_exists( 'Wavira\\Core\\Content\\Stats' ) ) {
+			return array();
+		}
+
+		return (array) \Wavira\Core\Content\Stats::top_albums( (string) $period, absint( $limit ) );
+	}
+}
+
 if ( ! function_exists( 'wavira_core_podcast_chapters' ) ) {
 	/**
 	 * Parsed timestamped chapters of a podcast or long-form track.

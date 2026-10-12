@@ -172,7 +172,7 @@ final class Installer {
 				update_post_meta( $track_id, MetaSchema::VIEWS_OFFSET, 1200 + ( $index * 340 ) + ( $release_index * 210 ) );
 				update_post_meta( $track_id, MetaSchema::LIKES_OFFSET, 85 + ( $index * 24 ) + ( $release_index * 15 ) );
 
-				if ( 'podcast' === (string) ( $track['kind'] ?? 'music' ) ) {
+				if ( in_array( (string) ( $track['kind'] ?? 'music' ), array( 'podcast', 'remix' ), true ) ) {
 					update_post_meta( $track_id, MetaSchema::EPISODE, 1 );
 					update_post_meta(
 						$track_id,

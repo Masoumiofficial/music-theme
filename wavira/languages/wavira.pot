@@ -14,6 +14,11 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr ""
 
+#: wavira/inc/hooks.php:443
+#. translators: 1: artist name, 2: number of tracks, 3: number of views.
+msgid "%1$s · %2$s tracks · %3$s views"
+msgstr ""
+
 #: wavira/inc/markup.php:303
 #. translators: 1: genre name, 2: number of published items.
 msgid "%1$s (%2$d)"
@@ -24,7 +29,7 @@ msgstr ""
 msgid "%1$s (%2$s)"
 msgstr ""
 
-#: wavira/inc/hooks.php:338
+#: wavira/inc/hooks.php:352
 #. translators: 1: number of works, 2: number of views.
 msgid "%1$s works · %2$s views"
 msgstr ""
@@ -37,6 +42,14 @@ msgstr ""
 #: wavira/inc/downloads.php:73
 #. translators: %s: file size in megabytes.
 msgid "%s MB"
+msgstr ""
+
+#: wavira/inc/hooks.php:106
+msgid "15s back"
+msgstr ""
+
+#: wavira/inc/hooks.php:108
+msgid "30s forward"
 msgstr ""
 
 #: wavira/inc/customizer.php:300
@@ -84,11 +97,12 @@ msgid "After installing and activating it, come back to this tab: the import but
 msgstr ""
 
 #: wavira/inc/artists.php:140
-#: wavira/inc/hooks.php:193
+#: wavira/inc/hooks.php:207
 msgid "Album"
 msgstr ""
 
-#: wavira/inc/hooks.php:279
+#: wavira/inc/hooks.php:293
+#: wavira/inc/hooks.php:383
 msgid "All time"
 msgstr ""
 
@@ -414,7 +428,7 @@ msgstr ""
 msgid "Cards wrap into as many columns as fit. A larger number means fewer, bigger cards."
 msgstr ""
 
-#: wavira/inc/hooks.php:109
+#: wavira/inc/hooks.php:123
 msgid "Chapters & timestamps"
 msgstr ""
 
@@ -738,19 +752,20 @@ msgctxt "message shown when a query returns no posts"
 msgid "Nothing published here yet."
 msgstr ""
 
-#: wavira/inc/hooks.php:277
+#: wavira/inc/hooks.php:291
+#: wavira/inc/hooks.php:381
 msgid "Monthly"
 msgstr ""
 
-#: wavira/inc/hooks.php:194
+#: wavira/inc/hooks.php:208
 msgid "Music video"
 msgstr ""
 
-#: wavira/inc/hooks.php:252
+#: wavira/inc/hooks.php:266
 msgid "Next slide"
 msgstr ""
 
-#: wavira/inc/hooks.php:149
+#: wavira/inc/hooks.php:163
 msgid "Next track"
 msgstr ""
 
@@ -849,11 +864,11 @@ msgstr ""
 msgid "Photos attached to this post: artist, release or video."
 msgstr ""
 
-#: wavira/inc/hooks.php:240
+#: wavira/inc/hooks.php:254
 msgid "Play album"
 msgstr ""
 
-#: wavira/inc/hooks.php:238
+#: wavira/inc/hooks.php:252
 msgid "Play now"
 msgstr ""
 
@@ -861,6 +876,10 @@ msgstr ""
 #: wavira/inc/markup.php:137
 #. translators: %s: the track, album, artist or video being played.
 msgid "Play: %s"
+msgstr ""
+
+#: wavira/inc/hooks.php:110
+msgid "Playback speed:"
 msgstr ""
 
 #: wavira/inc/options.php:137
@@ -875,11 +894,11 @@ msgstr ""
 msgid "Preload the bundled font"
 msgstr ""
 
-#: wavira/inc/hooks.php:251
+#: wavira/inc/hooks.php:265
 msgid "Previous slide"
 msgstr ""
 
-#: wavira/inc/hooks.php:142
+#: wavira/inc/hooks.php:156
 msgid "Previous track"
 msgstr ""
 
@@ -897,6 +916,10 @@ msgstr ""
 
 #: wavira/inc/admin-panel.php:403
 msgid "Remove"
+msgstr ""
+
+#: wavira/inc/hooks.php:112
+msgid "Resume from last stop"
 msgstr ""
 
 #: wavira/inc/admin-panel.php:227
@@ -1113,7 +1136,15 @@ msgstr ""
 msgid "Tools → Wavira demo content"
 msgstr ""
 
-#: wavira/inc/hooks.php:290
+#: wavira/inc/hooks.php:394
+msgid "Top albums"
+msgstr ""
+
+#: wavira/inc/hooks.php:395
+msgid "Top albums time range"
+msgstr ""
+
+#: wavira/inc/hooks.php:304
 msgid "Top artists"
 msgstr ""
 
@@ -1121,15 +1152,15 @@ msgstr ""
 msgid "Top artists ranking section on the front page"
 msgstr ""
 
-#: wavira/inc/hooks.php:291
+#: wavira/inc/hooks.php:305
 msgid "Top artists time range"
 msgstr ""
 
-#: wavira/inc/hooks.php:192
+#: wavira/inc/hooks.php:206
 msgid "Track"
 msgstr ""
 
-#: wavira/inc/hooks.php:138
+#: wavira/inc/hooks.php:152
 msgid "Track navigation"
 msgstr ""
 
@@ -1169,7 +1200,7 @@ msgstr ""
 msgid "View all"
 msgstr ""
 
-#: wavira/inc/hooks.php:243
+#: wavira/inc/hooks.php:257
 msgid "View details"
 msgstr ""
 
@@ -1214,7 +1245,8 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira/inc/hooks.php:276
+#: wavira/inc/hooks.php:290
+#: wavira/inc/hooks.php:380
 msgid "Weekly"
 msgstr ""
 
@@ -1223,7 +1255,8 @@ msgstr ""
 msgid "X (Twitter)"
 msgstr ""
 
-#: wavira/inc/hooks.php:278
+#: wavira/inc/hooks.php:292
+#: wavira/inc/hooks.php:382
 msgid "Yearly"
 msgstr ""
 

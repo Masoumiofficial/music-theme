@@ -117,6 +117,30 @@ final class StatsController extends AbstractController {
 				),
 			)
 		);
+
+		register_rest_route(
+			self::API_NAMESPACE,
+			'/albums/top',
+			array(
+				array(
+					'methods'             => 'GET',
+					'callback'            => array( $this, 'top_albums' ),
+					'permission_callback' => array( $this, 'read_permission' ),
+					'args'                => array(
+						'period' => array(
+							'type'    => 'string',
+							'default' => 'all',
+							'enum'    => array( 'week', 'month', 'year', 'all' ),
+						),
+						'limit'  => array(
+							'type'              => 'integer',
+							'default'           => 6,
+							'sanitize_callback' => 'absint',
+						),
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -188,6 +212,26 @@ final class StatsController extends AbstractController {
 		$period = isset( $request['period'] ) ? (string) $request['period'] : 'all';
 		$limit  = isset( $request['limit'] ) ? (int) $request['limit'] : 8;
 		$items  = Stats::top_artists( $period, $limit );
+
+		return rest_ensure_response(
+			array(
+				'period' => $period,
+				'count'  => count( $items ),
+				'items'  => $items,
+			)
+		);
+	}
+
+	/**
+	 * Ranked Top Albums for a time period.
+	 *
+	 * @param WP_REST_Request $request Request.
+	 * @return WP_REST_Response
+	 */
+	public function top_albums( $request ): WP_REST_Response {
+		$period = isset( $request['period'] ) ? (string) $request['period'] : 'all';
+		$limit  = isset( $request['limit'] ) ? (int) $request['limit'] : 6;
+		$items  = Stats::top_albums( $period, $limit );
 
 		return rest_ensure_response(
 			array(

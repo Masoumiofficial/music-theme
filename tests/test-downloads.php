@@ -267,5 +267,21 @@ class Test_Downloads extends Wavira_Test_Case {
 		$this->assertSame( 200, $top_res->get_status() );
 		$this->assertGreaterThanOrEqual( 1, $top_res->get_data()['count'] );
 		$this->assertSame( $artist_id, $top_res->get_data()['items'][0]['id'] );
+
+		$album_id = self::factory()->post->create(
+			array(
+				'post_type'   => PostTypes::ALBUM,
+				'post_status' => 'publish',
+				'post_title'  => 'آلبوم برگزیده',
+			)
+		);
+		update_post_meta( $album_id, MetaSchema::ARTIST, $artist_id );
+		update_post_meta( $album_id, MetaSchema::VIEWS_OFFSET, 900 );
+		update_post_meta( $album_id, MetaSchema::LIKES_OFFSET, 70 );
+
+		$top_alb = $this->dispatch( '/wavira/v1/albums/top', array( 'period' => 'all', 'limit' => 5 ) );
+		$this->assertSame( 200, $top_alb->get_status() );
+		$this->assertGreaterThanOrEqual( 1, $top_alb->get_data()['count'] );
+		$this->assertSame( $album_id, $top_alb->get_data()['items'][0]['id'] );
 	}
 }

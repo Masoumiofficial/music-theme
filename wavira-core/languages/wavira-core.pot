@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Admin/MetaBoxes.php:558
+#: wavira-core/src/Admin/MetaBoxes.php:585
 msgid "— None —"
 msgstr ""
 
@@ -57,11 +57,11 @@ msgstr ""
 msgid "Add new %s"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:440
+#: wavira-core/src/Admin/MetaBoxes.php:441
 msgid "Admin likes offset:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:430
+#: wavira-core/src/Admin/MetaBoxes.php:431
 msgid "Admin views offset:"
 msgstr ""
 
@@ -413,6 +413,11 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
+#: wavira-core/src/Admin/MetaBoxes.php:456
+#. translators: %s: date/time of last admin stats edit.
+msgid "Last admin adjustment: %s"
+msgstr ""
+
 #: wavira-core/src/Rest/AbstractController.php:123
 msgid "Limit results to a genre slug."
 msgstr ""
@@ -470,7 +475,7 @@ msgstr ""
 msgid "Moods"
 msgstr ""
 
-#: wavira-core/src/Rest/StatsController.php:213
+#: wavira-core/src/Rest/StatsController.php:257
 msgid "Music item not found."
 msgstr ""
 
@@ -650,16 +655,16 @@ msgstr ""
 msgid "Primary artist"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:427
-#: wavira-core/src/Admin/MetaBoxes.php:437
+#: wavira-core/src/Admin/MetaBoxes.php:428
+#: wavira-core/src/Admin/MetaBoxes.php:438
 msgid "Public total:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:435
+#: wavira-core/src/Admin/MetaBoxes.php:436
 msgid "Recorded likes:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:425
+#: wavira-core/src/Admin/MetaBoxes.php:426
 msgid "Recorded views:"
 msgstr ""
 
@@ -736,6 +741,10 @@ msgstr ""
 
 #: wavira-core/src/Settings/SettingsSchema.php:109
 msgid "Require a logged-in user to download"
+msgstr ""
+
+#: wavira-core/src/Admin/MetaBoxes.php:448
+msgid "Reset recorded counters to zero"
 msgstr ""
 
 #: wavira-core/src/Content/PostTypes.php:175

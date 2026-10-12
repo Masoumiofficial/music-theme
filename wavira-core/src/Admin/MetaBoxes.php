@@ -419,7 +419,8 @@ final class MetaBoxes implements Registrable {
 	 * @return void
 	 */
 	public function render_stats_box( WP_Post $post ): void {
-		$stats = Stats::breakdown( $post->ID );
+		$stats      = Stats::breakdown( $post->ID );
+		$updated_at = (string) get_post_meta( $post->ID, '_wavira_stats_updated_at', true );
 		?>
 		<p>
 			<strong><?php esc_html_e( 'Recorded views:', 'wavira-core' ); ?></strong>
@@ -440,6 +441,24 @@ final class MetaBoxes implements Registrable {
 			<label for="wavira_likes_offset"><?php esc_html_e( 'Admin likes offset:', 'wavira-core' ); ?></label><br />
 			<input type="number" class="small-text" id="wavira_likes_offset" min="0" name="wavira_meta[<?php echo esc_attr( MetaSchema::LIKES_OFFSET ); ?>]" value="<?php echo esc_attr( (string) $stats['likes_offset'] ); ?>" />
 		</p>
+		<hr />
+		<p>
+			<label>
+				<input type="checkbox" name="wavira_reset_recorded_stats" value="1" />
+				<?php esc_html_e( 'Reset recorded counters to zero', 'wavira-core' ); ?>
+			</label>
+		</p>
+		<?php if ( '' !== $updated_at ) : ?>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: date/time of last admin stats edit. */
+					esc_html__( 'Last admin adjustment: %s', 'wavira-core' ),
+					esc_html( $updated_at )
+				);
+				?>
+			</p>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -529,6 +548,14 @@ final class MetaBoxes implements Registrable {
 					update_post_meta( $post_id, $key, Meta::sanitize_text( $raw ) );
 					break;
 			}
+		}
+
+		if ( ! empty( $_POST['wavira_reset_recorded_stats'] ) ) {
+			update_post_meta( $post_id, MetaSchema::VIEWS, 0 );
+			update_post_meta( $post_id, MetaSchema::LIKES, 0 );
+			update_post_meta( $post_id, '_wavira_stats_updated_at', gmdate( 'Y-m-d H:i' ) );
+		} elseif ( isset( $posted[ MetaSchema::VIEWS_OFFSET ] ) || isset( $posted[ MetaSchema::LIKES_OFFSET ] ) ) {
+			update_post_meta( $post_id, '_wavira_stats_updated_at', gmdate( 'Y-m-d H:i' ) );
 		}
 	}
 

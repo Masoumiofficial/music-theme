@@ -1209,3 +1209,25 @@ msgstr "اسلایدر آثار ویژه در بنر صفحهٔ نخست"
 
 msgid "Top artists ranking section on the front page"
 msgstr "بخش رتبه‌بندی برترین هنرمندان در صفحهٔ نخست"
+
+msgid "15s back"
+msgstr "۱۵ ثانیه به عقب"
+
+msgid "30s forward"
+msgstr "۳۰ ثانیه به جلو"
+
+msgid "Playback speed:"
+msgstr "سرعت پخش:"
+
+msgid "Resume from last stop"
+msgstr "ادامه از آخرین توقف"
+
+msgid "Top albums"
+msgstr "برترین آلبوم‌ها"
+
+msgid "Top albums time range"
+msgstr "بازهٔ زمانی برترین آلبوم‌ها"
+
+msgid "%1$s · %2$s tracks · %3$s views"
+msgstr "%1$s · %2$s قطعه · %3$s بازدید"
+

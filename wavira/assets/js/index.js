@@ -676,6 +676,61 @@
 				return;
 			}
 
+			var skipBtn = target.closest( '[data-wavira-skip]' );
+
+			if ( skipBtn ) {
+				event.preventDefault();
+				var delta = parseInt( skipBtn.getAttribute( 'data-wavira-skip' ), 10 );
+				var skipAudio = doc.querySelector( 'audio' );
+				if ( skipAudio && ! isNaN( delta ) ) {
+					try {
+						skipAudio.currentTime = Math.max( 0, ( skipAudio.currentTime || 0 ) + delta );
+					} catch ( err ) {}
+				}
+				return;
+			}
+
+			var speedBtn = target.closest( '[data-wavira-speed]' );
+
+			if ( speedBtn ) {
+				event.preventDefault();
+				var rates = [ 1, 1.25, 1.5, 2 ];
+				var labels = [ '×۱', '×۱٫۲۵', '×۱٫۵', '×۲' ];
+				var cur = parseFloat( speedBtn.getAttribute( 'data-wavira-speed' ) ) || 1;
+				var idx = ( rates.indexOf( cur ) + 1 ) % rates.length;
+				var nextRate = rates[ idx ];
+				speedBtn.setAttribute( 'data-wavira-speed', String( nextRate ) );
+				var labelNode = speedBtn.querySelector( '[data-wavira-speed-label]' );
+				if ( labelNode ) {
+					labelNode.textContent = labels[ idx ];
+				}
+				var rateAudio = doc.querySelector( 'audio' );
+				if ( rateAudio ) {
+					try {
+						rateAudio.playbackRate = nextRate;
+					} catch ( err ) {}
+				}
+				return;
+			}
+
+			var resumeBtn = target.closest( '[data-wavira-resume]' );
+
+			if ( resumeBtn ) {
+				event.preventDefault();
+				var rTrackId = resumeBtn.getAttribute( 'data-wavira-resume' );
+				var rAudio = doc.querySelector( 'audio' );
+				if ( rTrackId && rAudio && global.localStorage ) {
+					try {
+						var savedSec = parseFloat( global.localStorage.getItem( 'wavira.pos.' + rTrackId ) );
+						if ( savedSec > 0 ) {
+							rAudio.currentTime = savedSec;
+							rAudio.play();
+						}
+					} catch ( err ) {}
+				}
+				return;
+			}
+
 			var tabBtn = target.closest( '[data-wavira-period-tab]' );
 
 			if ( tabBtn ) {
@@ -722,6 +777,26 @@
 				}
 			}
 		} );
+
+		if ( 'function' === typeof doc.querySelector && global.localStorage ) {
+			var lf = doc.querySelector( '[data-wavira-longform]' );
+			if ( lf ) {
+				var lfId = lf.getAttribute( 'data-wavira-longform' );
+				var resBtn = lf.querySelector( '[data-wavira-resume]' );
+				try {
+					if ( lfId && resBtn && parseFloat( global.localStorage.getItem( 'wavira.pos.' + lfId ) ) > 5 ) {
+						resBtn.hidden = false;
+					}
+				} catch ( err ) {}
+				doc.addEventListener( 'timeupdate', function ( ev ) {
+					if ( ev && ev.target && ev.target.currentTime > 5 && lfId ) {
+						try {
+							global.localStorage.setItem( 'wavira.pos.' + lfId, String( Math.floor( ev.target.currentTime ) ) );
+						} catch ( err ) {}
+					}
+				}, true );
+			}
+		}
 	}
 
 	/**

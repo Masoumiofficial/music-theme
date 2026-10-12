@@ -372,6 +372,119 @@ final class Stats {
 	}
 
 	/**
+	 * Compute the Top Albums ranking for a given time window.
+	 *
+	 * @param string $period `week`, `month`, `year`, or `all`.
+	 * @param int    $limit  Maximum number of albums (1–24).
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function top_albums( string $period = 'all', int $limit = 6 ): array {
+		$period = in_array( $period, array( 'week', 'month', 'year', 'all' ), true ) ? $period : 'all';
+		$limit  = max( 1, min( 24, $limit ) );
+		$key    = 'top_albums:' . $period . ':' . $limit . ':' . Dates::style() . ':' . get_locale();
+		$cached = Cache::get( $key );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$album_ids = get_posts(
+			array(
+				'post_type'              => PostTypes::ALBUM,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		if ( array() === $album_ids ) {
+			return array();
+		}
+
+		$buckets = array();
+
+		foreach ( $album_ids as $alb_id ) {
+			$alb_id             = (int) $alb_id;
+			$buckets[ $alb_id ] = array(
+				'views'        => self::period_metric( $alb_id, 'views', $period ),
+				'likes'        => self::period_metric( $alb_id, 'likes', $period ),
+				'downloads'    => MetaValues::int( $alb_id, MetaSchema::DOWNLOADS ),
+				'tracks_count' => 0,
+			);
+		}
+
+		$tracks = get_posts(
+			array(
+				'post_type'              => PostTypes::TRACK,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 100,
+				'fields'                 => 'ids',
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+			)
+		);
+
+		foreach ( $tracks as $track_id ) {
+			$track_id = (int) $track_id;
+			$alb_id   = MetaValues::int( $track_id, MetaSchema::ALBUM );
+
+			if ( $alb_id > 0 && isset( $buckets[ $alb_id ] ) ) {
+				$buckets[ $alb_id ]['views']     += self::period_metric( $track_id, 'views', $period );
+				$buckets[ $alb_id ]['likes']     += self::period_metric( $track_id, 'likes', $period );
+				$buckets[ $alb_id ]['downloads'] += MetaValues::int( $track_id, MetaSchema::DOWNLOADS );
+				++$buckets[ $alb_id ]['tracks_count'];
+			}
+		}
+
+		$rows = array();
+
+		foreach ( $buckets as $alb_id => $metrics ) {
+			$artist_id   = MetaValues::int( $alb_id, MetaSchema::ARTIST );
+			$artist_name = $artist_id > 0 ? (string) get_the_title( $artist_id ) : '';
+			$score       = ( $metrics['views'] * 1 ) + ( $metrics['likes'] * 3 ) + ( $metrics['downloads'] * 2 ) + ( $metrics['tracks_count'] * 5 );
+			$rows[]      = array(
+				'id'           => $alb_id,
+				'title'        => (string) get_the_title( $alb_id ),
+				'artist'       => $artist_name,
+				'permalink'    => (string) get_permalink( $alb_id ),
+				'cover'        => Cover::payload( $alb_id ),
+				'views'        => $metrics['views'],
+				'views_label'  => Dates::digits( number_format_i18n( $metrics['views'] ) ),
+				'likes'        => $metrics['likes'],
+				'likes_label'  => Dates::digits( number_format_i18n( $metrics['likes'] ) ),
+				'tracks_count' => $metrics['tracks_count'],
+				'tracks_label' => Dates::digits( number_format_i18n( $metrics['tracks_count'] ) ),
+				'score'        => $score,
+			);
+		}
+
+		usort(
+			$rows,
+			static function ( array $a, array $b ): int {
+				if ( $b['score'] !== $a['score'] ) {
+					return $b['score'] <=> $a['score'];
+				}
+
+				return $b['id'] <=> $a['id'];
+			}
+		);
+
+		$rows = array_slice( $rows, 0, $limit );
+
+		foreach ( $rows as $idx => &$row ) {
+			$row['rank']       = $idx + 1;
+			$row['rank_label'] = Dates::digits( (string) ( $idx + 1 ) );
+		}
+		unset( $row );
+
+		Cache::set( $key, $rows, 300 );
+
+		return $rows;
+	}
+
+	/**
 	 * Read period-specific views or likes for a post, falling back to total when
 	 * a period bucket has no recorded events yet (e.g. freshly seeded demo data).
 	 *
