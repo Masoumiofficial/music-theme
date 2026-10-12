@@ -67,8 +67,8 @@ class Test_I18n extends Wavira_Test_Case {
 	public function test_front_end_strings_come_back_in_persian() {
 		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
 
-		$this->assertSame( 'جدیدترین آلبومها', esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ) );
-		$this->assertSame( 'قطعهها', esc_html_x( 'Tracks', 'section heading above an album tracklist', 'wavira' ) );
+		$this->assertSame( 'جدیدترین آلبوم‌ها', esc_html_x( 'Latest albums', 'heading of the album grid pattern', 'wavira' ) );
+		$this->assertSame( 'قطعه‌ها', esc_html_x( 'Tracks', 'section heading above an album tracklist', 'wavira' ) );
 		$this->assertSame( 'تماشای ویدیو', esc_html__( 'Watch the video', 'wavira' ) );
 		$this->assertSame( 'همین حالا بشنوید', esc_html_x( 'Listen now', 'heading of the catalogue player pattern', 'wavira' ) );
 		$this->assertSame( 'صفحه یافت نشد', esc_html_x( 'Page not found', 'heading of the 404 template', 'wavira' ) );
@@ -98,7 +98,7 @@ class Test_I18n extends Wavira_Test_Case {
 		$this->load_catalogue( 'wavira', 'wavira/languages/fa_IR.mo' );
 
 		$this->assertSame( 'پخشکنندهٔ موسیقی', _x( 'Music player', 'block title', 'wavira' ) );
-		$this->assertSame( 'برچسبهای سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
+		$this->assertSame( 'برچسب‌های سبک', _x( 'Genre chips', 'block title', 'wavira' ) );
 		$this->assertSame( 'موسیقی', _x( 'music', 'block keyword', 'wavira' ) );
 		$this->assertSame( 'نمای هنرمند', _x( 'Artist profile', 'block title', 'wavira' ) );
 		$this->assertSame( 'گالری تصاویر', _x( 'Photo gallery', 'block title', 'wavira' ) );
@@ -143,7 +143,7 @@ class Test_I18n extends Wavira_Test_Case {
 
 		$this->assertSame( 'تنظیمات واویرا', __( 'Wavira settings', 'wavira-core' ) );
 		$this->assertSame( 'تعداد قطعه در هر صفحهٔ آرشیو', __( 'Tracks per archive page', 'wavira-core' ) );
-		$this->assertSame( 'قطعهها', __( 'Tracks', 'wavira-core' ) );
+		$this->assertSame( 'قطعه‌ها', __( 'Tracks', 'wavira-core' ) );
 		$this->assertSame( 'موزیکویدیوها', __( 'Music videos', 'wavira-core' ) );
 		$this->assertSame( 'زندگینامهٔ نمونه. آن را با محتوای واقعی جایگزین کنید.', __( 'Generated demo biography. Replace with real content.', 'wavira-core' ) );
 	}
