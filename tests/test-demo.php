@@ -93,7 +93,7 @@ class Test_Demo extends Wavira_Test_Case {
 	private function demo_ids(): array {
 		$ids = get_posts(
 			array(
-				'post_type'      => array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO ),
+				'post_type'      => array( PostTypes::ARTIST, PostTypes::ALBUM, PostTypes::TRACK, PostTypes::VIDEO, 'post' ),
 				'post_status'    => 'any',
 				'posts_per_page' => 100,
 				'fields'         => 'ids',
@@ -512,7 +512,7 @@ class Test_Demo extends Wavira_Test_Case {
 		foreach ( array( 'persian', 'english' ) as $name ) {
 			$fixture = 'persian' === $name ? Fixtures::persian() : Fixtures::english();
 
-			foreach ( array( 'artist', 'releases', 'video', 'site', 'menu' ) as $key ) {
+			foreach ( array( 'artist', 'releases', 'video', 'news', 'site', 'menu' ) as $key ) {
 				$this->assertArrayHasKey( $key, $fixture, "{$name} fixture: {$key}" );
 			}
 
