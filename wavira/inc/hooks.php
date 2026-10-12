@@ -268,7 +268,7 @@ function wavira_get_top_artists_section() {
 		return '';
 	}
 
-	if ( function_exists( 'wavira_option' ) && ! wavira_option( 'top_artists_section', true ) ) {
+	if ( function_exists( 'wavira_option' ) && ! wavira_option( 'top_artists', true ) ) {
 		return '';
 	}
 
@@ -306,7 +306,8 @@ function wavira_get_top_artists_section() {
 	foreach ( array_keys( $periods ) as $slug ) {
 		$rows   = 'all' === $slug ? $all_artists : wavira_core_top_artists( $slug, 6 );
 		$hidden = $first ? '' : ' hidden';
-		$html  .= '<ol class="wavira-top-artists__grid" role="tabpanel" data-wavira-period-panel="' . esc_attr( $slug ) . '"' . $hidden . '>';
+		$html  .= '<div class="wavira-top-artists__panel" role="tabpanel" data-wavira-period-panel="' . esc_attr( $slug ) . '"' . $hidden . '>';
+		$html  .= '<ol class="wavira-top-artists__grid">';
 
 		foreach ( $rows as $artist ) {
 			$aid         = isset( $artist['id'] ) ? absint( $artist['id'] ) : 0;
@@ -338,7 +339,7 @@ function wavira_get_top_artists_section() {
 			$html .= '</p></div></li>';
 		}
 
-		$html .= '</ol>';
+		$html .= '</ol></div>';
 		$first = false;
 	}
 

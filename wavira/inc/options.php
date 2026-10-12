@@ -129,21 +129,21 @@ function wavira_options_schema(): array {
 			'section' => 'header',
 			'label'   => __( 'Announcement link', 'wavira' ),
 		),
-		'player_bar'          => array(
+		'player_bar'        => array(
 			'default' => true,
 			'type'    => 'bool',
 			'control' => 'checkbox',
 			'section' => 'header',
 			'label'   => __( 'Player bar on every page', 'wavira' ),
 		),
-		'hero_slider'         => array(
+		'hero_slider'       => array(
 			'default' => true,
 			'type'    => 'bool',
 			'control' => 'checkbox',
-			'section' => 'header',
+			'section' => 'appearance',
 			'label'   => __( 'Featured content slider in the front-page banner', 'wavira' ),
 		),
-		'top_artists_section' => array(
+		'top_artists'       => array(
 			'default' => true,
 			'type'    => 'bool',
 			'control' => 'checkbox',

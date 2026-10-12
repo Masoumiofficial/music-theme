@@ -34,7 +34,7 @@ final class StatsController extends AbstractController {
 				array(
 					'methods'             => 'GET',
 					'callback'            => array( $this, 'get_stats' ),
-					'permission_callback' => array( $this, 'public_read' ),
+					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
 						'id' => array(
 							'type'              => 'integer',
@@ -53,7 +53,7 @@ final class StatsController extends AbstractController {
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'record_view' ),
-					'permission_callback' => array( $this, 'public_read' ),
+					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
 						'id'    => array(
 							'type'              => 'integer',
@@ -77,7 +77,7 @@ final class StatsController extends AbstractController {
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'toggle_like' ),
-					'permission_callback' => array( $this, 'public_read' ),
+					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
 						'id'    => array(
 							'type'              => 'integer',
@@ -101,7 +101,7 @@ final class StatsController extends AbstractController {
 				array(
 					'methods'             => 'GET',
 					'callback'            => array( $this, 'top_artists' ),
-					'permission_callback' => array( $this, 'public_read' ),
+					'permission_callback' => array( $this, 'read_permission' ),
 					'args'                => array(
 						'period' => array(
 							'type'    => 'string',

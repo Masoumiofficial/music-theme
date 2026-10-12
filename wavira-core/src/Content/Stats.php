@@ -188,8 +188,8 @@ final class Stats {
 				$recorded = max( 0, $recorded - 1 );
 				$now_like = false;
 			} else {
-				$liked[]  = $post_id;
-				$recorded = $recorded + 1;
+				$liked[] = $post_id;
+				++$recorded;
 				$now_like = true;
 			}
 
@@ -204,7 +204,7 @@ final class Stats {
 				$now_like = false;
 			} else {
 				set_transient( $guard, 1, 30 * DAY_IN_SECONDS );
-				$recorded = $recorded + 1;
+				++$recorded;
 				$now_like = true;
 			}
 		}
@@ -319,10 +319,10 @@ final class Stats {
 					continue;
 				}
 
-				$buckets[ $aid ]['views']       += $w_views;
-				$buckets[ $aid ]['likes']       += $w_likes;
-				$buckets[ $aid ]['downloads']   += $w_dl;
-				$buckets[ $aid ]['works_count'] += 1;
+				$buckets[ $aid ]['views']     += $w_views;
+				$buckets[ $aid ]['likes']     += $w_likes;
+				$buckets[ $aid ]['downloads'] += $w_dl;
+				++$buckets[ $aid ]['works_count'];
 			}
 		}
 

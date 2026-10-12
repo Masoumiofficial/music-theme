@@ -24,7 +24,7 @@ msgstr ""
 msgid "%1$s (%2$s)"
 msgstr ""
 
-#: wavira/inc/hooks.php:337
+#: wavira/inc/hooks.php:338
 #. translators: 1: number of works, 2: number of views.
 msgid "%1$s works · %2$s views"
 msgstr ""
