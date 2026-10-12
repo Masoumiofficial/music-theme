@@ -523,8 +523,19 @@ msgid "Dismiss"
 msgstr ""
 
 #: wavira/inc/downloads.php:53
+#: wavira/inc/downloads.php:189
 #: wavira/inc/markup.php:151
 msgid "Download"
+msgstr ""
+
+#: wavira/inc/downloads.php:174
+#. translators: 1: the track, album or video being downloaded, 2: its quality, such as «۳۲۰ کیلوبیت‌برثانیه».
+msgid "Download %1$s — %2$s"
+msgstr ""
+
+#: wavira/inc/downloads.php:177
+#. translators: %s: the track, album or video being downloaded.
+msgid "Download %s"
 msgstr ""
 
 #: wavira/inc/downloads.php:44
@@ -736,7 +747,7 @@ msgstr ""
 
 #: wavira/inc/admin-panel.php:534
 #: wavira/inc/customizer.php:160
-#: wavira/inc/site-defaults.php:237
+#: wavira/inc/site-defaults.php:314
 msgid "Make the site Persian"
 msgstr ""
 
@@ -789,7 +800,7 @@ msgstr ""
 msgid "No published tracks yet."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:239
+#: wavira/inc/site-defaults.php:316
 msgid "Not now"
 msgstr ""
 
@@ -1072,7 +1083,7 @@ msgstr ""
 msgid "The newest news posts as cards."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:230
+#: wavira/inc/site-defaults.php:307
 msgid "The Persian setup ran."
 msgstr ""
 
@@ -1088,7 +1099,7 @@ msgstr ""
 msgid "The Persian translation of WordPress itself was installed."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:236
+#: wavira/inc/site-defaults.php:313
 msgid "The site language is not Persian, so WordPress’ own screens stay in English. The theme and the plugin are already Persian."
 msgstr ""
 
@@ -1120,7 +1131,7 @@ msgstr ""
 msgid "The width of the site layout on wide screens."
 msgstr ""
 
-#: wavira/inc/site-defaults.php:238
+#: wavira/inc/site-defaults.php:315
 msgid "Theme settings"
 msgstr ""
 
@@ -1217,7 +1228,7 @@ msgstr ""
 msgid "Watch: %s"
 msgstr ""
 
-#: wavira/inc/site-defaults.php:227
+#: wavira/inc/site-defaults.php:304
 msgid "Wavira"
 msgstr ""
 
@@ -1260,7 +1271,7 @@ msgstr ""
 msgid "Yearly"
 msgstr ""
 
-#: wavira/inc/site-defaults.php:131
+#: wavira/inc/site-defaults.php:208
 msgid "You are not allowed to change the site language."
 msgstr ""
 
@@ -1269,7 +1280,7 @@ msgid "You are not allowed to change the theme settings."
 msgstr ""
 
 #: wavira/inc/admin-panel.php:787
-#: wavira/inc/site-defaults.php:154
+#: wavira/inc/site-defaults.php:231
 msgid "You are not allowed to change this."
 msgstr ""
 

@@ -78,6 +78,26 @@ if ( ! function_exists( 'wavira_download_size_label' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wavira_download_icon' ) ) {
+	/**
+	 * The download arrow, as an inline SVG.
+	 *
+	 * Inline and sized in `em`, so it takes the colour and the scale of whatever
+	 * it sits in, needs no request, and mirrors with the text in an RTL layout
+	 * because an arrow into a tray is not directional. `aria-hidden` because the
+	 * action's own label is right beside it.
+	 *
+	 * @return string SVG markup.
+	 */
+	function wavira_download_icon() {
+		return '<svg class="wavira-download__icon" viewBox="0 0 24 24" width="1.1em" height="1.1em"'
+			. ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"'
+			. ' stroke-linejoin="round" aria-hidden="true" focusable="false">'
+			. '<path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M4 20h16" />'
+			. '</svg>';
+	}
+}
+
 if ( ! function_exists( 'wavira_get_download' ) ) {
 	/**
 	 * Markup for a download control, or an empty string when there is nothing to download.
@@ -105,8 +125,19 @@ if ( ! function_exists( 'wavira_get_download' ) ) {
 		$type  = (string) $qualities[0]['type'];
 		$label = '' !== $label ? $label : wavira_download_type_label( $post_id, $type );
 
-		if ( 'list' === $variant && count( $qualities ) > 1 ) {
+		// The list variant is the *panel* a visitor downloads from, and it is a
+		// row of glass cards — one per quality, two for a track (320 and 128) and
+		// four for a hosted video. It was a line of underlined links until 0.15.0,
+		// which made the one deliberate action on the page look like an aside.
+		//
+		// It renders with **one** quality too, rather than falling through to the
+		// button: the panel's shape is the site's decision (the template asked for
+		// a list), and a release with only a 128 kbps file should get the same
+		// card as a release with two. The `button` and `link` variants keep their
+		// own shapes — a hero has no room for a grid.
+		if ( 'list' === $variant ) {
 			$items = '';
+			$title = (string) get_the_title( $post_id );
 
 			foreach ( $qualities as $item ) {
 				$url = wavira_core_download_url( $post_id, (int) $item['quality'] );
@@ -121,28 +152,42 @@ if ( ! function_exists( 'wavira_get_download' ) ) {
 					$item_label = wavira_core_digits( $item_label );
 				}
 
-				$suffix = '' !== $item_label ? ' <span class="wavira-download__meta">' . esc_html( $item_label ) . '</span>' : '';
+				$size = $sizes
+					? wavira_download_size_label( wavira_download_file_size( $post_id, (int) $item['quality'], $type ) )
+					: '';
 
-				if ( $sizes ) {
-					$size = wavira_download_size_label( wavira_download_file_size( $post_id, (int) $item['quality'], $type ) );
-
-					// The quality label beside it is Persian; the size has to be
-					// too, or the pair reads «۳۲۰ کیلوبیت‌برثانیه  94 کیلوبایت».
-					if ( '' !== $size && function_exists( 'wavira_core_digits' ) ) {
-						$size = wavira_core_digits( $size );
-					}
-
-					if ( '' !== $size ) {
-						$suffix .= ' <span class="wavira-download__meta">' . esc_html( $size ) . '</span>';
-					}
+				// The quality label is Persian; the size has to be too, or the
+				// pair reads «۳۲۰ کیلوبیت‌برثانیه  94 کیلوبایت».
+				if ( '' !== $size && function_exists( 'wavira_core_digits' ) ) {
+					$size = wavira_core_digits( $size );
 				}
 
-				$items .= sprintf(
-					'<li class="wavira-download__item"><a class="wavira-download__link" href="%s" download>%s%s</a></li>',
-					esc_url( $url ),
-					esc_html( $label ),
-					$suffix // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built above from esc_html() pieces.
-				);
+			// A screen reader's link list showed two entries both called
+			// «دانلود», with nothing to say which file each one was. The card
+			// names the release and its quality, and the visible word stays the
+			// leading word, so a voice-control visitor can still say «دانلود»
+			// and hit the link they meant (WCAG 2.5.3).
+			$name = '' !== $title ? $title : $label;
+
+			if ( '' !== $item_label ) {
+				/* translators: 1: the track, album or video being downloaded, 2: its quality, such as «۳۲۰ کیلوبیت‌برثانیه». */
+				$name = sprintf( __( 'Download %1$s — %2$s', 'wavira' ), $name, $item_label );
+			} else {
+				/* translators: %s: the track, album or video being downloaded. */
+				$name = sprintf( __( 'Download %s', 'wavira' ), $name );
+			}
+
+			$meta  = '' !== $item_label ? '<span class="wavira-download__quality">' . esc_html( $item_label ) . '</span>' : '';
+			$meta .= '' !== $size ? '<span class="wavira-download__size">' . esc_html( $size ) . '</span>' : '';
+
+			$items .= sprintf(
+				'<li class="wavira-download__item"><a class="wavira-download__link" href="%s" download aria-label="%s">%s<span class="wavira-download__action">%s<span class="wavira-download__action-label">%s</span></span></a></li>',
+				esc_url( $url ),
+				esc_attr( $name ),
+				$meta, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built above from esc_html() pieces.
+				wavira_download_icon(),
+				esc_html__( 'Download', 'wavira' )
+			);
 			}
 
 			if ( '' === $items ) {

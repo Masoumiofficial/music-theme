@@ -387,9 +387,71 @@
 	margin: 0;
 	padding: 0;
 	list-style: none;
+	display: grid;
+	/* Two qualities give two cards on any screen wide enough for two; one
+	   quality (or a narrow phone) gives one card at full width. `auto-fit` and
+	   `minmax` do that without a breakpoint, and the grid is what makes the
+	   panel mirror in an RTL layout for free. */
+	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+	gap: 0.75rem;
+	margin-block-start: var(--wp--preset--spacing--40, 1rem);
+}
+
+.wavira-download__item {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem 1.25rem;
+}
+
+.wavira-download--list .wavira-download__link {
+	/* A glass card: the product's own surface, border and blur tokens, so the
+	   panel is the same material as the player, the tracklist and the chapters
+	   box, in light and in dark alike (ADR 0024 §glass). */
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.15rem;
+	inline-size: 100%;
+	/* 44px on a coarse pointer (ADR 0009): the target size rule is about the
+	   finger, not the design. */
+	min-block-size: 2.75rem;
+	padding-block: 0.75rem;
+	padding-inline: 1rem;
+	border: 1px solid var(--wavira-glass-border);
+	border-radius: var(--wp--custom--radius--md, 12px);
+	background: var(--wavira-glass-surface);
+	backdrop-filter: var(--wavira-glass-filter);
+	color: var(--wp--preset--color--contrast);
+	text-decoration: none;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.wavira-download--list .wavira-download__link:hover,
+.wavira-download--list .wavira-download__link:focus-visible {
+	border-color: var(--wp--preset--color--primary);
+}
+
+.wavira-download__quality {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.wavira-download__size {
+	color: var(--wp--preset--color--muted);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+	font-variant-numeric: tabular-nums;
+}
+
+.wavira-download__action {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	margin-block-start: 0.4rem;
+	color: var(--wp--preset--color--primary);
+	font-size: var(--wp--preset--font-size--small, 0.875rem);
+	font-weight: 600;
+}
+
+.wavira-download__icon {
+	flex: none;
 }
 
 /* A hero that has both a player and a download button puts them side by side. */
