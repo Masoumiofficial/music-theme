@@ -457,7 +457,13 @@ class Test_Admin_Panel extends Wavira_Test_Case {
 			$this->assertStringContainsString( 'plugin-install.php?tab=upload', $html, 'the plugin can be installed from here' );
 		}
 
-		$this->assertStringContainsString( 'no audio or video', strtolower( $html ), 'the one thing the demo does not do is said out loud' );
+		// The tab has to say what the import really does with media, because it
+		// changed in 0.15.0: the demo used to ship no files at all (ADR 0010) and
+		// now generates its own locally (ADR 0024). A screen that still promises
+		// “no audio is imported” while the importer writes two tones per track is
+		// the kind of copy a customer discovers by disbelieving it.
+		$this->assertStringContainsString( 'generated on your own site', strtolower( $html ), 'the media is generated here, and the tab says so' );
+		$this->assertStringNotContainsString( 'no audio or video', strtolower( $html ), 'the tab does not promise files that 0.15.0 does write' );
 		$this->assertStringContainsString( esc_url( wavira_persian_setup_url() ), $html, 'the Persian setup lives here too' );
 	}
 

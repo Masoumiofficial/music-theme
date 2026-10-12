@@ -279,6 +279,22 @@ class Test_Downloads extends Wavira_Test_Case {
 		update_post_meta( $album_id, MetaSchema::VIEWS_OFFSET, 900 );
 		update_post_meta( $album_id, MetaSchema::LIKES_OFFSET, 70 );
 
+		// A ranking of albums is a ranking of *releases*: an album's score is the
+		// sum of its own counters and its tracks', so the fixture needs a track
+		// that names it as its album — which is also the relation the album
+		// ranking counts.
+		$album_track = self::factory()->post->create(
+			array(
+				'post_type'   => 'wavira_track',
+				'post_status' => 'publish',
+				'post_title'  => 'قطعهٔ آلبوم برگزیده',
+			)
+		);
+		update_post_meta( $album_track, MetaSchema::ALBUM, $album_id );
+		update_post_meta( $album_track, MetaSchema::ARTIST, $artist_id );
+		update_post_meta( $album_track, MetaSchema::VIEWS_OFFSET, 400 );
+		update_post_meta( $album_track, MetaSchema::LIKES_OFFSET, 30 );
+
 		$top_alb = $this->dispatch( '/wavira/v1/albums/top', array( 'period' => 'all', 'limit' => 5 ) );
 		$this->assertSame( 200, $top_alb->get_status() );
 
