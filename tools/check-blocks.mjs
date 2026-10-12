@@ -226,6 +226,35 @@ for ( const directory of CONTENT_DIRS ) {
 			problems.push( `${ directory }/${ name }: ships a wp:shortcode block — use the wavira/* block instead` );
 		}
 
+		/*
+		 * A taxonomy template's query must inherit the archive query.
+		 *
+		 * With `inherit: false` the loop runs the query written into the template
+		 * — every track on the site, whatever term the visitor asked for. Nothing
+		 * fails and nothing is empty, which is what made it survive review: the
+		 * genre pages all answered 200 with the same five cards. Only inheriting
+		 * narrows the loop to the term in the URL, and no block attribute can name
+		 * the current term, so `inherit: true` is the only correct setting here.
+		 *
+		 * Post-type archives are exempt on purpose: `postType` in the template is
+		 * what makes them archives of that type, and there is no term to narrow by.
+		 */
+		if ( /^taxonomy-.*\.html$/.test( name ) ) {
+			for ( const [ index, line ] of source.split( '\n' ).entries() ) {
+				if ( ! line.includes( '<!-- wp:query ' ) ) {
+					continue;
+				}
+
+				if ( ! line.includes( '"inherit":true' ) ) {
+					problems.push(
+						`${ directory }/${ name }:${ index + 1 }: a query in a taxonomy template must use ` +
+							'"inherit":true — with inherit:false the loop ignores the term in the URL and ' +
+							'every term page lists the whole site (the genre archives did exactly that).'
+					);
+				}
+			}
+		}
+
 		for ( const [ index, line ] of source.split( '\n' ).entries() ) {
 			if ( ! line.includes( '<!-- wp:group' ) || ! line.includes( '"layout":{"type":"constrained"}' ) ) {
 				continue;

@@ -75,6 +75,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   below one (`wavira/inc/related.php`, `wavira/blocks/related/`,
   `wavira/inc/shortcodes.php`, `tests/test-related.php`).
 
+- **A page is not a dead end.** `page.html` ended at the last paragraph, so a
+  static page — «دربارهٔ سایت», «تماس با ما» — left a visitor who had read it
+  with nothing to do but reach for the browser's back button. Pages now close
+  with «جدیدترین آلبوم‌ها», the same three-card section the 404 page offers, and
+  its «مشاهدهٔ همه» leads to the album archive. The section is a query, so a site
+  with no albums prints the no-results pattern instead of an empty grid
+  (`wavira/templates/page.html`).
+
 ### Fixed — 0.15.0
 
 - **An article ends by offering the next one.** A news post showed its title,
@@ -92,6 +100,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   work lists use, so a Site Editor user gets a titled section out of the block
   instead of having to place a pattern beside it.
 
+- **A genre page listed every track on the site.** `taxonomy-wavira_genre.html`
+  ran a query of its own — `postType: wavira_track`, `inherit: false` — so
+  «پاپ رؤیایی», «امبینت» and «راک تجربی» answered with the same five cards, and
+  the chips under the title were the only thing that said which genre you were
+  on. The query now inherits the archive it sits on, so each page lists what
+  actually carries the term: the album «شب‌های تهران» with the tracks «راه
+  بارانی», «سکوت» and the remix under «پاپ رؤیایی», two under «امبینت» and one
+  under «راک تجربی» — every card with the play and download controls the rest of
+  the theme uses. `tools/check-blocks.mjs` now refuses a query in a taxonomy
+  template that does not inherit: with `inherit: false` nothing fails and nothing
+  is empty, which is exactly why the defect survived review
+  (`wavira/templates/taxonomy-wavira_genre.html`, `tools/check-blocks.mjs`).
 - **The search page did not search.** `search.html` ran a query of its own —
   `postType: wavira_track`, `inherit: false` — so every query string answered
   with the same newest tracks: «پرواز» and «zzzznothing» returned identical

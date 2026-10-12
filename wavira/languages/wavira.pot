@@ -724,7 +724,7 @@ msgstr ""
 msgid "No genres with published music yet."
 msgstr ""
 
-#: wavira/blocks/news/render.php:43
+#: wavira/blocks/news/render.php:47
 msgid "No news posts yet. Publish one and it appears here."
 msgstr ""
 
