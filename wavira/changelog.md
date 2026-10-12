@@ -77,6 +77,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed — 0.15.0
 
+- **An article ends by offering the next one.** A news post showed its title,
+  its cover and its text, and nothing else: no date beside a category, no way
+  on to the next thing the site has published. `single.html` now carries a meta
+  row (the date next to the post's categories) and closes with a three-card news
+  feed headed «بیشتر بخوانید». The feed leaves out the article the reader is
+  already reading — one extra item is fetched so a feed of three still prints
+  three — and the heading belongs to the block rather than to the template, so
+  a site with a single post prints no section at all instead of a heading with
+  nothing under it (`wavira/templates/single.html`, `wavira/blocks/news/`,
+  `wavira/inc/news.php`).
+- **The news block takes a heading.** `wavira/news` accepts a `title` attribute
+  and prints it with `wavira_get_section_head()`, the same helper the artist's
+  work lists use, so a Site Editor user gets a titled section out of the block
+  instead of having to place a pattern beside it.
+
 - **The search page did not search.** `search.html` ran a query of its own —
   `postType: wavira_track`, `inherit: false` — so every query string answered
   with the same newest tracks: «پرواز» and «zzzznothing» returned identical

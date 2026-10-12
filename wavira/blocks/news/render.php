@@ -36,6 +36,10 @@ $wavira_markup = wavira_get_news(
 		'show_excerpt' => isset( $attributes['showExcerpt'] ) && (bool) $attributes['showExcerpt'],
 		'show_image'   => isset( $attributes['showImage'] ) && (bool) $attributes['showImage'],
 		'class'        => 'wavira-news--cols-' . $wavira_columns,
+		'title'        => isset( $attributes['title'] ) ? (string) $attributes['title'] : '',
+		// A feed at the foot of an article that offers the article itself has
+		// nothing to offer.
+		'exclude'      => is_singular() ? (int) get_queried_object_id() : 0,
 	)
 );
 

@@ -45,6 +45,10 @@
 		"showImage": {
 			"type": "boolean",
 			"default": true
+		},
+		"title": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {

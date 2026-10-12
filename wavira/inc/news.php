@@ -35,6 +35,14 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 	 *     @type bool   $show_excerpt Print the excerpt (default true).
 	 *     @type bool   $show_image  Print the thumbnail (default true).
 	 *     @type string $class       Extra classes for the wrapper.
+	 *     @type int    $exclude     Post ID to leave out: the article the reader
+	 *                               is already reading. One extra item is fetched
+	 *                               so a feed of N still prints N.
+	 *     @type string $title       Section heading. Printed by this function,
+	 *                               not by the template, for the same reason the
+	 *                               related section owns its own: a heading a
+	 *                               visitor can read with nothing under it is a
+	 *                               worse defect than no section at all.
 	 * }
 	 * @return string Markup, empty string when there is nothing to show.
 	 */
@@ -50,6 +58,8 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 				'show_excerpt' => true,
 				'show_image'   => true,
 				'class'        => '',
+				'exclude'      => 0,
+				'title'        => '',
 			)
 		);
 
@@ -69,9 +79,17 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 			return '';
 		}
 
+		$exclude = absint( $args['exclude'] );
+		$limit   = (int) $args['limit'];
+
+		if ( $limit < 1 ) {
+			$limit = 6;
+		}
+
+		// One extra, so leaving the current article out does not shorten the feed.
 		$items = wavira_core_news_feed(
 			array(
-				'limit'    => (int) $args['limit'],
+				'limit'    => $limit + ( $exclude > 0 ? 1 : 0 ),
 				'category' => $category,
 				'offset'   => (int) $args['offset'],
 			)
@@ -82,14 +100,28 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 		}
 
 		$classes = trim( 'wavira-news ' . (string) $args['class'] );
-		$html    = '<div class="' . esc_attr( $classes ) . '"><ul class="wavira-news__list">';
+		$html    = '<div class="' . esc_attr( $classes ) . '">';
+		$shown   = 0;
+		$cards   = '';
 
 		foreach ( $items as $item ) {
-			$item  = (array) $item;
+			$item = (array) $item;
+			$id   = isset( $item['id'] ) ? absint( $item['id'] ) : 0;
+
+			if ( $exclude > 0 && $id === $exclude ) {
+				continue;
+			}
+
+			if ( $shown >= $limit ) {
+				break;
+			}
+
+			++$shown;
+
 			$image = $args['show_image'] && isset( $item['thumbnail'] ) ? (array) $item['thumbnail'] : array();
 
-			$html .= '<li class="wavira-news__item">';
-			$html .= wavira_get_card(
+			$cards .= '<li class="wavira-news__item">';
+			$cards .= wavira_get_card(
 				array(
 					'title'      => isset( $item['title'] ) ? (string) $item['title'] : '',
 					'permalink'  => isset( $item['permalink'] ) ? (string) $item['permalink'] : '',
@@ -101,10 +133,18 @@ if ( ! function_exists( 'wavira_get_news' ) ) {
 					'class'      => 'wavira-card--news',
 				)
 			);
-			$html .= '</li>';
+			$cards .= '</li>';
 		}
 
-		return $html . '</ul></div>';
+		if ( $shown < 1 ) {
+			return '';
+		}
+
+		if ( '' !== (string) $args['title'] && function_exists( 'wavira_get_section_head' ) ) {
+			$html .= wavira_get_section_head( (string) $args['title'] );
+		}
+
+		return $html . '<ul class="wavira-news__list">' . $cards . '</ul></div>';
 	}
 }
 
