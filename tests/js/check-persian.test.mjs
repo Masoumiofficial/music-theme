@@ -16,7 +16,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { ALLOWED, checkPersian, elements, latinWords, visible, withoutEntities } from '../../tools/check-persian.mjs';
+import { ALLOWED, checkPersian, direction, elements, latinWords, visible, withoutEntities } from '../../tools/check-persian.mjs';
 
 test( 'the reader keeps text and drops markup, scripts and comments', () => {
 	assert.equal(
@@ -42,7 +42,9 @@ test( 'Latin words are found, minus the proper nouns the list allows', () => {
 
 test( 'a Persian page passes', () => {
 	const result = checkPersian( {
-		page: '<h1>واویرا موزیک</h1><p>پخش و انتشار موسیقی ایرانی</p><img src="/a.png" alt="طرح جلد آلبوم باران بهاری">',
+		page:
+			'<html dir="rtl" lang="fa-IR"><h1>واویرا موزیک</h1><p>پخش و انتشار موسیقی ایرانی</p>' +
+			'<img src="/a.png" alt="طرح جلد آلبوم باران بهاری"></html>',
 	} );
 
 	assert.equal( result.clean, true );
@@ -101,7 +103,10 @@ test( 'a directive is not an attribute, and an entity is not a word', () => {
 
 	// `&raquo;` is punctuation from core's feed titles, not the word “raquo”.
 	assert.equal( withoutEntities( 'واویرا موزیک &raquo; خوراک' ), 'واویرا موزیک   خوراک' );
-	assert.equal( checkPersian( { page: '<a title="واویرا موزیک &raquo; خوراک">خوراک</a>' } ).clean, true );
+	assert.equal(
+		checkPersian( { page: '<html dir="rtl"><a title="واویرا موزیک &raquo; خوراک">خوراک</a></html>' } ).clean,
+		true
+	);
 
 	// A machine reads `<link title>`: feed, oEmbed and RSD titles are WordPress's
 	// own and are not this product's to translate.
@@ -124,7 +129,36 @@ test( 'the element reader pairs tags with their own attributes', () => {
 test( 'the allow-list is proper nouns, and a caller can extend it', () => {
 	assert.ok( ALLOWED.includes( 'wavira' ) );
 	assert.equal(
-		checkPersian( { page: '<p>مجله Music Life</p>', allow: [ 'music', 'life' ] } ).clean,
+		checkPersian( { page: '<html dir="rtl"><p>مجله Music Life</p></html>', allow: [ 'music', 'life' ] } ).clean,
 		true
 	);
+} );
+
+test( 'a Persian page that is not right-to-left is a defect, and it is named', () => {
+	// The words can all be Persian and the page still be wrong: `dir="rtl"` comes
+	// from WordPress's locale, which learns it from the core language pack — so a
+	// Persian site without that pack rendered left to right, and every line of
+	// every sentence was read backwards. It shipped that way.
+	const flat = checkPersian( {
+		page: '<html lang="fa-IR"><body><p>پخش و انتشار موسیقی ایرانی</p></body></html>',
+	} );
+
+	assert.equal( flat.direction.persian, true );
+	assert.equal( flat.direction.rtl, false );
+	assert.equal( flat.clean, false, 'a Persian page read left to right is not clean' );
+
+	const mirrored = checkPersian( {
+		page: '<html dir="rtl" lang="fa-IR"><body><p>پخش و انتشار موسیقی ایرانی</p></body></html>',
+	} );
+
+	assert.equal( mirrored.direction.rtl, true );
+	assert.equal( mirrored.clean, true );
+
+	// An English page is not told to mirror: the check only speaks about a page
+	// that is actually Persian.
+	assert.equal( checkPersian( { page: '<html lang="en-US"><p>Latest albums</p>' } ).direction.persian, false );
+
+	// Single-quoted attributes are read too — core prints `<html lang='fa-IR'>`.
+	assert.equal( direction( "<html lang='fa-IR' dir='rtl'>" ).rtl, true );
+	assert.equal( direction( '<html>' ).declared, '' );
 } );

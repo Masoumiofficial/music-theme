@@ -804,4 +804,90 @@ class Test_Theme_Options extends Wavira_Test_Case {
 
 		return (string) ob_get_clean();
 	}
+
+	/**
+	 * The reading direction does not depend on a language pack being installed.
+	 *
+	 * WordPress prints `dir="rtl"` from `WP_Locale`, which learns the direction
+	 * from the *translation file*: on a site whose locale is Persian but whose
+	 * core language pack has not been downloaded, `<html lang="fa-IR">` came out
+	 * without a direction and the whole product rendered left to right — the
+	 * player, the track numbers and the badges all on the wrong side. The theme
+	 * knows the language it is Persian by design, so it says so itself.
+	 *
+	 * @return void
+	 */
+	public function test_the_document_direction_does_not_need_the_language_pack() {
+		add_filter(
+			'locale',
+			static function () {
+				return 'fa_IR';
+			}
+		);
+
+		$this->assertSame(
+			'dir="rtl" lang="fa-IR"',
+			wavira_language_attributes( 'lang="fa-IR"' ),
+			'a Persian site is right-to-left with or without the pack'
+		);
+		$this->assertSame(
+			'dir="rtl"',
+			wavira_language_attributes( '' ),
+			'nothing is added but the direction when WordPress said nothing else'
+		);
+
+		// WordPress already decided, or decided differently: the attribute is
+		// added, never replaced, so a site with the pack is untouched.
+		$this->assertSame( 'dir="rtl" lang="fa-IR"', wavira_language_attributes( 'dir="rtl" lang="fa-IR"' ) );
+
+		remove_all_filters( 'locale' );
+
+		$this->assertSame( 'lang="en-US"', wavira_language_attributes( 'lang="en-US"' ), 'an English site keeps its direction' );
+
+		// A Persian site that wants the other direction can say so: the list of
+		// right-to-left languages is a filter, and the attribute is only added.
+		add_filter( 'wavira_rtl_locales', '__return_empty_array' );
+
+		add_filter(
+			'locale',
+			static function () {
+				return 'fa_IR';
+			}
+		);
+
+		$this->assertSame( 'lang="fa-IR"', wavira_language_attributes( 'lang="fa-IR"' ), 'the list of right-to-left languages is filterable' );
+
+		remove_filter( 'wavira_rtl_locales', '__return_empty_array' );
+		remove_all_filters( 'locale' );
+	}
+
+	/**
+	 * A Persian locale is detected by its language subtag, not its spelling.
+	 *
+	 * @return void
+	 */
+	public function test_rtl_locale_detection_reads_the_language_subtag() {
+		add_filter(
+			'locale',
+			static function () {
+				return 'fa_IR';
+			}
+		);
+
+		$this->assertTrue( wavira_is_rtl_locale() );
+		$this->assertContains( 'fa', wavira_rtl_locales() );
+
+		remove_all_filters( 'locale' );
+
+		add_filter(
+			'locale',
+			static function () {
+				return 'ckb';
+			}
+		);
+
+		$this->assertTrue( wavira_is_rtl_locale(), 'a bare language tag is a locale too' );
+
+		remove_all_filters( 'locale' );
+	}
 }

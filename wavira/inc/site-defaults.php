@@ -103,6 +103,83 @@ function wavira_apply_persian_defaults(): array {
 }
 
 /**
+ * The languages WordPress itself renders right-to-left.
+ *
+ * The list is the language subtag, and it exists because the direction of a page
+ * is decided by WordPress from the *language pack*: `WP_Locale::init()` reads
+ * `$GLOBALS['text_direction']`, which a translation file sets, and falls back to
+ * asking whether `ltr` translates to itself. A site that set its locale to
+ * Persian but has not (yet) downloaded the pack therefore renders `dir="ltr"` —
+ * a Persian music site read left to right, with the player, the track numbers
+ * and the badges all on the wrong side. `wavira_has_core_language_pack()` exists
+ * because that pack is allowed to be absent; the layout is not.
+ *
+ * @return string[] Language subtags, lower-cased.
+ */
+function wavira_rtl_locales(): array {
+	/**
+	 * Filters the languages the theme forces right-to-left.
+	 *
+	 * @since 0.15.0
+	 * @param string[] $locales Language subtags.
+	 */
+	return (array) apply_filters(
+		'wavira_rtl_locales',
+		array( 'fa', 'ar', 'ckb', 'dv', 'he', 'iw', 'ps', 'sd', 'ug', 'ur', 'yi' )
+	);
+}
+
+/**
+ * Whether the language the site is being shown in is written right-to-left.
+ *
+ * @return bool
+ */
+function wavira_is_rtl_locale(): bool {
+	$locale = strtolower( (string) get_locale() );
+	$subtag = strtok( str_replace( '-', '_', $locale ), '_' );
+
+	return in_array( (string) $subtag, array_map( 'strtolower', wavira_rtl_locales() ), true );
+}
+
+/**
+ * Print the document's reading direction, even without the language pack.
+ *
+ * WordPress prints `dir="rtl"` from `get_language_attributes()` when `is_rtl()`
+ * says so, and this filter only speaks when WordPress did not: an attribute is
+ * added, never replaced, and a site that has the pack is untouched. The admin is
+ * left alone on purpose — its direction follows the *user's* language, and an
+ * English-speaking administrator of a Persian site should not have a mirrored
+ * dashboard.
+ *
+ * @param string $output Space-separated attributes WordPress built.
+ * @param string $doctype Doctype in use.
+ * @return string Attributes, with `dir="rtl"` in front when it belongs there.
+ */
+function wavira_language_attributes( $output, $doctype = 'html' ) {
+	$output = (string) $output;
+
+	if ( ( function_exists( 'is_admin' ) && is_admin() ) || false !== strpos( $output, 'dir=' ) ) {
+		return $output;
+	}
+
+	if ( ! function_exists( 'is_rtl' ) || is_rtl() || ! wavira_is_rtl_locale() ) {
+		return $output;
+	}
+
+	$attributes = 'dir="rtl"' . ( '' === trim( $output ) ? '' : ' ' . $output );
+
+	/**
+	 * Filters the attributes the theme puts on the `html` element.
+	 *
+	 * @since 0.15.0
+	 * @param string $attributes Attributes the theme built.
+	 * @param string $output     Attributes WordPress built.
+	 */
+	return (string) apply_filters( 'wavira_language_attributes', $attributes, $output );
+}
+add_filter( 'language_attributes', 'wavira_language_attributes', 10, 2 );
+
+/**
  * Whether a Persian translation of WordPress core is already installed.
  *
  * Modern WordPress stores translations as `fa_IR-<hash>.l10n.php`; older

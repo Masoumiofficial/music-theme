@@ -124,18 +124,49 @@ export function latinWords( text, allowed = ALLOWED ) {
 }
 
 /**
+ * The direction the document element declares.
+ *
+ * A Persian page read left to right is a defect no Latin-word scan can see: the
+ * words are all Persian and the layout is mirror-image wrong — the player's
+ * controls, the track numbers and the badges sit on the wrong side, and the
+ * first thing an RTL reader sees is the end of every line. It happened for real:
+ * `dir="rtl"` comes from WordPress's locale object, which learns it from the
+ * *core language pack*, so a site whose admin set the locale to Persian and had
+ * not downloaded the pack (`wavira_has_core_language_pack()` exists because that
+ * is an ordinary state) rendered `<html lang="fa-IR">` — and the theme's promise
+ * is Persian, not “Persian once you download something else”.
+ *
+ * @param {string} html Rendered HTML.
+ * @return {{declared: string, rtl: boolean, persian: boolean}} What the document says, and whether it is Persian.
+ */
+export function direction( html ) {
+	const tag = html.match( /<html\b[^>]*>/i );
+	const declared = tag ? ( tag[ 0 ].match( /\bdir\s*=\s*["']?([a-z-]+)/i ) || [ '', '' ] )[ 1 ].toLowerCase() : '';
+	const text = visible( html );
+
+	return {
+		declared,
+		rtl: 'rtl' === declared,
+		// Persian script anywhere on the page: the check only speaks about a page
+		// that is actually Persian, so an English fixture is not told to mirror.
+		persian: /[\u0600-\u06FF]/.test( text ),
+	};
+}
+
+/**
  * What a page says in a language that is not Persian.
  *
  * @param {object}   input
  * @param {string}   input.page    Rendered HTML.
  * @param {string[]} [input.allow] Extra allowed words.
- * @return {{ text: string[], attributes: Array<{element: string, attribute: string, value: string, words: string[]}>, clean: boolean }}
+ * @return {{ text: string[], attributes: Array<{element: string, attribute: string, value: string, words: string[]}>, direction: {declared: string, rtl: boolean, persian: boolean}, clean: boolean }}
  *         The Latin words in the page's text, in its spoken attributes, and whether the page is clean.
  */
 export function checkPersian( { page, allow = [] } ) {
 	const allowed = [ ...ALLOWED, ...allow ];
 	const text = latinWords( withoutEntities( visible( page ) ), allowed );
 	const attributes = [];
+	const dir = direction( page );
 
 	for ( const element of elements( page ) ) {
 		for ( const attribute of SPOKEN_ATTRIBUTES ) {
@@ -156,7 +187,12 @@ export function checkPersian( { page, allow = [] } ) {
 		}
 	}
 
-	return { text, attributes, clean: 0 === text.length && 0 === attributes.length };
+	return {
+		text,
+		attributes,
+		direction: dir,
+		clean: 0 === text.length && 0 === attributes.length && ! ( dir.persian && ! dir.rtl ),
+	};
 }
 
 export function usage() {
@@ -211,10 +247,20 @@ if ( process.argv[ 1 ] && import.meta.url === pathToFileURL( process.argv[ 1 ] )
 		);
 	}
 
+	if ( result.direction.persian && ! result.direction.rtl ) {
+		console.log(
+			`::error title=Persian page::${ where }: the page is Persian but <html> declares ` +
+				`dir="${ result.direction.declared || 'nothing' }" — every line of it is read backwards. ` +
+				'`dir="rtl"` must not depend on the core language pack being installed'
+		);
+	}
+
 	if ( ! result.clean ) {
 		process.exit( 1 );
 	}
 
-	console.log( '      OK    the page is Persian: no untranslated text, and no Latin alt or label' );
+	console.log(
+		'      OK    the page is Persian, right-to-left, with no untranslated text and no Latin alt or label'
+	);
 }
 /* c8 ignore stop */
