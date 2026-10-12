@@ -215,6 +215,11 @@ final class Dates {
 	/**
 	 * Persian numerals, when the site language is Persian.
 	 *
+	 * Display text only — the machine formats of rule 1 are never sent through
+	 * here. A grouping comma or decimal point that sits between two digits is
+	 * converted to its Persian mark as well, because those marks come from the
+	 * language pack and a site without one would otherwise print «۱۰,۲۴۰».
+	 *
 	 * @param string $value Any string containing Latin digits.
 	 * @return string
 	 */
@@ -222,6 +227,17 @@ final class Dates {
 		if ( ! self::locale_is_persian() ) {
 			return $value;
 		}
+
+		// The marks inside a number are part of the number. `number_format_i18n()`
+		// reads the grouping and decimal marks from the locale, and WordPress gets
+		// them from the *language pack*: a Persian site that has not downloaded
+		// one — a fresh install, which is what this repository's own preview is —
+		// falls back to the ASCII marks, and the page reads «۱۰,۲۴۰» and «۴.۲».
+		// A mark *between two digits* is converted; a comma in a sentence, or a
+		// dot in a file name, is not, and a site whose language pack already
+		// prints «٬» is left exactly as it is.
+		$value = (string) preg_replace( '/(?<=[0-9]),(?=[0-9])/u', '٬', (string) $value );
+		$value = (string) preg_replace( '/(?<=[0-9])\.(?=[0-9])/u', '٫', (string) $value );
 
 		return strtr(
 			$value,

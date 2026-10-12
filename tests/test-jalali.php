@@ -309,6 +309,20 @@ class Test_Jalali extends Wavira_Test_Case {
 		$this->assertSame( '۱۴۰۵', Dates::digits( '1405' ) );
 		$this->assertSame( '۲۴۰ / ۳۲۰', Dates::digits( '240 / 320' ) );
 
+		// The marks inside a number are Persian too: a grouping comma and a
+		// decimal point that `number_format_i18n()` produced from a site with no
+		// Persian language pack are not allowed to survive among Persian digits.
+		$this->assertSame( '۱۰٬۲۴۰', Dates::digits( '10,240' ) );
+		$this->assertSame( '۴٫۲', Dates::digits( '4.2' ) );
+		$this->assertSame( '۱٬۲۳۴٬۵۶۷', Dates::digits( '1,234,567' ) );
+
+		// …and prose is prose: punctuation that is not between digits is untouched,
+		// including the Persian thousands mark a language pack would have used —
+		// converting it twice is not possible, so the helper is idempotent.
+		$this->assertSame( 'راه بارانی (نسخهٔ ریمیکس)', Dates::digits( 'راه بارانی (نسخهٔ ریمیکس)' ) );
+		$this->assertSame( '۱۴۰۵، سال', Dates::digits( '1405، سال' ) );
+		$this->assertSame( '۱۰٬۲۴۰', Dates::digits( '۱۰٬۲۴۰' ) );
+
 		$this->pretend_english();
 	}
 
