@@ -39,8 +39,8 @@ msgid "A %s queue needs the ID of its source item."
 msgstr "صف %s به شناسهٔ مورد مبدأ نیاز دارد."
 
 #: wavira-core/src/Admin/DemoPage.php:108
-msgid "A demo pointing at files that do not exist would break the player on the first click; add your own media and the player picks it up."
-msgstr "نمایشی که به فایل‌های ناموجود اشاره کند، با نخستین کلیک پخش‌کننده را خراب می‌کند؛ فایل‌های خودتان را اضافه کنید تا پخش‌کننده آن‌ها را بردارد."
+msgid "Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install; replace the files with your own and the player picks them up."
+msgstr "برای هر قطعه یک قطعهٔ صوتی کوتاه در ۱۲۸ و ۳۲۰ کیلوبیت‌برثانیه و برای هر آلبوم یک جلد ساخته می‌شود تا پخش‌کننده، صف پخش، دکمه‌های دانلود و شمارنده‌ها از همان نصب تازه کار کنند؛ فایل‌های خودتان را جایگزین کنید تا پخش‌کننده آن‌ها را بردارد."
 
 #: wavira-core/src/Rest/PlayerController.php:192
 msgid "A genre queue needs a genre slug."
@@ -378,8 +378,8 @@ msgid "No %s found for the requested ID."
 msgstr "برای شناسهٔ درخواستی %s یافت نشد."
 
 #: wavira-core/src/Admin/DemoPage.php:107
-msgid "No audio or video files are imported."
-msgstr "هیچ فایل صوتی یا تصویری وارد نمی‌شود."
+msgid "The audio and the artwork are generated on your own site."
+msgstr "صدا و تصویر روی همین سایت ساخته می‌شود."
 
 #: wavira-core/src/Content/Taxonomies.php:102
 msgid "Noha"
@@ -582,8 +582,8 @@ msgid "The demo content could not be imported."
 msgstr "محتوای نمایشی وارد نشد."
 
 #: wavira-core/src/Admin/DemoPage.php:103
-msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
-msgstr "این نمایش یک سایت موسیقی فارسی کوچک و کامل است: یک هنرمند، یک آلبوم با پانزده قطعه (شامل یک ریمیکس)، یک تک‌آهنگ و یک موزیک‌ویدیو — همراه با متن ترانه، سبک، مدت و تاریخ شمسی."
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates."
+msgstr "محتوای نمایشی یک سایت موسیقی فارسیِ کوچک و کامل است: یک هنرمند، یک آلبوم با چهار قطعه (یکی از آن‌ها ریمیکس)، یک تک‌آهنگ، یک مجموعهٔ پادکست با دو قسمت و یک نماهنگ — با متن ترانه، سبک‌ها، مدت‌زمان و تاریخ شمسی."
 
 #: wavira-core/src/Demo/Installer.php:496
 msgid "The news have a page of their own: the front page is static now, and the posts are listed at their own address."

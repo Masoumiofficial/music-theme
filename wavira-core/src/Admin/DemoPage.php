@@ -100,12 +100,12 @@ final class DemoPage implements Registrable {
 			<?php echo $notice; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by notice() from fixed strings and integers. ?>
 
 			<p>
-				<?php esc_html_e( 'The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates.', 'wavira-core' ); ?>
+				<?php esc_html_e( 'The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates.', 'wavira-core' ); ?>
 			</p>
 
 			<p>
-				<strong><?php esc_html_e( 'No audio or video files are imported.', 'wavira-core' ); ?></strong>
-				<?php esc_html_e( 'A demo pointing at files that do not exist would break the player on the first click; add your own media and the player picks it up.', 'wavira-core' ); ?>
+				<strong><?php esc_html_e( 'The audio and the artwork are generated on your own site.', 'wavira-core' ); ?></strong>
+				<?php esc_html_e( 'Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install; replace the files with your own and the player picks them up.', 'wavira-core' ); ?>
 			</p>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

@@ -56,10 +56,6 @@ msgstr ""
 msgid "A CSS font stack, for example: \"IRANSans\", Tahoma, sans-serif. Used only when “Custom stack” is selected."
 msgstr ""
 
-#: wavira/inc/admin-panel.php:495
-msgid "A demo pointing at files that do not exist would break the player on the first click. Add your own media and the player picks it up."
-msgstr ""
-
 #: wavira/inc/customizer.php:112
 msgid "A filled field prints its icon in the footer. An empty field prints nothing at all — no dead links."
 msgstr ""
@@ -569,6 +565,10 @@ msgstr ""
 msgid "Every block size in the theme is relative to this, so the whole page scales together."
 msgstr ""
 
+#: wavira/inc/admin-panel.php:495
+msgid "Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install. Nothing is fetched from anywhere: replace the files with your own and the player picks them up."
+msgstr ""
+
 #: wavira/inc/customizer.php:141
 msgid "Everything the theme itself needs: identity, header, colours, fonts, social links and footer text. Music content, the player engine and the migration tool belong to the Wavira Core plugin and keep working if you switch themes."
 msgstr ""
@@ -767,10 +767,6 @@ msgstr ""
 
 #: wavira/inc/hooks.php:163
 msgid "Next track"
-msgstr ""
-
-#: wavira/inc/admin-panel.php:494
-msgid "No audio or video files are imported."
 msgstr ""
 
 #: wavira/blocks/genre-chips/render.php:23
@@ -1048,12 +1044,16 @@ msgstr ""
 msgid "Texts and footer"
 msgstr ""
 
+#: wavira/inc/admin-panel.php:494
+msgid "The audio and the artwork are generated on your own site."
+msgstr ""
+
 #: wavira/inc/customizer.php:75
 msgid "The browser tab icon (favicon) and the app icon on phones."
 msgstr ""
 
 #: wavira/inc/admin-panel.php:490
-msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music."
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music."
 msgstr ""
 
 #: wavira/inc/customizer.php:98

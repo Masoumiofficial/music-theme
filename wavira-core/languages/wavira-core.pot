@@ -35,10 +35,6 @@ msgstr ""
 msgid "A %s queue needs the ID of its source item."
 msgstr ""
 
-#: wavira-core/src/Admin/DemoPage.php:108
-msgid "A demo pointing at files that do not exist would break the player on the first click; add your own media and the player picks it up."
-msgstr ""
-
 #: wavira-core/src/Rest/PlayerController.php:192
 msgid "A genre queue needs a genre slug."
 msgstr ""
@@ -155,7 +151,7 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:300
+#: wavira-core/src/Demo/Fixtures.php:305
 msgid "Demo Album"
 msgstr ""
 
@@ -163,7 +159,7 @@ msgstr ""
 msgid "Demo album audio"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:294
+#: wavira-core/src/Demo/Fixtures.php:299
 msgid "Demo Artist"
 msgstr ""
 
@@ -191,19 +187,19 @@ msgstr ""
 msgid "Demo gallery photo %d"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:257
+#: wavira-core/src/Demo/Fixtures.php:262
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:309
+#: wavira-core/src/Demo/Fixtures.php:314
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:288
+#: wavira-core/src/Demo/Fixtures.php:293
 msgid "Demo News"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:282
+#: wavira-core/src/Demo/Fixtures.php:287
 #. translators: %d: demo news post number.
 msgid "Demo News %d"
 msgstr ""
@@ -212,7 +208,7 @@ msgstr ""
 msgid "Demo news image"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:264
+#: wavira-core/src/Demo/Fixtures.php:269
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
@@ -292,6 +288,10 @@ msgstr ""
 msgid "EP"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:108
+msgid "Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install; replace the files with your own and the player picks them up."
+msgstr ""
+
 #: wavira-core/src/Admin/MetaBoxes.php:200
 msgid "Explicit content badge"
 msgstr ""
@@ -335,20 +335,20 @@ msgstr ""
 msgid "Full album ZIP download — 320 kbps"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:295
+#: wavira-core/src/Demo/Fixtures.php:300
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:285
+#: wavira-core/src/Demo/Fixtures.php:290
 #. translators: %d: demo news post number.
 msgid "Generated demo excerpt — replace this text."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:256
+#: wavira-core/src/Demo/Fixtures.php:261
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:286
+#: wavira-core/src/Demo/Fixtures.php:291
 #. translators: %d: demo news post number.
 msgid "Generated demo news post. Replace with real content."
 msgstr ""
@@ -525,10 +525,6 @@ msgstr ""
 #: wavira-core/src/Rest/AbstractController.php:189
 #. translators: %s: entity name, e.g. "track".
 msgid "No %s found for the requested ID."
-msgstr ""
-
-#: wavira-core/src/Admin/DemoPage.php:107
-msgid "No audio or video files are imported."
 msgstr ""
 
 #: wavira-core/src/Content/Taxonomies.php:102
@@ -814,6 +810,10 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
+#: wavira-core/src/Admin/DemoPage.php:107
+msgid "The audio and the artwork are generated on your own site."
+msgstr ""
+
 #: wavira-core/src/Admin/DemoPage.php:288
 #. translators: %s: error message.
 msgid "The demo content could not be imported: %s"
@@ -825,7 +825,7 @@ msgid "The demo content could not be imported."
 msgstr ""
 
 #: wavira-core/src/Admin/DemoPage.php:103
-msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates."
 msgstr ""
 
 #: wavira-core/src/Demo/Installer.php:554

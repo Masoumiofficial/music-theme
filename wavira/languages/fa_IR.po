@@ -32,8 +32,8 @@ msgid "A CSS font stack, for example: \"IRANSans\", Tahoma, sans-serif. Used onl
 msgstr "یک پشتهٔ فونت CSS، مثلاً: «IRANSans»، Tahoma، sans-serif. فقط وقتی «پشتهٔ دلخواه» انتخاب شده باشد به کار می‌رود."
 
 #: wavira/inc/admin-panel.php:495
-msgid "A demo pointing at files that do not exist would break the player on the first click. Add your own media and the player picks it up."
-msgstr "دمویی که به پرونده‌های ناموجود اشاره کند، با نخستین کلیک پخش‌کننده را از کار می‌اندازد. پرونده‌های خودتان را بیفزایید تا پخش‌کننده آن‌ها را بردارد."
+msgid "Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install. Nothing is fetched from anywhere: replace the files with your own and the player picks them up."
+msgstr "برای هر قطعه یک قطعهٔ صوتی کوتاه در ۱۲۸ و ۳۲۰ کیلوبیت‌برثانیه و برای هر آلبوم یک جلد ساخته می‌شود تا پخش‌کننده، صف پخش، دکمه‌های دانلود و شمارنده‌ها از همان نصب تازه کار کنند. هیچ فایلی از بیرون گرفته نمی‌شود؛ فایل‌های خودتان را جایگزین کنید تا پخش‌کننده آن‌ها را بردارد."
 
 #: wavira/inc/customizer.php:112
 msgid "A filled field prints its icon in the footer. An empty field prints nothing at all — no dead links."
@@ -708,8 +708,8 @@ msgid "Nothing published here yet."
 msgstr "هنوز چیزی اینجا منتشر نشده است."
 
 #: wavira/inc/admin-panel.php:494
-msgid "No audio or video files are imported."
-msgstr "هیچ پروندهٔ صوتی یا ویدیویی درون‌ریزی نمی‌شود."
+msgid "The audio and the artwork are generated on your own site."
+msgstr "صدا و تصویر روی همین سایت ساخته می‌شود."
 
 #: wavira/blocks/genre-chips/render.php:23
 msgid "No genres with published music yet."
@@ -965,8 +965,8 @@ msgid "The browser tab icon (favicon) and the app icon on phones."
 msgstr "آیکون زبانهٔ مرورگر (فاوآیکون) و آیکون برنامه در گوشی."
 
 #: wavira/inc/admin-panel.php:490
-msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music."
-msgstr "دمو یک سایت موسیقی فارسیِ کوچک و کامل است: یک هنرمند، یک آلبوم با چهار قطعه (یکی از آن‌ها ریمیکس)، یک تک‌آهنگ و یک نماهنگ — با متن ترانه، سبک‌ها، مدت‌زمان و تاریخ شمسی. همان محتوایی است که این قالب بر پایهٔ آن طراحی شده؛ پس سایت پیش از افزودن موسیقی خودتان هم کامل به نظر می‌رسد."
+msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music."
+msgstr "محتوای نمایشی یک سایت موسیقی فارسیِ کوچک و کامل است: یک هنرمند، یک آلبوم با چهار قطعه (یکی از آن‌ها ریمیکس)، یک تک‌آهنگ، یک مجموعهٔ پادکست با دو قسمت و یک نماهنگ — با متن ترانه، سبک‌ها، مدت‌زمان و تاریخ شمسی. همان محتوایی است که این قالب بر پایهٔ آن طراحی شده؛ پس سایت پیش از افزودن موسیقی خودتان هم کامل به نظر می‌رسد."
 
 #: wavira/inc/customizer.php:98
 msgid "The header is a template part: reorder it and add blocks in the Site Editor. These switches control what the theme prints around your own blocks."

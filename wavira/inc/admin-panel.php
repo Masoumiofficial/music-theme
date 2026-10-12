@@ -487,12 +487,12 @@ function wavira_admin_panel_demo_tab(): void {
 	<h2><?php esc_html_e( 'Demo content', 'wavira' ); ?></h2>
 
 	<p>
-		<?php esc_html_e( 'The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music.', 'wavira' ); ?>
+		<?php esc_html_e( 'The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, a podcast series with two episodes, and a music video — with lyrics, genres, durations and Jalali dates. It is the same content this theme was designed on, so the site looks finished before you add your own music.', 'wavira' ); ?>
 	</p>
 
 	<p>
-		<strong><?php esc_html_e( 'No audio or video files are imported.', 'wavira' ); ?></strong>
-		<?php esc_html_e( 'A demo pointing at files that do not exist would break the player on the first click. Add your own media and the player picks it up.', 'wavira' ); ?>
+		<strong><?php esc_html_e( 'The audio and the artwork are generated on your own site.', 'wavira' ); ?></strong>
+		<?php esc_html_e( 'Every track gets a short generated tone at 128 and 320 kbps and every release a generated cover, so the player, the queue, the download buttons and the counters all work on a fresh install. Nothing is fetched from anywhere: replace the files with your own and the player picks them up.', 'wavira' ); ?>
 	</p>
 
 	<?php if ( $active ) : ?>

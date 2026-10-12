@@ -38,9 +38,14 @@ final class Fixtures {
 	 * The Persian catalogue: the demo the product ships as its example site.
 	 *
 	 * Fictional content, written for the demo (ADR 0010): one artist, an album
-	 * with four tracks (one of them a remix), a single, a music video, Persian
-	 * genres and Jalali-era release dates. No audio or video file is referenced
-	 * — a demo URL that 404s would break the player on the buyer's first click.
+	 * with four tracks (one of them a remix), a single, a podcast series with two
+	 * episodes (episode numbers and chapter timestamps), a music video, Persian
+	 * genres and Jalali-era release dates. No third-party file is referenced and
+	 * no remote URL is written — a demo URL that 404s would break the player on
+	 * the buyer's first click. The import *generates* its own media instead
+	 * (ADR 0024): a cover per release, a tone per track at 128 and 320 kbps, and
+	 * a longer tone for a long-form episode so its chapters point at real
+	 * seconds.
 	 *
 	 * @return array<string, mixed>
 	 */
