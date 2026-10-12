@@ -18,6 +18,7 @@ use Wavira\Core\Demo\Exporter;
 use Wavira\Core\Demo\Fixtures;
 use Wavira\Core\Demo\Installer;
 use Wavira\Core\Demo\Placeholders;
+use Wavira\Core\Player\Payload;
 
 /**
  * Class Test_Demo
@@ -116,8 +117,8 @@ class Test_Demo extends Wavira_Test_Case {
 		$this->posts = array_merge( $this->posts, $this->demo_ids() );
 
 		$this->assertFalse( $report['skipped'] );
-		$this->assertSame( 2, count( $report['releases'] ) );
-		$this->assertSame( 5, count( $report['tracks'] ), 'four songs and the remix of one of them' );
+		$this->assertSame( 3, count( $report['releases'] ), 'an album, a single and the podcast series' );
+		$this->assertSame( 7, count( $report['tracks'] ), 'four songs, the remix of one of them and two podcast episodes' );
 		$this->assertGreaterThan( 0, (int) $report['video'] );
 
 		$this->assertSame( PostTypes::ARTIST, get_post_type( (int) $report['artist'] ) );
@@ -141,6 +142,40 @@ class Test_Demo extends Wavira_Test_Case {
 
 		$this->assertContains( 'remix', $kinds, 'the demo shows a remix as a kind of its own' );
 		$this->assertContains( 'music', $kinds );
+		$this->assertContains( 'podcast', $kinds, 'the demo shows a podcast episode as a kind of its own' );
+
+		// The long-form demo is demonstrative, not decorative: an episode number
+		// that is printed, and chapters whose seconds fall inside the file the
+		// importer generated — a chapter that seeks past the end is a button
+		// that does nothing.
+		$episodes = array();
+
+		foreach ( $report['tracks'] as $track ) {
+			$episode = (int) get_post_meta( (int) $track, MetaSchema::EPISODE, true );
+
+			if ( $episode < 1 ) {
+				continue;
+			}
+
+			$episodes[ $episode ] = (int) $track;
+		}
+
+		$this->assertSame( array( 1, 2 ), array_keys( $episodes ), 'the podcast series ships numbered episodes' );
+
+		foreach ( $episodes as $episode => $episode_id ) {
+			$length   = (int) get_post_meta( $episode_id, MetaSchema::DURATION, true );
+			$chapters = Payload::chapters( $episode_id );
+
+			$this->assertGreaterThanOrEqual( 2, count( $chapters ), "episode {$episode} has a timestamped chapter list" );
+
+			foreach ( $chapters as $chapter ) {
+				$this->assertLessThanOrEqual(
+					$length,
+					(int) $chapter['time'],
+					"episode {$episode}: a chapter that seeks past the end of the file is a button that does nothing"
+				);
+			}
+		}
 
 		$this->assertSame( 'other', (string) get_post_meta( (int) $report['video'], MetaSchema::VIDEO_SOURCE, true ), 'the demo video does not pretend to be a file it does not have' );
 

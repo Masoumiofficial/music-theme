@@ -261,6 +261,7 @@ final class MetaBoxes implements Registrable {
 							<option value="ep" <?php selected( $album_type, 'ep' ); ?>><?php esc_html_e( 'EP', 'wavira-core' ); ?></option>
 							<option value="single" <?php selected( $album_type, 'single' ); ?>><?php esc_html_e( 'Single', 'wavira-core' ); ?></option>
 							<option value="compilation" <?php selected( $album_type, 'compilation' ); ?>><?php esc_html_e( 'Compilation', 'wavira-core' ); ?></option>
+							<option value="podcast" <?php selected( $album_type, 'podcast' ); ?>><?php esc_html_e( 'Podcast', 'wavira-core' ); ?></option>
 						</select>
 					</td>
 				</tr>

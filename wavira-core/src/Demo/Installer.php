@@ -172,8 +172,20 @@ final class Installer {
 				update_post_meta( $track_id, MetaSchema::VIEWS_OFFSET, 1200 + ( $index * 340 ) + ( $release_index * 210 ) );
 				update_post_meta( $track_id, MetaSchema::LIKES_OFFSET, 85 + ( $index * 24 ) + ( $release_index * 15 ) );
 
-				if ( in_array( (string) ( $track['kind'] ?? 'music' ), array( 'podcast', 'remix' ), true ) ) {
-					update_post_meta( $track_id, MetaSchema::EPISODE, 1 );
+				// A podcast episode (or any long-form track) carries its episode
+				// number and its chapter list in the fixture: the demo's chapters
+				// have to point at real seconds of the tone that is generated a
+				// few lines below, so the timestamps are content, not a decorator
+				// that jumps nowhere when a visitor clicks it (ADR 0024).
+				if ( ! empty( $track['episode'] ) ) {
+					update_post_meta( $track_id, MetaSchema::EPISODE, (int) $track['episode'] );
+				}
+
+				if ( ! empty( $track['chapters'] ) ) {
+					update_post_meta( $track_id, MetaSchema::CHAPTERS, (string) $track['chapters'] );
+				}
+
+				if ( ! empty( $track['episode'] ) && empty( $track['chapters'] ) ) {
 					update_post_meta(
 						$track_id,
 						MetaSchema::CHAPTERS,
@@ -196,15 +208,18 @@ final class Installer {
 					++$report['media'];
 				}
 
-				$audio = Placeholders::audio( $track_id, 6, 330 + ( $index * 42 ) );
+				// A song gets six seconds of tone; a long-form episode gets
+				// twenty, because the skip, the resume and the speed control are
+				// only visible on a file long enough to move inside. Either way
+				// the generated file's length is what the player shows while
+				// nothing has loaded yet, so the meta is what was really written.
+				$tone_seconds = ! empty( $track['longform'] ) ? 20 : 6;
+				$audio        = Placeholders::audio( $track_id, $tone_seconds, 330 + ( $index * 42 ) );
 
 				if ( ! empty( $audio['id'] ) ) {
 					$report['media'] += (int) ( $audio['files'] ?? 1 );
 
-					// The demo's own file length is what the player shows while
-					// nothing has loaded yet: six seconds of tone, not the four
-					// minutes the fixture pretends the song lasts.
-					update_post_meta( $track_id, MetaSchema::DURATION, 6 );
+					update_post_meta( $track_id, MetaSchema::DURATION, $tone_seconds );
 				}
 
 				$release_tracks[] = $track_id;

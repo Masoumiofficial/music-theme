@@ -41,9 +41,10 @@ hardcoded.
 
 ## 3. Registered meta
 
-**46 keys** are registered with `register_post_meta()` (type + single + sanitize_callback +
+**53 keys** are registered with `register_post_meta()` (type + single + sanitize_callback +
 auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`; the count is asserted by
-`wp wavira verify` and by `tests/test-meta-settings.php`.
+`wp wavira verify`, by `tests/test-meta-settings.php` and by the `[MAPPING]` gate, which reads it from
+`README.md`.
 
 ### Relations (post IDs — never free text, ADR 0012)
 
@@ -70,6 +71,25 @@ auth_callback + REST schema). Source of truth: `src/Content/MetaSchema.php`; the
 | `wavira_isrc` | text | industry identifier |
 | `wavira_explicit` | bool | explicit-content badge |
 | `wavira_version_note` | text | e.g. "Remix", "Live" |
+| `wavira_episode` | int | episode number of a podcast/long-form track (0.15.0) |
+| `wavira_chapters` | html (KSES allow-list) | timestamped chapter list, one `00:00 Title` per line (0.15.0) |
+
+### Engagement (0.15.0)
+
+Recorded numbers and admin adjustments are **different keys**, so the admin screen can say which is
+which and the audit trail can be reset without touching the other:
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `wavira_views` | int | page views recorded by the site (rate-limited per visitor) |
+| `wavira_likes` | int | likes recorded by the site (logged-in users and guests with a token) |
+| `wavira_views_offset` | int | admin baseline added to the recorded views before display |
+| `wavira_likes_offset` | int | admin baseline added to the recorded likes before display |
+
+`wavira_views`/`wavira_likes` are written by `Content\Stats` only; a public total is always
+`recorded + offset` (`Stats::breakdown()`), and a save that changes an offset or resets the recorded
+counters stamps `_wavira_stats_updated_at` so the box can print when it last changed. Legacy `views`
+is still not reinterpreted — the migration tool keeps it in `_migration_raw` (see `VERIFICATION.md`).
 
 **Counters (plugin-only, added in 0.4.0)** — `wavira_download_count`, `wavira_download_count_128`,
 `wavira_download_count_320`. Registered integers on tracks with **`show_in_rest => false`**: they are
@@ -92,7 +112,7 @@ job only; the theme never touches a counter (ADR 0013 §1).
 
 | Key | Type | Values |
 | --- | --- | --- |
-| `wavira_album_type` | enum | `album`, `single`, `ep`, `compilation` |
+| `wavira_album_type` | enum | `album`, `single`, `ep`, `compilation`, `podcast` |
 | `wavira_catalog_number` | text | label catalogue number |
 | `wavira_album_audio_128` / `_320` | url | album-level audio (legacy `album128` / `album320`), reserved for the full-album download; playback stays track-based |
 
@@ -102,7 +122,7 @@ job only; the theme never touches a counter (ADR 0013 §1).
 | --- | --- | --- |
 | `wavira_video_source` | enum | `self`, `youtube`, `vimeo`, `aparat`, `other` |
 | `wavira_video_url` | url | embed/main source |
-| `wavira_video_480` / `_720` / `_1080` | url | self-hosted qualities |
+| `wavira_video_480` / `_720` / `_1080` / `_2160` | url | self-hosted qualities (2160 = 4K, 0.15.0); an empty quality is not offered for download |
 | `wavira_video_poster` | int (attachment) | poster frame |
 
 ### Artist

@@ -281,7 +281,23 @@ class Test_Downloads extends Wavira_Test_Case {
 
 		$top_alb = $this->dispatch( '/wavira/v1/albums/top', array( 'period' => 'all', 'limit' => 5 ) );
 		$this->assertSame( 200, $top_alb->get_status() );
-		$this->assertGreaterThanOrEqual( 1, $top_alb->get_data()['count'] );
-		$this->assertSame( $album_id, $top_alb->get_data()['items'][0]['id'] );
+
+		$albums = $top_alb->get_data()['items'];
+
+		// A list, not a cache envelope: the ranking once shipped `Cache::get()`'s
+		// own `found`/`value` wrapper as its payload, which `count()` happily
+		// counted as two albums.
+		$this->assertArrayHasKey( 0, $albums, 'the album ranking is a list of albums' );
+		$this->assertSame( $album_id, $albums[0]['id'] );
+		$this->assertGreaterThanOrEqual( 1, (int) $albums[0]['tracks_count'], 'the album counts its own tracks' );
+
+		// Every window answers, not only the one the section prints first: a
+		// window that throws is a front page that dies for that visitor.
+		foreach ( array( 'week', 'month', 'year' ) as $period ) {
+			$window = $this->dispatch( '/wavira/v1/albums/top', array( 'period' => $period, 'limit' => 3 ) );
+
+			$this->assertSame( 200, $window->get_status(), $period );
+			$this->assertArrayHasKey( 0, $window->get_data()['items'], $period );
+		}
 	}
 }

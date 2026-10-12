@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Domain: wavira-core\n"
 
-#: wavira-core/src/Admin/MetaBoxes.php:585
+#: wavira-core/src/Admin/MetaBoxes.php:586
 msgid "— None —"
 msgstr ""
 
@@ -43,7 +43,7 @@ msgstr ""
 msgid "A genre queue needs a genre slug."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:629
+#: wavira-core/src/Demo/Installer.php:644
 msgid "About the site"
 msgstr ""
 
@@ -57,11 +57,11 @@ msgstr ""
 msgid "Add new %s"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:441
+#: wavira-core/src/Admin/MetaBoxes.php:442
 msgid "Admin likes offset:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:431
+#: wavira-core/src/Admin/MetaBoxes.php:432
 msgid "Admin views offset:"
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Album"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:283
+#: wavira-core/src/Admin/MetaBoxes.php:284
 msgid "Album flags"
 msgstr ""
 
@@ -88,7 +88,7 @@ msgstr ""
 msgid "All %s"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:326
+#: wavira-core/src/Admin/MetaBoxes.php:327
 #: wavira-core/src/Content/ArtistProfile.php:198
 msgid "Aparat"
 msgstr ""
@@ -126,7 +126,7 @@ msgstr ""
 msgid "Compilation"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:393
+#: wavira-core/src/Admin/MetaBoxes.php:394
 msgid "Country / Origin"
 msgstr ""
 
@@ -155,7 +155,7 @@ msgstr ""
 msgid "Delete all music content when the plugin is uninstalled"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:263
+#: wavira-core/src/Demo/Fixtures.php:300
 msgid "Demo Album"
 msgstr ""
 
@@ -163,7 +163,7 @@ msgstr ""
 msgid "Demo album audio"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:257
+#: wavira-core/src/Demo/Fixtures.php:294
 msgid "Demo Artist"
 msgstr ""
 
@@ -191,33 +191,33 @@ msgstr ""
 msgid "Demo gallery photo %d"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:220
+#: wavira-core/src/Demo/Fixtures.php:257
 msgid "Demo Genre"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:272
+#: wavira-core/src/Demo/Fixtures.php:309
 msgid "Demo Music Video"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:251
+#: wavira-core/src/Demo/Fixtures.php:288
 msgid "Demo News"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:245
+#: wavira-core/src/Demo/Fixtures.php:282
 #. translators: %d: demo news post number.
 msgid "Demo News %d"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:247
+#: wavira-core/src/Demo/Installer.php:262
 msgid "Demo news image"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:227
+#: wavira-core/src/Demo/Fixtures.php:264
 #. translators: %d: demo track number.
 msgid "Demo Track %d"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:325
+#: wavira-core/src/Admin/MetaBoxes.php:326
 msgid "Direct hosted video file (MP4 / WebM)"
 msgstr ""
 
@@ -233,19 +233,19 @@ msgstr ""
 msgid "Download URL — 320 kbps (MP3)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:338
+#: wavira-core/src/Admin/MetaBoxes.php:339
 msgid "Download URL — 4K (2160p)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:342
+#: wavira-core/src/Admin/MetaBoxes.php:343
 msgid "Download URL — Full HD (1080p)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:346
+#: wavira-core/src/Admin/MetaBoxes.php:347
 msgid "Download URL — HD (720p)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:350
+#: wavira-core/src/Admin/MetaBoxes.php:351
 msgid "Download URL — SD (480p)"
 msgstr ""
 
@@ -258,7 +258,7 @@ msgid "Downloads are not available for this post."
 msgstr ""
 
 #: wavira-core/src/Admin/MetaBoxes.php:183
-#: wavira-core/src/Admin/MetaBoxes.php:354
+#: wavira-core/src/Admin/MetaBoxes.php:355
 msgid "Duration (seconds)"
 msgstr ""
 
@@ -284,7 +284,7 @@ msgstr ""
 msgid "Enable the Release-year taxonomy"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:271
+#: wavira-core/src/Admin/MetaBoxes.php:272
 msgid "Enter published track IDs separated by commas in the exact album order."
 msgstr ""
 
@@ -310,8 +310,8 @@ msgid "Featured artist IDs (comma-separated)"
 msgstr ""
 
 #: wavira-core/src/Admin/MetaBoxes.php:196
-#: wavira-core/src/Admin/MetaBoxes.php:288
-#: wavira-core/src/Admin/MetaBoxes.php:363
+#: wavira-core/src/Admin/MetaBoxes.php:289
+#: wavira-core/src/Admin/MetaBoxes.php:364
 msgid "Featured in Hero / Spotlight"
 msgstr ""
 
@@ -327,28 +327,28 @@ msgstr ""
 msgid "Footer copyright text"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:279
+#: wavira-core/src/Admin/MetaBoxes.php:280
 msgid "Full album ZIP download — 128 kbps"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:275
+#: wavira-core/src/Admin/MetaBoxes.php:276
 msgid "Full album ZIP download — 320 kbps"
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:258
+#: wavira-core/src/Demo/Fixtures.php:295
 msgid "Generated demo biography. Replace with real content."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:248
+#: wavira-core/src/Demo/Fixtures.php:285
 #. translators: %d: demo news post number.
 msgid "Generated demo excerpt — replace this text."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:219
+#: wavira-core/src/Demo/Fixtures.php:256
 msgid "Generated demo lyrics — replace this text."
 msgstr ""
 
-#: wavira-core/src/Demo/Fixtures.php:249
+#: wavira-core/src/Demo/Fixtures.php:286
 #. translators: %d: demo news post number.
 msgid "Generated demo news post. Replace with real content."
 msgstr ""
@@ -369,7 +369,7 @@ msgstr ""
 msgid "Global social profile URLs"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:523
+#: wavira-core/src/Demo/Installer.php:538
 msgid "Home"
 msgstr ""
 
@@ -413,7 +413,7 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:456
+#: wavira-core/src/Admin/MetaBoxes.php:457
 #. translators: %s: date/time of last admin stats edit.
 msgid "Last admin adjustment: %s"
 msgstr ""
@@ -514,7 +514,7 @@ msgstr ""
 msgid "New %s name"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:526
+#: wavira-core/src/Demo/Installer.php:541
 msgid "News"
 msgstr ""
 
@@ -550,7 +550,7 @@ msgstr ""
 msgid "Now playing: %s"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:286
+#: wavira-core/src/Admin/MetaBoxes.php:287
 msgid "Offer album download buttons when files exist"
 msgstr ""
 
@@ -562,15 +562,15 @@ msgstr ""
 msgid "Offer download buttons when files exist"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:361
+#: wavira-core/src/Admin/MetaBoxes.php:362
 msgid "Offer video download buttons when files exist"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:397
+#: wavira-core/src/Admin/MetaBoxes.php:398
 msgid "Official website"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:322
+#: wavira-core/src/Admin/MetaBoxes.php:323
 msgid "Online playback source"
 msgstr ""
 
@@ -578,7 +578,7 @@ msgstr ""
 msgid "Online playback stream URL (independent from downloads)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:334
+#: wavira-core/src/Admin/MetaBoxes.php:335
 msgid "Online stream / embed URL"
 msgstr ""
 
@@ -592,11 +592,11 @@ msgstr ""
 msgid "Order direction."
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:268
+#: wavira-core/src/Admin/MetaBoxes.php:269
 msgid "Ordered tracklist (track IDs in playing order)"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:329
+#: wavira-core/src/Admin/MetaBoxes.php:330
 msgid "Other external provider"
 msgstr ""
 
@@ -629,6 +629,7 @@ msgstr ""
 msgid "Plugin activation failed"
 msgstr ""
 
+#: wavira-core/src/Admin/MetaBoxes.php:264
 #: wavira-core/src/Content/Taxonomies.php:103
 msgid "Podcast"
 msgstr ""
@@ -651,20 +652,20 @@ msgstr ""
 
 #: wavira-core/src/Admin/MetaBoxes.php:126
 #: wavira-core/src/Admin/MetaBoxes.php:245
-#: wavira-core/src/Admin/MetaBoxes.php:314
+#: wavira-core/src/Admin/MetaBoxes.php:315
 msgid "Primary artist"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:428
-#: wavira-core/src/Admin/MetaBoxes.php:438
+#: wavira-core/src/Admin/MetaBoxes.php:429
+#: wavira-core/src/Admin/MetaBoxes.php:439
 msgid "Public total:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:436
+#: wavira-core/src/Admin/MetaBoxes.php:437
 msgid "Recorded likes:"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:426
+#: wavira-core/src/Admin/MetaBoxes.php:427
 msgid "Recorded views:"
 msgstr ""
 
@@ -672,11 +673,11 @@ msgstr ""
 msgid "Redirect to the file (default) instead of returning its URL as JSON."
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:318
+#: wavira-core/src/Admin/MetaBoxes.php:319
 msgid "Related album"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:407
+#: wavira-core/src/Admin/MetaBoxes.php:408
 msgid "Related artist IDs (comma-separated)"
 msgstr ""
 
@@ -743,7 +744,7 @@ msgstr ""
 msgid "Require a logged-in user to download"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:448
+#: wavira-core/src/Admin/MetaBoxes.php:449
 msgid "Reset recorded counters to zero"
 msgstr ""
 
@@ -788,7 +789,7 @@ msgstr ""
 msgid "Singles"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:482
+#: wavira-core/src/Demo/Installer.php:497
 msgid "Site locale, timezone, first day of the week and date format were set to the Iranian defaults."
 msgstr ""
 
@@ -827,7 +828,7 @@ msgstr ""
 msgid "The demo is a small, complete Persian music site: one artist, an album with four tracks (one of them a remix), a single, and a music video — with lyrics, genres, durations and Jalali dates."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:539
+#: wavira-core/src/Demo/Installer.php:554
 msgid "The news have a page of their own: the front page is static now, and the posts are listed at their own address."
 msgstr ""
 
@@ -840,11 +841,11 @@ msgstr ""
 msgid "There is nothing to play here."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:630
+#: wavira-core/src/Demo/Installer.php:645
 msgid "This is a sample page. Write what your visitors should know about the music, the artists and how to reach you."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:619
+#: wavira-core/src/Demo/Installer.php:634
 msgid "This is your first post. Edit it, replace it with your own news, or delete it — the front page has a section for whatever you publish here."
 msgstr ""
 
@@ -896,7 +897,7 @@ msgstr ""
 msgid "Tracks per archive page"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:599
+#: wavira-core/src/Demo/Installer.php:614
 msgid "Uncategorized"
 msgstr ""
 
@@ -918,15 +919,15 @@ msgstr ""
 msgid "Use as cover image"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:386
+#: wavira-core/src/Admin/MetaBoxes.php:387
 msgid "Verification"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:389
+#: wavira-core/src/Admin/MetaBoxes.php:390
 msgid "Verified artist badge"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:358
+#: wavira-core/src/Admin/MetaBoxes.php:359
 msgid "Video flags"
 msgstr ""
 
@@ -939,7 +940,7 @@ msgstr ""
 msgid "Views, Likes & Admin Counter Offsets"
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:328
+#: wavira-core/src/Admin/MetaBoxes.php:329
 msgid "Vimeo"
 msgstr ""
 
@@ -971,7 +972,7 @@ msgstr ""
 msgid "Wavira settings"
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:618
+#: wavira-core/src/Demo/Installer.php:633
 msgid "Welcome to the music site"
 msgstr ""
 
@@ -983,7 +984,7 @@ msgstr ""
 msgid "When filled, the online player streams from this URL; when empty, it falls back to the 320 or 128 kbps file below."
 msgstr ""
 
-#: wavira-core/src/Demo/Installer.php:492
+#: wavira-core/src/Demo/Installer.php:507
 #. translators: %d: number of sample posts and pages.
 msgid "WordPress’s sample content (%d item(s)) now reads in the site’s language."
 msgstr ""
@@ -1004,7 +1005,7 @@ msgstr ""
 msgid "You are not allowed to import demo content on this site."
 msgstr ""
 
-#: wavira-core/src/Admin/MetaBoxes.php:327
+#: wavira-core/src/Admin/MetaBoxes.php:328
 #: wavira-core/src/Content/ArtistProfile.php:197
 msgid "YouTube"
 msgstr ""

@@ -275,7 +275,7 @@ final class MetaSchema {
 			self::ALBUM_TYPE         => array(
 				'type'     => 'string',
 				'sanitize' => 'enum',
-				'enum'     => array( 'album', 'single', 'ep', 'compilation' ),
+				'enum'     => array( 'album', 'single', 'ep', 'compilation', 'podcast' ),
 				'entities' => $album,
 			),
 			self::CATALOG_NUMBER     => array(

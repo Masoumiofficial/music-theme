@@ -50,9 +50,16 @@ and test PHP file, collects the classes, constants and methods the repository de
 `Class::member()` / `new Class()` references that resolve to nothing. Comments are stripped first,
 so prose never looks like code; fully-qualified references are left to PHPCS.
 
+Class **constants** are checked under `--strict-constants`, which `lint.sh` passes and which fails
+the run: `MetaSchema::DOWNLOADS` (a key the schema calls `DOWNLOAD_COUNT`) is not a PHP warning but
+`Error: Undefined constant`, and it reached a served page — through PHPCS, the syntax jobs, the
+structure gate and a green unit test — because the code path was short-circuited by a second bug in
+the same function. A constant name that any project class declares is accepted, so an inherited
+constant read through the child class is not reported.
+
 ```
-python3 tools/check-class-refs.py
-checked 53 file(s); 0 problem(s)
+python3 tools/check-class-refs.py --strict-constants
+checked 133 file(s); 2 problem(s)
 ```
 
 The gate is a static heuristic, not a PHP parser: it checks names, not signatures, and it cannot

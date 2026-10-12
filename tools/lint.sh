@@ -156,7 +156,7 @@ fi
 # defect that cost a full CI round in 0.5.0.
 say "[REFS] PHP class references"
 if command -v python3 >/dev/null 2>&1; then
-  if python3 tools/check-class-refs.py; then
+  if python3 tools/check-class-refs.py --strict-constants; then
     :
   else
     say "      FAIL  unresolved class references (see above)"

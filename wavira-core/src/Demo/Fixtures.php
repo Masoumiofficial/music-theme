@@ -114,6 +114,43 @@ final class Fixtures {
 						),
 					),
 				),
+				// A podcast series is a release of its own (type `podcast`) whose
+				// episodes are long-form tracks: an episode number, a timestamped
+				// chapter list, and a longer generated tone for the demo player to
+				// actually seek in. Without one, the chapters panel, the playback
+				// speed control and the resume button ship invisible on a fresh
+				// install — the same defect as an empty section (ADR 0024).
+				array(
+					'title'        => 'پادکست واویرا',
+					'type'         => 'podcast',
+					'date'         => '2026-02-10',
+					'release_date' => '2026-02-10',
+					'genre'        => 'گفت‌وگو',
+					'tracks'       => array(
+						array(
+							'title'    => 'قسمت یکم: پشت صحنهٔ ضبط',
+							'date'     => '2026-02-10',
+							'genre'    => 'گفت‌وگو',
+							'kind'     => 'podcast',
+							'duration' => 1320,
+							'episode'  => 1,
+							'longform' => true,
+							'chapters' => "00:00 خوش‌آمدگویی\n00:06 اتاق ضبط و سازها\n00:13 پرسش شنوندگان\n00:18 جمع‌بندی",
+							'lyrics'   => 'یادداشت این قسمت: گفت‌وگویی نمایشی دربارهٔ روند ضبط یک قطعه، از انتخاب ریتم تا میکس نهایی.',
+						),
+						array(
+							'title'    => 'قسمت دوم: گفت‌وگو با تهیه‌کننده',
+							'date'     => '2026-02-24',
+							'genre'    => 'گفت‌وگو',
+							'kind'     => 'podcast',
+							'duration' => 1495,
+							'episode'  => 2,
+							'longform' => true,
+							'chapters' => "00:00 مقدمه\n00:07 میز تدوین\n00:14 پیشنهاد شنیدنی\n00:19 پایان",
+							'lyrics'   => 'یادداشت این قسمت: تهیه‌کننده از تصمیم‌های هنری و ترتیب قطعات آلبوم می‌گوید.',
+						),
+					),
+				),
 			),
 			'video'    => array(
 				'title' => 'اجرای زندهٔ نمایشی',

@@ -384,8 +384,12 @@ final class Stats {
 		$key    = 'top_albums:' . $period . ':' . $limit . ':' . Dates::style() . ':' . get_locale();
 		$cached = Cache::get( $key );
 
-		if ( is_array( $cached ) ) {
-			return $cached;
+		// `Cache::get()` reports a hit as `found`/`value`, so the wrapper — not
+		// the value — is what is an array here. Returning the wrapper is how the
+		// ranking shipped a payload with an `items` map of `found` and `value`
+		// instead of a list of albums (and a count of two).
+		if ( ! empty( $cached['found'] ) && is_array( $cached['value'] ) ) {
+			return $cached['value'];
 		}
 
 		$album_ids = get_posts(
@@ -410,7 +414,7 @@ final class Stats {
 			$buckets[ $alb_id ] = array(
 				'views'        => self::period_metric( $alb_id, 'views', $period ),
 				'likes'        => self::period_metric( $alb_id, 'likes', $period ),
-				'downloads'    => MetaValues::int( $alb_id, MetaSchema::DOWNLOADS ),
+				'downloads'    => MetaValues::int( $alb_id, MetaSchema::DOWNLOAD_COUNT ),
 				'tracks_count' => 0,
 			);
 		}
@@ -433,7 +437,7 @@ final class Stats {
 			if ( $alb_id > 0 && isset( $buckets[ $alb_id ] ) ) {
 				$buckets[ $alb_id ]['views']     += self::period_metric( $track_id, 'views', $period );
 				$buckets[ $alb_id ]['likes']     += self::period_metric( $track_id, 'likes', $period );
-				$buckets[ $alb_id ]['downloads'] += MetaValues::int( $track_id, MetaSchema::DOWNLOADS );
+				$buckets[ $alb_id ]['downloads'] += MetaValues::int( $track_id, MetaSchema::DOWNLOAD_COUNT );
 				++$buckets[ $alb_id ]['tracks_count'];
 			}
 		}
