@@ -270,7 +270,7 @@ class Test_Downloads extends Wavira_Test_Case {
 
 		$album_id = self::factory()->post->create(
 			array(
-				'post_type'   => PostTypes::ALBUM,
+				'post_type'   => 'wavira_album',
 				'post_status' => 'publish',
 				'post_title'  => 'آلبوم برگزیده',
 			)
